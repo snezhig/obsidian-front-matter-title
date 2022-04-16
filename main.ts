@@ -1,5 +1,8 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-
+import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFileExplorer} from 'obsidian';
+import {parseYaml} from "obsidian";
+import MetaTitleParser from "./src/MetaTitleParser";
+import FileTitleResolver from "./src/FileTitleResolver";
+import FileExplorerTitles from "./src/FileExplorerTitles";
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -12,10 +15,66 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	resolver: FileTitleResolver;
+	explorer: FileExplorerTitles;
+
+	register(cb: () => any) {
+		super.register(cb);
+	}
+
+	async initExplorer(): Promise<void>{
+		const leaves = this.app.workspace.getLeavesOfType('file-explorer');
+		if(leaves.length > 1){
+			//TODO: Exception
+		}
+		if(leaves?.[0]?.view === undefined){
+			console.log('undef');
+			return;
+		}
+		const explorer = (leaves?.[0]?.view ) as TFileExplorer;
+
+		this.explorer = new FileExplorerTitles(explorer, this.resolver);
+		await this.explorer.initTitles();
+		this.app.vault.on('modify', (f) => {
+			console.debug('----modyfy----', f);
+			this.explorer.updateTitle(f);
+		});
+	}
 
 	async onload() {
 		await this.loadSettings();
+		this.resolver = new FileTitleResolver(this.app.vault, {
+			ignoreEmpty: true,
+			metaPath: 'title'
+		});
 
+		this.app.workspace.onLayoutReady(() => {
+			this.initExplorer();
+		})
+		this.app.workspace.on('layout-change', () => {
+
+		});
+
+		console.log(this.app.internalPlugins.getPluginById('graph'));
+		console.log(this.app.workspace.getLeavesOfType('graph')[0].view.renderer.nodes);
+		const nodes = this.app.workspace.getLeavesOfType('graph')[0].view.renderer.nodes;
+		console.clear();
+		for(const node of nodes){
+			console.log('---')
+			console.log(node);
+			const title = await this.resolver.resolveTitleByPath(node.id);
+			node.getDisplayText = () => title;
+			node.render();
+			console.log('===')
+		}
+		// const b= this.app.workspace.getLeavesOfType('graph')[0].view.renderer.nodes[0];
+		// console.log(this.app.metadataCache.getCache(b.id));
+		// b.getDisplayText = () => '-----'
+		// b.initGraphics();
+		this.app.workspace.getLeavesOfType('graph')[0].view.renderer.onIframeLoad();
+		return;
+
+		// console.log(a);
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
@@ -79,7 +138,8 @@ export default class MyPlugin extends Plugin {
 	}
 
 	onunload() {
-
+		this.explorer?.restoreTitles();
+		//this.app.vault.off('modify');
 	}
 
 	async loadSettings() {
