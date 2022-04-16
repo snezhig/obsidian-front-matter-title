@@ -1,1 +1,9 @@
-this file has not meta
+---
+simple_key: simple_value
+title: TitleToReplace
+title_d:
+    deep:
+        level: Title on third level
+---
+
+This file has some metas 

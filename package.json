@@ -7,23 +7,24 @@
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
-		"test": "nyc ./node_modules/.bin/_mocha 'test/**/*Test.ts'"
+		"test": "jest"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/jest": "^27.4.1",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "^5.2.0",
 		"@typescript-eslint/parser": "^5.2.0",
 		"builtin-modules": "^3.2.0",
 		"esbuild": "0.13.12",
+		"jest": "^27.5.1",
 		"obsidian": "latest",
+		"ts-jest": "^27.1.4",
 		"ts-node": "^10.7.0",
 		"tslib": "2.3.1",
-		"typescript": "4.4.4"
-	},
-	"dependencies": {
-		"@types/sinon": "^10.0.11"
+		"typescript": "4.4.4",
+		"yaml": "^2.0.1"
 	}
 }

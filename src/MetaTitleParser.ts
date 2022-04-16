@@ -1,8 +1,8 @@
 import {parseYaml, TFile} from "obsidian";
+import EmptyMetaPathError from "./Errors/EmptyMetaPathError";
 
 export default class MetaTitleParser {
 
-	private file: TFile;
 	private readonly REGEXP = /^---\n(?<yaml>.*?)---/s;
 
 	constructor(private file: TFile) {
@@ -13,6 +13,10 @@ export default class MetaTitleParser {
 	}
 
 	public async parse(metaPath: string): Promise<string | null> {
+		if (metaPath === '') {
+			throw new EmptyMetaPathError(`Meta path is empty (got "${metaPath}")`);
+		}
+
 		const keys = metaPath.split('.');
 		const meta = await this.getMetadata();
 		if (meta === null) {
@@ -36,7 +40,7 @@ export default class MetaTitleParser {
 
 	}
 
-	private async getMetadata(): Promise<Object | null> {
+	private async getMetadata(): Promise<{ [key: string]: any } | null> {
 		const content = await this.file.vault.read(this.file);
 		const yaml = content.match(this.REGEXP)?.groups?.yaml;
 		return yaml ? parseYaml(yaml) : null;
