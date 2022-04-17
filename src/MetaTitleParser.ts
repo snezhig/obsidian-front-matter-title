@@ -3,22 +3,17 @@ import EmptyMetaPathError from "./Errors/EmptyMetaPathError";
 
 export default class MetaTitleParser {
 
-	private readonly REGEXP = /^---\n(?<yaml>.*?)---/s;
+	private static readonly REGEXP = /^---\n(?<yaml>.*?)---/s;
 
-	constructor(private file: TFile) {
-	}
 
-	public getFile(): TFile {
-		return this.file;
-	}
-
-	public async parse(metaPath: string): Promise<string | null> {
+	public static async parse(metaPath: string, content: string): Promise<string | null> {
 		if (metaPath === '') {
 			throw new EmptyMetaPathError(`Meta path is empty (got "${metaPath}")`);
 		}
 
 		const keys = metaPath.split('.');
-		const meta = await this.getMetadata();
+		const meta = await this.getMetadata(content);
+
 		if (meta === null) {
 			return null;
 		}
@@ -40,8 +35,7 @@ export default class MetaTitleParser {
 
 	}
 
-	private async getMetadata(): Promise<{ [key: string]: any } | null> {
-		const content = await this.file.vault.read(this.file);
+	private static async getMetadata(content: string): Promise<{ [key: string]: any } | null> {
 		const yaml = content.match(this.REGEXP)?.groups?.yaml;
 		return yaml ? parseYaml(yaml) : null;
 	}

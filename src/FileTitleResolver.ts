@@ -2,7 +2,7 @@ import {TAbstractFile, TFile, Vault} from "obsidian";
 import MetaTitleParser from "./MetaTitleParser";
 
 type Item = {
-	parser: MetaTitleParser,
+	file: TFile,
 	title: string,
 	resolved: boolean
 }
@@ -39,10 +39,11 @@ export default class FileTitleResolver {
 
 	private async resolve(item: Item): Promise<string> {
 		if (!item.resolved) {
-			let title = await item.parser.parse(this.options.metaPath);
+			const content = await item.file.vault.read(item.file);
+			let title = await MetaTitleParser.parse(this.options.metaPath, content);
 
 			if (title === null || (title === '' && this.options.ignoreEmpty)) {
-				title = item.parser.getFile().basename;
+				title = item.file.basename;
 			}
 
 			item.resolved = true;
@@ -56,9 +57,8 @@ export default class FileTitleResolver {
 	private getOrCreate(abstract: TAbstractFile): Item | null {
 		if (abstract instanceof TFile) {
 			if (!this.collection.has(abstract.path)) {
-				const file = new MetaTitleParser(abstract);
 				this.collection.set(abstract.path, {
-					parser: file,
+					file: abstract,
 					title: null,
 					resolved: false
 				});
