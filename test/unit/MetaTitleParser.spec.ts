@@ -6,7 +6,7 @@ import * as fs from "fs";
 
 describe('Parser Test Meta', () => {
 	let parser = MetaTitleParser;
-	let fileName = "HasMeta.md";
+	let fileName = "HasMetaTitle.md";
 	const getContent = () => fs.readFileSync(path.join(__dirname, `../docs/${fileName}`), 'utf8');
 
 	test('Error in case path is empty', async () => {
@@ -19,11 +19,19 @@ describe('Parser Test Meta', () => {
 
 	test('Get title', async () => {
 		await expect(parser.parse('title', getContent())).resolves.toEqual('TitleToReplace');
-		await expect(parser.parse('title_d.deep.level',getContent())).resolves.toEqual('Title on third level');
+	})
+
+	test('Get deep level title', async () => {
+		await expect(parser.parse('title_d.deep.level', getContent())).resolves.toEqual('Title on third level');
 	})
 
 	test('Null with no meta', async () => {
 		fileName = 'HasNoMeta.md';
 		await expect(parser.parse('does.not.matter', getContent())).resolves.toBeNull();
 	});
+
+	test('Null with meta but no title', async () => {
+		fileName = 'HasMetaWithoutTitle.md';
+		await expect(parser.parse('does.not.matter', getContent())).resolves.toBeNull();
+	})
 });

@@ -18,6 +18,7 @@
 			"ES6",
 			"ES7",
 			"ES2017.Object",
+			"ES2019.Object",
 			"ES2018.Regexp"
 		]
 	},

@@ -2,6 +2,8 @@ import {TAbstractFile, TFile, TFileExplorer, TFileExplorerItem} from "obsidian";
 import FileTitleResolver from "./FileTitleResolver";
 
 export default class FileExplorerTitles {
+	private originTitles = new Map<string, string>();
+
 	constructor(
 		private explorer: TFileExplorer,
 		private resolver: FileTitleResolver
@@ -9,31 +11,41 @@ export default class FileExplorerTitles {
 	}
 
 	public async updateTitle(abstract: TAbstractFile): Promise<void> {
-		const file = this.explorer.fileItems[abstract.path];
-		if (file) {
-			await this.setTitle(file as TFileExplorerItem);
+		const item = this.explorer.fileItems[abstract.path];
+		if (item) {
+			await this.setTitle(item);
 		}
 	}
 
 	private async setTitle(item: TFileExplorerItem): Promise<void> {
 
 		const title = await this.resolver.resolveTitle(item.file);
-		console.log(title);
-		if (title !== null) {
+		if (this.canUpdateTitle(title)) {
+			this.keepOrigin(item);
 			item.titleEl.innerText = title;
+		}
+	}
+
+	private canUpdateTitle(title: string): boolean {
+		return title !== null && title !== '';
+	}
+
+	private keepOrigin(item: TFileExplorerItem): void{
+		if(!this.originTitles.has(item.file.path)){
+			this.originTitles.set(item.file.path, item.titleEl.innerText);
 		}
 	}
 
 	public async initTitles(): Promise<void> {
 		for (const item of Object.values(this.explorer.fileItems)) {
-			await this.setTitle(item as TFileExplorerItem);
+			await this.setTitle(item);
 		}
 	}
 
-	public async restoreTitles(): Promise<void> {
+	public restoreTitles(): void {
 		for (const item of Object.values(this.explorer.fileItems)) {
-			if (item.file instanceof TFile) {
-				item.titleEl.innerText = item.file.basename;
+			if (this.originTitles.has(item.file.path)) {
+				item.titleEl.innerText = this.originTitles.get(item.file.path);
 			}
 		}
 	}

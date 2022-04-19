@@ -2,7 +2,6 @@ import FileTitleResolver from "../../src/FileTitleResolver";
 import {TFile, Vault} from "obsidian";
 import MetaTitleParser from "../../src/MetaTitleParser";
 import {jest} from "@jest/globals";
-import {string} from "yaml/dist/schema/common/string";
 
 jest.mock('../../src/MetaTitleParser');
 jest.spyOn<Vault, any>(Vault.prototype, 'read').mockImplementation(() => null);

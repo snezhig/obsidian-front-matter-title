@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import YAML from 'yaml'
 import {EventEmitter} from "events";
+import {TFileExplorerItem} from "obsidian";
 
 export abstract class TAbstractFile {
 	path: string;
@@ -24,7 +25,12 @@ export class Vault extends EventEmitter {
 	trigger(name: string, ...data: any[]): void {
 		this.emit(name, ...data);
 	}
+}
 
+export class TFileExplorer {
+	fileItems: {
+		[K: string]: TFileExplorerItem
+	};
 }
 
 export function parseYaml(yaml: string) {

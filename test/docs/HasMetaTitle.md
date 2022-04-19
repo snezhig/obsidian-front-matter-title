@@ -6,4 +6,4 @@ title_d:
         level: Title on third level
 ---
 
-This file has some metas 
+This file has some titles in meta 
