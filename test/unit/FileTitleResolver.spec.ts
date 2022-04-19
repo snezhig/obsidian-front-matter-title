@@ -1,7 +1,7 @@
 import FileTitleResolver from "../../src/FileTitleResolver";
 import {TFile, Vault} from "obsidian";
 import MetaTitleParser from "../../src/MetaTitleParser";
-import {jest} from "@jest/globals";
+import {expect, jest} from "@jest/globals";
 
 jest.mock('../../src/MetaTitleParser');
 jest.spyOn<Vault, any>(Vault.prototype, 'read').mockImplementation(() => null);
@@ -21,9 +21,9 @@ const tFile = (() => {
 })();
 
 const Options = {
-	ignoreEmpty: false,
 	metaPath: 'title'
 };
+
 let resolver = new FileTitleResolver(vault, Options);
 
 beforeEach(() => {
@@ -34,25 +34,29 @@ beforeEach(() => {
 describe('File Title Resolver Test', () => {
 
 	describe('Test options', () => {
-		beforeEach(() => tFile.path = Math.random().toString())
+		const meta: {[s: string]: string} = {
+			title: 'simple_title',
+		};
 
-		test('Parse called with meta path and null', async () => {
-			await resolver.resolveTitle(tFile);
-			expect(parse).toHaveBeenCalledWith(Options.metaPath, null);
+		beforeEach(() => {
+			tFile.path = Math.random().toString();
+			parse.mockImplementationOnce(async (path: string) => {
+				return meta[path] ?? null;
+			})
 		})
 
-		test('Resolve return basename', async () => {
-			parse.mockImplementationOnce(async () => '');
+		const testTitleIsEqual = (title: string) => expect(title).toEqual(meta[Options.metaPath]);
+
+		test('Parse called with meta path and null and returns title', async () => {
 			const title = await resolver.resolveTitle(tFile);
-			expect(title).not.toBeNull();
-			expect(title).toEqual('');
+			expect(parse).toHaveBeenCalledWith(Options.metaPath, null);
+			testTitleIsEqual(title);
 		})
 
 		test('Resolve return null', async () => {
-			Options.ignoreEmpty = true;
-			parse.mockImplementationOnce(async () => '');
+			Options.metaPath = 'not.exists.path';
 			const title = await resolver.resolveTitle(tFile);
-			expect(title).toEqual(tFile.basename);
+			expect(title).toBeNull();
 		})
 
 		afterAll(() => tFile.path = 'mock_path');

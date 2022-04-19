@@ -7,7 +7,6 @@ type Item = {
 	resolved: boolean
 }
 type Options = {
-	ignoreEmpty: boolean,
 	metaPath: string
 }
 export default class FileTitleResolver {
@@ -42,8 +41,8 @@ export default class FileTitleResolver {
 			const content = await item.file.vault.read(item.file);
 			let title = await MetaTitleParser.parse(this.options.metaPath, content);
 
-			if (title === null || (title === '' && this.options.ignoreEmpty)) {
-				title = item.file.basename;
+			if (title === null || title === '') {
+				title = null;
 			}
 
 			item.resolved = true;
