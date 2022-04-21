@@ -37,9 +37,11 @@ export default class FileExplorerTitles {
 	}
 
 	public async initTitles(): Promise<void> {
+		const promises = [];
 		for (const item of Object.values(this.explorer.fileItems)) {
-			await this.setTitle(item);
+			promises.push(this.setTitle(item));
 		}
+		await Promise.all(promises);
 	}
 
 	public restoreTitles(): void {

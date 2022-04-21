@@ -3,6 +3,8 @@ import {parseYaml} from "obsidian";
 import MetaTitleParser from "./src/MetaTitleParser";
 import FileTitleResolver from "./src/FileTitleResolver";
 import FileExplorerTitles from "./src/FileExplorerTitles";
+import FunctionReplacer from "./src/FunctionReplacer";
+import GraphObserver from "./src/GraphObserver";
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -12,6 +14,7 @@ interface MyPluginSettings {
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
+
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
@@ -42,37 +45,28 @@ export default class MyPlugin extends Plugin {
 	}
 
 	async onload() {
+
+		// const def = app.workspace.trigger;
+		// app.workspace.trigger = (name: string, ...data: any[]) => {
+		// 	console.log(name, data);
+		// 	def.call(app.workspace, [name, ...data]);
+		// }
 		await this.loadSettings();
-		this.resolver = new FileTitleResolver(this.app.vault, {
-			ignoreEmpty: true,
-			metaPath: 'title'
-		});
+		this.resolver = new FileTitleResolver(this.app.vault, {metaPath: 'title'});
 
 		this.app.workspace.onLayoutReady(() => {
-			this.initExplorer();
+			// this.initExplorer();
 		})
-		this.app.workspace.on('layout-change', () => {
 
+		const g = new GraphObserver(this.app.workspace, this.resolver);
+
+		// g.onLayoutChange();
+		this.app.workspace.on('layout-change', () => {
+			console.log('================layout-change================')
+			g.onLayoutChange();
 		});
 
-		console.log(this.app.internalPlugins.getPluginById('graph'));
-		console.log(this.app.workspace.getLeavesOfType('graph')[0].view.renderer.nodes);
-		const nodes = this.app.workspace.getLeavesOfType('graph')[0].view.renderer.nodes;
-		console.clear();
-		for(const node of nodes){
-			console.log('---')
-			console.log(node);
-			const title = await this.resolver.resolveTitleByPath(node.id);
-			node.getDisplayText = () => title;
-			node.render();
-			console.log('===')
-		}
-		// const b= this.app.workspace.getLeavesOfType('graph')[0].view.renderer.nodes[0];
-		// console.log(this.app.metadataCache.getCache(b.id));
-		// b.getDisplayText = () => '-----'
-		// b.initGraphics();
-		this.app.workspace.getLeavesOfType('graph')[0].view.renderer.onIframeLoad();
-		return;
+return;
 
 		// console.log(a);
 		// This creates an icon in the left ribbon.

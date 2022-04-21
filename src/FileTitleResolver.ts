@@ -4,7 +4,8 @@ import MetaTitleParser from "./MetaTitleParser";
 type Item = {
 	file: TFile,
 	title: string,
-	resolved: boolean
+	state: 'resolved' | 'process' | 'none',
+	promise: Promise<string | null> | null
 }
 type Options = {
 	metaPath: string
@@ -20,36 +21,56 @@ export default class FileTitleResolver {
 		this.bind();
 	}
 
-	public async resolveTitle(abstract: TAbstractFile): Promise<string | null> {
-		const item = this.getOrCreate(abstract);
-
-		return item ? this.resolve(item) : null;
+	public isResolved(value: TAbstractFile | string): boolean {
+		const path = value instanceof TAbstractFile ? value.path : value;
+		return this.collection.get(path)?.state === 'resolved';
 	}
 
-	public async resolveTitleByPath(path: string): Promise<string | null> {
+	public getResolved(value: TAbstractFile | string): string | null {
+		const path = value instanceof TAbstractFile ? value.path : value;
+		return this.collection.get(path)?.title ?? null;
+	}
+
+	public async resolveTitle(abstract: TAbstractFile | string): Promise<string | null> {
+		const item = abstract instanceof TAbstractFile
+			? this.getOrCreate(abstract)
+			: this.getOrCreateByPath(abstract);
+		return item ? this.resolve(item) : null;
+
+	}
+
+	private getOrCreateByPath(path: string): Item | null {
 		if (!this.collection.has(path)) {
 			this.getOrCreate(this.vault.getAbstractFileByPath(path));
 		}
-
-		const item = this.collection.get(path);
-		return item ? this.resolve(item) : null;
-
+		return this.collection.get(path);
 	}
 
-	private async resolve(item: Item): Promise<string> {
-		if (!item.resolved) {
-			const content = await item.file.vault.read(item.file);
-			let title = await MetaTitleParser.parse(this.options.metaPath, content);
+	private async resolve(item: Item): Promise<string | null> {
+		switch (item.state) {
+			case 'resolved':
+				return item.title;
+			case "process":
+				return item.promise;
+			case "none": {
+				item.state = 'process';
+				item.promise = new Promise<string>(async (r) => {
+					const content = await item.file.vault.read(item.file);
+					let title = await MetaTitleParser.parse(this.options.metaPath, content);
 
-			if (title === null || title === '') {
-				title = null;
+					if (title === null || title === '') {
+						title = null;
+					}
+
+					item.title = title;
+					item.state = 'resolved';
+					item.promise = null;
+					r(item.title);
+				});
+				return await item.promise;
 			}
-
-			item.resolved = true;
-			item.title = title;
 		}
 
-		return item.title;
 	}
 
 
@@ -59,7 +80,8 @@ export default class FileTitleResolver {
 				this.collection.set(abstract.path, {
 					file: abstract,
 					title: null,
-					resolved: false
+					state: 'none',
+					promise: null
 				});
 			}
 			return this.collection.get(abstract.path);
@@ -72,7 +94,7 @@ export default class FileTitleResolver {
 		this.vault.on('modify', (file) => {
 			const item = this.collection.get(file.path);
 			if (item) {
-				item.resolved = false;
+				item.state = 'none';
 			}
 		});
 		this.vault.on('delete', (f) => {
