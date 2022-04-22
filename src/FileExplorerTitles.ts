@@ -19,7 +19,7 @@ export default class FileExplorerTitles {
 
 	private async setTitle(item: TFileExplorerItem): Promise<void> {
 
-		const title = await this.resolver.resolveTitle(item.file);
+		const title = await this.resolver.resolve(item.file);
 		if (this.canUpdateTitle(title)) {
 			this.keepOrigin(item);
 			item.titleEl.innerText = title;

@@ -31,11 +31,11 @@ export default class FileTitleResolver {
 		return this.collection.get(path)?.title ?? null;
 	}
 
-	public async resolveTitle(abstract: TAbstractFile | string): Promise<string | null> {
+	public async resolve(abstract: TAbstractFile | string): Promise<string | null> {
 		const item = abstract instanceof TAbstractFile
 			? this.getOrCreate(abstract)
 			: this.getOrCreateByPath(abstract);
-		return item ? this.resolve(item) : null;
+		return item ? this.resolveTitle(item) : null;
 
 	}
 
@@ -46,7 +46,7 @@ export default class FileTitleResolver {
 		return this.collection.get(path);
 	}
 
-	private async resolve(item: Item): Promise<string | null> {
+	private async resolveTitle(item: Item): Promise<string | null> {
 		switch (item.state) {
 			case 'resolved':
 				return item.title;

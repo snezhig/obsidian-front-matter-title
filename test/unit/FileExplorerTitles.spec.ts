@@ -24,8 +24,7 @@ describe('File Explorer Titles Test', () => {
 
 	const resolver = Object.create(FileTitleResolver) as FileTitleResolver;
 
-	const resolveTitle = jest.fn().mockImplementation(async (file: TFile) => titles.get(file.path).resolved);
-	resolver.resolveTitle = resolveTitle;
+	resolver.resolve = jest.fn().mockImplementation(async (file: TFile) => titles.get(file.path).resolved);
 
 	const fileExplorer = new TFileExplorer();
 	fileExplorer.fileItems = Object.fromEntries<TFileExplorerItem>(Array.from(titles.keys()).map(k => [k, createItem(k)]));
@@ -42,7 +41,7 @@ describe('File Explorer Titles Test', () => {
 
 	test('Titles have been updated', async () => {
 		await explorer.initTitles();
-		expect(resolveTitle).toBeCalledTimes(titles.size);
+		expect(resolver.resolve).toBeCalledTimes(titles.size);
 		checkTitles('new');
 	});
 

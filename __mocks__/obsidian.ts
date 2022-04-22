@@ -25,6 +25,14 @@ export class Vault extends EventEmitter {
 	trigger(name: string, ...data: any[]): void {
 		this.emit(name, ...data);
 	}
+
+	getAbstractFileByPath(path: string): TFile {
+		const file = new TFile();
+		file.path = path;
+		file.basename = `mock_${path}_basename`
+		file.vault = new Vault();
+		return file;
+	}
 }
 
 export class TFileExplorer {
