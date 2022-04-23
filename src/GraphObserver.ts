@@ -1,26 +1,28 @@
 import FileTitleResolver from "./FileTitleResolver";
-import FunctionReplacer from "./FunctionReplacer";
+import FunctionReplacer from "./Utils/FunctionReplacer";
 import {Workspace, GraphLeaf, GraphNode} from "obsidian";
 import {debounce} from "ts-debounce";
+import Queue from "./Utils/Queue";
 
 
 export default class GraphObserver {
 	private replacement: FunctionReplacer<GraphNode, 'getDisplayText'> = null;
-	private queue = new Set;
 
 	constructor(
 		private workspace: Workspace,
-		private resolver: FileTitleResolver
+		private resolver: FileTitleResolver,
+		private queue = new Queue(this.runQueue, 0)
 	) {
 	}
 
-	private runQueue = debounce(async () => {
+	private async runQueue() {
 
 		for (const id of this.queue) {
-			await this.resolver.resolveTitleByPath(id);
+			await this.resolver.resolve(id);
 		}
 
 		const leaves = this.workspace.getLeavesOfType('graph') as GraphLeaf[];
+
 		for (const leaf of leaves) {
 			const nodes = leaf?.view?.renderer?.nodes ?? [];
 			for (const node of nodes) {
@@ -30,15 +32,9 @@ export default class GraphObserver {
 				}
 			}
 		}
+
 		this.queue.clear();
-	}, 200);
-
-	private async resolveNodeTitle(id: string): Promise<void> {
-		this.queue.add(id);
-		console.log(id);
-		await this.runQueue();
-
-	}
+	};
 
 	//TODO: split to functions
 	public onLayoutChange() {
@@ -64,7 +60,7 @@ export default class GraphObserver {
 
 					return title || self.getVanilla().call(this, ...args);
 				} else {
-					ob.resolveNodeTitle.call(ob, this.id);
+					ob.queue.add(this.id);
 				}
 				return self.getVanilla().call(this, ...args);
 			})
