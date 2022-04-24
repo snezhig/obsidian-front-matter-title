@@ -17,6 +17,7 @@ export default class MetaTitleParser {
 		if (meta === null) {
 			return null;
 		}
+
 		let value = meta;
 		for (const key of keys) {
 			value = value?.[key] ?? null;
@@ -26,18 +27,18 @@ export default class MetaTitleParser {
 			}
 		}
 
-		if (typeof value !== "string") {
-			//TODO throw;
-			return null;
+		switch (typeof value) {
+			case "number":
+				return String(value);
+			case "string":
+				return value;
+			default:
+				throw new TypeError(`value of "${metaPath}" path muse be string, ${typeof value} got`);
 		}
-
-		return value;
-
 	}
 
 	private static async getMetadata(content: string): Promise<{ [key: string]: any } | null> {
 		const yaml = content.match(this.REGEXP)?.groups?.yaml;
 		return yaml ? parseYaml(yaml) : null;
 	}
-
 }

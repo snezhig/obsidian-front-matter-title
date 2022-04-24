@@ -22,6 +22,9 @@ beforeEach(() => {
 	parse.mockClear();
 })
 
+vault.on('modify', resolver.handleModify.bind(resolver));
+vault.on('delete', resolver.handleDelete.bind(resolver));
+
 describe('File Title Resolver Test', () => {
 
 	describe('Test options', () => {
@@ -49,7 +52,6 @@ describe('File Title Resolver Test', () => {
 			expect(title).toBeNull();
 		})
 	})
-
 
 	describe('Title multiple resolving', () => {
 		let title: string = null;
@@ -128,6 +130,5 @@ describe('File Title Resolver Test', () => {
 			expect(resolver.isResolved(path)).toBeTruthy();
 			expect(resolver.getResolved(path)).toEqual(expected);
 		})
-
 	})
 });

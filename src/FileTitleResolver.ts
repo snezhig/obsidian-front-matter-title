@@ -18,7 +18,6 @@ export default class FileTitleResolver {
 		private options: Options
 	) {
 		this.collection = new Map();
-		this.bind();
 	}
 
 	public isResolved(value: TAbstractFile | string): boolean {
@@ -90,16 +89,14 @@ export default class FileTitleResolver {
 		return null;
 	}
 
-	private bind(): void {
-		this.vault.on('modify', (file) => {
-			const item = this.collection.get(file.path);
-			if (item) {
-				item.state = 'none';
-			}
-		});
-		this.vault.on('delete', (f) => {
-			this.collection.delete(f.path);
-		});
+	public handleModify(file: TAbstractFile): void {
+		const item = this.collection.get(file.path);
+		if (item) {
+			item.state = 'none';
+		}
 	}
 
+	public handleDelete(file: TAbstractFile): void {
+		this.collection.delete(file.path);
+	}
 }

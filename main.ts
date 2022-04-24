@@ -1,74 +1,70 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFileExplorer} from 'obsidian';
-import {parseYaml} from "obsidian";
-import MetaTitleParser from "./src/MetaTitleParser";
+import {
+	App,
+	Editor,
+	MarkdownView,
+	Modal,
+	Notice,
+	Plugin,
+	TFileExplorer
+} from 'obsidian';
 import FileTitleResolver from "./src/FileTitleResolver";
 import FileExplorerTitles from "./src/FileExplorerTitles";
-import FunctionReplacer from "./src/FunctionReplacer";
 import GraphObserver from "./src/GraphObserver";
+import {Settings, SettingsTab} from "./src/Settings";
 // Remember to rename these classes and interfaces!
 
-interface MyPluginSettings {
-	mySetting: string;
-}
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
-
-
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class MetaTitle extends Plugin {
+	settings: Settings;
 	resolver: FileTitleResolver;
 	explorer: FileExplorerTitles;
+	graphObserver: GraphObserver;
+
 
 	register(cb: () => any) {
 		super.register(cb);
 	}
 
-	async initExplorer(): Promise<void>{
+	async initExplorer(): Promise<void> {
 		const leaves = this.app.workspace.getLeavesOfType('file-explorer');
-		if(leaves.length > 1){
+		if (leaves.length > 1) {
 			//TODO: Exception
 		}
-		if(leaves?.[0]?.view === undefined){
+		if (leaves?.[0]?.view === undefined) {
 			console.log('undef');
 			return;
 		}
-		const explorer = (leaves?.[0]?.view ) as TFileExplorer;
+		const explorer = (leaves?.[0]?.view) as TFileExplorer;
 
 		this.explorer = new FileExplorerTitles(explorer, this.resolver);
 		await this.explorer.initTitles();
-		this.app.vault.on('modify', (f) => {
-			console.debug('----modyfy----', f);
-			this.explorer.updateTitle(f);
-		});
 	}
+
+
+	bind() {
+		this.registerEvent(this.app.vault.on('modify', file => {
+			console.log(file);
+			this.resolver?.handleModify(file);
+			this.explorer?.updateTitle(file).catch(console.error);
+		}));
+
+		this.registerEvent(this.app.workspace.on('layout-change', () => {
+			this.graphObserver?.handleLayoutChange();
+		}));
+	}
+
 
 	async onload() {
 
-		// const def = app.workspace.trigger;
-		// app.workspace.trigger = (name: string, ...data: any[]) => {
-		// 	console.log(name, data);
-		// 	def.call(app.workspace, [name, ...data]);
-		// }
-		await this.loadSettings();
-		this.resolver = new FileTitleResolver(this.app.vault, {metaPath: 'title'});
-
+		this.settings = new Settings(await this.loadData());
+		this.bind();
+		this.resolver = new FileTitleResolver(this.app.vault, {metaPath: this.settings.get('path')});
+		this.graphObserver = new GraphObserver(this.app.workspace, this.resolver);
 		this.app.workspace.onLayoutReady(() => {
-			// this.initExplorer();
+			this.initExplorer();
 		})
 
-		const g = new GraphObserver(this.app.workspace, this.resolver);
 
-		// g.onLayoutChange();
-		this.app.workspace.on('layout-change', () => {
-			console.log('================layout-change================')
-			g.onLayoutChange();
-		});
-
-return;
-
-		// console.log(a);
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
@@ -119,29 +115,17 @@ return;
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.addSettingTab(new SettingsTab(this.app, this));
 	}
 
 	onunload() {
 		this.explorer?.restoreTitles();
-		//this.app.vault.off('modify');
+		this.graphObserver?.onUnload();
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
+	async saveSettings(): Promise<void>{
+		console.log('changes');
+		return this.saveData(this.settings.getAll());
 	}
 }
 
@@ -161,31 +145,3 @@ class SampleModal extends Modal {
 	}
 }
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					console.log('Secret: ' + value);
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
-}

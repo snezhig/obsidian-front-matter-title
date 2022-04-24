@@ -25,6 +25,16 @@ describe('Parser Test Meta', () => {
 		await expect(parser.parse('title_d.deep.level', getContent())).resolves.toEqual('Title on third level');
 	})
 
+	test('Get numeric title', async() => {
+		const title = await parser.parse('title_number', getContent());
+		expect(title).toEqual('1234567');
+	})
+
+	test('Get error, because value is not a string', async () => {
+		const promise = parser.parse('title_obj', getContent());
+		await expect(promise).rejects.toThrowError(TypeError);
+	})
+
 	test('Null with no meta', async () => {
 		fileName = 'HasNoMeta.md';
 		await expect(parser.parse('does.not.matter', getContent())).resolves.toBeNull();
