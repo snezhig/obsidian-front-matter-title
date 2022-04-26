@@ -6,10 +6,10 @@ type MetaTitleSettings = {
 }
 
 export class Settings {
-	private settings: MetaTitleSettings;
+	private readonly settings: MetaTitleSettings;
 
 	private constructor(
-		private current: MetaTitleSettings
+		current: MetaTitleSettings
 	) {
 		this.settings = Object.assign({}, Settings.getDefault(), current);
 	}

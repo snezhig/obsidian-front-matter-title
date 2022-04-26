@@ -20,18 +20,20 @@ export default class FileExplorerTitles {
 	private async setTitle(item: TFileExplorerItem): Promise<void> {
 
 		const title = await this.resolver.resolve(item.file);
-		if (this.canUpdateTitle(title)) {
+		if (this.isTitleEmpty(title)) {
+			if (this.originTitles.has(item.file.path)) {
+				return this.restore(item);
+			}
+		}else if (item.titleEl.innerText !== title) {
 			this.keepOrigin(item);
 			item.titleEl.innerText = title;
 		}
 	}
 
-	private canUpdateTitle(title: string): boolean {
-		return title !== null && title !== '';
-	}
+	private isTitleEmpty = (title: string): boolean => title === null || title === '';
 
-	private keepOrigin(item: TFileExplorerItem): void{
-		if(!this.originTitles.has(item.file.path)){
+	private keepOrigin(item: TFileExplorerItem): void {
+		if (!this.originTitles.has(item.file.path)) {
 			this.originTitles.set(item.file.path, item.titleEl.innerText);
 		}
 	}
@@ -45,10 +47,12 @@ export default class FileExplorerTitles {
 	}
 
 	public restoreTitles(): void {
-		for (const item of Object.values(this.explorer.fileItems)) {
-			if (this.originTitles.has(item.file.path)) {
-				item.titleEl.innerText = this.originTitles.get(item.file.path);
-			}
+		Object.values(this.explorer.fileItems).map(this.restore.bind(this));
+	}
+
+	private restore(item: TFileExplorerItem): void {
+		if (this.originTitles.has(item.file.path)) {
+			item.titleEl.innerText = this.originTitles.get(item.file.path);
 		}
 	}
 }

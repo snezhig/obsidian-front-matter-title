@@ -5,6 +5,8 @@ import {expect} from "@jest/globals";
 import {Arr} from "tern";
 
 
+//TODO: need to refactor it, make more clearly, readable and independent
+
 describe('File Explorer Titles Test', () => {
 	const titles = new Map<string, { origin: string, resolved: string, new: string }>()
 		.set('null', {origin: 'just_title_null', resolved: null, new: 'just_title_null'})
@@ -24,7 +26,8 @@ describe('File Explorer Titles Test', () => {
 
 	const resolver = Object.create(FileTitleResolver) as FileTitleResolver;
 
-	resolver.resolve = jest.fn().mockImplementation(async (file: TFile) => titles.get(file.path).resolved);
+	const resolve = jest.fn().mockImplementation(async (file: TFile) => titles.get(file.path).resolved);
+	resolver.resolve = resolve;
 
 	const fileExplorer = new TFileExplorer();
 	fileExplorer.fileItems = Object.fromEntries<TFileExplorerItem>(Array.from(titles.keys()).map(k => [k, createItem(k)]));
@@ -77,5 +80,28 @@ describe('File Explorer Titles Test', () => {
 		})
 	})
 
-
+	// describe('Resolving title with meta path changes', () => {
+	// 	const file = new TFile();
+	// 	file.path = 'init_path';
+	// 	const titleEl = Object.create(HTMLDivElement);
+	// 	titleEl.innerText = file.path;
+	//
+	// 	fileExplorer.fileItems = Object.fromEntries([[file.path, {file, titleEl}]]);
+	//
+	// 	const meta: { [k: string]: string } = {
+	// 		title: 'title_from_meta',
+	// 		another: 'another_from_meta'
+	// 	}
+	// 	let path = 'title';
+	//
+	// 	beforeEach(() => {
+	// 		resolve.mockImplementationOnce(async (): Promise<string | null> => meta?.[path] ?? null)
+	// 		console.log((new Date()).toString())
+	// 	})
+	//
+	// 	test('Title equal meta', async () => {
+	// 		await explorer.initTitles();
+	// 		expect(titleEl.innerText).toEqual(meta[path]);
+	// 	});
+	// })
 })

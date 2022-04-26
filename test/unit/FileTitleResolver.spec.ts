@@ -47,7 +47,7 @@ describe('File Title Resolver Test', () => {
 		})
 
 		test('Resolve return null', async () => {
-			Options.metaPath = 'not.exists.path';
+			resolver.setMetaPath('not.exists.path');
 			const title = await resolver.resolve(Math.random().toString());
 			expect(title).toBeNull();
 		})
@@ -56,11 +56,11 @@ describe('File Title Resolver Test', () => {
 	describe('Title multiple resolving', () => {
 		let title: string = null;
 		const path = 'mock_path';
-		const testResolved = async () => {
+		const testTitleResolved = async () => {
 			expect(await resolver.resolve(path)).toEqual(title);
 			expect(parse).not.toHaveBeenCalled();
 		};
-		const testAfterEvent = async () => {
+		const testThatPasseCalledAndTitleEqual = async () => {
 			const newTitle = await resolver.resolve(path);
 			expect(newTitle).not.toEqual(title);
 			expect(parse).toHaveBeenCalled();
@@ -72,21 +72,22 @@ describe('File Title Resolver Test', () => {
 			expect(parse).toHaveBeenCalled();
 		});
 
-		test('Get title without parse', testResolved)
+		test('Get title without parse', testTitleResolved)
 
 		test('Parse after edit', async () => {
 			vault.trigger('modify', vault.getAbstractFileByPath(path));
-			await testAfterEvent();
+			await testThatPasseCalledAndTitleEqual();
 		})
 
-		test('Get title without parse after edit', testResolved)
+		test('Get title without parse after edit', testTitleResolved)
 
 		test('Parse after delete', async () => {
 			vault.trigger('delete', vault.getAbstractFileByPath(path));
-			await testAfterEvent()
+			await testThatPasseCalledAndTitleEqual()
 		});
 
-		test('Get title without parse after edit', testResolved)
+		test('Get title without parse after edit', testTitleResolved)
+
 	});
 
 	describe('Test concurrent resolving', () => {
