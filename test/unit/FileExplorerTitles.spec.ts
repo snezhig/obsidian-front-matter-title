@@ -7,6 +7,38 @@ import {Arr} from "tern";
 
 //TODO: need to refactor it, make more clearly, readable and independent
 
+describe('new', () => {
+	test('Inner text won`t be replaced because title is null', () => {
+
+	});
+
+	test('Inner text won`t be replaced because title is empty', () => {
+
+	})
+
+	test('Inner text will be replaced with new title', () => {
+
+	})
+
+	test('Inner text is replaces and will be restored', () => {
+
+	})
+
+	describe('Replace text some times is a row', () => {
+		test('Inner text will be replaced', () => {
+
+		})
+
+		test('Inner text is equal to previous and will be replaced again', () => {
+
+		})
+
+		test('Inner text is equal to previous, but will be replaced with origin', () => {
+
+		})
+	})
+})
+
 describe('File Explorer Titles Test', () => {
 	const titles = new Map<string, { origin: string, resolved: string, new: string }>()
 		.set('null', {origin: 'just_title_null', resolved: null, new: 'just_title_null'})
