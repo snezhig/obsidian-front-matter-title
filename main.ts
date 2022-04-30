@@ -56,7 +56,10 @@ export default class MetaTitle extends Plugin {
 
 		this.settings = new Settings(await this.loadData());
 		this.bind();
-		this.resolver = new FileTitleResolver(this.app.vault, {metaPath: this.settings.get('path')});
+		this.resolver = new FileTitleResolver(this.app.vault, {
+			metaPath: this.settings.get('path'),
+			excluded: this.settings.get('excluded_folders')
+		});
 		this.graph = new GraphTitles(this.app.workspace, this.resolver);
 		this.app.workspace.onLayoutReady(() => {
 			this.initExplorer();

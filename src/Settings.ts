@@ -67,7 +67,7 @@ export class SettingsTab extends PluginSettingTab {
 				}));
 		new Setting(containerEl)
 			.setName('Exclude folders')
-			.setDesc('Set excluded folders. Can use regexp')
+			.setDesc('Set excluded folders and files in this folders will not be parsed')
 			.addTextArea(e => e
 				.setValue(this.plugin.settings.get('excluded_folders').join('\n'))
 				.onChange(async v => {

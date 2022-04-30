@@ -1,6 +1,5 @@
 import {TAbstractFile, TFile, Vault} from "obsidian";
 import MetaTitleParser from "./MetaTitleParser";
-import {Obj} from "tern";
 
 type Item = {
 	file: TFile,
@@ -45,8 +44,6 @@ export default class FileTitleResolver {
 		return hasReset;
 	}
 
-
-
 	public setMetaPath(v: string): boolean {
 		if (this.options.metaPath === v) {
 			return false;
@@ -61,6 +58,10 @@ export default class FileTitleResolver {
 		return true;
 	}
 
+	public canBeResolved(path: string): boolean {
+		return !this.isExcluded(path);
+	}
+
 	public isResolved(value: TAbstractFile | string): boolean {
 		const path = value instanceof TAbstractFile ? value.path : value;
 		return this.collection.get(path)?.state === 'resolved';
@@ -72,18 +73,22 @@ export default class FileTitleResolver {
 	}
 
 	public async resolve(abstract: TAbstractFile | string): Promise<string | null> {
-		const item = abstract instanceof TAbstractFile
-			? this.getOrCreate(abstract)
-			: this.getOrCreateByPath(abstract);
+		const file = this.getFileByAbstract(abstract);
+		const item = file ? this.getOrCreate(file) : null;
+
 		return item ? this.resolveTitle(item) : null;
 
 	}
 
-	private getOrCreateByPath(path: string): Item | null {
-		if (!this.collection.has(path)) {
-			this.getOrCreate(this.vault.getAbstractFileByPath(path));
+	public handleModify(file: TAbstractFile): void {
+		const item = this.collection.get(file.path);
+		if (item) {
+			item.state = 'none';
 		}
-		return this.collection.get(path);
+	}
+
+	public handleDelete(file: TAbstractFile): void {
+		this.collection.delete(file.path);
 	}
 
 	private async resolveTitle(item: Item): Promise<string | null> {
@@ -123,36 +128,36 @@ export default class FileTitleResolver {
 		return false;
 	}
 
-	private isAbstractCompatible(abstract: TAbstractFile): boolean {
-		return abstract instanceof TFile
-			&& abstract.extension == 'md'
-			&& !this.isExcluded(abstract.path);
+	private isFileCompatible(abstract: TFile): boolean {
+		return abstract.extension == 'md' && !this.isExcluded(abstract.path);
 	}
 
-	private getOrCreate(abstract: TAbstractFile): Item | null {
-		if (this.isAbstractCompatible(abstract)) {
-			if (!this.collection.has(abstract.path)) {
-				this.collection.set(abstract.path, {
-					file: abstract as TFile,
+	private getFileByAbstract(abstract: TAbstractFile | string | null): TFile | null {
+		if (abstract instanceof TFile) {
+			return abstract;
+		} else if (typeof abstract === 'string') {
+			if (this.collection.has(abstract)) {
+				return this.collection.get(abstract).file;
+			} else {
+				return this.getFileByAbstract(this.vault.getAbstractFileByPath(abstract));
+			}
+		}
+		return null;
+	}
+
+	private getOrCreate(file: TFile): Item | null {
+		if (this.isFileCompatible(file)) {
+			if (!this.collection.has(file.path)) {
+				this.collection.set(file.path, {
+					file: file,
 					title: null,
 					state: 'none',
 					promise: null
 				});
 			}
-			return this.collection.get(abstract.path);
+			return this.collection.get(file.path);
 		}
 
 		return null;
-	}
-
-	public handleModify(file: TAbstractFile): void {
-		const item = this.collection.get(file.path);
-		if (item) {
-			item.state = 'none';
-		}
-	}
-
-	public handleDelete(file: TAbstractFile): void {
-		this.collection.delete(file.path);
 	}
 }

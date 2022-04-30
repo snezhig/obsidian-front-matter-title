@@ -13,6 +13,7 @@ const Options = {
 	metaPath: 'title',
 	excluded: [] as string[]
 };
+
 const vault = new Vault();
 let resolver = new FileTitleResolver(vault, Options);
 

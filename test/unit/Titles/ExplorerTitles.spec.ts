@@ -17,7 +17,7 @@ const createItem = (text: string): TFileExplorerItem => {
 	return {file, titleEl}
 }
 
-const resolver = new FileTitleResolver(new Vault(), {metaPath: 'title'});
+const resolver = new FileTitleResolver(new Vault(), {metaPath: 'title', excluded: []});
 
 resolver.resolve = jest.fn().mockImplementation(async () => titles.resolved);
 

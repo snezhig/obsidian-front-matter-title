@@ -47,7 +47,6 @@ export default class ExplorerTitles {
 	}
 
 	public restoreTitles(): void {
-		console.log(this);
 		Object.values(this.explorer.fileItems).map(e => this.restore(e));
 	}
 
