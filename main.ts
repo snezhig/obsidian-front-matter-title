@@ -1,15 +1,12 @@
 import {
-	App,
 	Editor,
 	MarkdownView,
-	Modal,
-	Notice,
 	Plugin,
 	TFileExplorer
 } from 'obsidian';
 import FileTitleResolver from "./src/FileTitleResolver";
-import FileExplorerTitles from "./src/FileExplorerTitles";
-import GraphObserver from "./src/GraphObserver";
+import ExplorerTitles from "./src/Titles/ExplorerTitles";
+import GraphTitles from "./src/Titles/GraphTitles";
 import {Settings, SettingsTab} from "./src/Settings";
 import {debounce} from "ts-debounce";
 // Remember to rename these classes and interfaces!
@@ -18,8 +15,8 @@ import {debounce} from "ts-debounce";
 export default class MetaTitle extends Plugin {
 	settings: Settings;
 	resolver: FileTitleResolver;
-	explorer: FileExplorerTitles;
-	graphObserver: GraphObserver;
+	explorer: ExplorerTitles;
+	graph: GraphTitles;
 
 
 	register(cb: () => any) {
@@ -29,28 +26,28 @@ export default class MetaTitle extends Plugin {
 	async initExplorer(): Promise<void> {
 		const leaves = this.app.workspace.getLeavesOfType('file-explorer');
 		if (leaves.length > 1) {
-			//TODO: Exception
+			console.log('there is more then one explorer')
 		}
 		if (leaves?.[0]?.view === undefined) {
-			console.log('undef');
+			console.log('explorer is undefined');
 			return;
 		}
 		const explorer = (leaves?.[0]?.view) as TFileExplorer;
 
-		this.explorer = new FileExplorerTitles(explorer, this.resolver);
+		this.explorer = new ExplorerTitles(explorer, this.resolver);
 		await this.explorer.initTitles();
 	}
 
 
 	bind() {
 		this.registerEvent(this.app.vault.on('modify', file => {
-			console.log(file);
 			this.resolver?.handleModify(file);
 			this.explorer?.updateTitle(file).catch(console.error);
+			this.graph.forceTitleUpdate(file);
 		}));
 
 		this.registerEvent(this.app.workspace.on('layout-change', () => {
-			this.graphObserver?.handleLayoutChange();
+			this.graph?.handleLayoutChange();
 		}));
 	}
 
@@ -60,7 +57,7 @@ export default class MetaTitle extends Plugin {
 		this.settings = new Settings(await this.loadData());
 		this.bind();
 		this.resolver = new FileTitleResolver(this.app.vault, {metaPath: this.settings.get('path')});
-		this.graphObserver = new GraphObserver(this.app.workspace, this.resolver);
+		this.graph = new GraphTitles(this.app.workspace, this.resolver);
 		this.app.workspace.onLayoutReady(() => {
 			this.initExplorer();
 		})
@@ -81,7 +78,7 @@ export default class MetaTitle extends Plugin {
 
 	onunload() {
 		this.explorer?.restoreTitles();
-		this.graphObserver?.onUnload();
+		this.graph?.onUnload();
 	}
 
 	saveSettings = debounce(
@@ -89,6 +86,7 @@ export default class MetaTitle extends Plugin {
 			await this.saveData(this.settings.getAll());
 			this.resolver.setMetaPath(this.settings.get('path'));
 			await this.explorer.initTitles();
+			this.graph.forceTitleUpdate();
 		},
 		1000
 	);

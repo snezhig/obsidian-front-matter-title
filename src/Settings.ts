@@ -3,6 +3,7 @@ import MetaTitle from "../main";
 
 type MetaTitleSettings = {
 	path: string,
+	excluded_folders: string[]
 }
 
 export class Settings {
@@ -16,7 +17,8 @@ export class Settings {
 
 	private static getDefault(): MetaTitleSettings {
 		return {
-			path: 'title'
+			path: 'title',
+			excluded_folders: []
 		};
 	}
 
@@ -43,7 +45,6 @@ export class SettingsTab extends PluginSettingTab {
 	}
 
 	hide(): any {
-		console.log('hide');
 		return super.hide();
 	}
 
@@ -64,5 +65,15 @@ export class SettingsTab extends PluginSettingTab {
 					this.plugin.settings.set('path', value);
 					await this.plugin.saveSettings();
 				}));
+		new Setting(containerEl)
+			.setName('Exclude folders')
+			.setDesc('Set excluded folders. Can use regexp')
+			.addTextArea(e => e
+				.setValue(this.plugin.settings.get('excluded_folders').join('\n'))
+				.onChange(async v => {
+					this.plugin.settings.set('excluded_folders', v.split('\n').filter(e => e))
+					await  this.plugin.saveSettings();
+				})
+			)
 	}
 }

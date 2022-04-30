@@ -1,28 +1,30 @@
-import FileTitleResolver from "./FileTitleResolver";
-import FunctionReplacer from "./Utils/FunctionReplacer";
-import {Workspace, GraphLeaf, GraphNode} from "obsidian";
-import Queue from "./Utils/Queue";
+import FileTitleResolver from "../FileTitleResolver";
+import FunctionReplacer from "../Utils/FunctionReplacer";
+import {Workspace, GraphLeaf, GraphNode, TAbstractFile} from "obsidian";
+import Queue from "../Utils/Queue";
 
 
-export default class GraphObserver {
+export default class GraphTitles {
 	private replacement: FunctionReplacer<GraphNode, 'getDisplayText'> = null;
 
 	constructor(
 		private workspace: Workspace,
 		private resolver: FileTitleResolver,
-		private queue = new Queue<string>(this.runQueue, 0)
+		private queue = new Queue<string>(this.runQueue.bind(this), 200)
 	) {
+	}
+
+	private getLeaves(): GraphLeaf[] {
+		return this.workspace.getLeavesOfType('graph') as GraphLeaf[];
 	}
 
 	private async runQueue(items: Set<string>) {
 
-		for (const id of this.queue) {
+		for (const id of items) {
 			await this.resolver.resolve(id);
 		}
 
-		const leaves = this.workspace.getLeavesOfType('graph') as GraphLeaf[];
-
-		for (const leaf of leaves) {
+		for (const leaf of this.getLeaves()) {
 			const nodes = leaf?.view?.renderer?.nodes ?? [];
 			for (const node of nodes) {
 				if (items.has(node.id)) {
@@ -49,7 +51,6 @@ export default class GraphObserver {
 		this.replacement.replace(function (self, args) {
 			if (ob.resolver.isResolved(this.id)) {
 				const title = ob.resolver.getResolved(this.id);
-
 				return title || self.getVanilla().call(this, ...args);
 			} else {
 				ob.queue.add(this.id);
@@ -59,7 +60,7 @@ export default class GraphObserver {
 	}
 
 	public handleLayoutChange() {
-		if (this.replacement?.isReplaced()) {
+		if (this.replacement?.isReplaced() === false) {
 			return;
 		}
 
@@ -67,8 +68,20 @@ export default class GraphObserver {
 			this.createReplacement();
 		}
 
-		if (this.replacement) {
+		if (this.replacement?.isReplaced() === false) {
 			this.replace();
+		}
+	}
+
+	public forceTitleUpdate(file: TAbstractFile = null): void {
+		for (const leaf of this.getLeaves()) {
+			for (const node of leaf.view?.renderer?.nodes ?? []) {
+				if (file && file.path === node.id) {
+					this.queue.add(node.id);
+					break;
+				}
+				this.queue.add(node.id);
+			}
 		}
 	}
 

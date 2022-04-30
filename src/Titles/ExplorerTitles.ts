@@ -1,7 +1,7 @@
 import {TAbstractFile, TFile, TFileExplorer, TFileExplorerItem} from "obsidian";
-import FileTitleResolver from "./FileTitleResolver";
+import FileTitleResolver from "../FileTitleResolver";
 
-export default class FileExplorerTitles {
+export default class ExplorerTitles {
 	private originTitles = new Map<string, string>();
 
 	constructor(
@@ -47,7 +47,8 @@ export default class FileExplorerTitles {
 	}
 
 	public restoreTitles(): void {
-		Object.values(this.explorer.fileItems).map(this.restore.bind(this));
+		console.log(this);
+		Object.values(this.explorer.fileItems).map(e => this.restore(e));
 	}
 
 	private restore(item: TFileExplorerItem): void {

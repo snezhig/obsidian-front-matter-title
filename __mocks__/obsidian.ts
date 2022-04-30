@@ -14,7 +14,7 @@ export class TFolder extends TAbstractFile {
 }
 
 export class TFile extends TAbstractFile {
-
+	extension: string
 }
 
 export class Vault extends EventEmitter {
@@ -30,6 +30,7 @@ export class Vault extends EventEmitter {
 		const file = new TFile();
 		file.path = path;
 		file.basename = `mock_${path}_basename`
+		file.extension = 'md'
 		file.vault = new Vault();
 		return file;
 	}

@@ -4,7 +4,7 @@ type callback<Item> = (items: Set<Item>) => void;
 
 export default class Queue<Item> {
 	private readonly items: Set<Item>;
-	private cb: () => void;
+	private readonly cb: () => void;
 
 	constructor(
 		cb: callback<Item>,
@@ -16,5 +16,6 @@ export default class Queue<Item> {
 
 	public add(item: Item): void {
 		this.items.add(item);
+		this.cb();
 	}
 }

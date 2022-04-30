@@ -6,13 +6,12 @@ import {expect, jest} from "@jest/globals";
 jest.mock('../../src/MetaTitleParser');
 const read = jest.spyOn<Vault, any>(Vault.prototype, 'read').mockImplementation(() => null);
 //@ts-ignore
-const parse = jest
-	.spyOn(MetaTitleParser, "parse")
-	.mockImplementation(async () => (Math.random() * Math.random()).toString());
+const parse = jest.spyOn(MetaTitleParser, "parse");
 
 
 const Options = {
-	metaPath: 'title'
+	metaPath: 'title',
+	excluded: [] as string[]
 };
 const vault = new Vault();
 let resolver = new FileTitleResolver(vault, Options);
@@ -22,40 +21,79 @@ beforeEach(() => {
 	parse.mockClear();
 })
 
-vault.on('modify', resolver.handleModify.bind(resolver));
-vault.on('delete', resolver.handleDelete.bind(resolver));
 
 describe('File Title Resolver Test', () => {
 
 	describe('Test options', () => {
-		const meta: { [s: string]: string } = {
-			title: 'simple_title',
-		};
+		describe('Test option [path]', () => {
+			const meta: { [s: string]: string } = {
+				title: 'simple_title',
+			};
 
-		beforeEach(() => {
-			parse.mockImplementationOnce(async (path: string) => {
-				return meta[path] ?? null;
+			beforeAll(() => {
+				parse.mockImplementation(async (path: string) => {
+					return meta[path] ?? null;
+				})
 			})
-		})
 
-		const testTitleIsEqual = (title: string) => expect(title).toEqual(meta[Options.metaPath]);
+			const testTitleIsEqual = (title: string) => expect(title).toEqual(meta[Options.metaPath]);
 
-		test('Parse called with meta path and null and returns title', async () => {
-			const title = await resolver.resolve(Math.random().toString());
-			expect(parse).toHaveBeenCalledWith(Options.metaPath, null);
-			testTitleIsEqual(title);
-		})
+			test('Parse called with meta path and null and returns title', async () => {
+				const title = await resolver.resolve(Math.random().toString());
+				expect(parse).toHaveBeenCalledWith(Options.metaPath, null);
+				testTitleIsEqual(title);
+			})
 
-		test('Resolve return null', async () => {
-			resolver.setMetaPath('not.exists.path');
-			const title = await resolver.resolve(Math.random().toString());
-			expect(title).toBeNull();
+			test('Resolve return null', async () => {
+				resolver.setMetaPath('not.exists.path');
+				const title = await resolver.resolve(Math.random().toString());
+				expect(title).toBeNull();
+			})
+		});
+
+		describe('Test option [excluded]', () => {
+			const title = 'title_test_excluded';
+			const path = 'path/to/stub.md';
+			beforeAll(() => {
+				parse.mockImplementation(async () => title);
+			})
+			test('Title will be resolved', async () => {
+				await expect(resolver.resolve(path)).resolves.toEqual(title);
+			})
+
+			test('Title is resolved', () => {
+				expect(resolver.isResolved(path)).toBeTruthy();
+			})
+
+			test('Title is resolved after excluded option update', async () => {
+				resolver.setExcluded(['doc']);
+				expect(resolver.isResolved(path)).toBeTruthy();
+			})
+
+			test('Title is not resolved because file is on excluded path', () => {
+				resolver.setExcluded(['path']);
+				expect(resolver.isResolved(path)).toBeFalsy();
+			})
+
+			test('Title won`t be resolved', async () => {
+				await expect(resolver.resolve(path)).resolves.toBeNull();
+				expect(parse).not.toHaveBeenCalled();
+			})
+			test('Title will be resolved because file is not ignored already', async () => {
+				resolver.setExcluded(['path/to/not']);
+				await expect(resolver.resolve(path)).resolves.toEqual(title);
+				expect(parse).toHaveBeenCalled();
+			})
 		})
 	})
 
 	describe('Title multiple resolving', () => {
+		beforeEach(() => {
+			parse.mockImplementation(async () => (Math.random() * Math.random()).toString());
+		})
 		let title: string = null;
 		const path = 'mock_path';
+
 		const testTitleResolved = async () => {
 			expect(await resolver.resolve(path)).toEqual(title);
 			expect(parse).not.toHaveBeenCalled();
@@ -75,14 +113,14 @@ describe('File Title Resolver Test', () => {
 		test('Get title without parse', testTitleResolved)
 
 		test('Parse after edit', async () => {
-			vault.trigger('modify', vault.getAbstractFileByPath(path));
+			resolver.handleModify(vault.getAbstractFileByPath(path));
 			await testThatPasseCalledAndTitleEqual();
 		})
 
 		test('Get title without parse after edit', testTitleResolved)
 
 		test('Parse after delete', async () => {
-			vault.trigger('delete', vault.getAbstractFileByPath(path));
+			resolver.handleDelete(vault.getAbstractFileByPath(path));
 			await testThatPasseCalledAndTitleEqual()
 		});
 
@@ -95,8 +133,8 @@ describe('File Title Resolver Test', () => {
 		const path = 'concurrent';
 		const expected = 'resolved_title';
 
-		beforeEach(() => {
-			parse.mockImplementationOnce(async () => new Promise(r => {
+		beforeAll(() => {
+			parse.mockImplementation(async () => new Promise(r => {
 				const timer = setInterval(() => {
 					if (resolve) {
 						r(resolve());
@@ -104,6 +142,9 @@ describe('File Title Resolver Test', () => {
 					}
 				}, 1)
 			}));
+		})
+
+		beforeEach(() => {
 			read.mockClear();
 		})
 

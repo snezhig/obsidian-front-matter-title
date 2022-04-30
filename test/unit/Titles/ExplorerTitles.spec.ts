@@ -1,5 +1,5 @@
-import FileExplorerTitles from "../../src/FileExplorerTitles";
-import FileTitleResolver from "../../src/FileTitleResolver";
+import ExplorerTitles from "../../../src/Titles/ExplorerTitles";
+import FileTitleResolver from "../../../src/FileTitleResolver";
 import {TFile, TFileExplorer, TFileExplorerItem, Vault} from "obsidian";
 import {expect} from "@jest/globals";
 
@@ -24,10 +24,10 @@ resolver.resolve = jest.fn().mockImplementation(async () => titles.resolved);
 const fileExplorer = new TFileExplorer();
 fileExplorer.fileItems = {};
 
-const explorer = new FileExplorerTitles(fileExplorer, resolver);
+const explorer = new ExplorerTitles(fileExplorer, resolver);
 
 
-describe('new', () => {
+describe('Explorer Titles Test', () => {
 
 	describe('Init and restore', () => {
 		let item: TFileExplorerItem = null;
