@@ -1,5 +1,5 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
-import MetaTitle from "../main";
+import MetaTitlePlugin from "../main";
 
 type MetaTitleSettings = {
 	path: string,
@@ -39,7 +39,7 @@ export class SettingsTab extends PluginSettingTab {
 
 	constructor(
 		app: App,
-		public plugin: MetaTitle
+		public plugin: MetaTitlePlugin
 	) {
 		super(app, plugin);
 	}
@@ -72,7 +72,7 @@ export class SettingsTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.get('excluded_folders').join('\n'))
 				.onChange(async v => {
 					this.plugin.settings.set('excluded_folders', v.split('\n').filter(e => e))
-					await  this.plugin.saveSettings();
+					await this.plugin.saveSettings();
 				})
 			)
 	}

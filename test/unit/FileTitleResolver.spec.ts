@@ -17,6 +17,8 @@ const Options = {
 const vault = new Vault();
 let resolver = new FileTitleResolver(vault, Options);
 
+const onUnresolvedHandler = jest.fn();
+resolver.on('unresolved', onUnresolvedHandler);
 beforeEach(() => {
 	jest.clearAllMocks();
 	parse.mockClear();
@@ -68,11 +70,13 @@ describe('File Title Resolver Test', () => {
 
 			test('Title is resolved after excluded option update', async () => {
 				resolver.setExcluded(['doc']);
+				expect(onUnresolvedHandler).not.toHaveBeenCalled();
 				expect(resolver.isResolved(path)).toBeTruthy();
 			})
 
 			test('Title is not resolved because file is on excluded path', () => {
 				resolver.setExcluded(['path']);
+				expect(onUnresolvedHandler).toHaveBeenCalled();
 				expect(resolver.isResolved(path)).toBeFalsy();
 			})
 

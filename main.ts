@@ -1,29 +1,55 @@
-import {
-	Editor,
-	MarkdownView,
-	Plugin,
-	TFileExplorer
-} from 'obsidian';
+import {Plugin, TFileExplorer} from 'obsidian';
 import FileTitleResolver from "./src/FileTitleResolver";
 import ExplorerTitles from "./src/Titles/ExplorerTitles";
 import GraphTitles from "./src/Titles/GraphTitles";
 import {Settings, SettingsTab} from "./src/Settings";
 import {debounce} from "ts-debounce";
-// Remember to rename these classes and interfaces!
 
-
-export default class MetaTitle extends Plugin {
+export default class MetaTitlePlugin extends Plugin {
 	settings: Settings;
 	resolver: FileTitleResolver;
 	explorer: ExplorerTitles;
 	graph: GraphTitles;
 
+	public saveSettings = debounce(
+		async () => {
+			await this.saveData(this.settings.getAll());
+			this.resolver.setMetaPath(this.settings.get('path'));
+			this.resolver.setExcluded(this.settings.get('excluded_folders'));
+		},
+		1000
+	);
 
-	register(cb: () => any) {
+	public register(cb: () => any) {
 		super.register(cb);
 	}
 
-	async initExplorer(): Promise<void> {
+	public async onload() {
+
+		this.settings = new Settings(await this.loadData());
+
+		this.bind();
+
+		this.resolver = new FileTitleResolver(this.app.vault, {
+			metaPath: this.settings.get('path'),
+			excluded: this.settings.get('excluded_folders')
+		});
+		this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
+
+		this.graph = new GraphTitles(this.app.workspace, this.resolver);
+
+		this.app.workspace.onLayoutReady(this.initExplorer.bind(this))
+
+		this.addSettingTab(new SettingsTab(this.app, this));
+	}
+
+	public onunload() {
+		this.explorer?.restoreTitles();
+		this.graph?.onUnload();
+		this.resolver.removeAllListeners('unresolved');
+	}
+
+	private async initExplorer(): Promise<void> {
 		const leaves = this.app.workspace.getLeavesOfType('file-explorer');
 		if (leaves.length > 1) {
 			console.log('there is more then one explorer')
@@ -38,8 +64,7 @@ export default class MetaTitle extends Plugin {
 		await this.explorer.initTitles();
 	}
 
-
-	bind() {
+	private bind() {
 		this.registerEvent(this.app.vault.on('modify', file => {
 			this.resolver?.handleModify(file);
 			this.explorer?.updateTitle(file).catch(console.error);
@@ -51,46 +76,8 @@ export default class MetaTitle extends Plugin {
 		}));
 	}
 
-
-	async onload() {
-
-		this.settings = new Settings(await this.loadData());
-		this.bind();
-		this.resolver = new FileTitleResolver(this.app.vault, {
-			metaPath: this.settings.get('path'),
-			excluded: this.settings.get('excluded_folders')
-		});
-		this.graph = new GraphTitles(this.app.workspace, this.resolver);
-		this.app.workspace.onLayoutReady(() => {
-			this.initExplorer();
-		})
-
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SettingsTab(this.app, this));
+	private async onUnresolvedHandler(): Promise<void> {
+		await this.explorer.initTitles();
+		this.graph.forceTitleUpdate();
 	}
-
-	onunload() {
-		this.explorer?.restoreTitles();
-		this.graph?.onUnload();
-	}
-
-	saveSettings = debounce(
-		async () => {
-			await this.saveData(this.settings.getAll());
-			this.resolver.setMetaPath(this.settings.get('path'));
-			await this.explorer.initTitles();
-			this.graph.forceTitleUpdate();
-		},
-		1000
-	);
 }

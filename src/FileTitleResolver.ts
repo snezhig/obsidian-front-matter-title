@@ -1,5 +1,6 @@
 import {TAbstractFile, TFile, Vault} from "obsidian";
 import MetaTitleParser from "./MetaTitleParser";
+import {EventEmitter} from "events";
 
 type Item = {
 	file: TFile,
@@ -11,7 +12,8 @@ type Options = {
 	metaPath: string,
 	excluded: string[]
 }
-export default class FileTitleResolver {
+
+export default class FileTitleResolver extends EventEmitter {
 	private collection: Map<string, Item>;
 	private options: Options;
 
@@ -19,34 +21,43 @@ export default class FileTitleResolver {
 		private vault: Vault,
 		options: Options
 	) {
+		super();
 		this.collection = new Map();
 		this.options = {...options};
 	}
 
-	//TODO: replace return with event logic
-	public setExcluded(v: string[]): boolean {
-		let hasDiff = this.options.excluded.some(e => !v.includes(e));
-		hasDiff = hasDiff ? hasDiff : !v.some(e => this.options.excluded.includes(e));
-		if (hasDiff === false) {
-			return false;
+	on(eventName: 'unresolved', listener: () => void): this {
+		super.on(eventName, listener);
+		return this;
+	}
+
+
+	public setExcluded(v: string[]): void {
+		let emit = this.options.excluded.some(e => !v.includes(e));
+
+		const hasNew = v.some(e => !this.options.excluded.includes(e));
+
+		if(emit || hasNew) {
+			this.options.excluded = v;
 		}
 
-		this.options.excluded = v;
-
-		let hasReset = false;
-		for (const [k, v] of this.collection.entries()) {
-			if (this.isExcluded(v.file.path)) {
-				this.collection.delete(k);
-				hasReset = true;
+		if(hasNew) {
+			for (const [k, v] of this.collection.entries()) {
+				if (this.isExcluded(v.file.path)) {
+					this.collection.delete(k);
+					emit = true;
+				}
 			}
 		}
 
-		return hasReset;
+		if (emit) {
+			this.emit('unresolved');
+		}
 	}
 
-	public setMetaPath(v: string): boolean {
+	public setMetaPath(v: string): void {
 		if (this.options.metaPath === v) {
-			return false;
+			return;
 		}
 
 		for (const item of this.collection.values()) {
@@ -55,7 +66,7 @@ export default class FileTitleResolver {
 		}
 
 		this.options.metaPath = v;
-		return true;
+		this.emit('unresolved');
 	}
 
 	public canBeResolved(path: string): boolean {
