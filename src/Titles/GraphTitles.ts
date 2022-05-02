@@ -6,12 +6,13 @@ import Queue from "../Utils/Queue";
 
 export default class GraphTitles {
 	private replacement: FunctionReplacer<GraphNode, 'getDisplayText'> = null;
+	private queue: Queue<string>;
 
 	constructor(
 		private workspace: Workspace,
 		private resolver: FileTitleResolver,
-		private queue = new Queue<string>(this.runQueue.bind(this), 200)
 	) {
+		this.queue = new Queue<string>(this.runQueue.bind(this), 200)
 	}
 
 	public replaceNodeTextFunction() {

@@ -8,10 +8,14 @@ declare module 'obsidian' {
 		titleInnerEl: HTMLDivElement,
 	}
 
-	export class TFileExplorer {
+	export class TFileExplorer extends View{
 		fileItems: {
 			[K: string]: TFileExplorerItem
 		};
+
+		getDisplayText(): string;
+
+		getViewType(): string;
 	}
 
 	export class GraphNode {

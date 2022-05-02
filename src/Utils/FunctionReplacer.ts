@@ -1,10 +1,10 @@
 
 export default class FunctionReplacer<T, K extends keyof T> {
-	private vanilla = null;
+	private vanilla: T[K] = null;
 
 	public constructor(
 		private proto: T,
-		private method: K
+		private method: K,
 	) {
 		this.valid();
 	}
@@ -19,16 +19,16 @@ export default class FunctionReplacer<T, K extends keyof T> {
 		}
 	}
 
-	public replace(e: (self: FunctionReplacer<T, K>, args: any[]) => any): boolean {
+	public replace(e: (self: FunctionReplacer<T, K>, args: unknown[]) => any): boolean {
 		if (this.vanilla !== null) {
 			return false;
 		}
 
 		const self = this;
 		this.vanilla = this.proto[this.method];
-		this.proto[this.method] = function (...args) {
+		this.proto[this.method] = function (...args: unknown[]): unknown {
 			return e.call(this, self, args);
-		} as K;
+		} as unknown as T[K];
 
 		return true;
 	}
