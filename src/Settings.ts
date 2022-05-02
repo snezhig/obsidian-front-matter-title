@@ -3,7 +3,8 @@ import MetaTitlePlugin from "../main";
 
 type MetaTitleSettings = {
 	path: string,
-	excluded_folders: string[]
+	excluded_folders: string[],
+	graph_enabled: boolean
 }
 
 export class Settings {
@@ -18,7 +19,8 @@ export class Settings {
 	private static getDefault(): MetaTitleSettings {
 		return {
 			path: 'title',
-			excluded_folders: []
+			excluded_folders: [],
+			graph_enabled: true
 		};
 	}
 
@@ -73,7 +75,15 @@ export class SettingsTab extends PluginSettingTab {
 				.onChange(async v => {
 					this.plugin.settings.set('excluded_folders', v.split('\n').filter(e => e))
 					await this.plugin.saveSettings();
-				})
-			)
+				}));
+		new Setting(containerEl)
+			.setName('Enable graph titles')
+			.setDesc('If it is on, plugin will replace titles in graph and update them')
+			.addToggle(e => e
+				.setValue(this.plugin.settings.get('graph_enabled'))
+				.onChange(async v => {
+					this.plugin.settings.set('graph_enabled', v);
+					await this.plugin.saveSettings();
+				}));
 	}
 }

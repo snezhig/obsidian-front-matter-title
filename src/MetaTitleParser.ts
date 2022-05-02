@@ -1,10 +1,9 @@
-import {parseYaml, TFile} from "obsidian";
+import {parseYaml} from "obsidian";
 import EmptyMetaPathError from "./Errors/EmptyMetaPathError";
 
 export default class MetaTitleParser {
 
 	private static readonly REGEXP = /^---\n(?<yaml>.*?)---/s;
-
 
 	public static async parse(metaPath: string, content: string): Promise<string | null> {
 		if (metaPath === '') {

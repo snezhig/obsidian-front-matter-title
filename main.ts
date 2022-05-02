@@ -4,6 +4,7 @@ import ExplorerTitles from "./src/Titles/ExplorerTitles";
 import GraphTitles from "./src/Titles/GraphTitles";
 import {Settings, SettingsTab} from "./src/Settings";
 import {debounce} from "ts-debounce";
+import {set} from "yaml/dist/schema/yaml-1.1/set";
 
 export default class MetaTitlePlugin extends Plugin {
 	settings: Settings;
@@ -13,9 +14,11 @@ export default class MetaTitlePlugin extends Plugin {
 
 	public saveSettings = debounce(
 		async () => {
-			await this.saveData(this.settings.getAll());
-			this.resolver.setMetaPath(this.settings.get('path'));
-			this.resolver.setExcluded(this.settings.get('excluded_folders'));
+			const settings = this.settings.getAll();
+			await this.saveData(settings);
+			this.resolver.setMetaPath(settings.path);
+			this.resolver.setExcluded(settings.excluded_folders);
+			this.toggleGraph(settings.graph_enabled)
 		},
 		1000
 	);
@@ -36,7 +39,7 @@ export default class MetaTitlePlugin extends Plugin {
 		});
 		this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
 
-		this.graph = new GraphTitles(this.app.workspace, this.resolver);
+		this.toggleGraph(this.settings.get('graph_enabled'));
 
 		this.app.workspace.onLayoutReady(this.initExplorer.bind(this))
 
@@ -64,20 +67,32 @@ export default class MetaTitlePlugin extends Plugin {
 		await this.explorer.initTitles();
 	}
 
+	private toggleGraph(state: boolean = true): void {
+		if (state && !this.graph) {
+			this.graph = new GraphTitles(this.app.workspace, this.resolver);
+			this.graph.replaceNodeTextFunction();
+			this.graph.forceTitleUpdate();
+		} else if (!state) {
+			this.graph?.onUnload();
+			this.graph?.forceTitleUpdate();
+			this.graph = null;
+		}
+	}
+
 	private bind() {
 		this.registerEvent(this.app.vault.on('modify', file => {
 			this.resolver?.handleModify(file);
 			this.explorer?.updateTitle(file).catch(console.error);
-			this.graph.forceTitleUpdate(file);
+			this.graph?.forceTitleUpdate(file);
 		}));
 
 		this.registerEvent(this.app.workspace.on('layout-change', () => {
-			this.graph?.handleLayoutChange();
+			this.graph?.replaceNodeTextFunction();
 		}));
 	}
 
 	private async onUnresolvedHandler(): Promise<void> {
 		await this.explorer.initTitles();
-		this.graph.forceTitleUpdate();
+		this.graph?.forceTitleUpdate();
 	}
 }

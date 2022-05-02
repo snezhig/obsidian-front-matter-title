@@ -1,10 +1,10 @@
 {
 	"id": "obsidian-meta-title-filename-plugin",
 	"name": "Meta title filename",
-	"version": "1.0.1",
+	"version": "1.0.0",
 	"minAppVersion": "0.12.0",
 	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
+	"author": "Snezhig",
+	"authorUrl": "https://github.com/snezhig",
 	"isDesktopOnly": false
 }
