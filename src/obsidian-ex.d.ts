@@ -4,7 +4,8 @@ import {TAbstractFile, View, WorkspaceLeaf} from "obsidian";
 declare module 'obsidian' {
 	export interface TFileExplorerItem {
 		file: TAbstractFile,
-		titleEl: HTMLDivElement
+		titleEl: HTMLDivElement,
+		titleInnerEl: HTMLDivElement,
 	}
 
 	export class TFileExplorer {

@@ -39,6 +39,7 @@ export default class GraphTitles {
 	}
 
 	public onUnload(): void {
+		this.forceTitleUpdate();
 		this.replacement.restore();
 	}
 

@@ -17,6 +17,7 @@ export default class ExplorerTitles {
 		}
 	}
 
+
 	private async setTitle(item: TFileExplorerItem): Promise<void> {
 
 		const title = await this.resolver.resolve(item.file);
@@ -24,9 +25,9 @@ export default class ExplorerTitles {
 			if (this.originTitles.has(item.file.path)) {
 				return this.restore(item);
 			}
-		}else if (item.titleEl.innerText !== title) {
+		}else if (item.titleInnerEl.innerText !== title) {
 			this.keepOrigin(item);
-			item.titleEl.innerText = title;
+			item.titleInnerEl.innerText = title;
 		}
 	}
 
@@ -34,7 +35,7 @@ export default class ExplorerTitles {
 
 	private keepOrigin(item: TFileExplorerItem): void {
 		if (!this.originTitles.has(item.file.path)) {
-			this.originTitles.set(item.file.path, item.titleEl.innerText);
+			this.originTitles.set(item.file.path, item.titleInnerEl.innerText);
 		}
 	}
 
@@ -52,7 +53,7 @@ export default class ExplorerTitles {
 
 	private restore(item: TFileExplorerItem): void {
 		if (this.originTitles.has(item.file.path)) {
-			item.titleEl.innerText = this.originTitles.get(item.file.path);
+			item.titleInnerEl.innerText = this.originTitles.get(item.file.path);
 		}
 	}
 }
