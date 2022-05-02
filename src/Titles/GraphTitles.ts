@@ -63,7 +63,7 @@ export default class GraphTitles {
 		}
 
 		items.clear();
-	};
+	}
 
 	private createReplacement(): void {
 		for (const leaf of (this.workspace.getLeavesOfType('graph') as GraphLeaf[])) {

@@ -46,10 +46,6 @@ export class SettingsTab extends PluginSettingTab {
 		super(app, plugin);
 	}
 
-	hide(): any {
-		return super.hide();
-	}
-
 	display(): void {
 		const {containerEl} = this;
 

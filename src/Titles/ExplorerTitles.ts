@@ -1,4 +1,4 @@
-import {TAbstractFile, TFile, TFileExplorer, TFileExplorerItem} from "obsidian";
+import {TAbstractFile, TFileExplorer, TFileExplorerItem} from "obsidian";
 import FileTitleResolver from "../FileTitleResolver";
 
 export default class ExplorerTitles {

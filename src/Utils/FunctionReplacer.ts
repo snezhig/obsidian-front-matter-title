@@ -40,7 +40,7 @@ export default class FunctionReplacer<T, K extends keyof T> {
 		}
 	}
 
-	public getVanilla(): Function | null {
+	public getVanilla(): T[K] | null {
 		return this.vanilla;
 	}
 
