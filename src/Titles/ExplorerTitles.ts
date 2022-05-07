@@ -1,11 +1,11 @@
-import {TAbstractFile, TFileExplorer, TFileExplorerItem} from "obsidian";
+import {TAbstractFile, TFileExplorerView, TFileExplorerItem} from "obsidian";
 import FileTitleResolver from "../FileTitleResolver";
 
 export default class ExplorerTitles {
 	private originTitles = new Map<string, string>();
 
 	constructor(
-		private explorer: TFileExplorer,
+		private explorer: TFileExplorerView,
 		private resolver: FileTitleResolver
 	) {
 	}

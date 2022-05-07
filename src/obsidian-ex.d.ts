@@ -8,7 +8,7 @@ declare module 'obsidian' {
 		titleInnerEl: HTMLDivElement,
 	}
 
-	export class TFileExplorer extends View{
+	export class TFileExplorerView extends View{
 		fileItems: {
 			[K: string]: TFileExplorerItem
 		};

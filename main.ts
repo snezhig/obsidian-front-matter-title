@@ -1,10 +1,9 @@
-import {Plugin, TFileExplorer} from 'obsidian';
+import {debounce, Plugin, TFileExplorerView} from 'obsidian';
 import FileTitleResolver from "./src/FileTitleResolver";
 import ExplorerTitles from "./src/Titles/ExplorerTitles";
 import GraphTitles from "./src/Titles/GraphTitles";
 import {Settings, SettingsTab} from "./src/Settings";
-import {debounce} from "ts-debounce";
-import {set} from "yaml/dist/schema/yaml-1.1/set";
+import {stat} from "fs";
 
 export default class MetaTitlePlugin extends Plugin {
 	settings: Settings;
@@ -19,6 +18,7 @@ export default class MetaTitlePlugin extends Plugin {
 			this.resolver.setMetaPath(settings.path);
 			this.resolver.setExcluded(settings.excluded_folders);
 			this.toggleGraph(settings.graph_enabled)
+			await this.toggleExplorer(settings.explorer_enabled);
 		},
 		1000
 	);
@@ -41,8 +41,9 @@ export default class MetaTitlePlugin extends Plugin {
 
 		this.toggleGraph(this.settings.get('graph_enabled'));
 
-		this.app.workspace.onLayoutReady(this.initExplorer.bind(this))
-
+		this.app.workspace.onLayoutReady(() => {
+			this.toggleExplorer(this.settings.get('explorer_enabled'));
+		})
 		this.addSettingTab(new SettingsTab(this.app, this));
 	}
 
@@ -52,19 +53,32 @@ export default class MetaTitlePlugin extends Plugin {
 		this.resolver.removeAllListeners('unresolved');
 	}
 
-	private async initExplorer(): Promise<void> {
+	private getExplorerView(): TFileExplorerView | null {
 		const leaves = this.app.workspace.getLeavesOfType('file-explorer');
+
 		if (leaves.length > 1) {
 			console.log('there is more then one explorer')
+			return null;
 		}
-		if (leaves?.[0]?.view === undefined) {
-			console.log('explorer is undefined');
-			return;
-		}
-		const explorer = (leaves?.[0]?.view) as TFileExplorer;
 
-		this.explorer = new ExplorerTitles(explorer, this.resolver);
-		await this.explorer.initTitles();
+		if (leaves?.first()?.view === undefined) {
+			console.log('explorer is undefined');
+			return null;
+		}
+
+		return leaves.first().view as TFileExplorerView;
+	}
+
+	private async toggleExplorer(state: boolean = true): Promise<void> {
+		console.log(state)
+		if (state && !this.explorer) {
+			const view = this.getExplorerView();
+			this.explorer = new ExplorerTitles(view, this.resolver);
+			await this.explorer.initTitles();
+		} else if (!state && this.explorer) {
+			this.explorer.restoreTitles();
+			this.explorer = null;
+		}
 	}
 
 	private toggleGraph(state: boolean = true): void {
@@ -86,8 +100,14 @@ export default class MetaTitlePlugin extends Plugin {
 			this.graph?.forceTitleUpdate(file);
 		}));
 
+		let isReplaced = false;
 		this.registerEvent(this.app.workspace.on('layout-change', () => {
-			this.graph?.replaceNodeTextFunction();
+			if(!isReplaced) {
+				setTimeout(() => {
+					isReplaced = this.graph?.replaceNodeTextFunction();
+					this.graph?.forceTitleUpdate();
+				}, 50);
+			}
 		}));
 	}
 

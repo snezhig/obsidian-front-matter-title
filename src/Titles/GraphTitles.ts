@@ -15,16 +15,15 @@ export default class GraphTitles {
 		this.queue = new Queue<string>(this.runQueue.bind(this), 200)
 	}
 
-	public replaceNodeTextFunction() {
-		if (this.replacement?.isReplaced() === false) {
-			return;
-		}
+	public replaceNodeTextFunction(): boolean {
 		if (this.replacement === null) {
 			this.createReplacement();
 		}
 		if (this.replacement?.isReplaced() === false) {
 			this.replace();
+			return true;
 		}
+		return false;
 	}
 
 	public forceTitleUpdate(file: TAbstractFile = null): void {
@@ -59,6 +58,7 @@ export default class GraphTitles {
 			for (const node of nodes) {
 				if (items.has(node.id)) {
 					leaf.view?.renderer?.onIframeLoad();
+					console.log('reloaded');
 					break;
 				}
 			}
@@ -69,8 +69,8 @@ export default class GraphTitles {
 
 	private createReplacement(): void {
 		for (const leaf of (this.workspace.getLeavesOfType('graph') as GraphLeaf[])) {
-			const nodes = leaf?.view?.renderer?.nodes ?? [];
-			for (const node of nodes) {
+			const node = (leaf?.view?.renderer?.nodes ?? [])?.first() ?? null;
+			if (node) {
 				this.replacement = new FunctionReplacer(Object.getPrototypeOf(node), 'getDisplayText');
 			}
 		}

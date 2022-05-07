@@ -1,4 +1,4 @@
-import {debounce} from "ts-debounce";
+import {debounce} from "obsidian";
 
 type callback<Item> = (items: Set<Item>) => void;
 
