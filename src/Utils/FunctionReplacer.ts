@@ -1,15 +1,17 @@
 
-export default class FunctionReplacer<T, K extends keyof T> {
+export default class FunctionReplacer<T, K extends keyof T, O> {
 	private vanilla: T[K] = null;
 
 	public constructor(
 		private proto: T,
 		private method: K,
+		private args: O,
+		private implementation: (args: O, defaultArgs: unknown[], vanilla: T[K]) => any
 	) {
 		this.valid();
 	}
 
-	public isReplaced(): boolean{
+	public isEnabled(): boolean{
 		return this.vanilla !== null;
 	}
 
@@ -19,7 +21,7 @@ export default class FunctionReplacer<T, K extends keyof T> {
 		}
 	}
 
-	public replace(e: (self: FunctionReplacer<T, K>, args: unknown[]) => any): boolean {
+	public enable(): boolean {
 		if (this.vanilla !== null) {
 			return false;
 		}
@@ -27,21 +29,16 @@ export default class FunctionReplacer<T, K extends keyof T> {
 		const self = this;
 		this.vanilla = this.proto[this.method];
 		this.proto[this.method] = function (...args: unknown[]): unknown {
-			return e.call(this, self, args);
+			return self.implementation.call(this, self.args, args, self.vanilla);
 		} as unknown as T[K];
 
 		return true;
 	}
 
-	public restore(): void {
+	public disable(): void {
 		if (this.vanilla !== null) {
 			this.proto[this.method] = this.vanilla;
 			this.vanilla = null;
 		}
 	}
-
-	public getVanilla(): T[K] | null {
-		return this.vanilla;
-	}
-
 }

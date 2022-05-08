@@ -5,13 +5,13 @@ export default class ExplorerTitles {
 	private originTitles = new Map<string, string>();
 
 	constructor(
-		private explorer: TFileExplorerView,
+		private explorerView: TFileExplorerView,
 		private resolver: FileTitleResolver
 	) {
 	}
 
 	public async updateTitle(abstract: TAbstractFile): Promise<void> {
-		const item = this.explorer.fileItems[abstract.path];
+		const item = this.explorerView.fileItems[abstract.path];
 		if (item) {
 			await this.setTitle(item);
 		}
@@ -41,14 +41,14 @@ export default class ExplorerTitles {
 
 	public async initTitles(): Promise<void> {
 		const promises = [];
-		for (const item of Object.values(this.explorer.fileItems)) {
+		for (const item of Object.values(this.explorerView.fileItems)) {
 			promises.push(this.setTitle(item));
 		}
 		await Promise.all(promises);
 	}
 
 	public restoreTitles(): void {
-		Object.values(this.explorer.fileItems).map(e => this.restore(e));
+		Object.values(this.explorerView.fileItems).map(e => this.restore(e));
 	}
 
 	private restore(item: TFileExplorerItem): void {
