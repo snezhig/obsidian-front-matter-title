@@ -33,7 +33,7 @@ export default class GraphTitles implements TitlesManager {
 
     disable(): void {
         this.replacement.disable();
-        this.update();
+        this.update().catch(console.error);
     }
 
     enable(): void {
@@ -54,7 +54,7 @@ export default class GraphTitles implements TitlesManager {
         return this.enabled;
     }
 
-    async update(abstract: TAbstractFile|null = null): Promise<boolean> {
+    async update(abstract: TAbstractFile | null = null): Promise<boolean> {
         if (!this.enabled) {
             return false;
         }
@@ -89,9 +89,13 @@ export default class GraphTitles implements TitlesManager {
 
     private async runQueue(items: Set<string>) {
 
+        const promises = [];
+
         for (const id of items) {
-            await this.resolver.resolve(id);
+            promises.push(this.resolver.resolve(id));
         }
+
+        await Promise.all(promises);
 
         for (const leaf of this.getLeaves()) {
             const nodes = leaf?.view?.renderer?.nodes ?? [];

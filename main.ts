@@ -1,4 +1,4 @@
-import {debounce, Plugin, TAbstractFile, TFileExplorerView} from 'obsidian';
+import {debounce, Debouncer, Plugin, TAbstractFile, TFileExplorerView} from 'obsidian';
 import FileTitleResolver from "./src/FileTitleResolver";
 import ExplorerTitles from "./src/Titles/ExplorerTitles";
 import GraphTitles from "./src/Titles/GraphTitles";
@@ -8,20 +8,9 @@ import TitlesManager from "./src/Titles/TitlesManager";
 type Manager = 'graph' | 'explorer';
 
 export default class MetaTitlePlugin extends Plugin {
-    settings: Settings;
-    resolver: FileTitleResolver;
-
-    public saveSettings = debounce(
-        async () => {
-            const settings = this.settings.getAll();
-            await this.saveData(settings);
-            this.resolver.setMetaPath(settings.path);
-            this.resolver.setExcluded(settings.excluded_folders);
-            this.toggleGraph(settings.graph_enabled)
-            await this.toggleExplorer(settings.explorer_enabled);
-        },
-        1000
-    );
+    public settings: Settings;
+    private resolver: FileTitleResolver;
+    private saveSettingDebounce: Debouncer<void> = null;
     private managers: Map<Manager, TitlesManager> = new Map();
 
     private get graph(): TitlesManager | null {
@@ -30,6 +19,24 @@ export default class MetaTitlePlugin extends Plugin {
 
     private get explorer(): TitlesManager | null {
         return this.managers.get('explorer') ?? null;
+    }
+
+    public async saveSettings() {
+        if (this.saveSettingDebounce === null) {
+            this.saveSettingDebounce = debounce(
+                async () => {
+                    const settings = this.settings.getAll();
+                    await this.saveData(settings);
+                    this.resolver.setMetaPath(settings.path);
+                    this.resolver.setExcluded(settings.excluded_folders);
+                    this.toggleGraph(settings.graph_enabled)
+                    await this.toggleExplorer(settings.explorer_enabled);
+                },
+                1000,
+                true
+            )
+        }
+        this.saveSettingDebounce();
     }
 
     public async onload() {

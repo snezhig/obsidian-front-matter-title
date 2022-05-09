@@ -7,5 +7,5 @@ export default interface TitlesManager {
 
     disable(): void;
 
-    update(abstract: TAbstractFile|null = null): Promise<boolean>;
+    update(abstract?: TAbstractFile | null): Promise<boolean>;
 }
