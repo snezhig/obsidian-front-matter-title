@@ -2,10 +2,12 @@ import FileTitleResolver from "../FileTitleResolver";
 import FunctionReplacer from "../Utils/FunctionReplacer";
 import {GraphLeaf, GraphNode, TAbstractFile, Workspace} from "obsidian";
 import Queue from "../Utils/Queue";
+import TitlesManager from "./TitlesManager";
 
-export default class GraphTitles {
+export default class GraphTitles implements TitlesManager {
     private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphTitles> = null;
     private queue: Queue<string>;
+    private enabled = false;
 
     constructor(
         private workspace: Workspace,
@@ -13,6 +15,7 @@ export default class GraphTitles {
     ) {
         this.queue = new Queue<string>(this.runQueue.bind(this), 200)
     }
+
 
     private static getReplaceFunction() {
         return function (self: GraphTitles, defaultArgs: unknown[], vanilla: Function) {
@@ -28,33 +31,46 @@ export default class GraphTitles {
         };
     }
 
-    public tryToReplaceNodeTextFunction(): boolean {
+    disable(): void {
+        this.replacement.disable();
+        this.update();
+    }
+
+    enable(): void {
         if (this.replacement === null) {
             const node = this.getFirstGraphNode();
             if (node) {
                 this.replacement = this.createReplacement(node);
                 this.replacement.enable();
-                return true;
+                this.enabled = true;
+                return;
             }
+        } else {
+            this.enabled = true;
         }
-        return false;
     }
 
-    public forceTitleUpdate(file: TAbstractFile = null): void {
+    isEnabled(): boolean {
+        return this.enabled;
+    }
+
+    async update(abstract: TAbstractFile|null = null): Promise<boolean> {
+        if (!this.enabled) {
+            return false;
+        }
+
         for (const leaf of this.getLeaves()) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
-                if (file && file.path === node.id) {
+                if (abstract && abstract.path === node.id) {
                     this.queue.add(node.id);
                     break;
+                } else if (abstract === null) {
+                    this.queue.add(node.id);
                 }
-                this.queue.add(node.id);
             }
         }
-    }
 
-    public onUnload(): void {
-        this.forceTitleUpdate();
-        this.replacement.disable();
+        return true;
     }
 
     private getFirstGraphNode(): GraphNode | null {
