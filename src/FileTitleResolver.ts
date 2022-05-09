@@ -1,6 +1,5 @@
 import {TAbstractFile, TFile, Vault} from "obsidian";
 import MetaTitleParser from "./MetaTitleParser";
-import {EventEmitter} from "events";
 
 type Item = {
 	file: TFile,
@@ -13,22 +12,35 @@ type Options = {
 	excluded: string[]
 }
 
-export default class FileTitleResolver extends EventEmitter {
+export default class FileTitleResolver {
 	private collection: Map<string, Item>;
 	private options: Options;
+	private listeners = new Map<string, Function[]>();
 
 	constructor(
 		private vault: Vault,
 		options: Options
 	) {
-		super();
 		this.collection = new Map();
 		this.options = {...options};
 	}
 
 	on(eventName: 'unresolved', listener: () => void): this {
-		super.on(eventName, listener);
+		if(!this.listeners.has(eventName)){
+			this.listeners.set(eventName, []);
+		}
+		this.listeners.get(eventName).push(listener);
 		return this;
+	}
+
+	public removeAllListeners(eventName: string): void{
+		this.listeners.delete(eventName);
+	}
+
+	private emit(eventName: string): void{
+		for (const listener of this.listeners.get(eventName) ?? []){
+			listener();
+		}
 	}
 
 

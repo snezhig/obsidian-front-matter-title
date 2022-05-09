@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-meta-title-filename-plugin",
+	"name": "Meta title filename",
+	"version": "1.0.1",
+	"minAppVersion": "0.14.6",
+	"description": "This plugin replace filename with value from meta block",
+	"author": "Snezhig",
+	"authorUrl": "https://github.com/snezhig",
+	"isDesktopOnly": false
+}

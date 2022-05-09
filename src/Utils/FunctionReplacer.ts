@@ -11,10 +11,6 @@ export default class FunctionReplacer<T, K extends keyof T, O> {
 		this.valid();
 	}
 
-	public isEnabled(): boolean{
-		return this.vanilla !== null;
-	}
-
 	private valid(): void {
 		if (typeof this.proto[this.method] !== "function") {
 			throw new Error(`Method ${this.method} is not a function`)
