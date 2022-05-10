@@ -1,4 +1,5 @@
 import {debounce, Debouncer, Plugin, TAbstractFile, TFileExplorerView} from 'obsidian';
+import {debounce as ts_debounce} from 'ts-debounce';
 import FileTitleResolver from "./src/FileTitleResolver";
 import ExplorerTitles from "./src/Titles/ExplorerTitles";
 import GraphTitles from "./src/Titles/GraphTitles";

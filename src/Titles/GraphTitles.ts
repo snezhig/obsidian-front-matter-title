@@ -6,25 +6,26 @@ import TitlesManager from "./TitlesManager";
 
 export default class GraphTitles implements TitlesManager {
     private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphTitles> = null;
-    private queue: Queue<string>;
+    private queue: Queue<string, void>;
     private enabled = false;
 
     constructor(
         private workspace: Workspace,
         private resolver: FileTitleResolver,
     ) {
-        this.queue = new Queue<string>(this.runQueue.bind(this), 200)
+        this.queue = new Queue<string, void>(this.runQueue.bind(this), 200)
     }
 
 
     private static getReplaceFunction() {
         return function (self: GraphTitles, defaultArgs: unknown[], vanilla: Function) {
             if (self.resolver.canBeResolved(this.id)) {
+                //TODO: what if it can be resolved, but is not resolved again and again?
                 if (self.resolver.isResolved(this.id)) {
                     const title = self.resolver.getResolved(this.id);
                     return title || vanilla.call(this, ...defaultArgs);
                 } else {
-                    self.queue.add(this.id);
+                    self.queue.add(this.id).catch(console.error);
                 }
             }
             return vanilla.call(this, ...defaultArgs);
@@ -34,6 +35,7 @@ export default class GraphTitles implements TitlesManager {
     disable(): void {
         this.replacement.disable();
         this.update().catch(console.error);
+        this.enabled = false;
     }
 
     enable(): void {
@@ -62,10 +64,10 @@ export default class GraphTitles implements TitlesManager {
         for (const leaf of this.getLeaves()) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
                 if (abstract && abstract.path === node.id) {
-                    this.queue.add(node.id);
+                    this.queue.add(node.id).catch(console.error);
                     break;
                 } else if (abstract === null) {
-                    this.queue.add(node.id);
+                    this.queue.add(node.id).catch(console.error);
                 }
             }
         }

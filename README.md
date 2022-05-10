@@ -38,12 +38,12 @@ Then set the path like `additional.title` and plugin will set `Project ideas` as
 
 ## Todo
 
-* [ ] Add a possibility to make a template fo file name
+* [ ] Add a possibility to make a template for file name
 * [ ] Add markers to distinguish the same titles
 * [ ] Add titles for search view
 * [ ] Add commands to update titles manually
 * [ ] Add settings for title's length
-* [ ] Fix the problem that titles in graph were not changed, in case application opens with graph
+* [x] Fix the problem that titles in graph were not changed, in case application opens with graph
 
 ## Note
 

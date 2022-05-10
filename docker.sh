@@ -1,0 +1,1 @@
+docker run -it -u 1000 -w /app -v "$(pwd)":/app node "$@"
