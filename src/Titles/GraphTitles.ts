@@ -3,11 +3,13 @@ import FunctionReplacer from "../Utils/FunctionReplacer";
 import {GraphLeaf, GraphNode, TAbstractFile, Workspace} from "obsidian";
 import Queue from "../Utils/Queue";
 import TitlesManager from "./TitlesManager";
+import {string} from "yaml/dist/schema/common/string";
 
 export default class GraphTitles implements TitlesManager {
     private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphTitles> = null;
     private queue: Queue<string, void>;
     private enabled = false;
+    private lastTitles = new Map<string, string>();
 
     constructor(
         private workspace: Workspace,
@@ -16,16 +18,22 @@ export default class GraphTitles implements TitlesManager {
         this.queue = new Queue<string, void>(this.runQueue.bind(this), 200)
     }
 
+    private getTitle(id: string): string | null | false {
+        //TODO: what if it can be resolved, but is not resolved again and again?
+        return this.resolver.isResolved(id) ? this.resolver.getResolved(id) : false;
+    }
 
     private static getReplaceFunction() {
         return function (self: GraphTitles, defaultArgs: unknown[], vanilla: Function) {
             if (self.resolver.canBeResolved(this.id)) {
-                //TODO: what if it can be resolved, but is not resolved again and again?
-                if (self.resolver.isResolved(this.id)) {
-                    const title = self.resolver.getResolved(this.id);
-                    return title || vanilla.call(this, ...defaultArgs);
-                } else {
+                const title = self.getTitle(this.id);
+                if (title) {
+                    self.lastTitles.set(this.id, title);
+                    return title;
+                } else if (title === false) {
                     self.queue.add(this.id).catch(console.error);
+                } else {
+                    self.lastTitles.delete(this.id);
                 }
             }
             return vanilla.call(this, ...defaultArgs);
@@ -89,15 +97,32 @@ export default class GraphTitles implements TitlesManager {
         return this.workspace.getLeavesOfType('graph') as GraphLeaf[];
     }
 
-    private async runQueue(items: Set<string>) {
-
+    private async resolveTitles(items: Iterable<string>): Promise<[string, string | null][]> {
         const promises = [];
 
         for (const id of items) {
-            promises.push(this.resolver.resolve(id));
+            promises.push(this.resolver.resolve(id).then(e => [id, e]));
         }
 
-        await Promise.all(promises);
+        return await Promise.all(promises) as unknown as Promise<[string, string | null][]>;
+    }
+
+    private async runQueue(items: Set<string>) {
+        let hasDiff = false;
+
+        for (const [id, title] of await this.resolveTitles(items)) {
+            if (this.lastTitles.has(id)) {
+                hasDiff = this.lastTitles.get(id) !== title;
+            } else {
+                hasDiff = title !== null;
+            }
+        }
+
+        if (hasDiff == false) {
+            items.clear();
+            return;
+        }
+
 
         for (const leaf of this.getLeaves()) {
             const nodes = leaf?.view?.renderer?.nodes ?? [];

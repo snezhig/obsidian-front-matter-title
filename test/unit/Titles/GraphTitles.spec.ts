@@ -3,8 +3,6 @@ import FileTitleResolver from "../../../src/FileTitleResolver";
 import {GraphLeaf, GraphNode, GraphView, TFile, Workspace} from "obsidian";
 import {expect} from "@jest/globals";
 import Queue from "../../../src/Utils/Queue";
-import mock = jest.mock;
-import exp from "constants";
 
 jest.mock('../../../src/FileTitleResolver');
 
@@ -28,8 +26,7 @@ const mocks = {
     getDisplayText: jest.spyOn(GraphNode.prototype, 'getDisplayText').mockImplementation(() => nodeText),
     onIframeLoad: jest.fn().mockImplementation(function () {
         this.nodes.forEach((e: GraphNode) => e.getDisplayText());
-    })
-
+    }),
 }
 
 let resolvedTitle: string = null;
@@ -109,20 +106,34 @@ describe('Graph Titles Test', () => {
                 expect(mocks.resolver.resolve).toHaveBeenCalledTimes(1);
             })
 
-                //TODO: make test for update function
+            describe('Update test', () => {
+                test('Iframe wil not be reloaded because title was not changed', async () => {
+                    mocks.resolver.resolve.mockResolvedValueOnce(resolvedTitle);
+                    await expect(graph.update(file)).resolves.toBeTruthy();
+                    expect(lastQueueAdd).not.toBeNull();
+                    await lastQueueAdd;
+                    expect(mocks.onIframeLoad).not.toHaveBeenCalled();
+                })
+                test('Iframe will be reloaded', async () => {
+                    await expect(graph.update(file)).resolves.toBeTruthy();
+                    expect(lastQueueAdd).not.toBeNull();
+                    await lastQueueAdd;
+                    expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
+                })
+            });
         });
 
 
-        test('Graph disabled', async () => {
-            mocks.getDisplayText.mockClear();
-            graph.disable();
-            expect(lastQueueAdd).not.toBeNull();
-            expect(graph.isEnabled()).toBeFalsy();
-            await lastQueueAdd;
-            expect(mocks.getDisplayText).toBeCalledTimes(1);
-            expect(node.getDisplayText()).toEqual(nodeText);
-            expect(mocks.getDisplayText).toBeCalledTimes(2);
-        });
+        // test('Graph disabled', async () => {
+        //     mocks.getDisplayText.mockClear();
+        //     graph.disable();
+        //     expect(lastQueueAdd).not.toBeNull();
+        //     expect(graph.isEnabled()).toBeFalsy();
+        //     await lastQueueAdd;
+        //     expect(mocks.getDisplayText).toBeCalledTimes(1);
+        //     expect(node.getDisplayText()).toEqual(nodeText);
+        //     expect(mocks.getDisplayText).toBeCalledTimes(2);
+        // });
     })
 
 
