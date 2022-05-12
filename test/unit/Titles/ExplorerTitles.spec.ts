@@ -1,6 +1,6 @@
 import ExplorerTitles from "../../../src/Titles/ExplorerTitles";
 import FileTitleResolver from "../../../src/FileTitleResolver";
-import {TFile, TFileExplorerView, TFileExplorerItem, Vault, WorkspaceLeaf} from "obsidian";
+import {TFile, TFileExplorerView, TFileExplorerItem, Vault, WorkspaceLeaf, MetadataCache} from "obsidian";
 import {expect} from "@jest/globals";
 
 
@@ -17,14 +17,14 @@ const createItem = (text: string): TFileExplorerItem => {
 	return {file, titleInnerEl, titleEl: null}
 }
 
-const resolver = new FileTitleResolver(new Vault(), {metaPath: 'title', excluded: []});
+const resolver = new FileTitleResolver(new MetadataCache(), {metaPath: 'title', excluded: []});
 
 resolver.resolve = jest.fn().mockImplementation(async () => titles.resolved);
 
-const fileExplorer = {} as TFileExplorerView;
-fileExplorer.fileItems = {};
+const explorerView = {} as TFileExplorerView;
+explorerView.fileItems = {};
 
-const explorer = new ExplorerTitles(fileExplorer, resolver);
+const explorer = new ExplorerTitles(explorerView, resolver);
 
 
 describe('Explorer Titles Test', () => {
@@ -37,30 +37,31 @@ describe('Explorer Titles Test', () => {
 				origin: 'init_and_restore_test_title',
 				resolved: null
 			}
+			explorer.enable();
 		})
 
 		beforeEach(() => {
 			item = createItem(titles.origin);
-			fileExplorer.fileItems = {[item.file.path]: item};
+			explorerView.fileItems = {[item.file.path]: item};
 		})
 
 		test('Inner text won`t be replaced because title is null', async () => {
-			await explorer.initTitles();
+			await explorer.update();
 			expect(item.titleInnerEl.innerText).toEqual(titles.origin);
 		});
 
 		test('Inner text won`t be replaced because title is empty', async () => {
 			titles.resolved = '';
-			await explorer.initTitles();
+			await explorer.update();
 			expect(item.titleInnerEl.innerText).toEqual(titles.origin);
 		})
 
 		test('Inner text will be replaced with new title and restored', async () => {
 			titles.resolved = 'new_title';
-			await explorer.initTitles();
+			await explorer.update();
 			expect(item.titleInnerEl.innerText).toEqual(titles.resolved);
 
-			explorer.restoreTitles();
+			explorer.disable();
 			expect(item.titleInnerEl.innerText).toEqual(titles.origin);
 		})
 
@@ -77,25 +78,26 @@ describe('Explorer Titles Test', () => {
 				resolved: 'resolved_title'
 			};
 			item = createItem(titles.origin);
-			fileExplorer.fileItems = {[item.file.path]: item};
+			explorerView.fileItems = {[item.file.path]: item};
+			explorer.enable();
 		})
 
 		test('Inner text will be replaced', async () => {
-			await explorer.updateTitle(item.file);
+			await explorer.update(item.file);
 			expect(item.titleInnerEl.innerText).toEqual(titles.resolved);
 		})
 
 		test('Inner text is equal to previous and will be replaced again', async () => {
 			expect(item.titleInnerEl.innerText).toEqual(titles.resolved);
 			titles.resolved = 'new_resolved_title';
-			await explorer.updateTitle(item.file);
+			await explorer.update(item.file);
 			expect(item.titleInnerEl.innerText).toEqual(titles.resolved);
 		})
 
 		test('Inner text is equal to previous, but will be replaced with origin', async () => {
 			expect(item.titleInnerEl.innerText).toEqual(titles.resolved);
 			titles.resolved = null;
-			await explorer.updateTitle(item.file);
+			await explorer.update(item.file);
 			expect(item.titleInnerEl.innerText).toEqual(titles.origin);
 		})
 	})

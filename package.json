@@ -23,6 +23,7 @@
 		"eslint": "^8.14.0",
 		"jest": "^27.5.1",
 		"obsidian": "latest",
+		"ts-debounce": "^4.0.0",
 		"ts-jest": "^27.1.4",
 		"ts-node": "^10.7.0",
 		"tslib": "2.3.1",

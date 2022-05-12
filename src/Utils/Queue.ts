@@ -1,21 +1,21 @@
-import {debounce} from "obsidian";
+import {debounce} from "ts-debounce";
 
-type callback<Item> = (items: Set<Item>) => void;
+type callback<Item, Return> = (items: Set<Item>) => Promise<Return>;
 
-export default class Queue<Item> {
+export default class Queue<Item, Return> {
 	private readonly items: Set<Item>;
 	private readonly cb: () => void;
 
 	constructor(
-		cb: callback<Item>,
+		cb: callback<Item, Return>,
 		delay: number
 	) {
 		this.items = new Set<Item>();
-		this.cb = debounce(() => cb(this.items), delay);
+		this.cb = debounce(async () => cb(this.items), delay);
 	}
 
-	public add(item: Item): void {
+	public add(item: Item): Promise<Return> {
 		this.items.add(item);
-		this.cb();
+		return this.cb() as unknown as Promise<Return>;
 	}
 }

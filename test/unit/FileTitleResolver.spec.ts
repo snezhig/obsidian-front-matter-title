@@ -1,31 +1,28 @@
 import FileTitleResolver from "../../src/FileTitleResolver";
-import {Vault} from "obsidian";
+import {MetadataCache, Vault} from "obsidian";
 import MetaTitleParser from "../../src/MetaTitleParser";
 import {expect, jest} from "@jest/globals";
 
 jest.mock('../../src/MetaTitleParser');
-const read = jest.spyOn<Vault, any>(Vault.prototype, 'read').mockImplementation(() => null);
-//@ts-ignore
+const read = jest.spyOn<MetadataCache, any>(MetadataCache.prototype, 'getCache').mockImplementation(() => null);
 const parse = jest.spyOn(MetaTitleParser, "parse");
-
 
 const Options = {
 	metaPath: 'title',
 	excluded: [] as string[]
 };
-
 const vault = new Vault();
-let resolver = new FileTitleResolver(vault, Options);
 
 const onUnresolvedHandler = jest.fn();
+let resolver = new FileTitleResolver(new MetadataCache(), Options);
 resolver.on('unresolved', onUnresolvedHandler);
-beforeEach(() => {
-	jest.clearAllMocks();
-	parse.mockClear();
-})
-
 
 describe('File Title Resolver Test', () => {
+	const getRandomPath = (extension: string = '.md') => Math.random().toString() + extension;
+	beforeEach(() => {
+		jest.clearAllMocks();
+		parse.mockClear();
+	})
 
 	describe('Test options', () => {
 		describe('Test option [path]', () => {
@@ -42,14 +39,14 @@ describe('File Title Resolver Test', () => {
 			const testTitleIsEqual = (title: string) => expect(title).toEqual(meta[Options.metaPath]);
 
 			test('Parse called with meta path and null and returns title', async () => {
-				const title = await resolver.resolve(Math.random().toString());
-				expect(parse).toHaveBeenCalledWith(Options.metaPath, null);
+				const title = await resolver.resolve(getRandomPath());
+				expect(parse).toHaveBeenCalledWith(Options.metaPath, {});
 				testTitleIsEqual(title);
 			})
 
 			test('Resolve return null', async () => {
 				resolver.setMetaPath('not.exists.path');
-				const title = await resolver.resolve(Math.random().toString());
+				const title = await resolver.resolve(getRandomPath());
 				expect(title).toBeNull();
 			})
 		});
@@ -97,7 +94,7 @@ describe('File Title Resolver Test', () => {
 			parse.mockImplementation(async () => (Math.random() * Math.random()).toString());
 		})
 		let title: string = null;
-		const path = 'mock_path';
+		const path = 'mock_path.md';
 
 		const testTitleResolved = async () => {
 			expect(await resolver.resolve(path)).toEqual(title);
@@ -118,7 +115,7 @@ describe('File Title Resolver Test', () => {
 		test('Get title without parse', testTitleResolved)
 
 		test('Parse after edit', async () => {
-			resolver.handleModify(vault.getAbstractFileByPath(path));
+			resolver.handleCacheChanged(vault.getAbstractFileByPath(path));
 			await testThatPasseCalledAndTitleEqual();
 		})
 
@@ -135,7 +132,7 @@ describe('File Title Resolver Test', () => {
 
 	describe('Test concurrent resolving', () => {
 		let resolve: Function = null;
-		const path = 'concurrent';
+		const path = 'concurrent.md';
 		const expected = 'resolved_title';
 
 		beforeAll(() => {

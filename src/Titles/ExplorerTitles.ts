@@ -1,59 +1,72 @@
-import {TAbstractFile, TFileExplorerView, TFileExplorerItem} from "obsidian";
+import {TAbstractFile, TFileExplorerItem, TFileExplorerView} from "obsidian";
 import FileTitleResolver from "../FileTitleResolver";
+import TitlesManager from "./TitlesManager";
 
-export default class ExplorerTitles {
-	private originTitles = new Map<string, string>();
+export default class ExplorerTitles implements TitlesManager {
+    private originTitles = new Map<string, string>();
+    private enabled = false;
 
-	constructor(
-		private explorerView: TFileExplorerView,
-		private resolver: FileTitleResolver
-	) {
-	}
+    constructor(
+        private explorerView: TFileExplorerView,
+        private resolver: FileTitleResolver
+    ) {
+    }
 
-	public async updateTitle(abstract: TAbstractFile): Promise<void> {
-		const item = this.explorerView.fileItems[abstract.path];
-		if (item) {
-			await this.setTitle(item);
-		}
-	}
+    isEnabled(): boolean {
+        return this.enabled;
+    }
 
+    disable(): void {
+        this.restoreTitles();
+        this.enabled = false;
+    }
 
-	private async setTitle(item: TFileExplorerItem): Promise<void> {
+    enable(): void {
+        this.enabled = true;
+    }
 
-		const title = await this.resolver.resolve(item.file);
-		if (this.isTitleEmpty(title)) {
-			if (this.originTitles.has(item.file.path)) {
-				return this.restore(item);
-			}
-		}else if (item.titleInnerEl.innerText !== title) {
-			this.keepOrigin(item);
-			item.titleInnerEl.innerText = title;
-		}
-	}
+    async update(abstract: TAbstractFile | null = null): Promise<boolean> {
+        if (!this.isEnabled()) {
+            return false;
+        }
 
-	private isTitleEmpty = (title: string): boolean => title === null || title === '';
+        const items = abstract
+            ? [this.explorerView.fileItems[abstract.path]]
+            : Object.values(this.explorerView.fileItems);
 
-	private keepOrigin(item: TFileExplorerItem): void {
-		if (!this.originTitles.has(item.file.path)) {
-			this.originTitles.set(item.file.path, item.titleInnerEl.innerText);
-		}
-	}
+        const promises = items.map(e => this.setTitle(e));
 
-	public async initTitles(): Promise<void> {
-		const promises = [];
-		for (const item of Object.values(this.explorerView.fileItems)) {
-			promises.push(this.setTitle(item));
-		}
-		await Promise.all(promises);
-	}
+        return Promise.all(promises).then(() => true);
+    }
 
-	public restoreTitles(): void {
-		Object.values(this.explorerView.fileItems).map(e => this.restore(e));
-	}
+    private async setTitle(item: TFileExplorerItem): Promise<void> {
 
-	private restore(item: TFileExplorerItem): void {
-		if (this.originTitles.has(item.file.path)) {
-			item.titleInnerEl.innerText = this.originTitles.get(item.file.path);
-		}
-	}
+        const title = await this.resolver.resolve(item.file);
+        if (this.isTitleEmpty(title)) {
+            if (this.originTitles.has(item.file.path)) {
+                return this.restore(item);
+            }
+        } else if (item.titleInnerEl.innerText !== title) {
+            this.keepOrigin(item);
+            item.titleInnerEl.innerText = title;
+        }
+    }
+
+    private isTitleEmpty = (title: string): boolean => title === null || title === '';
+
+    private keepOrigin(item: TFileExplorerItem): void {
+        if (!this.originTitles.has(item.file.path)) {
+            this.originTitles.set(item.file.path, item.titleInnerEl.innerText);
+        }
+    }
+
+    private restoreTitles(): void {
+        Object.values(this.explorerView.fileItems).map(this.restore.bind(this));
+    }
+
+    private restore(item: TFileExplorerItem): void {
+        if (this.originTitles.has(item.file.path)) {
+            item.titleInnerEl.innerText = this.originTitles.get(item.file.path);
+        }
+    }
 }

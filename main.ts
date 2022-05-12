@@ -1,29 +1,43 @@
-import {debounce, Plugin, TFileExplorerView} from 'obsidian';
+import {debounce, Debouncer, Plugin, TAbstractFile, TFileExplorerView} from 'obsidian';
+import {debounce as ts_debounce} from 'ts-debounce';
 import FileTitleResolver from "./src/FileTitleResolver";
 import ExplorerTitles from "./src/Titles/ExplorerTitles";
 import GraphTitles from "./src/Titles/GraphTitles";
 import {Settings, SettingsTab} from "./src/Settings";
+import TitlesManager from "./src/Titles/TitlesManager";
+
+type Manager = 'graph' | 'explorer';
 
 export default class MetaTitlePlugin extends Plugin {
-    settings: Settings;
-    resolver: FileTitleResolver;
-    explorer: ExplorerTitles;
-    graph: GraphTitles;
+    public settings: Settings;
+    private resolver: FileTitleResolver;
+    private saveSettingDebounce: Debouncer<void> = null;
+    private managers: Map<Manager, TitlesManager> = new Map();
 
-    public saveSettings = debounce(
-        async () => {
-            const settings = this.settings.getAll();
-            await this.saveData(settings);
-            this.resolver.setMetaPath(settings.path);
-            this.resolver.setExcluded(settings.excluded_folders);
-            this.toggleGraph(settings.graph_enabled)
-            await this.toggleExplorer(settings.explorer_enabled);
-        },
-        1000
-    );
+    private get graph(): TitlesManager | null {
+        return this.managers.get('graph') ?? null;
+    }
 
-    public register(cb: () => any) {
-        super.register(cb);
+    private get explorer(): TitlesManager | null {
+        return this.managers.get('explorer') ?? null;
+    }
+
+    public async saveSettings() {
+        if (this.saveSettingDebounce === null) {
+            this.saveSettingDebounce = debounce(
+                async () => {
+                    const settings = this.settings.getAll();
+                    await this.saveData(settings);
+                    this.resolver.setMetaPath(settings.path);
+                    this.resolver.setExcluded(settings.excluded_folders);
+                    this.toggleGraph(settings.graph_enabled)
+                    await this.toggleExplorer(settings.explorer_enabled);
+                },
+                1000,
+                true
+            )
+        }
+        this.saveSettingDebounce();
     }
 
     public async onload() {
@@ -32,23 +46,22 @@ export default class MetaTitlePlugin extends Plugin {
 
         this.bind();
 
-        this.resolver = new FileTitleResolver(this.app.vault, {
+        this.resolver = new FileTitleResolver(this.app.metadataCache, {
             metaPath: this.settings.get('path'),
             excluded: this.settings.get('excluded_folders')
         });
         this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
 
-        this.toggleGraph(this.settings.get('graph_enabled'));
-
         this.app.workspace.onLayoutReady(() => {
+            this.toggleGraph(this.settings.get('graph_enabled'));
             this.toggleExplorer(this.settings.get('explorer_enabled'));
-        })
+        });
+
         this.addSettingTab(new SettingsTab(this.app, this));
     }
 
     public onunload() {
-        this.explorer?.restoreTitles();
-        this.graph?.onUnload();
+        this.managers.forEach(e => e.disable());
         this.resolver.removeAllListeners('unresolved');
     }
 
@@ -56,10 +69,12 @@ export default class MetaTitlePlugin extends Plugin {
         const leaves = this.app.workspace.getLeavesOfType('file-explorer');
 
         if (leaves.length > 1) {
+            //TODO: error? Try to work with more than one explorer?
             console.log('there is more then one explorer')
             return null;
         }
 
+        //TODO: what if it be later?
         if (leaves?.first()?.view === undefined) {
             console.log('explorer is undefined');
             return null;
@@ -69,45 +84,45 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private async toggleExplorer(state: boolean = true): Promise<void> {
+        console.log(state, this.explorer);
         if (state && !this.explorer) {
             const view = this.getExplorerView();
-            this.explorer = new ExplorerTitles(view, this.resolver);
-            await this.explorer.initTitles();
+            this.managers.set('explorer', new ExplorerTitles(view, this.resolver));
+            this.explorer.enable();
+            await this.explorer.update();
         } else if (!state && this.explorer) {
-            this.explorer.restoreTitles();
-            this.explorer = null;
+            this.explorer.disable();
+            this.managers.delete('explorer');
         }
     }
 
     private toggleGraph(state: boolean = true): void {
         if (state && !this.graph) {
-            this.graph = new GraphTitles(this.app.workspace, this.resolver);
-            this.graph.tryToReplaceNodeTextFunction();
-            this.graph.forceTitleUpdate();
-        } else if (!state) {
-            this.graph?.onUnload();
-            this.graph?.forceTitleUpdate();
-            this.graph = null;
+            this.managers.set('graph', new GraphTitles(this.app.workspace, this.resolver));
+            this.graph.enable();
+            this.graph.update().catch(console.error);
+        } else if (!state && this.graph) {
+            this.graph.disable();
+            this.managers.delete('graph');
         }
     }
 
     private bind() {
-        this.registerEvent(this.app.vault.on('modify', file => {
-            this.resolver?.handleModify(file);
-            this.explorer?.updateTitle(file).catch(console.error);
-            this.graph?.forceTitleUpdate(file);
+        this.registerEvent(this.app.metadataCache.on('changed', file => {
+            console.log(file);
+            this.resolver?.handleCacheChanged(file);
+            this.runManagersUpdate(file).catch(console.error)
         }));
 
-        let isReplaced = false;
 
         const initGraph = () => {
-            if (isReplaced) {
+            if (!this.graph || this.graph.isEnabled()) {
                 return;
             }
-            isReplaced = this.graph.tryToReplaceNodeTextFunction();
+            this.graph.enable();
 
-            if (isReplaced) {
-                this.graph.forceTitleUpdate();
+            if (this.graph.isEnabled()) {
+                this.graph.update().catch(console.error);
             } else if (this.app.workspace.getLeavesOfType('graph').length) {
                 setTimeout(initGraph.bind(this), 20);
             }
@@ -116,9 +131,16 @@ export default class MetaTitlePlugin extends Plugin {
         this.registerEvent(this.app.workspace.on('layout-change', initGraph.bind(this)));
     }
 
+    private async runManagersUpdate(abstract: TAbstractFile = null): Promise<void> {
+        const promises = [];
+        for (const manager of this.managers.values()) {
+            promises.push(manager.update(abstract));
+        }
+        await Promise.all(promises);
+    }
+
 
     private async onUnresolvedHandler(): Promise<void> {
-        await this.explorer?.initTitles();
-        this.graph?.forceTitleUpdate();
+        await this.runManagersUpdate();
     }
 }
