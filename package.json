@@ -4,9 +4,11 @@
 	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
 	"main": "main.js",
 	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc --project tsconfig.build.json -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"pack.beta": "node utils/pack-release.mjs beta",
+		"pack.release": "node utils/pack-release.mjs release",
+		"dev": "node utils/esbuild.config.mjs",
+		"build": "tsc --project tsconfig.build.json -noEmit -skipLibCheck && node utils/esbuild.config.mjs production",
+		"version": "node utils/version-bump.mjs && git add manifest.json versions.json",
 		"test": "jest",
 		"eslint": "eslint src"
 	},
@@ -18,6 +20,7 @@
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "^5.2.0",
 		"@typescript-eslint/parser": "^5.2.0",
+		"adm-zip": "^0.5.9",
 		"builtin-modules": "^3.2.0",
 		"esbuild": "0.13.12",
 		"eslint": "^8.14.0",
