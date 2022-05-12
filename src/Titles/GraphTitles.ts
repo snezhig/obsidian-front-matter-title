@@ -15,7 +15,7 @@ export default class GraphTitles implements TitlesManager {
         private workspace: Workspace,
         private resolver: FileTitleResolver,
     ) {
-        this.queue = new Queue<string, void>(this.runQueue.bind(this), 200)
+        this.queue = new Queue<string, void>(this.runQueue.bind(this), 50)
     }
 
     private getTitle(id: string): string | null | false {
