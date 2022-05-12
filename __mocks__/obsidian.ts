@@ -1,8 +1,6 @@
 import * as fs from "fs";
-import YAML from 'yaml'
 import {EventEmitter} from "events";
-import {Debouncer, TFileExplorerItem, WorkspaceLeaf} from "obsidian";
-import {debounce as ts_debounce} from "ts-debounce";
+import {CachedMetadata, TFileExplorerItem, WorkspaceLeaf} from "obsidian";
 
 export abstract class TAbstractFile {
     path: string;
@@ -44,23 +42,25 @@ export class TFileExplorer {
     };
 }
 
-export function parseYaml(yaml: string) {
-    return YAML.parse(yaml);
-}
 
-
-export class Workspace{
-    getLeavesOfType(viewType: string): WorkspaceLeaf[]{
+export class Workspace {
+    getLeavesOfType(viewType: string): WorkspaceLeaf[] {
         return [];
     }
 }
 
-export class GraphLeaf{
+export class GraphLeaf {
 
 }
 
-export class GraphNode{
-    getDisplayText(){
+export class GraphNode {
+    getDisplayText() {
 
+    }
+}
+
+export class MetadataCache {
+    public getCache(path: string): CachedMetadata | null {
+        return null;
     }
 }

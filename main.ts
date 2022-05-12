@@ -46,7 +46,7 @@ export default class MetaTitlePlugin extends Plugin {
 
         this.bind();
 
-        this.resolver = new FileTitleResolver(this.app.vault, {
+        this.resolver = new FileTitleResolver(this.app.metadataCache, {
             metaPath: this.settings.get('path'),
             excluded: this.settings.get('excluded_folders')
         });
@@ -84,9 +84,11 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private async toggleExplorer(state: boolean = true): Promise<void> {
+        console.log(state, this.explorer);
         if (state && !this.explorer) {
             const view = this.getExplorerView();
             this.managers.set('explorer', new ExplorerTitles(view, this.resolver));
+            this.explorer.enable();
             await this.explorer.update();
         } else if (!state && this.explorer) {
             this.explorer.disable();
@@ -106,8 +108,9 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private bind() {
-        this.registerEvent(this.app.vault.on('modify', file => {
-            this.resolver?.handleModify(file);
+        this.registerEvent(this.app.metadataCache.on('changed', file => {
+            console.log(file);
+            this.resolver?.handleCacheChanged(file);
             this.runManagersUpdate(file).catch(console.error)
         }));
 

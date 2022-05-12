@@ -1,6 +1,6 @@
 import ExplorerTitles from "../../../src/Titles/ExplorerTitles";
 import FileTitleResolver from "../../../src/FileTitleResolver";
-import {TFile, TFileExplorerView, TFileExplorerItem, Vault, WorkspaceLeaf} from "obsidian";
+import {TFile, TFileExplorerView, TFileExplorerItem, Vault, WorkspaceLeaf, MetadataCache} from "obsidian";
 import {expect} from "@jest/globals";
 
 
@@ -17,7 +17,7 @@ const createItem = (text: string): TFileExplorerItem => {
 	return {file, titleInnerEl, titleEl: null}
 }
 
-const resolver = new FileTitleResolver(new Vault(), {metaPath: 'title', excluded: []});
+const resolver = new FileTitleResolver(new MetadataCache(), {metaPath: 'title', excluded: []});
 
 resolver.resolve = jest.fn().mockImplementation(async () => titles.resolved);
 
