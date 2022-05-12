@@ -1,5 +1,5 @@
 import {CachedMetadata, MetadataCache, TAbstractFile} from "obsidian";
-import Item from "./TitleResolverItem";
+import Item from "./ResolverItem";
 import MetaTitleParser from "../../MetaTitleParser";
 
 type Options = {
@@ -7,7 +7,7 @@ type Options = {
     excluded: string[]
 }
 
-export default class TitleResolver {
+export default class Resolver {
     private collection: Map<string, Item>;
     private options: Options;
     private listeners = new Map<string, Function[]>();
@@ -75,23 +75,23 @@ export default class TitleResolver {
     }
 
     public isResolved(value: TAbstractFile | string): boolean {
-        const path = TitleResolver.getPathByAbstract(value);
+        const path = Resolver.getPathByAbstract(value);
         return this.collection.get(path)?.isResolved();
     }
 
     public getResolved(value: TAbstractFile | string): string | null {
-        const path = TitleResolver.getPathByAbstract(value);
+        const path = Resolver.getPathByAbstract(value);
         return this.collection.get(path)?.getResolved() ?? null;
     }
 
     public async resolve(abstract: TAbstractFile | string): Promise<string | null> {
-        const item = this.getOrCreate(TitleResolver.getPathByAbstract(abstract))
+        const item = this.getOrCreate(Resolver.getPathByAbstract(abstract))
         return item ? item.await() : null;
 
     }
 
     public revoke(abstract: TAbstractFile | string): void {
-        this.collection.delete(TitleResolver.getPathByAbstract(abstract));
+        this.collection.delete(Resolver.getPathByAbstract(abstract));
     }
 
     private emit(eventName: string): void {

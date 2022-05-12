@@ -1,4 +1,4 @@
-import TitleResolver from "../../../../src/Title/Resolver/TitleResolver";
+import Resolver from "../../../../src/Title/Resolver/Resolver";
 import {MetadataCache, Vault} from "obsidian";
 import MetaTitleParser from "../../../../src/MetaTitleParser";
 
@@ -13,7 +13,7 @@ const Options = {
 const vault = new Vault();
 
 const onUnresolvedHandler = jest.fn();
-let resolver = new TitleResolver(new MetadataCache(), Options);
+let resolver = new Resolver(new MetadataCache(), Options);
 resolver.on('unresolved', onUnresolvedHandler);
 
 describe('File Title Resolver Test', () => {

@@ -1,10 +1,10 @@
-import GraphTitles from "../../../src/Titles/GraphTitles";
+import GraphManager from "../../../../src/Title/Manager/GraphManager";
 import {GraphLeaf, GraphNode, GraphView, TFile, Workspace} from "obsidian";
 import {expect} from "@jest/globals";
-import Queue from "../../../src/Utils/Queue";
-import TitleResolver from "../../../src/Title/Resolver/TitleResolver";
+import Queue from "../../../../src/Utils/Queue";
+import Resolver from "../../../../src/Title/Resolver/Resolver";
 
-jest.mock('../../../src/Title/Resolver/TitleResolver');
+jest.mock('../../../../src/Title/Resolver/Resolver');
 
 Array.prototype.first = function () {
     return this[0];
@@ -12,13 +12,13 @@ Array.prototype.first = function () {
 
 const mocks = {
     resolver: {
-        resolve: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'resolve').mockImplementation(async () => {
+        resolve: jest.spyOn<Resolver, any>(Resolver.prototype, 'resolve').mockImplementation(async () => {
             resolvedTitle = Math.random().toString();
             return resolvedTitle;
         }),
-        isSupported: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'isSupported').mockImplementation(() => true),
-        isResolved: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'isResolved').mockImplementation(() => resolvedTitle !== null),
-        getResolved: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'getResolved').mockImplementation(() => resolvedTitle)
+        isSupported: jest.spyOn<Resolver, any>(Resolver.prototype, 'isSupported').mockImplementation(() => true),
+        isResolved: jest.spyOn<Resolver, any>(Resolver.prototype, 'isResolved').mockImplementation(() => resolvedTitle !== null),
+        getResolved: jest.spyOn<Resolver, any>(Resolver.prototype, 'getResolved').mockImplementation(() => resolvedTitle)
     },
     workspace: {
         getLeavesOfType: jest.spyOn<Workspace, any>(Workspace.prototype, 'getLeavesOfType').mockImplementation(() => [])
@@ -37,9 +37,9 @@ const createNode = () => {
     return node;
 };
 
-const graph = new GraphTitles(
+const graph = new GraphManager(
     Object.create(Workspace.prototype),
-    Object.create(TitleResolver.prototype)
+    Object.create(Resolver.prototype)
 );
 
 describe('Graph Titles Test', () => {
@@ -124,16 +124,15 @@ describe('Graph Titles Test', () => {
         });
 
 
-        // test('Graph disabled', async () => {
-        //     mocks.getDisplayText.mockClear();
-        //     graph.disable();
-        //     expect(lastQueueAdd).not.toBeNull();
-        //     expect(graph.isEnabled()).toBeFalsy();
-        //     await lastQueueAdd;
-        //     expect(mocks.getDisplayText).toBeCalledTimes(1);
-        //     expect(node.getDisplayText()).toEqual(nodeText);
-        //     expect(mocks.getDisplayText).toBeCalledTimes(2);
-        // });
+        test('Graph disabled', async () => {
+            mocks.getDisplayText.mockClear();
+            graph.disable();
+            expect(lastQueueAdd).toBeNull();
+            expect(graph.isEnabled()).toBeFalsy();
+            expect(mocks.onIframeLoad).toHaveBeenCalled();
+            expect(mocks.getDisplayText).toBeCalledTimes(1);
+            expect(node.getDisplayText()).toEqual(nodeText);
+        });
     })
 
 

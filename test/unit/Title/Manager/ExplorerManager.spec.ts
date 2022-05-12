@@ -1,7 +1,7 @@
-import ExplorerTitles from "../../../src/Titles/ExplorerTitles";
+import ExplorerManager from "../../../../src/Title/Manager/ExplorerManager";
 import {TFile, TFileExplorerView, TFileExplorerItem,MetadataCache} from "obsidian";
 import {expect} from "@jest/globals";
-import TitleResolver from "../../../src/Title/Resolver/TitleResolver";
+import Resolver from "../../../../src/Title/Resolver/Resolver";
 
 
 let titles: {
@@ -17,14 +17,14 @@ const createItem = (text: string): TFileExplorerItem => {
 	return {file, titleInnerEl, titleEl: null}
 }
 
-const resolver = new TitleResolver(new MetadataCache(), {metaPath: 'title', excluded: []});
+const resolver = new Resolver(new MetadataCache(), {metaPath: 'title', excluded: []});
 
 resolver.resolve = jest.fn().mockImplementation(async () => titles.resolved);
 
 const explorerView = {} as TFileExplorerView;
 explorerView.fileItems = {};
 
-const explorer = new ExplorerTitles(explorerView, resolver);
+const explorer = new ExplorerManager(explorerView, resolver);
 
 
 describe('Explorer Titles Test', () => {

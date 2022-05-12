@@ -1,18 +1,18 @@
-import TitleResolver from "src/Title/Resolver/TitleResolver";
-import FunctionReplacer from "../Utils/FunctionReplacer";
+import Resolver from "src/Title/Resolver/Resolver";
+import FunctionReplacer from "../../Utils/FunctionReplacer";
 import {GraphLeaf, GraphNode, TAbstractFile, Workspace} from "obsidian";
-import Queue from "../Utils/Queue";
-import TitlesManager from "./TitlesManager";
+import Queue from "../../Utils/Queue";
+import Manager from "./Manager";
 
-export default class GraphTitles implements TitlesManager {
-    private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphTitles> = null;
+export default class GraphManager implements Manager {
+    private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphManager> = null;
     private queue: Queue<string, void>;
     private enabled = false;
     private lastTitles = new Map<string, string>();
 
     constructor(
         private workspace: Workspace,
-        private resolver: TitleResolver,
+        private resolver: Resolver,
     ) {
         this.queue = new Queue<string, void>(this.runQueue.bind(this), 50)
     }
@@ -23,7 +23,7 @@ export default class GraphTitles implements TitlesManager {
     }
 
     private static getReplaceFunction() {
-        return function (self: GraphTitles, defaultArgs: unknown[], vanilla: Function) {
+        return function (self: GraphManager, defaultArgs: unknown[], vanilla: Function) {
             if (self.resolver.isSupported(this.id)) {
                 const title = self.getTitle(this.id);
                 if (title) {
@@ -41,7 +41,7 @@ export default class GraphTitles implements TitlesManager {
 
     disable(): void {
         this.replacement.disable();
-        this.update().catch(console.error);
+        this.reloadIframeWithNodes(new Set(this.lastTitles.keys()));
         this.enabled = false;
     }
 
@@ -122,26 +122,28 @@ export default class GraphTitles implements TitlesManager {
             return;
         }
 
+        this.reloadIframeWithNodes(items);
+        items.clear();
+    }
 
+    private reloadIframeWithNodes(nodeIds: Set<string>): void{
         for (const leaf of this.getLeaves()) {
             const nodes = leaf?.view?.renderer?.nodes ?? [];
             for (const node of nodes) {
-                if (items.has(node.id)) {
+                if (nodeIds.has(node.id)) {
                     leaf.view?.renderer?.onIframeLoad();
                     break;
                 }
             }
         }
-
-        items.clear();
     }
 
-    private createReplacement(node: GraphNode): FunctionReplacer<GraphNode, 'getDisplayText', GraphTitles> {
+    private createReplacement(node: GraphNode): FunctionReplacer<GraphNode, 'getDisplayText', GraphManager> {
         return new FunctionReplacer(
             Object.getPrototypeOf(node),
             'getDisplayText',
             this,
-            GraphTitles.getReplaceFunction()
+            GraphManager.getReplaceFunction()
         );
     }
 }

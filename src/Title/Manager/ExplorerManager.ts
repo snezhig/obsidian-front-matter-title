@@ -1,14 +1,14 @@
 import {TAbstractFile, TFileExplorerItem, TFileExplorerView} from "obsidian";
-import TitleResolver from "src/Title/Resolver/TitleResolver";
-import TitlesManager from "./TitlesManager";
+import Resolver from "src/Title/Resolver/Resolver";
+import Manager from "./Manager";
 
-export default class ExplorerTitles implements TitlesManager {
+export default class ExplorerManager implements Manager {
     private originTitles = new Map<string, string>();
     private enabled = false;
 
     constructor(
         private explorerView: TFileExplorerView,
-        private resolver: TitleResolver
+        private resolver: Resolver
     ) {
     }
 

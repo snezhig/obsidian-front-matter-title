@@ -1,4 +1,4 @@
-export default class TitleResolverItem {
+export default class ResolverItem {
     private title: string | null;
     private promise: Promise<string | null> | null;
 
