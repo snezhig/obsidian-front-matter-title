@@ -1,9 +1,8 @@
-import FileTitleResolver from "../FileTitleResolver";
+import TitleResolver from "src/Title/Resolver/TitleResolver";
 import FunctionReplacer from "../Utils/FunctionReplacer";
 import {GraphLeaf, GraphNode, TAbstractFile, Workspace} from "obsidian";
 import Queue from "../Utils/Queue";
 import TitlesManager from "./TitlesManager";
-import {string} from "yaml/dist/schema/common/string";
 
 export default class GraphTitles implements TitlesManager {
     private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphTitles> = null;
@@ -13,7 +12,7 @@ export default class GraphTitles implements TitlesManager {
 
     constructor(
         private workspace: Workspace,
-        private resolver: FileTitleResolver,
+        private resolver: TitleResolver,
     ) {
         this.queue = new Queue<string, void>(this.runQueue.bind(this), 50)
     }
@@ -25,7 +24,7 @@ export default class GraphTitles implements TitlesManager {
 
     private static getReplaceFunction() {
         return function (self: GraphTitles, defaultArgs: unknown[], vanilla: Function) {
-            if (self.resolver.canBeResolved(this.id)) {
+            if (self.resolver.isSupported(this.id)) {
                 const title = self.getTitle(this.id);
                 if (title) {
                     self.lastTitles.set(this.id, title);

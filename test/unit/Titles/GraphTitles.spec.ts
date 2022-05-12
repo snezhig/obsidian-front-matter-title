@@ -1,10 +1,10 @@
 import GraphTitles from "../../../src/Titles/GraphTitles";
-import FileTitleResolver from "../../../src/FileTitleResolver";
 import {GraphLeaf, GraphNode, GraphView, TFile, Workspace} from "obsidian";
 import {expect} from "@jest/globals";
 import Queue from "../../../src/Utils/Queue";
+import TitleResolver from "../../../src/Title/Resolver/TitleResolver";
 
-jest.mock('../../../src/FileTitleResolver');
+jest.mock('../../../src/Title/Resolver/TitleResolver');
 
 Array.prototype.first = function () {
     return this[0];
@@ -12,13 +12,13 @@ Array.prototype.first = function () {
 
 const mocks = {
     resolver: {
-        resolve: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'resolve').mockImplementation(async () => {
+        resolve: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'resolve').mockImplementation(async () => {
             resolvedTitle = Math.random().toString();
             return resolvedTitle;
         }),
-        canBeResolved: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'canBeResolved').mockImplementation(() => true),
-        isResolved: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'isResolved').mockImplementation(() => resolvedTitle !== null),
-        getResolved: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'getResolved').mockImplementation(() => resolvedTitle)
+        isSupported: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'isSupported').mockImplementation(() => true),
+        isResolved: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'isResolved').mockImplementation(() => resolvedTitle !== null),
+        getResolved: jest.spyOn<TitleResolver, any>(TitleResolver.prototype, 'getResolved').mockImplementation(() => resolvedTitle)
     },
     workspace: {
         getLeavesOfType: jest.spyOn<Workspace, any>(Workspace.prototype, 'getLeavesOfType').mockImplementation(() => [])
@@ -39,7 +39,7 @@ const createNode = () => {
 
 const graph = new GraphTitles(
     Object.create(Workspace.prototype),
-    Object.create(FileTitleResolver.prototype)
+    Object.create(TitleResolver.prototype)
 );
 
 describe('Graph Titles Test', () => {
@@ -87,7 +87,7 @@ describe('Graph Titles Test', () => {
             })
 
             test('Original function will be called once without resolving', async () => {
-                mocks.resolver.canBeResolved.mockReturnValueOnce(false);
+                mocks.resolver.isSupported.mockReturnValueOnce(false);
                 expect(mocks.getDisplayText).not.toHaveBeenCalled();
                 leaf.view.renderer.onIframeLoad();
                 expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);

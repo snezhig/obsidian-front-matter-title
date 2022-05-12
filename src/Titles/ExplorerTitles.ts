@@ -1,5 +1,5 @@
 import {TAbstractFile, TFileExplorerItem, TFileExplorerView} from "obsidian";
-import FileTitleResolver from "../FileTitleResolver";
+import TitleResolver from "src/Title/Resolver/TitleResolver";
 import TitlesManager from "./TitlesManager";
 
 export default class ExplorerTitles implements TitlesManager {
@@ -8,7 +8,7 @@ export default class ExplorerTitles implements TitlesManager {
 
     constructor(
         private explorerView: TFileExplorerView,
-        private resolver: FileTitleResolver
+        private resolver: TitleResolver
     ) {
     }
 
@@ -43,9 +43,7 @@ export default class ExplorerTitles implements TitlesManager {
 
         const title = await this.resolver.resolve(item.file);
         if (this.isTitleEmpty(title)) {
-            if (this.originTitles.has(item.file.path)) {
-                return this.restore(item);
-            }
+            return this.restore(item);
         } else if (item.titleInnerEl.innerText !== title) {
             this.keepOrigin(item);
             item.titleInnerEl.innerText = title;
@@ -67,6 +65,7 @@ export default class ExplorerTitles implements TitlesManager {
     private restore(item: TFileExplorerItem): void {
         if (this.originTitles.has(item.file.path)) {
             item.titleInnerEl.innerText = this.originTitles.get(item.file.path);
+            this.originTitles.delete(item.file.path);
         }
     }
 }

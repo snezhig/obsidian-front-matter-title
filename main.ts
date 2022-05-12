@@ -1,6 +1,5 @@
 import {debounce, Debouncer, Plugin, TAbstractFile, TFileExplorerView} from 'obsidian';
-import {debounce as ts_debounce} from 'ts-debounce';
-import FileTitleResolver from "./src/FileTitleResolver";
+import TitleResolver from "./src/Title/Resolver/TitleResolver";
 import ExplorerTitles from "./src/Titles/ExplorerTitles";
 import GraphTitles from "./src/Titles/GraphTitles";
 import {Settings, SettingsTab} from "./src/Settings";
@@ -10,8 +9,8 @@ type Manager = 'graph' | 'explorer';
 
 export default class MetaTitlePlugin extends Plugin {
     public settings: Settings;
-    private resolver: FileTitleResolver;
-    private saveSettingDebounce: Debouncer<void> = null;
+    private resolver: TitleResolver;
+    private saveSettingDebounce: Debouncer<unknown[]> = null;
     private managers: Map<Manager, TitlesManager> = new Map();
 
     private get graph(): TitlesManager | null {
@@ -46,7 +45,7 @@ export default class MetaTitlePlugin extends Plugin {
 
         this.bind();
 
-        this.resolver = new FileTitleResolver(this.app.metadataCache, {
+        this.resolver = new TitleResolver(this.app.metadataCache, {
             metaPath: this.settings.get('path'),
             excluded: this.settings.get('excluded_folders')
         });
@@ -110,7 +109,7 @@ export default class MetaTitlePlugin extends Plugin {
     private bind() {
         this.registerEvent(this.app.metadataCache.on('changed', file => {
             console.log(file);
-            this.resolver?.handleCacheChanged(file);
+            this.resolver?.revoke(file);
             this.runManagersUpdate(file).catch(console.error)
         }));
 
