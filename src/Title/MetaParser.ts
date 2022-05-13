@@ -1,7 +1,7 @@
 import {CachedMetadata} from "obsidian";
-import EmptyMetaPathError from "./Errors/EmptyMetaPathError";
+import EmptyMetaPathError from "../Errors/EmptyMetaPathError";
 
-export default class MetaTitleParser {
+export default class MetaParser {
 
 	public static async parse(metaPath: string, metadata: CachedMetadata): Promise<string | null> {
 		if (metaPath === '') {

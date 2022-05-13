@@ -1,6 +1,6 @@
 import {CachedMetadata, MetadataCache, TAbstractFile} from "obsidian";
 import Item from "./ResolverItem";
-import MetaTitleParser from "../../MetaTitleParser";
+import MetaParser from "../MetaParser";
 
 type Options = {
     metaPath: string,
@@ -117,7 +117,7 @@ export default class Resolver {
 
                 item.process(new Promise(r => {
                     const metadata: CachedMetadata = this.cache.getCache(path) ?? {};
-                    r(MetaTitleParser.parse(this.options.metaPath, metadata));
+                    r(MetaParser.parse(this.options.metaPath, metadata));
                 })).catch(console.error);
 
                 this.collection.set(path, item);

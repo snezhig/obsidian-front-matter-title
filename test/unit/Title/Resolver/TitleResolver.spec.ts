@@ -1,10 +1,10 @@
 import Resolver from "../../../../src/Title/Resolver/Resolver";
 import {MetadataCache, Vault} from "obsidian";
-import MetaTitleParser from "../../../../src/MetaTitleParser";
+import MetaParser from "../../../../src/Title/MetaParser";
 
-jest.mock('../../../../src/MetaTitleParser');
+jest.mock('../../../../src/Title/MetaParser');
 const read = jest.spyOn<MetadataCache, any>(MetadataCache.prototype, 'getCache').mockImplementation(() => null);
-const parse = jest.spyOn(MetaTitleParser, "parse");
+const parse = jest.spyOn(MetaParser, "parse");
 
 const Options = {
     metaPath: 'title',

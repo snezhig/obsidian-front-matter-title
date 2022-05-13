@@ -1,5 +1,5 @@
-import MetaTitleParser from "../../src/MetaTitleParser";
-import EmptyMetaPathError from "../../src/Errors/EmptyMetaPathError";
+import MetaParser from "../../../src/Title/MetaParser";
+import EmptyMetaPathError from "../../../src/Errors/EmptyMetaPathError";
 import {expect} from "@jest/globals";
 import * as fs from "fs";
 import {CachedMetadata} from "obsidian";
@@ -7,10 +7,10 @@ import YAML from "yaml";
 import path = require("path");
 
 describe('Parser Test Meta', () => {
-    let parser = MetaTitleParser;
+    let parser = MetaParser;
     let fileName = "HasMetaTitle.md";
     const getMetadata = (): CachedMetadata => {
-        const content = fs.readFileSync(path.join(__dirname, `../docs/${fileName}`), 'utf8');
+        const content = fs.readFileSync(path.join(__dirname, `../../docs/${fileName}`), 'utf8');
         const yaml = content.match(/^---\n(?<yaml>.*?)---/s)?.groups?.yaml;
         let metadata: CachedMetadata = {};
         if (yaml) {
