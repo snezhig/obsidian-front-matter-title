@@ -106,7 +106,7 @@ describe('File Title Resolver Test', () => {
             title = newTitle;
         }
 
-        test('Parser must be called', async () => {
+        test('PathTemplate must be called', async () => {
             title = await resolver.resolve(path);
             expect(parse).toHaveBeenCalled();
         });

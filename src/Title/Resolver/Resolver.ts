@@ -1,6 +1,7 @@
 import {CachedMetadata, MetadataCache, TAbstractFile} from "obsidian";
 import Item from "./ResolverItem";
 import MetaParser from "../MetaParser";
+import PathTemplate from "../../PathTemplate/PathTemplateInterface";
 
 type Options = {
     metaPath: string,
@@ -11,6 +12,7 @@ export default class Resolver {
     private collection: Map<string, Item>;
     private options: Options;
     private listeners = new Map<string, Function[]>();
+    private template: PathTemplate = null;
 
     constructor(
         private cache: MetadataCache,
