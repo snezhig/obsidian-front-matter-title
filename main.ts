@@ -22,27 +22,18 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     public async saveSettings() {
-        if (this.saveSettingDebounce === null) {
-            this.saveSettingDebounce = debounce(
-                async () => {
-                    const settings = this.settings.getAll();
-                    await this.saveData(settings);
-                    this.resolver.setMetaPath(settings.path);
-                    this.resolver.setExcluded(settings.excluded_folders);
-                    this.toggleGraph(settings.graph_enabled)
-                    await this.toggleExplorer(settings.explorer_enabled);
-                },
-                1000,
-                true
-            )
-        }
-        this.saveSettingDebounce();
+        const settings = this.settings.getAll();
+        await this.saveData(settings);
+        this.resolver.setMetaPath(settings.path);
+        this.resolver.setExcluded(settings.excluded_folders);
+        this.toggleGraph(settings.graph_enabled)
+        await this.toggleExplorer(settings.explorer_enabled);
     }
 
     public async onload() {
+        this.saveSettings = debounce(this.saveSettings, 500, true) as () => Promise<void>
 
         this.settings = new Settings(await this.loadData());
-
         this.bind();
 
         this.resolver = new Resolver(this.app.metadataCache, {
