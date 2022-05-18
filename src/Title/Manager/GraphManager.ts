@@ -18,7 +18,7 @@ export default class GraphManager implements Manager {
     }
 
     private getTitle(id: string): string | null | false {
-        //TODO: what if it can be resolved, but is not resolved again and again?
+        //TODO: what if it can be resolved, but is not resolved again and again? (Try to repeat)
         return this.resolver.isResolved(id) ? this.resolver.getResolved(id) : false;
     }
 
