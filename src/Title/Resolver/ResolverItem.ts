@@ -3,18 +3,22 @@ export default class ResolverItem {
     private promise: Promise<string | null> | null;
 
 
-    public process(promise: Promise<string | null>): Promise<string | null> {
-        this.promise = new Promise<string | null>(async (r) => {
-            let title = await promise;
-            title = (title === null || title === '') ? null : title;
+    public process(promise: Promise<string | null>): void {
+        this.promise = new Promise<string | null>(async (r, reject) => {
+            try {
+                let title = await promise;
+                title = (title === null || title === '') ? null : title;
 
-            this.title = title;
-            this.promise = null;
+                this.title = title;
+                this.promise = null;
 
-            r(this.title);
+                r(this.title);
+            } catch (e) {
+                reject(e);
+            }
         })
 
-        return this.promise;
+        return;
     }
 
     public async await(): Promise<string | null> {

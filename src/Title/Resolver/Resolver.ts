@@ -74,11 +74,19 @@ export default class Resolver {
         return !this.isExcluded(path) && /\.md$/.test(path);
     }
 
+    /**
+     * @deprecated
+     * @param value
+     */
     public isResolved(value: TAbstractFile | string): boolean {
         const path = Resolver.getPathByAbstract(value);
         return this.collection.get(path)?.isResolved();
     }
 
+    /**
+     * @deprecated
+     * @param value
+     */
     public getResolved(value: TAbstractFile | string): string | null {
         const path = Resolver.getPathByAbstract(value);
         return this.collection.get(path)?.getResolved() ?? null;
@@ -87,7 +95,6 @@ export default class Resolver {
     public async resolve(fileOrPath: TAbstractFile | string): Promise<string | null> {
         const item = this.getOrCreate(Resolver.getPathByAbstract(fileOrPath))
         return item ? item.await() : null;
-
     }
 
     public revoke(fileOrPath: TAbstractFile | string): void {
@@ -115,10 +122,14 @@ export default class Resolver {
             if (!this.collection.has(path)) {
                 const item = new Item();
 
-                item.process(new Promise(r => {
+                item.process(new Promise((res, rej) => {
                     const metadata: CachedMetadata = this.cache.getCache(path) ?? {};
-                    r(MetaParser.parse(this.options.metaPath, metadata));
-                })).catch(console.error);
+                    try {
+                        res(MetaParser.parse(this.options.metaPath, metadata));
+                    } catch (e) {
+                        rej(e);
+                    }
+                }));
 
                 this.collection.set(path, item);
 

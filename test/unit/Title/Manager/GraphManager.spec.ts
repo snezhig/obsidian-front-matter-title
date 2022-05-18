@@ -17,8 +17,6 @@ const mocks = {
             return resolvedTitle;
         }),
         isSupported: jest.spyOn<Resolver, any>(Resolver.prototype, 'isSupported').mockImplementation(() => true),
-        isResolved: jest.spyOn<Resolver, any>(Resolver.prototype, 'isResolved').mockImplementation(() => resolvedTitle !== null),
-        getResolved: jest.spyOn<Resolver, any>(Resolver.prototype, 'getResolved').mockImplementation(() => resolvedTitle)
     },
     workspace: {
         getLeavesOfType: jest.spyOn<Workspace, any>(Workspace.prototype, 'getLeavesOfType').mockImplementation(() => [])
@@ -119,6 +117,15 @@ describe('Graph Titles Test', () => {
                     expect(lastQueueAdd).not.toBeNull();
                     await lastQueueAdd;
                     expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
+                })
+
+                test('Original will be called because of resolving reject', async () => {
+                    mocks.resolver.resolve.mockRejectedValueOnce(new Error());
+                    await expect(graph.update(file)).resolves.toBeTruthy();
+                    expect(lastQueueAdd).not.toBeNull();
+                    await lastQueueAdd;
+                    expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
+                    expect(mocks.getDisplayText).toHaveBeenCalledTimes(1);
                 })
             });
         });

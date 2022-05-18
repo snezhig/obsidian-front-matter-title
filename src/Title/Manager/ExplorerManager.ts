@@ -40,8 +40,8 @@ export default class ExplorerManager implements Manager {
     }
 
     private async setTitle(item: TFileExplorerItem): Promise<void> {
+        const title = await this.resolver.resolve(item.file).catch(() => null);
 
-        const title = await this.resolver.resolve(item.file);
         if (this.isTitleEmpty(title)) {
             return this.restore(item);
         } else if (item.titleInnerEl.innerText !== title) {

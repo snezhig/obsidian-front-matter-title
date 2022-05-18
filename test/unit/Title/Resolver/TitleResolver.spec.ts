@@ -1,10 +1,9 @@
 import Resolver from "../../../../src/Title/Resolver/Resolver";
-import {MetadataCache, Vault} from "obsidian";
+import {CachedMetadata, MetadataCache, Vault} from "obsidian";
 import MetaParser from "../../../../src/Title/MetaParser";
 import {expect} from "@jest/globals";
 
-jest.mock('../../../../src/Title/MetaParser');
-const read = jest.spyOn<MetadataCache, any>(MetadataCache.prototype, 'getCache').mockImplementation(() => null);
+const getCache = jest.spyOn<MetadataCache, any>(MetadataCache.prototype, 'getCache').mockImplementation(() => null);
 const parse = jest.spyOn(MetaParser, "parse");
 
 const Options = {
@@ -127,7 +126,6 @@ describe('File Title Resolver Test', () => {
         });
 
         test('Get title without parse after edit', testTitleResolved)
-
     });
 
     describe('Test concurrent resolving', () => {
@@ -139,7 +137,7 @@ describe('File Title Resolver Test', () => {
         });
 
         beforeEach(() => {
-            read.mockClear();
+            getCache.mockClear();
         })
 
         test('Title is not resolved and returns null', () => {
@@ -160,13 +158,27 @@ describe('File Title Resolver Test', () => {
             expect(parse).toHaveBeenCalledTimes(1);
 
 
-            expect(read).toHaveBeenCalledTimes(1);
+            expect(getCache).toHaveBeenCalledTimes(1);
             expect(parse).toHaveBeenCalledTimes(1);
         })
 
         test('Title is resolved and return expected', () => {
             expect(resolver.isResolved(path)).toBeTruthy();
             expect(resolver.getResolved(path)).toEqual(expected);
+        })
+    })
+
+    describe('Test exceptions', () => {
+        test('Return null because of non valid meta-value', async () => {
+            const path = 'array_title';
+            parse.mockRestore();
+            getCache.mockImplementationOnce(() => {
+                const meta: CachedMetadata = {};
+                meta.frontmatter = {[path]: []} as any;
+                return meta;
+            })
+            resolver.setMetaPath(path);
+            await expect(resolver.resolve(getRandomPath())).rejects.toBeInstanceOf(Error);
         })
     })
 });
