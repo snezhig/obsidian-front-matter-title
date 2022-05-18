@@ -25,13 +25,13 @@ export default class ExplorerManager implements Manager {
         this.enabled = true;
     }
 
-    async update(abstract: TAbstractFile | null = null): Promise<boolean> {
+    async update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
         if (!this.isEnabled()) {
             return false;
         }
 
-        const items = abstract
-            ? [this.explorerView.fileItems[abstract.path]]
+        const items = fileOrPath
+            ? [this.explorerView.fileItems[fileOrPath.path]]
             : Object.values(this.explorerView.fileItems);
 
         const promises = items.map(e => this.setTitle(e));

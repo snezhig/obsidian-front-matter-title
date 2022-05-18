@@ -63,17 +63,17 @@ export default class GraphManager implements Manager {
         return this.enabled;
     }
 
-    async update(abstract: TAbstractFile | null = null): Promise<boolean> {
+    async update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
         if (!this.enabled) {
             return false;
         }
 
         for (const leaf of this.getLeaves()) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
-                if (abstract && abstract.path === node.id) {
+                if (fileOrPath && fileOrPath.path === node.id) {
                     this.queue.add(node.id).catch(console.error);
                     break;
-                } else if (abstract === null) {
+                } else if (fileOrPath === null) {
                     this.queue.add(node.id).catch(console.error);
                 }
             }

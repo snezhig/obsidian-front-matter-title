@@ -31,7 +31,7 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     public async onload() {
-        this.saveSettings = debounce(this.saveSettings, 500, true) as () => Promise<void>
+        this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
 
         this.settings = new Settings(await this.loadData());
         this.bind();
@@ -104,6 +104,7 @@ export default class MetaTitlePlugin extends Plugin {
 
 
         const initGraph = () => {
+            console.log(this);
             if (!this.graph || this.graph.isEnabled()) {
                 return;
             }
@@ -116,13 +117,13 @@ export default class MetaTitlePlugin extends Plugin {
             }
         }
 
-        this.registerEvent(this.app.workspace.on('layout-change', initGraph.bind(this)));
+        this.registerEvent(this.app.workspace.on('layout-change', initGraph));
     }
 
-    private async runManagersUpdate(abstract: TAbstractFile = null): Promise<void> {
+    private async runManagersUpdate(fileOrPath: TAbstractFile = null): Promise<void> {
         const promises = [];
         for (const manager of this.managers.values()) {
-            promises.push(manager.update(abstract));
+            promises.push(manager.update(fileOrPath));
         }
         await Promise.all(promises);
     }
