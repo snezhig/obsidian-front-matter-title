@@ -1,10 +1,10 @@
-import GraphTitles from "../../../src/Titles/GraphTitles";
-import FileTitleResolver from "../../../src/FileTitleResolver";
+import GraphManager from "../../../../src/Title/Manager/GraphManager";
 import {GraphLeaf, GraphNode, GraphView, TFile, Workspace} from "obsidian";
 import {expect} from "@jest/globals";
-import Queue from "../../../src/Utils/Queue";
+import Queue from "../../../../src/Utils/Queue";
+import Resolver from "../../../../src/Title/Resolver/Resolver";
 
-jest.mock('../../../src/FileTitleResolver');
+jest.mock('../../../../src/Title/Resolver/Resolver');
 
 Array.prototype.first = function () {
     return this[0];
@@ -12,13 +12,11 @@ Array.prototype.first = function () {
 
 const mocks = {
     resolver: {
-        resolve: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'resolve').mockImplementation(async () => {
+        resolve: jest.spyOn<Resolver, any>(Resolver.prototype, 'resolve').mockImplementation(async () => {
             resolvedTitle = Math.random().toString();
             return resolvedTitle;
         }),
-        canBeResolved: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'canBeResolved').mockImplementation(() => true),
-        isResolved: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'isResolved').mockImplementation(() => resolvedTitle !== null),
-        getResolved: jest.spyOn<FileTitleResolver, any>(FileTitleResolver.prototype, 'getResolved').mockImplementation(() => resolvedTitle)
+        isSupported: jest.spyOn<Resolver, any>(Resolver.prototype, 'isSupported').mockImplementation(() => true),
     },
     workspace: {
         getLeavesOfType: jest.spyOn<Workspace, any>(Workspace.prototype, 'getLeavesOfType').mockImplementation(() => [])
@@ -37,9 +35,9 @@ const createNode = () => {
     return node;
 };
 
-const graph = new GraphTitles(
+const graph = new GraphManager(
     Object.create(Workspace.prototype),
-    Object.create(FileTitleResolver.prototype)
+    Object.create(Resolver.prototype)
 );
 
 describe('Graph Titles Test', () => {
@@ -87,7 +85,7 @@ describe('Graph Titles Test', () => {
             })
 
             test('Original function will be called once without resolving', async () => {
-                mocks.resolver.canBeResolved.mockReturnValueOnce(false);
+                mocks.resolver.isSupported.mockReturnValueOnce(false);
                 expect(mocks.getDisplayText).not.toHaveBeenCalled();
                 leaf.view.renderer.onIframeLoad();
                 expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
@@ -120,20 +118,28 @@ describe('Graph Titles Test', () => {
                     await lastQueueAdd;
                     expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
                 })
+
+                test('Original will be called because of resolving reject', async () => {
+                    mocks.resolver.resolve.mockRejectedValueOnce(new Error());
+                    await expect(graph.update(file)).resolves.toBeTruthy();
+                    expect(lastQueueAdd).not.toBeNull();
+                    await lastQueueAdd;
+                    expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
+                    expect(mocks.getDisplayText).toHaveBeenCalledTimes(1);
+                })
             });
         });
 
 
-        // test('Graph disabled', async () => {
-        //     mocks.getDisplayText.mockClear();
-        //     graph.disable();
-        //     expect(lastQueueAdd).not.toBeNull();
-        //     expect(graph.isEnabled()).toBeFalsy();
-        //     await lastQueueAdd;
-        //     expect(mocks.getDisplayText).toBeCalledTimes(1);
-        //     expect(node.getDisplayText()).toEqual(nodeText);
-        //     expect(mocks.getDisplayText).toBeCalledTimes(2);
-        // });
+        test('Graph disabled', async () => {
+            mocks.getDisplayText.mockClear();
+            graph.disable();
+            expect(lastQueueAdd).toBeNull();
+            expect(graph.isEnabled()).toBeFalsy();
+            expect(mocks.onIframeLoad).toHaveBeenCalled();
+            expect(mocks.getDisplayText).toBeCalledTimes(1);
+            expect(node.getDisplayText()).toEqual(nodeText);
+        });
     })
 
 

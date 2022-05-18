@@ -1,14 +1,14 @@
 import {TAbstractFile, TFileExplorerItem, TFileExplorerView} from "obsidian";
-import FileTitleResolver from "../FileTitleResolver";
-import TitlesManager from "./TitlesManager";
+import Resolver from "src/Title/Resolver/Resolver";
+import Manager from "./Manager";
 
-export default class ExplorerTitles implements TitlesManager {
+export default class ExplorerManager implements Manager {
     private originTitles = new Map<string, string>();
     private enabled = false;
 
     constructor(
         private explorerView: TFileExplorerView,
-        private resolver: FileTitleResolver
+        private resolver: Resolver
     ) {
     }
 
@@ -25,13 +25,13 @@ export default class ExplorerTitles implements TitlesManager {
         this.enabled = true;
     }
 
-    async update(abstract: TAbstractFile | null = null): Promise<boolean> {
+    async update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
         if (!this.isEnabled()) {
             return false;
         }
 
-        const items = abstract
-            ? [this.explorerView.fileItems[abstract.path]]
+        const items = fileOrPath
+            ? [this.explorerView.fileItems[fileOrPath.path]]
             : Object.values(this.explorerView.fileItems);
 
         const promises = items.map(e => this.setTitle(e));
@@ -40,12 +40,10 @@ export default class ExplorerTitles implements TitlesManager {
     }
 
     private async setTitle(item: TFileExplorerItem): Promise<void> {
+        const title = await this.resolver.resolve(item.file).catch(() => null);
 
-        const title = await this.resolver.resolve(item.file);
         if (this.isTitleEmpty(title)) {
-            if (this.originTitles.has(item.file.path)) {
-                return this.restore(item);
-            }
+            return this.restore(item);
         } else if (item.titleInnerEl.innerText !== title) {
             this.keepOrigin(item);
             item.titleInnerEl.innerText = title;
@@ -67,6 +65,7 @@ export default class ExplorerTitles implements TitlesManager {
     private restore(item: TFileExplorerItem): void {
         if (this.originTitles.has(item.file.path)) {
             item.titleInnerEl.innerText = this.originTitles.get(item.file.path);
+            this.originTitles.delete(item.file.path);
         }
     }
 }

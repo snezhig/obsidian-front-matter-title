@@ -1,52 +1,42 @@
 import {debounce, Debouncer, Plugin, TAbstractFile, TFileExplorerView} from 'obsidian';
-import {debounce as ts_debounce} from 'ts-debounce';
-import FileTitleResolver from "./src/FileTitleResolver";
-import ExplorerTitles from "./src/Titles/ExplorerTitles";
-import GraphTitles from "./src/Titles/GraphTitles";
+import Resolver from "./src/Title/Resolver/Resolver";
+import ExplorerManager from "./src/Title/Manager/ExplorerManager";
+import GraphManager from "./src/Title/Manager/GraphManager";
 import {Settings, SettingsTab} from "./src/Settings";
-import TitlesManager from "./src/Titles/TitlesManager";
+import Manager from "./src/Title/Manager/Manager";
 
-type Manager = 'graph' | 'explorer';
+type ManagerType = 'graph' | 'explorer';
 
 export default class MetaTitlePlugin extends Plugin {
     public settings: Settings;
-    private resolver: FileTitleResolver;
-    private saveSettingDebounce: Debouncer<void> = null;
-    private managers: Map<Manager, TitlesManager> = new Map();
+    private resolver: Resolver;
+    private saveSettingDebounce: Debouncer<unknown[]> = null;
+    private managers: Map<ManagerType, Manager> = new Map();
 
-    private get graph(): TitlesManager | null {
+    private get graph(): Manager | null {
         return this.managers.get('graph') ?? null;
     }
 
-    private get explorer(): TitlesManager | null {
+    private get explorer(): Manager | null {
         return this.managers.get('explorer') ?? null;
     }
 
     public async saveSettings() {
-        if (this.saveSettingDebounce === null) {
-            this.saveSettingDebounce = debounce(
-                async () => {
-                    const settings = this.settings.getAll();
-                    await this.saveData(settings);
-                    this.resolver.setMetaPath(settings.path);
-                    this.resolver.setExcluded(settings.excluded_folders);
-                    this.toggleGraph(settings.graph_enabled)
-                    await this.toggleExplorer(settings.explorer_enabled);
-                },
-                1000,
-                true
-            )
-        }
-        this.saveSettingDebounce();
+        const settings = this.settings.getAll();
+        await this.saveData(settings);
+        this.resolver.setMetaPath(settings.path);
+        this.resolver.setExcluded(settings.excluded_folders);
+        this.toggleGraph(settings.graph_enabled)
+        await this.toggleExplorer(settings.explorer_enabled);
     }
 
     public async onload() {
+        this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
 
         this.settings = new Settings(await this.loadData());
-
         this.bind();
 
-        this.resolver = new FileTitleResolver(this.app.metadataCache, {
+        this.resolver = new Resolver(this.app.metadataCache, {
             metaPath: this.settings.get('path'),
             excluded: this.settings.get('excluded_folders')
         });
@@ -84,10 +74,9 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private async toggleExplorer(state: boolean = true): Promise<void> {
-        console.log(state, this.explorer);
         if (state && !this.explorer) {
             const view = this.getExplorerView();
-            this.managers.set('explorer', new ExplorerTitles(view, this.resolver));
+            this.managers.set('explorer', new ExplorerManager(view, this.resolver));
             this.explorer.enable();
             await this.explorer.update();
         } else if (!state && this.explorer) {
@@ -98,7 +87,7 @@ export default class MetaTitlePlugin extends Plugin {
 
     private toggleGraph(state: boolean = true): void {
         if (state && !this.graph) {
-            this.managers.set('graph', new GraphTitles(this.app.workspace, this.resolver));
+            this.managers.set('graph', new GraphManager(this.app.workspace, this.resolver));
             this.graph.enable();
             this.graph.update().catch(console.error);
         } else if (!state && this.graph) {
@@ -109,8 +98,7 @@ export default class MetaTitlePlugin extends Plugin {
 
     private bind() {
         this.registerEvent(this.app.metadataCache.on('changed', file => {
-            console.log(file);
-            this.resolver?.handleCacheChanged(file);
+            this.resolver?.revoke(file);
             this.runManagersUpdate(file).catch(console.error)
         }));
 
@@ -128,13 +116,13 @@ export default class MetaTitlePlugin extends Plugin {
             }
         }
 
-        this.registerEvent(this.app.workspace.on('layout-change', initGraph.bind(this)));
+        this.registerEvent(this.app.workspace.on('layout-change', initGraph));
     }
 
-    private async runManagersUpdate(abstract: TAbstractFile = null): Promise<void> {
+    private async runManagersUpdate(fileOrPath: TAbstractFile = null): Promise<void> {
         const promises = [];
         for (const manager of this.managers.values()) {
-            promises.push(manager.update(abstract));
+            promises.push(manager.update(fileOrPath));
         }
         await Promise.all(promises);
     }

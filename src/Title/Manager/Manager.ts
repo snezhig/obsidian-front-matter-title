@@ -1,6 +1,6 @@
 import {TAbstractFile} from "obsidian";
 
-export default interface TitlesManager {
+export default interface Manager {
     isEnabled(): boolean;
 
     enable(): void;

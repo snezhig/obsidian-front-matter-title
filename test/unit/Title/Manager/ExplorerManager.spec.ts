@@ -1,7 +1,7 @@
-import ExplorerTitles from "../../../src/Titles/ExplorerTitles";
-import FileTitleResolver from "../../../src/FileTitleResolver";
-import {TFile, TFileExplorerView, TFileExplorerItem, Vault, WorkspaceLeaf, MetadataCache} from "obsidian";
+import ExplorerManager from "../../../../src/Title/Manager/ExplorerManager";
+import {TFile, TFileExplorerView, TFileExplorerItem, MetadataCache} from "obsidian";
 import {expect} from "@jest/globals";
+import Resolver from "../../../../src/Title/Resolver/Resolver";
 
 
 let titles: {
@@ -17,14 +17,14 @@ const createItem = (text: string): TFileExplorerItem => {
 	return {file, titleInnerEl, titleEl: null}
 }
 
-const resolver = new FileTitleResolver(new MetadataCache(), {metaPath: 'title', excluded: []});
-
-resolver.resolve = jest.fn().mockImplementation(async () => titles.resolved);
+const resolver = new Resolver(new MetadataCache(), {metaPath: 'title', excluded: []});
+const resolve = jest.fn().mockImplementation(async () => titles.resolved);
+resolver.resolve = resolve;
 
 const explorerView = {} as TFileExplorerView;
 explorerView.fileItems = {};
 
-const explorer = new ExplorerTitles(explorerView, resolver);
+const explorer = new ExplorerManager(explorerView, resolver);
 
 
 describe('Explorer Titles Test', () => {
@@ -63,7 +63,7 @@ describe('Explorer Titles Test', () => {
 
 			explorer.disable();
 			expect(item.titleInnerEl.innerText).toEqual(titles.origin);
-		})
+		});
 
 	})
 
@@ -100,5 +100,16 @@ describe('Explorer Titles Test', () => {
 			await explorer.update(item.file);
 			expect(item.titleInnerEl.innerText).toEqual(titles.origin);
 		})
+
+        test('Inner text will be restored because of reject', async() => {
+            titles.resolved = Math.random().toString();
+            await explorer.update(item.file);
+            expect(item.titleInnerEl.innerText).toEqual(titles.resolved);
+
+            resolve.mockRejectedValueOnce(new Error());
+            await explorer.update(item.file);
+            expect(item.titleInnerEl.innerText).toEqual(titles.origin);
+
+        })
 	})
 })

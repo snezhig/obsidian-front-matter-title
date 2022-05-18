@@ -4,7 +4,7 @@ type callback<Item, Return> = (items: Set<Item>) => Promise<Return>;
 
 export default class Queue<Item, Return> {
 	private readonly items: Set<Item>;
-	private readonly cb: () => void;
+	private readonly cb: () => Promise<any>;
 
 	constructor(
 		cb: callback<Item, Return>,
@@ -16,6 +16,6 @@ export default class Queue<Item, Return> {
 
 	public add(item: Item): Promise<Return> {
 		this.items.add(item);
-		return this.cb() as unknown as Promise<Return>;
+		return this.cb();
 	}
 }
