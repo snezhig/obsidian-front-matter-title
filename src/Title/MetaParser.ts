@@ -3,7 +3,7 @@ import EmptyMetaPathError from "../Errors/EmptyMetaPathError";
 
 export default class MetaParser {
 
-	public static async parse(metaPath: string, metadata: CachedMetadata): Promise<string | null> {
+	public static parse(metaPath: string, metadata: CachedMetadata): string | null {
 		if (metaPath === '') {
 			throw new EmptyMetaPathError(`Meta path is empty (got "${metaPath}")`);
 		}
@@ -30,7 +30,7 @@ export default class MetaParser {
 			case "string":
 				return value;
 			default:
-				throw new TypeError(`value of "${metaPath}" path muse be string, ${typeof value} got`);
+				throw new TypeError(`value of "${metaPath}" path must be string, ${typeof value} got`);
 		}
 	}
 }

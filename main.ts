@@ -104,7 +104,6 @@ export default class MetaTitlePlugin extends Plugin {
 
 
         const initGraph = () => {
-            console.log(this);
             if (!this.graph || this.graph.isEnabled()) {
                 return;
             }

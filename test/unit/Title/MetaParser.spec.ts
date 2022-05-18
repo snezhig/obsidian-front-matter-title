@@ -19,39 +19,38 @@ describe('Parser Test Meta', () => {
         return metadata;
     };
 
-    test('Error in case path is empty', async () => {
-        await expect(parser.parse('', getMetadata())).rejects.toThrow(EmptyMetaPathError);
+    test('Error in case path is empty',  () => {
+        expect(() => parser.parse('', getMetadata())).toThrow(EmptyMetaPathError);
     })
 
-    test('Null when path not exist', async () => {
-        await expect(parser.parse('not_exist_path', getMetadata())).resolves.toBeNull();
+    test('Null when path not exist', () => {
+        expect(parser.parse('not_exist_path', getMetadata())).toBeNull();
     })
 
-    test('Get title', async () => {
-        await expect(parser.parse('title', getMetadata())).resolves.toEqual('TitleToReplace');
+    test('Get title', () => {
+        expect(parser.parse('title', getMetadata())).toEqual('TitleToReplace');
     })
 
-    test('Get deep level title', async () => {
-        await expect(parser.parse('title_d.deep.level', getMetadata())).resolves.toEqual('Title on third level');
+    test('Get deep level title', () => {
+        expect(parser.parse('title_d.deep.level', getMetadata())).toEqual('Title on third level');
     })
 
-    test('Get numeric title', async () => {
-        const title = await parser.parse('title_number', getMetadata());
+    test('Get numeric title', () => {
+        const title = parser.parse('title_number', getMetadata());
         expect(title).toEqual('1234567');
     })
 
-    test('Get error, because value is not a string', async () => {
-        const promise = parser.parse('title_obj', getMetadata());
-        await expect(promise).rejects.toThrowError(TypeError);
+    test('Get error, because value is not a string', () => {
+        expect(() => parser.parse('title_obj', getMetadata())).toThrowError(TypeError);
     })
 
-    test('Null with no meta', async () => {
+    test('Null with no meta', () => {
         fileName = 'HasNoMeta.md';
-        await expect(parser.parse('does.not.matter', getMetadata())).resolves.toBeNull();
+        expect(parser.parse('does.not.matter', getMetadata())).toBeNull();
     });
 
-    test('Null with meta but no title', async () => {
+    test('Null with meta but no title', () => {
         fileName = 'HasMetaWithoutTitle.md';
-        await expect(parser.parse('does.not.matter', getMetadata())).resolves.toBeNull();
+        expect(parser.parse('does.not.matter', getMetadata())).toBeNull();
     })
 });
