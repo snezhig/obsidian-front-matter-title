@@ -4,15 +4,20 @@ This is a plugin for [Obsidian](https://obsidian.md).
 
 ## Introduction
 
-Plugin let you replace filename with meta block. For example, you can have a `my_title`
-key in your file with specific title and configure the plugin to read this key.
+Plugin **does not rename files**,
+it just uses specific value from meta-block of markdown file as displayed filename in explorer or graph.
 
-Also, plugin supports deep-key-value, for example you can have the following meta:
+> Value from specific key must be a string or a number
+
+## Examples
+
+For example, you can have the following meta-block:
 
 ```yaml
 alias:
   - MPI
 status: open
+short_name: 'PI'
 tags:
   - '#project'
   - '#improvement'
@@ -22,11 +27,14 @@ additional:
   title: Project ideas
 ```
 
-Then set the path like `additional.title` and plugin will set `Project ideas` as filename
+|  Meta title path   | Original filename | Displayed filename |                    Comment                     |
+|:------------------:|:-----------------:|:------------------:|:----------------------------------------------:|
+|    `short_name`    |   202110151351    |        `PI`        |                   All is ok                    |
+| `additional.title` |   202110151351    |  `Project Ideas`   |                   All is ok                    |
+|    `not_exists`    |   202110151351    |   `202110151351`   |      Original because path does not exist      |
+|    'additional'    |   202110151351    |   `202110151351`   | Original because value is not string or number |
 
-> If key does not have a value, filename will not be replaced
-
-## Examples
+## Result
 
 |                My folder                 |               My folder with plugin                |
 |:----------------------------------------:|:--------------------------------------------------:|
