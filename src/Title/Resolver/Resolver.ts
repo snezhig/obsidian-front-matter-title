@@ -1,7 +1,8 @@
-import {CachedMetadata, MetadataCache, TAbstractFile} from "obsidian";
+import { MetadataCache, TAbstractFile} from "obsidian";
 import Item from "./ResolverItem";
-import MetaParser from "../MetaParser";
+import MetaParser, {Meta} from "../MetaParser";
 import PathTemplate from "../../PathTemplate/PathTemplateInterface";
+import Factory from "../../PathTemplate/Factory";
 
 type Options = {
     metaPath: string,
@@ -20,6 +21,7 @@ export default class Resolver {
     ) {
         this.collection = new Map();
         this.options = {...options};
+        this.template = Factory.create(this.options.metaPath);
     }
 
     private static getPathByAbstract(fileOrPath: TAbstractFile | string): string {
@@ -69,6 +71,7 @@ export default class Resolver {
         this.collection.clear();
 
         this.options.metaPath = v;
+        this.template = Factory.create(v);
         this.emit('unresolved');
     }
 
@@ -124,14 +127,7 @@ export default class Resolver {
             if (!this.collection.has(path)) {
                 const item = new Item();
 
-                item.process(new Promise((res, rej) => {
-                    const metadata: CachedMetadata = this.cache.getCache(path) ?? {};
-                    try {
-                        res(MetaParser.parse(this.options.metaPath, metadata));
-                    } catch (e) {
-                        rej(e);
-                    }
-                }));
+                item.process(this.makeTitle(path));
 
                 this.collection.set(path, item);
 
@@ -140,5 +136,14 @@ export default class Resolver {
         }
 
         return null;
+    }
+
+    private async makeTitle(path: string): Promise<string | null> {
+        const metadata: Meta = this.cache.getCache(path)?.frontmatter ?? {};
+        const paths = this.template.getMetaPaths();
+        const parts = Object.fromEntries(paths.map(e => [e, MetaParser.parse(e, metadata)]));
+
+        return this.template.buildTitle(parts);
+
     }
 }
