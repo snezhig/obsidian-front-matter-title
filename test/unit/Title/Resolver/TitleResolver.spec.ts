@@ -172,11 +172,7 @@ describe('File Title Resolver Test', () => {
         test('Return null because of non valid meta-value', async () => {
             const path = 'array_title';
             parse.mockRestore();
-            getCache.mockImplementationOnce(() => {
-                const meta: CachedMetadata = {};
-                meta.frontmatter = {[path]: []} as any;
-                return meta;
-            })
+            getCache.mockImplementationOnce(() => ({[path]: []}))
             resolver.setMetaPath(path);
             await expect(resolver.resolve(getRandomPath())).rejects.toBeInstanceOf(Error);
         })
