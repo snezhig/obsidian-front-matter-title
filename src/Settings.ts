@@ -53,7 +53,7 @@ export class SettingsTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
+        containerEl.createEl('h2', {text: 'Settings for plugin.'});
 
         new Setting(containerEl)
             .setName('Meta title path')

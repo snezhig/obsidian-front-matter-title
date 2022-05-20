@@ -10,7 +10,6 @@ type ManagerType = 'graph' | 'explorer';
 export default class MetaTitlePlugin extends Plugin {
     public settings: Settings;
     private resolver: Resolver;
-    private saveSettingDebounce: Debouncer<unknown[]> = null;
     private managers: Map<ManagerType, Manager> = new Map();
 
     private get graph(): Manager | null {
@@ -22,27 +21,18 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     public async saveSettings() {
-        if (this.saveSettingDebounce === null) {
-            this.saveSettingDebounce = debounce(
-                async () => {
-                    const settings = this.settings.getAll();
-                    await this.saveData(settings);
-                    this.resolver.setMetaPath(settings.path);
-                    this.resolver.setExcluded(settings.excluded_folders);
-                    this.toggleGraph(settings.graph_enabled)
-                    await this.toggleExplorer(settings.explorer_enabled);
-                },
-                1000,
-                true
-            )
-        }
-        this.saveSettingDebounce();
+        const settings = this.settings.getAll();
+        await this.saveData(settings);
+        this.resolver.setMetaPath(settings.path);
+        this.resolver.setExcluded(settings.excluded_folders);
+        this.toggleGraph(settings.graph_enabled)
+        await this.toggleExplorer(settings.explorer_enabled);
     }
 
     public async onload() {
+        this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
 
         this.settings = new Settings(await this.loadData());
-
         this.bind();
 
         this.resolver = new Resolver(this.app.metadataCache, {
@@ -125,13 +115,13 @@ export default class MetaTitlePlugin extends Plugin {
             }
         }
 
-        this.registerEvent(this.app.workspace.on('layout-change', initGraph.bind(this)));
+        this.registerEvent(this.app.workspace.on('layout-change', initGraph));
     }
 
-    private async runManagersUpdate(abstract: TAbstractFile = null): Promise<void> {
+    private async runManagersUpdate(fileOrPath: TAbstractFile = null): Promise<void> {
         const promises = [];
         for (const manager of this.managers.values()) {
-            promises.push(manager.update(abstract));
+            promises.push(manager.update(fileOrPath));
         }
         await Promise.all(promises);
     }

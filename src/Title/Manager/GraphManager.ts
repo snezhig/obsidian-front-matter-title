@@ -8,7 +8,7 @@ export default class GraphManager implements Manager {
     private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphManager> = null;
     private queue: Queue<string, void>;
     private enabled = false;
-    private lastTitles = new Map<string, string>();
+    private resolved = new Map<string, string|null|false>();
 
     constructor(
         private workspace: Workspace,
@@ -17,22 +17,14 @@ export default class GraphManager implements Manager {
         this.queue = new Queue<string, void>(this.runQueue.bind(this), 50)
     }
 
-    private getTitle(id: string): string | null | false {
-        //TODO: what if it can be resolved, but is not resolved again and again?
-        return this.resolver.isResolved(id) ? this.resolver.getResolved(id) : false;
-    }
-
     private static getReplaceFunction() {
         return function (self: GraphManager, defaultArgs: unknown[], vanilla: Function) {
             if (self.resolver.isSupported(this.id)) {
-                const title = self.getTitle(this.id);
+                const title = self.resolved.get(this.id);
                 if (title) {
-                    self.lastTitles.set(this.id, title);
                     return title;
-                } else if (title === false) {
+                } else if(!self.resolved.has(this.id)){
                     self.queue.add(this.id).catch(console.error);
-                } else {
-                    self.lastTitles.delete(this.id);
                 }
             }
             return vanilla.call(this, ...defaultArgs);
@@ -41,7 +33,7 @@ export default class GraphManager implements Manager {
 
     disable(): void {
         this.replacement.disable();
-        this.reloadIframeWithNodes(new Set(this.lastTitles.keys()));
+        this.reloadIframeWithNodes(new Set(this.resolved.keys()));
         this.enabled = false;
     }
 
@@ -63,17 +55,17 @@ export default class GraphManager implements Manager {
         return this.enabled;
     }
 
-    async update(abstract: TAbstractFile | null = null): Promise<boolean> {
+    async update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
         if (!this.enabled) {
             return false;
         }
 
         for (const leaf of this.getLeaves()) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
-                if (abstract && abstract.path === node.id) {
+                if (fileOrPath && fileOrPath.path === node.id) {
                     this.queue.add(node.id).catch(console.error);
                     break;
-                } else if (abstract === null) {
+                } else if (fileOrPath === null) {
                     this.queue.add(node.id).catch(console.error);
                 }
             }
@@ -100,7 +92,7 @@ export default class GraphManager implements Manager {
         const promises = [];
 
         for (const id of items) {
-            promises.push(this.resolver.resolve(id).then(e => [id, e]));
+            promises.push(this.resolver.resolve(id).then(e => [id, e]).catch(() => [id, false]));
         }
 
         return await Promise.all(promises) as unknown as Promise<[string, string | null][]>;
@@ -110,11 +102,16 @@ export default class GraphManager implements Manager {
         let hasDiff = false;
 
         for (const [id, title] of await this.resolveTitles(items)) {
-            if (this.lastTitles.has(id)) {
-                hasDiff = this.lastTitles.get(id) !== title;
-            } else {
-                hasDiff = title !== null;
+            if (!hasDiff) {
+                if (!this.resolved.has(id)) {
+                    hasDiff = true;
+                }
+
+                if (this.resolved.get(id) !== title) {
+                    hasDiff = true;
+                }
             }
+            this.resolved.set(id, title);
         }
 
         if (hasDiff == false) {

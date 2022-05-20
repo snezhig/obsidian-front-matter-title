@@ -1,9 +1,9 @@
 import Resolver from "../../../../src/Title/Resolver/Resolver";
-import {MetadataCache, Vault} from "obsidian";
+import {CachedMetadata, MetadataCache, Vault} from "obsidian";
 import MetaParser from "../../../../src/Title/MetaParser";
+import {expect} from "@jest/globals";
 
-jest.mock('../../../../src/Title/MetaParser');
-const read = jest.spyOn<MetadataCache, any>(MetadataCache.prototype, 'getCache').mockImplementation(() => null);
+const getCache = jest.spyOn<MetadataCache, any>(MetadataCache.prototype, 'getCache').mockImplementation(() => null);
 const parse = jest.spyOn(MetaParser, "parse");
 
 const Options = {
@@ -30,7 +30,7 @@ describe('File Title Resolver Test', () => {
             };
 
             beforeAll(() => {
-                parse.mockImplementation(async (path: string) => {
+                parse.mockImplementation((path: string) => {
                     return meta[path] ?? null;
                 })
             })
@@ -54,7 +54,7 @@ describe('File Title Resolver Test', () => {
             const title = 'title_test_excluded';
             const path = 'path/to/stub.md';
             beforeAll(() => {
-                parse.mockImplementation(async () => title);
+                parse.mockImplementation(() => title);
             })
             test('Title will be resolved', async () => {
                 await expect(resolver.resolve(path)).resolves.toEqual(title);
@@ -90,7 +90,7 @@ describe('File Title Resolver Test', () => {
 
     describe('Title multiple resolving', () => {
         beforeEach(() => {
-            parse.mockImplementation(async () => (Math.random() * Math.random()).toString());
+            parse.mockImplementation(() => (Math.random() * Math.random()).toString());
         })
         let title: string = null;
         const path = 'mock_path.md';
@@ -126,27 +126,18 @@ describe('File Title Resolver Test', () => {
         });
 
         test('Get title without parse after edit', testTitleResolved)
-
     });
 
     describe('Test concurrent resolving', () => {
-        let resolve: Function = null;
         const path = 'concurrent.md';
         const expected = 'resolved_title';
 
         beforeAll(() => {
-            parse.mockImplementation(async () => new Promise(r => {
-                const timer = setInterval(() => {
-                    if (resolve) {
-                        r(resolve());
-                        clearInterval(timer);
-                    }
-                }, 1)
-            }));
-        })
+            parse.mockImplementation(() => expected);
+        });
 
         beforeEach(() => {
-            read.mockClear();
+            getCache.mockClear();
         })
 
         test('Title is not resolved and returns null', () => {
@@ -157,21 +148,37 @@ describe('File Title Resolver Test', () => {
         test('Resolve title twice, but parse only once', async () => {
             const firstPromise = resolver.resolve(path);
             const secondPromise = resolver.resolve(path);
-            resolve = () => expected;
 
             const firstTitle = await firstPromise;
             const secondTitle = await secondPromise;
+
             expect(firstTitle).toEqual(expected);
             expect(secondTitle).toEqual(expected);
 
+            expect(parse).toHaveBeenCalledTimes(1);
 
-            expect(read).toHaveBeenCalledTimes(1);
+
+            expect(getCache).toHaveBeenCalledTimes(1);
             expect(parse).toHaveBeenCalledTimes(1);
         })
 
         test('Title is resolved and return expected', () => {
             expect(resolver.isResolved(path)).toBeTruthy();
             expect(resolver.getResolved(path)).toEqual(expected);
+        })
+    })
+
+    describe('Test exceptions', () => {
+        test('Return null because of non valid meta-value', async () => {
+            const path = 'array_title';
+            parse.mockRestore();
+            getCache.mockImplementationOnce(() => {
+                const meta: CachedMetadata = {};
+                meta.frontmatter = {[path]: []} as any;
+                return meta;
+            })
+            resolver.setMetaPath(path);
+            await expect(resolver.resolve(getRandomPath())).rejects.toBeInstanceOf(Error);
         })
     })
 });
