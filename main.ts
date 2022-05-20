@@ -10,7 +10,6 @@ type ManagerType = 'graph' | 'explorer';
 export default class MetaTitlePlugin extends Plugin {
     public settings: Settings;
     private resolver: Resolver;
-    private saveSettingDebounce: Debouncer<unknown[]> = null;
     private managers: Map<ManagerType, Manager> = new Map();
 
     private get graph(): Manager | null {
