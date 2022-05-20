@@ -16,17 +16,25 @@ const type = process.argv[2] ?? 'beta';
             throw new Error(`Type must be one of ${Object.keys(manifests).join(',')}, got ${type}`);
         }
 
+        const files = new Set(['main.js', manifests.release, manifests[type]]);
+
         await new Promise(r => exec('npm run build', r));
 
         const { id, version } = JSON.parse(fs.readFileSync(manifests[type], 'utf8'));
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir);
-        }
+
+        const releaseName = `${id}-${version}`;
+        const releaseDir = `${dir}/${releaseName}`;
+
+        [dir, releaseDir].forEach(e => !fs.existsSync(e) ? fs.mkdirSync(e) : null);
 
         const zip = new AdmZip();
-        zip.addLocalFile(manifests[type]);
-        zip.addLocalFile('main.js');
-        zip.writeZip(`${dir}/${id}-${version}.zip`);
+
+        for (const file of files){
+            zip.addLocalFile(file);
+            fs.copyFileSync(file, `${releaseDir}/${file}`);
+        }
+
+        return new Promise(r => zip.writeZip(`${releaseDir}/${releaseName}.zip`, r));
     } catch (e) {
         console.error(e.message);
     }

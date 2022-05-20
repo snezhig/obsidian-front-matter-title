@@ -17,7 +17,7 @@ For example, you can have the following meta-block:
 alias:
   - MPI
 status: open
-short_name: 'PI'
+short: 'PI'
 tags:
   - '#project'
   - '#improvement'
@@ -27,12 +27,17 @@ additional:
   title: Project ideas
 ```
 
-|  Meta title path   | Original filename | Displayed filename |                    Comment                     |
-|:------------------:|:-----------------:|:------------------:|:----------------------------------------------:|
-|    `short_name`    |   202110151351    |        `PI`        |                   All is ok                    |
-| `additional.title` |   202110151351    |  `Project Ideas`   |                   All is ok                    |
-|    `not_exists`    |   202110151351    |   `202110151351`   |      Original because path does not exist      |
-|    'additional'    |   202110151351    |   `202110151351`   | Original because value is not string or number |
+|       Meta title path        | Original filename | Displayed filename |                    Comment                     |
+|:----------------------------:|:-----------------:|:------------------:|:----------------------------------------------:|
+|           `short`            |   202110151351    |        `PI`        |                   All is ok                    |
+|      `additional.title`      |   202110151351    |  `Project Ideas`   |                   All is ok                    |
+|         `not_exists`         |   202110151351    |   `202110151351`   |      Original because path does not exist      |
+|         `additional`         |   202110151351    |   `202110151351`   | Original because value is not string or number |
+|         `{{short}}`          |   202110151351    |        `PI`        |                   All is ok                    |
+|   `{{short}} - {{status}}`   |   202110151351    |    `PI - open`     |                   All is ok                    |
+| `{{short}} - {{not_exists}}` |   202110151351    |      `PI - `       |            The second part is empty            |
+
+> **If you use the only one value, use `short` instead of `{{short}}` to have a better performance**
 
 ## Result
 
@@ -46,7 +51,7 @@ additional:
 
 ## Todo
 
-* [ ] Add a possibility to make a template for file name
+* [x] Add a possibility to make a template for file name
 * [ ] Add markers to distinguish the same titles
 * [ ] Add titles for search view
 * [ ] Add commands to update titles manually

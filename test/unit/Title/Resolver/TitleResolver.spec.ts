@@ -106,7 +106,7 @@ describe('File Title Resolver Test', () => {
             title = newTitle;
         }
 
-        test('Parser must be called', async () => {
+        test('PathTemplate must be called', async () => {
             title = await resolver.resolve(path);
             expect(parse).toHaveBeenCalled();
         });
@@ -172,11 +172,7 @@ describe('File Title Resolver Test', () => {
         test('Return null because of non valid meta-value', async () => {
             const path = 'array_title';
             parse.mockRestore();
-            getCache.mockImplementationOnce(() => {
-                const meta: CachedMetadata = {};
-                meta.frontmatter = {[path]: []} as any;
-                return meta;
-            })
+            getCache.mockImplementationOnce((): CachedMetadata => ({frontmatter: {[path]: []} as any}))
             resolver.setMetaPath(path);
             await expect(resolver.resolve(getRandomPath())).rejects.toBeInstanceOf(Error);
         })
