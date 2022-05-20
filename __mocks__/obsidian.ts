@@ -43,10 +43,11 @@ export class TFileExplorer {
 }
 
 
-export class Workspace {
+export class Workspace  extends EventEmitter{
     getLeavesOfType(viewType: string): WorkspaceLeaf[] {
         return [];
     }
+
 }
 
 export class GraphLeaf {

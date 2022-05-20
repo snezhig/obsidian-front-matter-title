@@ -3,12 +3,15 @@ import FunctionReplacer from "../../Utils/FunctionReplacer";
 import {GraphLeaf, GraphNode, TAbstractFile, Workspace} from "obsidian";
 import Queue from "../../Utils/Queue";
 import Manager from "./Manager";
+import {Leaves} from "../../enum";
 
+type State = 'disabled' | 'enabled';
 export default class GraphManager implements Manager {
     private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphManager> = null;
     private queue: Queue<string, void>;
-    private enabled = false;
-    private resolved = new Map<string, string|null|false>();
+    private state: State = 'disabled';
+    private bound: boolean = false;
+    private resolved = new Map<string, string | null | false>();
 
     constructor(
         private workspace: Workspace,
@@ -23,7 +26,7 @@ export default class GraphManager implements Manager {
                 const title = self.resolved.get(this.id);
                 if (title) {
                     return title;
-                } else if(!self.resolved.has(this.id)){
+                } else if (!self.resolved.has(this.id)) {
                     self.queue.add(this.id).catch(console.error);
                 }
             }
@@ -34,29 +37,41 @@ export default class GraphManager implements Manager {
     disable(): void {
         this.replacement.disable();
         this.reloadIframeWithNodes(new Set(this.resolved.keys()));
-        this.enabled = false;
+        this.state = "disabled";
     }
 
     enable(): void {
-        if (this.replacement === null) {
-            const node = this.getFirstGraphNode();
-            if (node) {
-                this.replacement = this.createReplacement(node);
-                this.replacement.enable();
-                this.enabled = true;
-                return;
-            }
-        } else {
-            this.enabled = true;
+        this.state = "enabled";
+        this.initReplacement();
+
+        if (!this.bound) {
+            this.workspace.on('layout-change', this.initReplacement);
+            this.bound = true;
         }
     }
 
+    private initReplacement(): void {
+        if (this.replacement || !this.isEnabled()) {
+            return;
+        }
+
+        const node = this.getFirstGraphNode();
+
+        if (node) {
+            this.replacement = this.createReplacement(node);
+            this.replacement.enable();
+        } else if (this.getLeaves().length) {
+            setTimeout(this.initReplacement.bind(this), 20);
+        }
+
+    }
+
     isEnabled(): boolean {
-        return this.enabled;
+        return this.state !== "disabled";
     }
 
     async update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
-        if (!this.enabled) {
+        if (!this.isEnabled()) {
             return false;
         }
 
@@ -75,7 +90,7 @@ export default class GraphManager implements Manager {
     }
 
     private getFirstGraphNode(): GraphNode | null {
-        for (const leaf of (this.workspace.getLeavesOfType('graph') as GraphLeaf[])) {
+        for (const leaf of this.getLeaves()) {
             const node = (leaf?.view?.renderer?.nodes ?? [])?.first() ?? null;
             if (node) {
                 return node;
@@ -85,7 +100,7 @@ export default class GraphManager implements Manager {
     }
 
     private getLeaves(): GraphLeaf[] {
-        return this.workspace.getLeavesOfType('graph') as GraphLeaf[];
+        return this.workspace.getLeavesOfType(Leaves.G) as GraphLeaf[];
     }
 
     private async resolveTitles(items: Iterable<string>): Promise<[string, string | null][]> {
@@ -123,7 +138,7 @@ export default class GraphManager implements Manager {
         items.clear();
     }
 
-    private reloadIframeWithNodes(nodeIds: Set<string>): void{
+    private reloadIframeWithNodes(nodeIds: Set<string>): void {
         for (const leaf of this.getLeaves()) {
             const nodes = leaf?.view?.renderer?.nodes ?? [];
             for (const node of nodes) {

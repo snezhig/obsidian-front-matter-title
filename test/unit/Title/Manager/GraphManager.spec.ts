@@ -5,6 +5,9 @@ import Queue from "../../../../src/Utils/Queue";
 import Resolver from "../../../../src/Title/Resolver/Resolver";
 
 jest.mock('../../../../src/Title/Resolver/Resolver');
+// jest.useFakeTimers('legacy');
+// jest.runAllTimers();
+jest.spyOn<any, 'setTimeout'>(global, 'setTimeout');
 
 Array.prototype.first = function () {
     return this[0];
@@ -19,7 +22,8 @@ const mocks = {
         isSupported: jest.spyOn<Resolver, any>(Resolver.prototype, 'isSupported').mockImplementation(() => true),
     },
     workspace: {
-        getLeavesOfType: jest.spyOn<Workspace, any>(Workspace.prototype, 'getLeavesOfType').mockImplementation(() => [])
+        getLeavesOfType: jest.spyOn<Workspace, any>(Workspace.prototype, 'getLeavesOfType').mockImplementation(() => []),
+        on: jest.spyOn<Workspace, 'on'>(Workspace.prototype, 'on')
     },
     getDisplayText: jest.spyOn(GraphNode.prototype, 'getDisplayText').mockImplementation(() => nodeText),
     onIframeLoad: jest.fn().mockImplementation(function () {
@@ -44,7 +48,24 @@ describe('Graph Titles Test', () => {
     test('Graph will not be enabled', () => {
         expect(graph.isEnabled()).toBeFalsy();
         graph.enable();
-        expect(graph.isEnabled()).toBeFalsy();
+        expect(graph.isEnabled()).toBeTruthy();
+    })
+
+    test('Bind to layout-change only one time', () => {
+        graph.enable();
+        graph.enable();
+        expect(mocks.workspace.on).toHaveBeenCalledTimes(1);
+    })
+
+    test('Timer has not been started', () => {
+        expect(setTimeout).not.toHaveBeenCalled();
+    })
+
+    test('Times has been started', () => {
+        mocks.workspace.getLeavesOfType.mockReturnValue([{}]);
+        graph.enable();
+        expect(setTimeout).toHaveBeenCalled();
+        mocks.workspace.getLeavesOfType.mockReturnValue([]);
     })
 
     describe('Graph state test', () => {
@@ -54,7 +75,7 @@ describe('Graph Titles Test', () => {
         file.path = nodeText;
 
         let lastQueueAdd: Promise<void> = null;
-        const queueAdd = jest.spyOn<Queue<unknown, void>, any>(Queue.prototype, 'add').mockImplementation(function (v: unknown) {
+        jest.spyOn<Queue<unknown, void>, any>(Queue.prototype, 'add').mockImplementation(function (v: unknown) {
             this.items.add(v);
             lastQueueAdd = this.cb();
             return lastQueueAdd;
