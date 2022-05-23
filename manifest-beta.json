@@ -1,9 +1,9 @@
 {
-	"id": "obsidian-meta-title-filename-plugin",
-	"name": "Meta title filename",
+	"id": "obsidian-front-matter-title-plugin",
+	"name": "Front Matter Title",
 	"version": "1.2.0-beta",
 	"minAppVersion": "0.14.6",
-	"description": "This plugin replace filename with value from meta block",
+	"description": "Lets you define a title in frontmatter to be displayed as the filename",
 	"author": "Snezhig",
 	"authorUrl": "https://github.com/snezhig",
 	"isDesktopOnly": false
