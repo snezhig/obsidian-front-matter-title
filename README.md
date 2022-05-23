@@ -1,4 +1,5 @@
-## Meta Title Filename
+## Front Matter Title
+__Also known as `Meta Title Filename`__
 
 This is a plugin for [Obsidian](https://obsidian.md).
 
