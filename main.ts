@@ -100,22 +100,6 @@ export default class MetaTitlePlugin extends Plugin {
             this.resolver?.revoke(file);
             this.runManagersUpdate(file).catch(console.error)
         }));
-
-
-        const initGraph = () => {
-            if (!this.graph || this.graph.isEnabled()) {
-                return;
-            }
-            this.graph.enable();
-
-            if (this.graph.isEnabled()) {
-                this.graph.update().catch(console.error);
-            } else if (this.app.workspace.getLeavesOfType('graph').length) {
-                setTimeout(initGraph.bind(this), 20);
-            }
-        }
-
-        this.registerEvent(this.app.workspace.on('layout-change', initGraph));
     }
 
     private async runManagersUpdate(fileOrPath: TAbstractFile = null): Promise<void> {

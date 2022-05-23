@@ -5,8 +5,6 @@ import Queue from "../../../../src/Utils/Queue";
 import Resolver from "../../../../src/Title/Resolver/Resolver";
 
 jest.mock('../../../../src/Title/Resolver/Resolver');
-// jest.useFakeTimers('legacy');
-// jest.runAllTimers();
 jest.spyOn<any, 'setTimeout'>(global, 'setTimeout');
 
 Array.prototype.first = function () {
@@ -33,40 +31,82 @@ const mocks = {
 
 let resolvedTitle: string = null;
 const nodeText = 'graph-node-text';
-const createNode = () => {
+const createNode = (): GraphNode => {
     const node = new GraphNode()
     node.id = nodeText;
     return node;
 };
+const createLeaf = (): GraphLeaf => {
+    const leaf = Object.create(GraphLeaf.prototype) as GraphLeaf;
+    leaf.view = {
+        renderer: {
+            onIframeLoad: mocks.onIframeLoad
+        }
+    } as unknown as GraphView;
+    return leaf;
+}
+let lastQueueAdd: Promise<void> = null;
+jest.spyOn<Queue<unknown, void>, any>(Queue.prototype, 'add').mockImplementation(function (v: unknown) {
+    this.items.add(v);
+    lastQueueAdd = this.cb();
+    return lastQueueAdd;
+})
 
 const graph = new GraphManager(
     Object.create(Workspace.prototype),
     Object.create(Resolver.prototype)
 );
 
+
+/**
+ * TODO: rewrite test
+ * Create independent cases, more readable
+ */
+
 describe('Graph Titles Test', () => {
-    test('Graph will not be enabled', () => {
-        expect(graph.isEnabled()).toBeFalsy();
-        graph.enable();
-        expect(graph.isEnabled()).toBeTruthy();
-    })
+    describe('Graph init flow test', () => {
+        afterAll(() => {
+            mocks.workspace.getLeavesOfType.mockReturnValue([]);
+            mocks.resolver.resolve.mockClear();
+            graph.disable();
+        })
+        test('Graph will not be enabled', () => {
+            expect(graph.isEnabled()).toBeFalsy();
+            graph.enable();
+            expect(graph.isEnabled()).toBeTruthy();
+        })
 
-    test('Bind to layout-change only one time', () => {
-        graph.enable();
-        graph.enable();
-        expect(mocks.workspace.on).toHaveBeenCalledTimes(1);
-    })
+        test('Bind to layout-change only one time', () => {
+            graph.enable();
+            graph.enable();
+            expect(mocks.workspace.on).toHaveBeenCalledTimes(1);
+        })
 
-    test('Timer has not been started', () => {
-        expect(setTimeout).not.toHaveBeenCalled();
-    })
+        test('Iframe has not been updated yet', () => {
+            expect(mocks.onIframeLoad).not.toHaveBeenCalled();
+        })
 
-    test('Times has been started', () => {
-        mocks.workspace.getLeavesOfType.mockReturnValue([{}]);
-        graph.enable();
-        expect(setTimeout).toHaveBeenCalled();
-        mocks.workspace.getLeavesOfType.mockReturnValue([]);
-    })
+        test('Timer has not been started', () => {
+            expect(setTimeout).not.toHaveBeenCalled();
+        })
+
+        test('Times has been started', () => {
+            mocks.workspace.getLeavesOfType.mockReturnValue([{}]);
+            graph.enable();
+            expect(setTimeout).toHaveBeenCalled();
+        })
+
+        test('Iframe has been updated', async () => {
+            expect(lastQueueAdd).toBeNull();
+            const leaf = createLeaf();
+            leaf.view.renderer.nodes = [createNode()]
+            mocks.workspace.getLeavesOfType.mockReturnValue([leaf]);
+            graph.enable();
+            expect(lastQueueAdd).not.toBeNull();
+            await lastQueueAdd;
+            expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
+        })
+    });
 
     describe('Graph state test', () => {
         let node: GraphNode = null;
@@ -74,20 +114,10 @@ describe('Graph Titles Test', () => {
         let file: TFile = new TFile();
         file.path = nodeText;
 
-        let lastQueueAdd: Promise<void> = null;
-        jest.spyOn<Queue<unknown, void>, any>(Queue.prototype, 'add').mockImplementation(function (v: unknown) {
-            this.items.add(v);
-            lastQueueAdd = this.cb();
-            return lastQueueAdd;
-        })
 
         beforeAll(() => {
-            leaf = Object.create(GraphLeaf.prototype) as GraphLeaf;
-            leaf.view = {
-                renderer: {
-                    onIframeLoad: mocks.onIframeLoad
-                }
-            } as unknown as GraphView;
+            leaf = createLeaf();
+
             mocks.workspace.getLeavesOfType.mockImplementation(() => [leaf]);
         })
 
@@ -97,6 +127,7 @@ describe('Graph Titles Test', () => {
             lastQueueAdd = null;
             mocks.onIframeLoad.mockClear();
             mocks.getDisplayText.mockClear();
+
         })
 
         describe('Graph is enabled', () => {
@@ -111,6 +142,7 @@ describe('Graph Titles Test', () => {
                 leaf.view.renderer.onIframeLoad();
                 expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
                 expect(mocks.getDisplayText).toHaveBeenCalledTimes(1);
+                expect(mocks.resolver.resolve).not.toHaveBeenCalled();
                 expect(lastQueueAdd).toBeNull();
             })
 
@@ -165,3 +197,4 @@ describe('Graph Titles Test', () => {
 
 
 });
+``

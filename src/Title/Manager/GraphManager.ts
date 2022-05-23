@@ -37,6 +37,7 @@ export default class GraphManager implements Manager {
     disable(): void {
         this.replacement.disable();
         this.reloadIframeWithNodes(new Set(this.resolved.keys()));
+        this.resolved.clear();
         this.state = "disabled";
     }
 
@@ -51,7 +52,10 @@ export default class GraphManager implements Manager {
     }
 
     private initReplacement(): void {
-        if (this.replacement || !this.isEnabled()) {
+        if (this.replacement) {
+            this.replacement.enable();
+            return;
+        }else if(!this.isEnabled()){
             return;
         }
 
@@ -60,6 +64,7 @@ export default class GraphManager implements Manager {
         if (node) {
             this.replacement = this.createReplacement(node);
             this.replacement.enable();
+            this.update().catch(console.error);
         } else if (this.getLeaves().length) {
             setTimeout(this.initReplacement.bind(this), 20);
         }
@@ -70,11 +75,10 @@ export default class GraphManager implements Manager {
         return this.state !== "disabled";
     }
 
-    async update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
+    update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
         if (!this.isEnabled()) {
-            return false;
+            return Promise.resolve(false);
         }
-
         for (const leaf of this.getLeaves()) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
                 if (fileOrPath && fileOrPath.path === node.id) {
@@ -86,7 +90,7 @@ export default class GraphManager implements Manager {
             }
         }
 
-        return true;
+        return Promise.resolve(true);
     }
 
     private getFirstGraphNode(): GraphNode | null {
