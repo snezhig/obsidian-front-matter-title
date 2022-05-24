@@ -57,7 +57,7 @@ export class SettingsTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('Meta title path')
-            .setDesc('Set a yaml path, which value will be used as a file title. Value must be string or numeric')
+            .setDesc('Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}". See Readme to find out')
             .addText(text => text
                 .setPlaceholder('Type path')
                 .setValue(this.plugin.settings.get('path'))
