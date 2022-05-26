@@ -117,7 +117,6 @@ describe('Graph Titles Test', () => {
 
         beforeAll(() => {
             leaf = createLeaf();
-
             mocks.workspace.getLeavesOfType.mockImplementation(() => [leaf]);
         })
 
@@ -127,6 +126,7 @@ describe('Graph Titles Test', () => {
             lastQueueAdd = null;
             mocks.onIframeLoad.mockClear();
             mocks.getDisplayText.mockClear();
+            mocks.resolver.resolve.mockClear();
 
         })
 
@@ -179,6 +179,19 @@ describe('Graph Titles Test', () => {
                     await lastQueueAdd;
                     expect(mocks.onIframeLoad).toHaveBeenCalledTimes(1);
                     expect(mocks.getDisplayText).toHaveBeenCalledTimes(1);
+                })
+
+                test('Text has been updated inspire of there is not leaf', async () => {
+                    const title = 'update without existing leaves';
+                    mocks.resolver.resolve.mockResolvedValueOnce(title)
+                    mocks.workspace.getLeavesOfType.mockReturnValueOnce([]);
+                    await graph.update(file);
+                    expect(lastQueueAdd).toBeNull();
+                    leaf.view.renderer.onIframeLoad();
+                    expect(lastQueueAdd).not.toBeNull();
+                    await lastQueueAdd;
+                    expect(mocks.resolver.resolve).toHaveBeenCalledTimes(1);
+                    expect(node.getDisplayText()).toEqual(title);
                 })
             });
         });

@@ -24,6 +24,7 @@ export default class GraphManager implements Manager {
         return function (self: GraphManager, defaultArgs: unknown[], vanilla: Function) {
             if (self.resolver.isSupported(this.id)) {
                 const title = self.resolved.get(this.id);
+                console.log('t', title)
                 if (title) {
                     return title;
                 } else if (!self.resolved.has(this.id)) {
@@ -46,7 +47,7 @@ export default class GraphManager implements Manager {
         this.initReplacement();
 
         if (!this.bound) {
-            this.workspace.on('layout-change', this.initReplacement);
+            this.workspace.on('layout-change', this.initReplacement.bind(this));
             this.bound = true;
         }
     }
@@ -75,20 +76,29 @@ export default class GraphManager implements Manager {
         return this.state !== "disabled";
     }
 
-    update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
+    update(file: TAbstractFile | null = null): Promise<boolean> {
         if (!this.isEnabled()) {
             return Promise.resolve(false);
         }
-        for (const leaf of this.getLeaves()) {
+        const leaves = this.getLeaves();
+        if(leaves.length === 0){
+            if(file){
+                this.resolved.delete(file.path);
+            }else{
+                this.resolved.clear();
+            }
+        }
+        for (const leaf of leaves) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
-                if (fileOrPath && fileOrPath.path === node.id) {
+                if (file && file.path === node.id) {
                     this.queue.add(node.id).catch(console.error);
                     break;
-                } else if (fileOrPath === null) {
+                } else if (file === null) {
                     this.queue.add(node.id).catch(console.error);
                 }
             }
         }
+
 
         return Promise.resolve(true);
     }
@@ -132,13 +142,12 @@ export default class GraphManager implements Manager {
             }
             this.resolved.set(id, title);
         }
-
-        if (hasDiff == false) {
-            items.clear();
-            return;
+console.log('h', hasDiff)
+        console.log('s', this.resolved)
+        if (hasDiff !== false) {
+            this.reloadIframeWithNodes(items);
         }
 
-        this.reloadIframeWithNodes(items);
         items.clear();
     }
 
