@@ -24,7 +24,6 @@ export default class GraphManager implements Manager {
         return function (self: GraphManager, defaultArgs: unknown[], vanilla: Function) {
             if (self.resolver.isSupported(this.id)) {
                 const title = self.resolved.get(this.id);
-                console.log('t', title)
                 if (title) {
                     return title;
                 } else if (!self.resolved.has(this.id)) {
@@ -142,8 +141,6 @@ export default class GraphManager implements Manager {
             }
             this.resolved.set(id, title);
         }
-console.log('h', hasDiff)
-        console.log('s', this.resolved)
         if (hasDiff !== false) {
             this.reloadIframeWithNodes(items);
         }
