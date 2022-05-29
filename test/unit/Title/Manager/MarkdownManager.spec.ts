@@ -3,8 +3,9 @@ import MarkdownManager from "../../../../src/Title/Manager/MarkdownManager";
 import {MarkdownViewExt, TFile, Workspace, WorkspaceLeaf} from "obsidian";
 import Resolver from "../../../../src/Title/Resolver/Resolver"
 
+const workspace = new Workspace();
 let manager: Manager = new MarkdownManager(
-    Object.create(Workspace.prototype),
+    workspace,
     Object.create(Resolver.prototype)
 );
 const createView = (name: string) => {
@@ -44,15 +45,21 @@ const mocks = {
 }
 
 describe('Markdown leaf test', () => {
+    const enable = () => {
+        manager.enable();
+        expect(manager.isEnabled()).toBeTruthy();
+    }
+
+    const disable = () => {
+        manager.disable();
+        expect(manager.isEnabled()).toBeFalsy();
+    }
+
     describe('Plugin without exist leaves', () => {
-        test('Plugin has been enabled', () => {
-            manager.enable();
-            expect(manager.isEnabled()).toBeTruthy();
-        })
-        test('Plugin has been disabled', () => {
-            manager.disable();
-            expect(manager.isEnabled()).toBeFalsy();
-        })
+
+        test('Plugin has been enabled', () => enable());
+        test('Plugin has been disabled', () => disable());
+
         test('Foo and Bar have not been called', () => {
             expect(mocks.foo.innerText).not.toHaveBeenCalled();
             expect(mocks.bar.innerText).not.toHaveBeenCalled();
@@ -60,19 +67,24 @@ describe('Markdown leaf test', () => {
     });
 
     describe('Plugin with leaves', () => {
-        beforeAll(() => {
-            manager.enable();
-        })
         describe('Test Foo view', () => {
+            const title = 'new-foo-title';
+            const origin = 'foo';
             beforeAll(() => {
                 mocks.workspace.getLeavesOfType.mockReturnValue([{view: views.foo} as unknown as WorkspaceLeaf]);
+                mocks.resolver.resolve.mockResolvedValue(title);
             })
             beforeEach(() => {
                 mocks.foo.innerText.mockClear();
+                mocks.resolver.resolve.mockClear();
             })
+            afterEach(() => {
+                views.foo.titleEl.innerText = origin;
+            })
+
+            test('Enable', () => enable())
+
             test('Has been changed', async () => {
-                const title = 'new_title';
-                mocks.resolver.resolve.mockResolvedValueOnce(title);
                 await manager.update();
                 expect(mocks.foo.innerText).toHaveBeenNthCalledWith(1, title);
             })
@@ -85,21 +97,51 @@ describe('Markdown leaf test', () => {
             test('Has been restores because of null', async () => {
                 mocks.resolver.resolve.mockResolvedValueOnce(null);
                 await manager.update()
-                expect(mocks.foo.innerText).toHaveBeenNthCalledWith(1, 'foo');
+                expect(mocks.foo.innerText).toHaveBeenNthCalledWith(1, origin);
             })
 
             test('Has been changed and restored because of disable', async () => {
-                const title = 'test';
-                mocks.resolver.resolve.mockResolvedValueOnce(title);
                 await manager.update();
                 expect(mocks.foo.innerText).toHaveBeenNthCalledWith(1, title);
-                manager.disable();
-                expect(mocks.foo.innerText).toHaveBeenNthCalledWith(2, 'foo');
+                disable();
+                expect(mocks.foo.innerText).toHaveBeenNthCalledWith(2, origin);
                 expect(mocks.foo.innerText).toHaveBeenCalledTimes(2);
+            })
+
+            test('Has not been updated because of disable', async () => {
+                disable();
+                await manager.update();
+                expect(mocks.resolver.resolve).not.toHaveBeenCalled();
+                expect(mocks.foo.innerText).not.toHaveBeenCalled();
+            })
+
+            test('Has been updated by event', async () => {
+                enable();
+                let resolved: boolean = false;
+                mocks.resolver.resolve.mockImplementationOnce(async () => {
+                    resolved = true;
+                    return title;
+                })
+                workspace.trigger('layout-change');
+                await new Promise<void>(r => setTimeout(() => {
+                    if (resolved) r();
+                }, 1));
+                expect(mocks.resolver.resolve).toHaveBeenCalledTimes(1);
+                expect(mocks.foo.innerText).toHaveBeenNthCalledWith(1, title);
+            })
+
+            test('Has not been updated twice', async () => {
+                enable();
+                await manager.update();
+                await manager.update();
+
+                expect(mocks.foo.innerText).toHaveBeenNthCalledWith(1, title);
+                expect(mocks.foo.innerText).toHaveBeenCalledTimes(1);
             })
 
             afterAll(() => {
                 mocks.workspace.getLeavesOfType.mockReset();
+                mocks.resolver.resolve.mockReset();
             })
         })
     })

@@ -47,6 +47,11 @@ export class Workspace  extends EventEmitter{
     getLeavesOfType(viewType: string): WorkspaceLeaf[] {
         return [];
     }
+    trigger(name: string, ...data: any[]): void{
+        this.emit(name, ...data);
+    }
+
+
 
 }
 
