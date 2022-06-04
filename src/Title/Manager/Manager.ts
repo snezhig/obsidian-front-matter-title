@@ -3,9 +3,9 @@ import {TAbstractFile} from "obsidian";
 export default interface Manager {
     isEnabled(): boolean;
 
-    enable(): void;
+    enable(): Promise<void>|void;
 
-    disable(): void;
+    disable(): Promise<void>|void;
 
     update(abstract?: TAbstractFile | null): Promise<boolean>;
 }

@@ -1,5 +1,6 @@
-export const Leaves = {
-    FE: 'file-explorer',
-    G: 'graph',
-    MD: 'markdown'
+export enum Leaves  {
+    FE = 'file-explorer',
+    G = 'graph',
+    LG = 'localgraph',
+    MD = 'markdown',
 }

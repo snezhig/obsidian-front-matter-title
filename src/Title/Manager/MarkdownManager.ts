@@ -1,12 +1,15 @@
 import Manager from "./Manager";
-import {EventRef, MarkdownViewExt, TAbstractFile, Workspace} from "obsidian";
+import {MarkdownViewExt, TAbstractFile, Workspace} from "obsidian";
 import {Leaves} from "../../enum";
 import Resolver from "../Resolver/Resolver";
 
 export default class MarkdownManager implements Manager {
     private original = new Map<string, string>();
-    private bound: boolean = false;
-    private handler = () => this.update();
+    private bound = false;
+    private handlers = {
+        'layout-change': () => this.update(),
+        'mousedown': (e: Event) => e.preventDefault()
+    };
 
     constructor(
         private workspace: Workspace,
@@ -14,7 +17,7 @@ export default class MarkdownManager implements Manager {
     ) {
     }
 
-    private enabled: boolean = false;
+    private enabled = false;
 
     disable(): void {
         for (const leaf of this.workspace.getLeavesOfType(Leaves.MD)) {
@@ -23,7 +26,7 @@ export default class MarkdownManager implements Manager {
         this.original.clear();
         this.enabled = false;
         if (this.bound) {
-            this.workspace.off('layout-change', this.handler);
+            this.workspace.off('layout-change', this.handlers['layout-change']);
             this.bound = false;
         }
     }
@@ -31,7 +34,7 @@ export default class MarkdownManager implements Manager {
     enable(): void {
         this.enabled = true;
         if (!this.bound) {
-            this.workspace.on('layout-change', this.handler);
+            this.workspace.on('layout-change', this.handlers['layout-change']);
             this.bound = true;
         }
     }
@@ -68,9 +71,12 @@ export default class MarkdownManager implements Manager {
             this.original.set(view.file.path, view.titleEl.innerText);
             view.titleEl.innerText = title;
             view.titleEl.contentEditable = 'false';
+            view.titleEl.addEventListener('mousedown', this.handlers.mousedown);
+
         } else if (!title && this.original.has(view.file.path)) {
             view.titleEl.innerText = this.original.get(view.file.path);
             view.titleEl.contentEditable = 'true';
+            view.titleEl.removeEventListener('mousedown', this.handlers.mousedown);
         }
     }
 

@@ -10,7 +10,7 @@ export default class GraphManager implements Manager {
     private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphManager> = null;
     private queue: Queue<string, void>;
     private state: State = 'disabled';
-    private bound: boolean = false;
+    private bound = false;
     private resolved = new Map<string, string | null | false>();
 
     constructor(
@@ -21,7 +21,7 @@ export default class GraphManager implements Manager {
     }
 
     private static getReplaceFunction() {
-        return function (self: GraphManager, defaultArgs: unknown[], vanilla: Function) {
+        return function (self: GraphManager, defaultArgs: unknown[], vanilla: () => string) {
             if (self.resolver.isSupported(this.id)) {
                 const title = self.resolved.get(this.id);
                 if (title) {
@@ -35,15 +35,15 @@ export default class GraphManager implements Manager {
     }
 
     disable(): void {
-        this.replacement.disable();
+        this.replacement?.disable();
         this.reloadIframeWithNodes(new Set(this.resolved.keys()));
         this.resolved.clear();
         this.state = "disabled";
     }
 
-    enable(): void {
+    async enable(): Promise<void> {
         this.state = "enabled";
-        this.initReplacement();
+        await this.initReplacement();
 
         if (!this.bound) {
             this.workspace.on('layout-change', this.initReplacement.bind(this));
@@ -51,11 +51,11 @@ export default class GraphManager implements Manager {
         }
     }
 
-    private initReplacement(): void {
+    private async initReplacement(): Promise<void> {
         if (this.replacement) {
             this.replacement.enable();
             return;
-        }else if(!this.isEnabled()){
+        } else if (!this.isEnabled()) {
             return;
         }
 
@@ -64,9 +64,13 @@ export default class GraphManager implements Manager {
         if (node) {
             this.replacement = this.createReplacement(node);
             this.replacement.enable();
-            this.update().catch(console.error);
+            console.log('update');
+            await this.update();
         } else if (this.getLeaves().length) {
-            setTimeout(this.initReplacement.bind(this), 20);
+            //TODO: complete
+            return new Promise(r => setTimeout(() => {
+
+            }))
         }
 
     }
@@ -80,13 +84,15 @@ export default class GraphManager implements Manager {
             return Promise.resolve(false);
         }
         const leaves = this.getLeaves();
-        if(leaves.length === 0){
-            if(file){
+
+        if (leaves.length === 0) {
+            if (file) {
                 this.resolved.delete(file.path);
-            }else{
+            } else {
                 this.resolved.clear();
             }
         }
+        console.log(leaves);
         for (const leaf of leaves) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
                 if (file && file.path === node.id) {
@@ -113,7 +119,10 @@ export default class GraphManager implements Manager {
     }
 
     private getLeaves(): GraphLeaf[] {
-        return this.workspace.getLeavesOfType(Leaves.G) as GraphLeaf[];
+        return [
+            ...this.workspace.getLeavesOfType(Leaves.G) as GraphLeaf[],
+            ...this.workspace.getLeavesOfType(Leaves.LG) as GraphLeaf[],
+        ];
     }
 
     private async resolveTitles(items: Iterable<string>): Promise<[string, string | null][]> {

@@ -12,7 +12,7 @@ type Options = {
 export default class Resolver {
     private collection: Map<string, Item>;
     private options: Options;
-    private listeners = new Map<string, Function[]>();
+    private listeners = new Map<string, (() => void)[]>();
     private template: PathTemplate = null;
 
     constructor(

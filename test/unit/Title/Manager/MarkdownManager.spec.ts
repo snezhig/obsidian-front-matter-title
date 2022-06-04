@@ -20,6 +20,9 @@ const createView = (name: string) => {
         get innerText(): string {
             return this.text;
         }
+
+        addEventListener = jest.fn()
+        removeEventListener = jest.fn()
     }(name) as unknown as HTMLDivElement;
 
     const file = new TFile();
