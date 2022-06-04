@@ -51,30 +51,6 @@ export default class GraphManager implements Manager {
         }
     }
 
-    private async initReplacement(): Promise<void> {
-        if (this.replacement) {
-            this.replacement.enable();
-            return;
-        } else if (!this.isEnabled()) {
-            return;
-        }
-
-        const node = this.getFirstGraphNode();
-
-        if (node) {
-            this.replacement = this.createReplacement(node);
-            this.replacement.enable();
-            console.log('update');
-            await this.update();
-        } else if (this.getLeaves().length) {
-            //TODO: complete
-            return new Promise(r => setTimeout(() => {
-
-            }))
-        }
-
-    }
-
     isEnabled(): boolean {
         return this.state !== "disabled";
     }
@@ -92,7 +68,6 @@ export default class GraphManager implements Manager {
                 this.resolved.clear();
             }
         }
-        console.log(leaves);
         for (const leaf of leaves) {
             for (const node of leaf.view?.renderer?.nodes ?? []) {
                 if (file && file.path === node.id) {
@@ -106,6 +81,38 @@ export default class GraphManager implements Manager {
 
 
         return Promise.resolve(true);
+    }
+
+    private async initReplacement(): Promise<void> {
+        if (this.replacement) {
+            this.replacement.enable();
+            return;
+        } else if (!this.isEnabled()) {
+            return;
+        }
+
+        const node = this.getFirstGraphNode();
+
+        if (node) {
+            this.replacement = this.createReplacement(node);
+            this.replacement.enable();
+            await this.update();
+        } else if (this.getLeaves().length) {
+            return new Promise(r => {
+                const timer = setTimeout(async () => {
+                    let clear = !this.isEnabled() || this.replacement || this.getLeaves().length === 0;
+                    if (this.getFirstGraphNode()) {
+                        await this.initReplacement();
+                        clear = true;
+                    }
+                    if (clear) {
+                        clearTimeout(timer);
+                        r();
+                    }
+                }, 20);
+            })
+        }
+
     }
 
     private getFirstGraphNode(): GraphNode | null {

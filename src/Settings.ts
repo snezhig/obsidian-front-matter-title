@@ -1,7 +1,8 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
 import MetaTitlePlugin from "../main";
 
-const aliases = {
+type Aliases = { [k in keyof MetaTitleSettings]?: keyof MetaTitleSettings };
+const aliases: Aliases = {
     explorer_enabled: 'm_explorer',
     graph_enabled: 'm_graph'
 }
@@ -11,7 +12,9 @@ type MetaTitleSettings = {
     excluded_folders: string[],
     m_markdown: boolean,
     m_graph: boolean,
-    m_explorer: boolean
+    m_explorer: boolean,
+    explorer_enabled?: boolean,
+    graph_enabled?: boolean
 }
 
 export class Settings {
@@ -22,8 +25,10 @@ export class Settings {
         private cb: (s: MetaTitleSettings) => void
     ) {
         this.settings = Object.assign({}, Settings.getDefault(), current);
-        for (const [k,v] of Object.entries(aliases)){
-            if(this.settings[k] !== undefined){
+        const als = Object.entries(aliases) as [keyof MetaTitleSettings, keyof MetaTitleSettings][];
+        for (const [k, v] of als) {
+            if (this.settings[k] !== undefined) {
+                //@ts-ignore
                 this.settings[v] = this.settings[k];
                 delete this.settings[k];
             }

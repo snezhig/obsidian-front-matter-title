@@ -32,7 +32,6 @@ export default class Composer {
     public setState(state: boolean, type?: ManagerType): void {
         const method: keyof Manager = state ? 'enable' : 'disable';
         for (const [, manager] of this.determine(type)) {
-            console.log(manager, method)
             manager[method]();
         }
     }
