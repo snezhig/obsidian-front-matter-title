@@ -1,13 +1,15 @@
-import {TAbstractFile, TFileExplorerItem, TFileExplorerView} from "obsidian";
+import {TAbstractFile, TFileExplorerItem, TFileExplorerView, Workspace} from "obsidian";
 import Resolver from "src/Title/Resolver/Resolver";
 import Manager from "./Manager";
+import {Leaves} from "../../enum";
 
 export default class ExplorerManager implements Manager {
+    private explorerView: TFileExplorerView = null;
     private originTitles = new Map<string, string>();
     private enabled = false;
 
     constructor(
-        private explorerView: TFileExplorerView,
+        private workspace: Workspace,
         private resolver: Resolver
     ) {
     }
@@ -17,16 +19,39 @@ export default class ExplorerManager implements Manager {
     }
 
     disable(): void {
-        this.restoreTitles();
+        if(this.explorerView) {
+            this.restoreTitles();
+            this.explorerView = null;
+        }
         this.enabled = false;
     }
 
     enable(): void {
+        this.explorerView = this.getExplorerView();
         this.enabled = true;
     }
 
+
+    private getExplorerView(): TFileExplorerView | null {
+        const leaves = this.workspace.getLeavesOfType(Leaves.FE);
+
+        if (leaves.length > 1) {
+            //TODO: error? Try to work with more than one explorer?
+            console.log('there is more then one explorer')
+            return null;
+        }
+
+        //TODO: what if it be later?
+        if (leaves?.first()?.view === undefined) {
+            console.log('explorer is undefined');
+            return null;
+        }
+
+        return leaves.first().view as TFileExplorerView;
+    }
+
     async update(fileOrPath: TAbstractFile | null = null): Promise<boolean> {
-        if (!this.isEnabled()) {
+        if (!this.isEnabled() || !this.explorerView) {
             return false;
         }
 
