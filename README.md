@@ -1,4 +1,5 @@
 ## Front Matter Title
+
 __Also known as `Meta Title Filename`__
 
 This is a plugin for [Obsidian](https://obsidian.md).
@@ -9,6 +10,20 @@ Plugin **does not rename files**,
 it just uses specific value from meta-block of markdown file as displayed filename in explorer or graph.
 
 > Value from specific key must be a string or a number
+
+# Functional
+
+* Display title from frontmatter in `graph`, `explorer`, `markdown leaf header`
+* Settings to switch on\off each of type from above separately
+* Settings to exclude folders or files
+* Option to use `template like` title path
+
+## Installation (one of)
+
+* Download in from Obsidian through `Community plugins`
+* Use [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
+* Download `obsidian-front-matter-title-#LAST_RELEASE#-beta.zip` from last release and unpack it into your vault by
+  path: `.obsidian/plugins`
 
 ## Examples
 
@@ -58,6 +73,8 @@ additional:
 * [ ] Add commands to update titles manually
 * [ ] Add settings for title's length
 * [x] Fix the problem that titles in graph were not changed, in case application opens with graph
+* [x] Add local-graph compatibility
+* [x] Add support for leaf's header
 
 ## Note
 
