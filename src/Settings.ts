@@ -72,11 +72,10 @@ export class SettingsTab extends PluginSettingTab {
         const {containerEl} = this;
 
         containerEl.empty();
-
         containerEl.createEl('h2', {text: 'Settings for plugin.'});
 
         new Setting(containerEl)
-            .setName('Meta title path')
+            .setName('Front matter title path')
             .setDesc('Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}". See Readme to find out')
             .addText(text => text
                 .setPlaceholder('Type path')
@@ -84,6 +83,25 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.set('path', value);
                 }));
+
+        //TODO: create settings for list. Think about rewriting settings at all
+
+        // const list = new Setting(containerEl)
+        //     .setName('Use first value from list front matter value')
+        //     .setDesc('If you title path contains a list value, the first value will be used');
+        //     list.addDropdown(e => {
+        //         e.addOptions({first: 'Use first value', delimiter: 'Join all by delimiter'})
+        //             .onChange(e => {
+        //                 const text = list.components.last();
+        //                 if(e === 'first'){
+        //                     text.setValue(e);
+        //                 }
+        //             })
+        //     })
+        //     .addText(e => {
+        //     });
+
+
         new Setting(containerEl)
             .setName('Exclude folders')
             .setDesc('Set excluded folders and files in this folders will not be parsed')
@@ -92,7 +110,13 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('excluded_folders', v.split('\n').filter(e => e))
                 }));
-        new Setting(containerEl)
+
+        this.buildMangers();
+    }
+
+    private buildMangers(): void {
+        this.containerEl.createEl('h4', {text: 'Managers'});
+        new Setting(this.containerEl)
             .setName('Enable explorer titles')
             .setDesc('If it is on, plugin will replace titles in file explorer and update them')
             .addToggle(e => e
@@ -100,7 +124,7 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('m_explorer', v)
                 }));
-        new Setting(containerEl)
+        new Setting(this.containerEl)
             .setName('Enable graph titles')
             .setDesc('If it is on, plugin will replace titles in graph and update them')
             .addToggle(e => e
@@ -108,7 +132,7 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('m_graph', v);
                 }));
-        new Setting(containerEl)
+        new Setting(this.containerEl)
             .setName('Enable leaf`s header titles')
             .setDesc('If it is on, plugin will replace titles in graph and update them. Also it will prevent click on header to avoid accidentally renaming')
             .addToggle(e => e
