@@ -1,31 +1,33 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
+//TODO: separate it, make more readable.
+import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../main";
 
-type Aliases = { [k in keyof MetaTitleSettings]?: keyof MetaTitleSettings };
+type Aliases = { [k in keyof TSettings]?: keyof TSettings };
 const aliases: Aliases = {
     explorer_enabled: 'm_explorer',
     graph_enabled: 'm_graph'
 }
 
-type MetaTitleSettings = {
+type TSettings = {
     path: string,
+    list_pattern: true | string
     excluded_folders: string[],
     m_markdown: boolean,
     m_graph: boolean,
     m_explorer: boolean,
     explorer_enabled?: boolean,
-    graph_enabled?: boolean
+    graph_enabled?: boolean,
 }
 
 export class Settings {
-    private readonly settings: MetaTitleSettings;
+    private readonly settings: TSettings;
 
     public constructor(
-        current: MetaTitleSettings,
-        private cb: (s: MetaTitleSettings) => void
+        current: TSettings,
+        private cb: (s: TSettings) => void
     ) {
         this.settings = Object.assign({}, Settings.getDefault(), current);
-        const als = Object.entries(aliases) as [keyof MetaTitleSettings, keyof MetaTitleSettings][];
+        const als = Object.entries(aliases) as [keyof TSettings, keyof TSettings][];
         for (const [k, v] of als) {
             if (this.settings[k] !== undefined) {
                 //@ts-ignore
@@ -35,26 +37,28 @@ export class Settings {
         }
     }
 
-    private static getDefault(): MetaTitleSettings {
+    private static getDefault(): TSettings {
         return {
             path: 'title',
+            list_pattern: true,
             excluded_folders: [],
             m_graph: true,
             m_explorer: true,
-            m_markdown: true
+            m_markdown: true,
         };
     }
 
-    public set<K extends keyof MetaTitleSettings>(key: K, value: MetaTitleSettings[K]): void {
+    public set<K extends keyof TSettings>(key: K, value: TSettings[K]): void {
         this.settings[key] = value;
         this.cb(this.getAll());
     }
 
-    public get<K extends keyof MetaTitleSettings>(key: K): MetaTitleSettings[K] {
+    public get<K extends keyof TSettings>(key: K): TSettings[K] {
+        this.set('m_markdown', true)
         return this.settings[key];
     }
 
-    public getAll(): MetaTitleSettings {
+    public getAll(): TSettings {
         return this.settings;
     }
 }
@@ -72,11 +76,10 @@ export class SettingsTab extends PluginSettingTab {
         const {containerEl} = this;
 
         containerEl.empty();
-
         containerEl.createEl('h2', {text: 'Settings for plugin.'});
 
         new Setting(containerEl)
-            .setName('Meta title path')
+            .setName('Front matter title path')
             .setDesc('Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}". See Readme to find out')
             .addText(text => text
                 .setPlaceholder('Type path')
@@ -84,6 +87,9 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async (value) => {
                     this.plugin.settings.set('path', value);
                 }));
+
+        this.buildDelimiter();
+
         new Setting(containerEl)
             .setName('Exclude folders')
             .setDesc('Set excluded folders and files in this folders will not be parsed')
@@ -92,7 +98,13 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('excluded_folders', v.split('\n').filter(e => e))
                 }));
-        new Setting(containerEl)
+
+        this.buildMangers();
+    }
+
+    private buildMangers(): void {
+        this.containerEl.createEl('h4', {text: 'Managers'});
+        new Setting(this.containerEl)
             .setName('Enable explorer titles')
             .setDesc('If it is on, plugin will replace titles in file explorer and update them')
             .addToggle(e => e
@@ -100,7 +112,7 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('m_explorer', v)
                 }));
-        new Setting(containerEl)
+        new Setting(this.containerEl)
             .setName('Enable graph titles')
             .setDesc('If it is on, plugin will replace titles in graph and update them')
             .addToggle(e => e
@@ -108,7 +120,7 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('m_graph', v);
                 }));
-        new Setting(containerEl)
+        new Setting(this.containerEl)
             .setName('Enable leaf`s header titles')
             .setDesc('If it is on, plugin will replace titles in graph and update them. Also it will prevent click on header to avoid accidentally renaming')
             .addToggle(e => e
@@ -116,5 +128,35 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('m_markdown', v);
                 }));
+    }
+
+    private buildDelimiter(): void {
+
+        const list = new Setting(this.containerEl)
+            .setName('List value behaviour')
+            .setDesc('Plugin can use first value from list values or join all once by delimiter');
+
+
+        let text: TextComponent = null;
+
+        list.addDropdown(e =>
+            e.addOptions({true: 'Use first value', delimiter: 'Join all by delimiter'})
+                .setValue(this.plugin.settings.get('list_pattern') === true ? 'true' : 'delimiter')
+                .onChange(e => toggleText(e === 'delimiter'))
+        );
+
+        list.addText(e => {
+            text = e.onChange(v => this.plugin.settings.set('list_pattern', v))
+        });
+
+        const toggleText = (enabled: boolean) => {
+            if (!enabled) {
+                text.setValue('').setPlaceholder('First value will be used').setDisabled(true);
+                this.plugin.settings.set('list_pattern', true);
+            } else {
+                text.setValue(this.plugin.settings.get('list_pattern') as string).setPlaceholder('Type a delimiter').setDisabled(false);
+            }
+        }
+        toggleText(this.plugin.settings.get('list_pattern') !== true);
     }
 }

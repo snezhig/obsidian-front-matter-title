@@ -1,6 +1,6 @@
-import { MetadataCache, TAbstractFile} from "obsidian";
+import {MetadataCache, TAbstractFile} from "obsidian";
 import Item from "./ResolverItem";
-import MetaParser, {Meta} from "../MetaParser";
+import FrontMatterParser, {Meta} from "../FrontMatterParser";
 import PathTemplate from "../../PathTemplate/PathTemplateInterface";
 import Factory from "../../PathTemplate/Factory";
 
@@ -17,6 +17,7 @@ export default class Resolver {
 
     constructor(
         private cache: MetadataCache,
+        private parser: FrontMatterParser,
         options: Options
     ) {
         this.collection = new Map();
@@ -68,7 +69,7 @@ export default class Resolver {
             return;
         }
 
-        this.collection.clear();
+        this.revokeAll();
 
         this.options.metaPath = v;
         this.template = Factory.create(v);
@@ -106,6 +107,10 @@ export default class Resolver {
         this.collection.delete(Resolver.getPathByAbstract(fileOrPath));
     }
 
+    public revokeAll(): void {
+        this.collection.clear();
+    }
+
     private emit(eventName: string): void {
         for (const listener of this.listeners.get(eventName) ?? []) {
             listener();
@@ -141,7 +146,7 @@ export default class Resolver {
     private async makeTitle(path: string): Promise<string | null> {
         const metadata: Meta = this.cache.getCache(path)?.frontmatter ?? {};
         const paths = this.template.getMetaPaths();
-        const parts = Object.fromEntries(paths.map(e => [e, MetaParser.parse(e, metadata)]));
+        const parts = Object.fromEntries(paths.map(e => [e, this.parser.parse(e, metadata)]));
 
         return this.template.buildTitle(parts);
 
