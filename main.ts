@@ -3,19 +3,34 @@ import Resolver from "./src/Title/Resolver/Resolver";
 import {Settings, SettingsTab} from "./src/Settings";
 import Composer from "./src/Title/Manager/Composer";
 import {Leaves} from "./src/enum";
+import FrontMatterParser from "./src/Title/FrontMatterParser";
 
 
 export default class MetaTitlePlugin extends Plugin {
     public settings: Settings;
     private resolver: Resolver;
     private composer: Composer = null;
+    private parser: FrontMatterParser;
 
 
     public async saveSettings() {
         const settings = this.settings.getAll();
         await this.saveData(settings);
+
+        console.log(settings.list_pattern + ' --- ' + this.parser.getDelimiter());
+        //TODO: refactor
+        if (
+            settings.list_pattern === true && this.parser.getDelimiter() !== null
+            || settings.list_pattern !== true && settings.list_pattern !== this.parser.getDelimiter()
+        ) {
+            console.log('revoke');
+            this.parser.setDelimiter(settings.list_pattern === true ? null : settings.list_pattern);
+            this.resolver.revokeAll();
+        }
+
         this.resolver.setMetaPath(settings.path);
         this.resolver.setExcluded(settings.excluded_folders);
+
         this.composer.setState(settings.m_graph, Leaves.G);
         this.composer.setState(settings.m_explorer, Leaves.FE);
         this.composer.setState(settings.m_markdown, Leaves.MD);
@@ -28,10 +43,14 @@ export default class MetaTitlePlugin extends Plugin {
         this.settings = new Settings(await this.loadData(), this.saveSettings.bind(this));
         this.bind();
 
-        this.resolver = new Resolver(this.app.metadataCache, {
-            metaPath: this.settings.get('path'),
-            excluded: this.settings.get('excluded_folders')
-        });
+        this.parser = new FrontMatterParser();
+        this.resolver = new Resolver(
+            this.app.metadataCache,
+            this.parser,
+            {
+                metaPath: this.settings.get('path'),
+                excluded: this.settings.get('excluded_folders')
+            });
         this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
 
         this.composer = new Composer(this.app.workspace, this.resolver);

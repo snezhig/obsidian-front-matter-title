@@ -1,31 +1,33 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
+//TODO: separate it, make more readable.
+import {App, DropdownComponent, PluginSettingTab, Setting} from "obsidian";
 import MetaTitlePlugin from "../main";
 
-type Aliases = { [k in keyof MetaTitleSettings]?: keyof MetaTitleSettings };
+type Aliases = { [k in keyof TSettings]?: keyof TSettings };
 const aliases: Aliases = {
     explorer_enabled: 'm_explorer',
     graph_enabled: 'm_graph'
 }
 
-type MetaTitleSettings = {
+type TSettings = {
     path: string,
+    list_pattern: true | string
     excluded_folders: string[],
     m_markdown: boolean,
     m_graph: boolean,
     m_explorer: boolean,
     explorer_enabled?: boolean,
-    graph_enabled?: boolean
+    graph_enabled?: boolean,
 }
 
 export class Settings {
-    private readonly settings: MetaTitleSettings;
+    private readonly settings: TSettings;
 
     public constructor(
-        current: MetaTitleSettings,
-        private cb: (s: MetaTitleSettings) => void
+        current: TSettings,
+        private cb: (s: TSettings) => void
     ) {
         this.settings = Object.assign({}, Settings.getDefault(), current);
-        const als = Object.entries(aliases) as [keyof MetaTitleSettings, keyof MetaTitleSettings][];
+        const als = Object.entries(aliases) as [keyof TSettings, keyof TSettings][];
         for (const [k, v] of als) {
             if (this.settings[k] !== undefined) {
                 //@ts-ignore
@@ -35,26 +37,28 @@ export class Settings {
         }
     }
 
-    private static getDefault(): MetaTitleSettings {
+    private static getDefault(): TSettings {
         return {
             path: 'title',
+            list_pattern: true,
             excluded_folders: [],
             m_graph: true,
             m_explorer: true,
-            m_markdown: true
+            m_markdown: true,
         };
     }
 
-    public set<K extends keyof MetaTitleSettings>(key: K, value: MetaTitleSettings[K]): void {
+    public set<K extends keyof TSettings>(key: K, value: TSettings[K]): void {
         this.settings[key] = value;
         this.cb(this.getAll());
     }
 
-    public get<K extends keyof MetaTitleSettings>(key: K): MetaTitleSettings[K] {
+    public get<K extends keyof TSettings>(key: K): TSettings[K] {
+        this.set('m_markdown', true)
         return this.settings[key];
     }
 
-    public getAll(): MetaTitleSettings {
+    public getAll(): TSettings {
         return this.settings;
     }
 }
@@ -84,23 +88,7 @@ export class SettingsTab extends PluginSettingTab {
                     this.plugin.settings.set('path', value);
                 }));
 
-        //TODO: create settings for list. Think about rewriting settings at all
-
-        // const list = new Setting(containerEl)
-        //     .setName('Use first value from list front matter value')
-        //     .setDesc('If you title path contains a list value, the first value will be used');
-        //     list.addDropdown(e => {
-        //         e.addOptions({first: 'Use first value', delimiter: 'Join all by delimiter'})
-        //             .onChange(e => {
-        //                 const text = list.components.last();
-        //                 if(e === 'first'){
-        //                     text.setValue(e);
-        //                 }
-        //             })
-        //     })
-        //     .addText(e => {
-        //     });
-
+        this.buildDelimiter();
 
         new Setting(containerEl)
             .setName('Exclude folders')
@@ -140,5 +128,38 @@ export class SettingsTab extends PluginSettingTab {
                 .onChange(async v => {
                     this.plugin.settings.set('m_markdown', v);
                 }));
+    }
+
+    private buildDelimiter(): void {
+
+        const list = new Setting(this.containerEl)
+            .setName('List value behaviour')
+            .setDesc('Plugin can use first value from list values or join all once by delimiter');
+
+
+        let dropdown: DropdownComponent = null;
+        let text = null;
+
+        list.addDropdown(e => {
+            dropdown = e
+                .addOptions({true: 'Use first value', delimiter: 'Join all by delimiter'})
+                .setValue(this.plugin.settings.get('list_pattern') === true ? 'true' : 'delimiter')
+                .onChange(e => toggleText(e === 'delimiter'))
+
+        });
+
+        list.addText(e => {
+            text = e.onChange(v => this.plugin.settings.set('list_pattern', v))
+        });
+
+        const toggleText = (enabled: boolean) => {
+            if (!enabled) {
+                text.setValue('').setPlaceholder('First value will be used').setDisabled(true);
+                this.plugin.settings.set('list_pattern', true);
+            } else {
+                text.setValue(this.plugin.settings.get('list_pattern')).setPlaceholder('Type a delimiter').setDisabled(false);
+            }
+        }
+        toggleText(this.plugin.settings.get('list_pattern') !== true);
     }
 }
