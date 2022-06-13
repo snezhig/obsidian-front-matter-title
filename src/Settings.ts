@@ -1,5 +1,5 @@
 //TODO: separate it, make more readable.
-import {App, DropdownComponent, PluginSettingTab, Setting} from "obsidian";
+import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../main";
 
 type Aliases = { [k in keyof TSettings]?: keyof TSettings };
@@ -137,16 +137,13 @@ export class SettingsTab extends PluginSettingTab {
             .setDesc('Plugin can use first value from list values or join all once by delimiter');
 
 
-        let dropdown: DropdownComponent = null;
-        let text = null;
+        let text: TextComponent = null;
 
-        list.addDropdown(e => {
-            dropdown = e
-                .addOptions({true: 'Use first value', delimiter: 'Join all by delimiter'})
+        list.addDropdown(e =>
+            e.addOptions({true: 'Use first value', delimiter: 'Join all by delimiter'})
                 .setValue(this.plugin.settings.get('list_pattern') === true ? 'true' : 'delimiter')
                 .onChange(e => toggleText(e === 'delimiter'))
-
-        });
+        );
 
         list.addText(e => {
             text = e.onChange(v => this.plugin.settings.set('list_pattern', v))
@@ -157,7 +154,7 @@ export class SettingsTab extends PluginSettingTab {
                 text.setValue('').setPlaceholder('First value will be used').setDisabled(true);
                 this.plugin.settings.set('list_pattern', true);
             } else {
-                text.setValue(this.plugin.settings.get('list_pattern')).setPlaceholder('Type a delimiter').setDisabled(false);
+                text.setValue(this.plugin.settings.get('list_pattern') as string).setPlaceholder('Type a delimiter').setDisabled(false);
             }
         }
         toggleText(this.plugin.settings.get('list_pattern') !== true);

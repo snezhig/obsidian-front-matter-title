@@ -17,13 +17,11 @@ export default class MetaTitlePlugin extends Plugin {
         const settings = this.settings.getAll();
         await this.saveData(settings);
 
-        console.log(settings.list_pattern + ' --- ' + this.parser.getDelimiter());
         //TODO: refactor
         if (
             settings.list_pattern === true && this.parser.getDelimiter() !== null
             || settings.list_pattern !== true && settings.list_pattern !== this.parser.getDelimiter()
         ) {
-            console.log('revoke');
             this.parser.setDelimiter(settings.list_pattern === true ? null : settings.list_pattern);
             this.resolver.revokeAll();
         }
@@ -73,6 +71,10 @@ export default class MetaTitlePlugin extends Plugin {
         this.registerEvent(this.app.metadataCache.on('changed', file => {
             this.resolver?.revoke(file);
             this.runManagersUpdate(file).catch(console.error)
+        }));
+        this.registerEvent(this.app.vault.on('rename', (e, o) => {
+            this.resolver?.revoke(o);
+            this.runManagersUpdate(e).catch(console.error);
         }));
     }
 
