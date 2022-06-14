@@ -1,10 +1,10 @@
 import Resolver from "../../../../src/Title/Resolver/Resolver";
 import {CachedMetadata, MetadataCache, Vault} from "obsidian";
-import MetaParser from "../../../../src/Title/MetaParser";
+import FrontMatterParser from "../../../../src/Title/FrontMatterParser";
 import {expect} from "@jest/globals";
 
 const getCache = jest.spyOn<MetadataCache, any>(MetadataCache.prototype, 'getCache').mockImplementation(() => null);
-const parse = jest.spyOn(MetaParser, "parse");
+const parse = jest.spyOn<FrontMatterParser, 'parse'>(FrontMatterParser.prototype, "parse");
 
 const Options = {
     metaPath: 'title',
@@ -13,7 +13,7 @@ const Options = {
 const vault = new Vault();
 
 const onUnresolvedHandler = jest.fn();
-let resolver = new Resolver(new MetadataCache(), Options);
+let resolver = new Resolver(new MetadataCache(), new FrontMatterParser(), Options);
 resolver.on('unresolved', onUnresolvedHandler);
 
 describe('File Title Resolver Test', () => {
@@ -170,9 +170,9 @@ describe('File Title Resolver Test', () => {
 
     describe('Test exceptions', () => {
         test('Return null because of non valid meta-value', async () => {
-            const path = 'array_title';
+            const path = 'object_title';
             parse.mockRestore();
-            getCache.mockImplementationOnce((): CachedMetadata => ({frontmatter: {[path]: []} as any}))
+            getCache.mockImplementationOnce((): CachedMetadata => ({frontmatter: {[path]: {}} as any}))
             resolver.setMetaPath(path);
             await expect(resolver.resolve(getRandomPath())).rejects.toBeInstanceOf(Error);
         })

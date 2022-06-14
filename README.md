@@ -9,7 +9,7 @@ This is a plugin for [Obsidian](https://obsidian.md).
 Plugin **does not rename files**,
 it just uses specific value from meta-block of markdown file as displayed filename in explorer or graph.
 
-> Value from specific key must be a string or a number
+> Value from specific key **must be** a string or a number or an array(list)
 
 # Functional
 
@@ -17,6 +17,7 @@ it just uses specific value from meta-block of markdown file as displayed filena
 * Settings to switch on\off each of type from above separately
 * Settings to exclude folders or files
 * Option to use `template like` title path
+* List values support
 
 ## Installation (one of)
 
@@ -41,18 +42,20 @@ date_updated: '2022-03-04 22:42:50'
 additional:
   author: Snezhig
   title: Project ideas
+
 ```
 
-|       Meta title path        | Original filename | Displayed filename |                    Comment                     |
-|:----------------------------:|:-----------------:|:------------------:|:----------------------------------------------:|
-|           `short`            |   202110151351    |        `PI`        |                   All is ok                    |
-|      `additional.title`      |   202110151351    |  `Project Ideas`   |                   All is ok                    |
-|         `not_exists`         |   202110151351    |   `202110151351`   |      Original because path does not exist      |
-|         `additional`         |   202110151351    |   `202110151351`   | Original because value is not string or number |
-|         `{{short}}`          |   202110151351    |        `PI`        |                   All is ok                    |
-|   `{{short}} - {{status}}`   |   202110151351    |    `PI - open`     |                   All is ok                    |
-| `{{short}} - {{not_exists}}` |   202110151351    |      `PI - `       |            The second part is empty            |
-
+|       Meta title path        | Original filename |    Displayed filename     |                        Comment                        |
+|:----------------------------:|:-----------------:|:-------------------------:|:-----------------------------------------------------:|
+|           `short`            |   202110151351    |           `PI`            |                       All is ok                       |
+|      `additional.title`      |   202110151351    |      `Project Ideas`      |                       All is ok                       |
+|         `not_exists`         |   202110151351    |      `202110151351`       |         Original because path does not exist          |
+|         `additional`         |   202110151351    |      `202110151351`       | Original because value is not string, number or array |
+|         `{{short}}`          |   202110151351    |           `PI`            |                       All is ok                       |
+|   `{{short}} - {{status}}`   |   202110151351    |        `PI - open`        |                       All is ok                       |
+| `{{short}} - {{not_exists}}` |   202110151351    |          `PI - `          |               The second part is empty                |
+|            `tags`            |   202110151351    |        `#project`         |       First value is used (depends on settings)       |
+|            `tags`            |   202110151351    | `#project - #improvement` |  Values are joined by delimiter defined in settings   |
 > **If you use the only one value, use `short` instead of `{{short}}` to have a better performance**
 
 ## Result
