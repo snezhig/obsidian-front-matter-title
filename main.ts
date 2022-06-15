@@ -72,10 +72,12 @@ export default class MetaTitlePlugin extends Plugin {
             this.resolver?.revoke(file);
             this.runManagersUpdate(file).catch(console.error)
         }));
-        this.registerEvent(this.app.vault.on('rename', (e, o) => {
-            this.resolver?.revoke(o);
-            this.runManagersUpdate(e).catch(console.error);
-        }));
+        this.app.workspace.onLayoutReady(() =>
+            this.registerEvent(this.app.vault.on('rename', (e, o) => {
+                this.resolver?.revoke(o);
+                this.runManagersUpdate(e).catch(console.error);
+            }))
+        );
     }
 
 
