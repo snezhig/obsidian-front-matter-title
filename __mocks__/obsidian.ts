@@ -15,6 +15,7 @@ export class TFolder extends TAbstractFile {
 
 export class TFile extends TAbstractFile {
     extension: string
+    name: string
 }
 
 export class Vault extends EventEmitter {
@@ -31,6 +32,7 @@ export class Vault extends EventEmitter {
         file.path = path;
         file.basename = `mock_${path}_basename`
         file.extension = 'md'
+        file.name = `${path}/${file.basename}.md`
         file.vault = new Vault();
         return file;
     }
@@ -43,14 +45,14 @@ export class TFileExplorer {
 }
 
 
-export class Workspace  extends EventEmitter{
+export class Workspace extends EventEmitter {
     getLeavesOfType(viewType: string): WorkspaceLeaf[] {
         return [];
     }
-    trigger(name: string, ...data: any[]): void{
+
+    trigger(name: string, ...data: any[]): void {
         this.emit(name, ...data);
     }
-
 
 
 }

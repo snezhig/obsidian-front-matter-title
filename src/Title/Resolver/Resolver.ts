@@ -3,6 +3,7 @@ import Item from "./ResolverItem";
 import FrontMatterParser, {Meta} from "../FrontMatterParser";
 import PathTemplate from "../../PathTemplate/PathTemplateInterface";
 import Factory from "../../PathTemplate/Factory";
+import VaultFacade from "../../Obsidian/VaultFacade";
 
 type Options = {
     metaPath: string,
@@ -18,6 +19,7 @@ export default class Resolver {
     constructor(
         private cache: MetadataCache,
         private parser: FrontMatterParser,
+        private vault: VaultFacade,
         options: Options
     ) {
         this.collection = new Map();
@@ -146,9 +148,8 @@ export default class Resolver {
     private async makeTitle(path: string): Promise<string | null> {
         const metadata: Meta = this.cache.getCache(path)?.frontmatter ?? {};
         const paths = this.template.getMetaPaths();
+
         const parts = Object.fromEntries(paths.map(e => [e, this.parser.parse(e, metadata)]));
-
         return this.template.buildTitle(parts);
-
     }
 }
