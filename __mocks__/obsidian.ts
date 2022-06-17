@@ -29,10 +29,11 @@ export class Vault extends EventEmitter {
 
     getAbstractFileByPath(path: string): TFile {
         const file = new TFile();
-        file.path = path;
         file.basename = `mock_${path}_basename`
         file.extension = 'md'
-        file.name = `${path}/${file.basename}.md`
+        file.name = `${file.basename}.md`
+        // file.path = path;
+        file.path = `${path}/${file.name}`;
         file.vault = new Vault();
         return file;
     }

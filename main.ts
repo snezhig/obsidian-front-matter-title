@@ -27,7 +27,7 @@ export default class MetaTitlePlugin extends Plugin {
             this.resolver.revokeAll();
         }
 
-        this.resolver.setMetaPath(settings.path);
+        this.resolver.changePath(settings.path);
         this.resolver.setExcluded(settings.excluded_folders);
 
         this.composer.setState(settings.m_graph, Leaves.G);
