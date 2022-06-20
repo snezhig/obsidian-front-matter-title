@@ -68,7 +68,22 @@ const data: {
             around_space: 'ap'
         },
         title: 'ap'
-    }
+    },
+    {
+        template: "{{ left_space}}",
+        paths: {
+            left_space: 'left_space_value'
+        },
+        title: 'left_space_value'
+    },
+    {
+        template: "{{right_space }}",
+        paths: {
+            right_space: 'right_space_value'
+        },
+        title: 'right_space_value'
+    },
+
 ]
 
 describe('Composite Path Template Test', () => {
