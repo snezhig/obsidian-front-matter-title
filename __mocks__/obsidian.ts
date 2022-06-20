@@ -15,6 +15,7 @@ export class TFolder extends TAbstractFile {
 
 export class TFile extends TAbstractFile {
     extension: string
+    name: string
 }
 
 export class Vault extends EventEmitter {
@@ -26,13 +27,17 @@ export class Vault extends EventEmitter {
         this.emit(name, ...data);
     }
 
-    getAbstractFileByPath(path: string): TFile {
-        const file = new TFile();
-        file.path = path;
-        file.basename = `mock_${path}_basename`
-        file.extension = 'md'
-        file.vault = new Vault();
-        return file;
+    getAbstractFileByPath(path: string): TAbstractFile|null {
+        if(/.*\.md$/.test(path)) {
+            const file = new TFile();
+            file.basename = path.replace(/.*\/(.*)\.md/, '$1');
+            file.extension = 'md'
+            file.name = `${file.basename}.md`
+            file.path = path;
+            file.vault = new Vault();
+            return file;
+        }
+        return null;
     }
 }
 
@@ -43,14 +48,14 @@ export class TFileExplorer {
 }
 
 
-export class Workspace  extends EventEmitter{
+export class Workspace extends EventEmitter {
     getLeavesOfType(viewType: string): WorkspaceLeaf[] {
         return [];
     }
-    trigger(name: string, ...data: any[]): void{
+
+    trigger(name: string, ...data: any[]): void {
         this.emit(name, ...data);
     }
-
 
 
 }

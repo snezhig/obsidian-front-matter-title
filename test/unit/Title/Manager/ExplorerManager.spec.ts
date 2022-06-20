@@ -1,8 +1,9 @@
 import ExplorerManager from "../../../../src/Title/Manager/ExplorerManager";
-import {TFile, TFileExplorerView, TFileExplorerItem, MetadataCache, Workspace, WorkspaceLeaf} from "obsidian";
+import {TFile, TFileExplorerView, TFileExplorerItem, MetadataCache, Workspace, WorkspaceLeaf, Vault} from "obsidian";
 import {expect} from "@jest/globals";
 import Resolver from "../../../../src/Title/Resolver/Resolver";
 import FrontMatterParser from "../../../../src/Title/FrontMatterParser";
+import VaultFacade from "../../../../src/Obsidian/VaultFacade";
 
 Array.prototype.first = function () {
     return this[0];
@@ -21,7 +22,12 @@ const createItem = (text: string): TFileExplorerItem => {
     return {file, titleInnerEl, titleEl: null}
 }
 
-const resolver = new Resolver(new MetadataCache(), new FrontMatterParser(), {metaPath: 'title', excluded: []});
+const resolver = new Resolver(
+    new MetadataCache(),
+    new FrontMatterParser(),
+    new VaultFacade(new Vault()),
+    {metaPath: 'title', excluded: []}
+);
 const resolve = jest.fn().mockImplementation(async () => titles.resolved);
 resolver.resolve = resolve;
 
