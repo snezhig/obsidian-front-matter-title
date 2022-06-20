@@ -53,8 +53,8 @@ describe('File Title Resolver Test', () => {
         });
 
         test('Resolve reserved paths', async () => {
-            const file = vaultFacade.getTFile('path_reserved');
-            parse.mockReturnValueOnce('frontitle');
+            const file = vaultFacade.getTFile('path_reserved.md');
+            parse.mockReturnValueOnce('fronttitle');
             getCache.mockReturnValueOnce({});
             resolver.changePath('{{ title }} and {{ _path }} {{ _basename }} {{ _name }}');
             const title = await resolver.resolve(file);

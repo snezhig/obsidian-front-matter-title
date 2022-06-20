@@ -25,8 +25,8 @@ export default class Resolver {
         options: Options
     ) {
         this.collection = new Map();
-        this.options = {...options};
-        this.changePath(this.options.metaPath);
+        this.options = {...options, metaPath: ''};
+        this.changePath(options.metaPath);
     }
 
     private static getPathByAbstract(fileOrPath: TAbstractFile | string): string {
@@ -154,7 +154,7 @@ export default class Resolver {
 
         const parts = Object.fromEntries(paths.map(e => [e, this.metaParser.parse(e, metadata)]));
         const reserved = this.reservedParser.parse(this.vault.getTFile(path));
-        console.log(parts, reserved);
+
         return this.template.buildTitle({...parts, ... reserved});
     }
 }

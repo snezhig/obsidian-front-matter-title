@@ -5,22 +5,22 @@ import ReservedParser from "../../../src/Title/ReservedParser";
 const vault = new Vault();
 const data = [
     {
-        parts: ['_basename', 'title'], file: vault.getAbstractFileByPath('first'), expected() {
+        parts: ['_basename', 'title'], file: vault.getAbstractFileByPath('first.md'), expected() {
             return {_basename: this.file.basename}
         },
     },
     {
-        parts: ['_basename', 'title', 'name', '_path'], file: vault.getAbstractFileByPath('second'), expected() {
+        parts: ['_basename', 'title', 'name', '_path'], file: vault.getAbstractFileByPath('second.md'), expected() {
             return {_basename: this.file.basename, _path: this.file.path}
         },
     },
     {
-        parts: ['title'], file: vault.getAbstractFileByPath('third'), expected() {
+        parts: ['title'], file: vault.getAbstractFileByPath('third.md'), expected() {
             return {}
         },
     },
     {
-        parts: ['_basename', '_path', '_name', '_extension'], file: vault.getAbstractFileByPath('four'), expected() {
+        parts: ['_basename', '_path', '_name', '_extension'], file: vault.getAbstractFileByPath('four.md'), expected() {
             return {_basename: this.file.basename, _path: this.file.path, _name: this.file.name}
         },
     }

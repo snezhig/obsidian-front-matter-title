@@ -27,15 +27,17 @@ export class Vault extends EventEmitter {
         this.emit(name, ...data);
     }
 
-    getAbstractFileByPath(path: string): TFile {
-        const file = new TFile();
-        file.basename = `mock_${path}_basename`
-        file.extension = 'md'
-        file.name = `${file.basename}.md`
-        // file.path = path;
-        file.path = `${path}/${file.name}`;
-        file.vault = new Vault();
-        return file;
+    getAbstractFileByPath(path: string): TAbstractFile|null {
+        if(/.*\.md$/.test(path)) {
+            const file = new TFile();
+            file.basename = path.replace(/.*\/(.*)\.md/, '$1');
+            file.extension = 'md'
+            file.name = `${file.basename}.md`
+            file.path = path;
+            file.vault = new Vault();
+            return file;
+        }
+        return null;
     }
 }
 
