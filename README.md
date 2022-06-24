@@ -66,15 +66,15 @@ additional:
     - _**_name**_ - name of file with extension
     - _**_path**_ - path to file with folders and extension
 
-|        Meta title path        |  Original filename  |     Displayed filename     |               Comment                |
-|:-----------------------------:|:-------------------:|:--------------------------:|:------------------------------------:|
-|          `{{short}}`          |    202110151351     |            `PI`            |              All is ok               |
-|   `{{short}} - {{status}}`    |    202110151351     |        `PI - open`         |              All is ok               |
-| `{{short}} - {{not_exists}}`  |    202110151351     |          `PI - `           |       The second part is empty       |
-| `{{short}} - {{not_exists}}`  |    202110151351     |          `PI - `           |       The second part is empty       |
-| `{{short}} - {{ _basename }}` | folder/202110151351 |    `PI - 202110151351`     | The second part is original basename |
-|   `{{short}} - {{ _path }}`   | folder/202110151351 | `PI - folder/202110151351` |   The second part is original path   |
-|   `{{short}} - {{ _name }}`   | folder/202110151351 |   `PI - 202110151351.md`   |   The second part is original name   |
+|       Meta title path        |  Original filename  |     Displayed filename     |               Comment                |
+|:----------------------------:|:-------------------:|:--------------------------:|:------------------------------------:|
+|         `{{short}}`          |    202110151351     |            `PI`            |              All is ok               |
+|   `{{short}} - {{status}}`   |    202110151351     |        `PI - open`         |              All is ok               |
+| `{{short}} - {{not_exists}}` |    202110151351     |          `PI - `           |       The second part is empty       |
+| `{{short}} - {{not_exists}}` |    202110151351     |          `PI - `           |       The second part is empty       |
+| `{{short}} - {{_basename}}`  | folder/202110151351 |    `PI - 202110151351`     | The second part is original basename |
+|   `{{short}} - {{_path}}`    | folder/202110151351 | `PI - folder/202110151351` |   The second part is original path   |
+|   `{{short}} - {{_name}}`    | folder/202110151351 |   `PI - 202110151351.md`   |   The second part is original name   |
 
 > **If you use the only one value, use `short` instead of `{{short}}` to have a better performance**
 
