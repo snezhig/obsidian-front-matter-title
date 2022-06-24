@@ -3,6 +3,8 @@ import Item from "./ResolverItem";
 import FrontMatterParser, {Meta} from "../FrontMatterParser";
 import PathTemplate from "../../PathTemplate/PathTemplateInterface";
 import Factory from "../../PathTemplate/Factory";
+import VaultFacade from "../../Obsidian/VaultFacade";
+import ReservedParser from "../ReservedParser";
 
 type Options = {
     metaPath: string,
@@ -14,15 +16,17 @@ export default class Resolver {
     private options: Options;
     private listeners = new Map<string, (() => void)[]>();
     private template: PathTemplate = null;
+    private reservedParser: ReservedParser;
 
     constructor(
         private cache: MetadataCache,
-        private parser: FrontMatterParser,
+        private metaParser: FrontMatterParser,
+        private vault: VaultFacade,
         options: Options
     ) {
         this.collection = new Map();
-        this.options = {...options};
-        this.template = Factory.create(this.options.metaPath);
+        this.options = {...options, metaPath: ''};
+        this.changePath(options.metaPath);
     }
 
     private static getPathByAbstract(fileOrPath: TAbstractFile | string): string {
@@ -64,7 +68,7 @@ export default class Resolver {
         }
     }
 
-    public setMetaPath(v: string): void {
+    public changePath(v: string): void {
         if (this.options.metaPath === v) {
             return;
         }
@@ -73,6 +77,7 @@ export default class Resolver {
 
         this.options.metaPath = v;
         this.template = Factory.create(v);
+        this.reservedParser = new ReservedParser(this.template.getMetaPaths());
         this.emit('unresolved');
     }
 
@@ -146,9 +151,10 @@ export default class Resolver {
     private async makeTitle(path: string): Promise<string | null> {
         const metadata: Meta = this.cache.getCache(path)?.frontmatter ?? {};
         const paths = this.template.getMetaPaths();
-        const parts = Object.fromEntries(paths.map(e => [e, this.parser.parse(e, metadata)]));
 
-        return this.template.buildTitle(parts);
+        const parts = Object.fromEntries(paths.map(e => [e, this.metaParser.parse(e, metadata)]));
+        const reserved = this.reservedParser.parse(this.vault.getTFile(path));
 
+        return this.template.buildTitle({...parts, ... reserved});
     }
 }

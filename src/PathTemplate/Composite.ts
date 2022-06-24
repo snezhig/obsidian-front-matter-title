@@ -4,8 +4,8 @@ import {CompositePattern} from "./Factory";
 
 export default class Composite implements PathTemplateInterface {
 
-    private metaPaths: string[] = [];
     private pattern = CompositePattern;
+    private placeholders: Map<string, string> = new Map();
 
     constructor(
         private template: string
@@ -15,24 +15,24 @@ export default class Composite implements PathTemplateInterface {
 
     buildTitle(titles: { [p: string]: string | null }): string | null {
         let title = this.template;
-        for (const path of this.metaPaths) {
+        for (const [path, placeholder] of this.placeholders.entries()) {
             if (titles[path] === undefined) {
                 throw new TemplateTitleUndefinedError(`Template path ${path} is undefined`);
             }
-            title = title.replace(`{{${path}}}`, titles[path] ?? '');
+            title = title.replace(`{{${placeholder}}}`, titles[path] ?? '');
         }
         return title?.length > 0 ? title : null;
     }
 
     getMetaPaths(): string[] {
-        return this.metaPaths;
+        return Array.from(this.placeholders.keys());
     }
 
     private parse(): void {
         const parts = this.template.match(new RegExp(this.pattern, 'g'));
         for (const part of parts) {
             const {groups: {title}} = part.match(this.pattern);
-            this.metaPaths.push(title);
+            this.placeholders.set(title.trim(), title);
         }
     }
 

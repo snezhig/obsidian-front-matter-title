@@ -61,14 +61,39 @@ const data: {
             second_null: null
         },
         title: null
-    }
+    },
+    {
+        template: "{{ around_space }}",
+        paths: {
+            around_space: 'ap'
+        },
+        title: 'ap'
+    },
+    {
+        template: "{{ left_space}}",
+        paths: {
+            left_space: 'left_space_value'
+        },
+        title: 'left_space_value'
+    },
+    {
+        template: "{{right_space }}",
+        paths: {
+            right_space: 'right_space_value'
+        },
+        title: 'right_space_value'
+    },
+
 ]
 
 describe('Composite Path Template Test', () => {
     for (const item of data){
-        test(`Test template "${item.template}"`, () => {
-            const pathTemplate = new Composite(item.template);
+        const pathTemplate = new Composite(item.template);
+        test(`Test template "${item.template}" paths`, () => {
             expect(pathTemplate.getMetaPaths()).toEqual(Object.keys(item.paths));
+        })
+
+        test(`Test template "${item.template}" title`, () => {
             expect(pathTemplate.buildTitle(item.paths)).toEqual(item.title);
         })
     }

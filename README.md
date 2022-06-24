@@ -23,7 +23,7 @@ it just uses specific value from meta-block of markdown file as displayed filena
 
 * Download in from Obsidian through `Community plugins`
 * Use [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
-* Download `obsidian-front-matter-title-#LAST_RELEASE#-beta.zip` from last release and unpack it into your vault by
+* Download `obsidian-front-matter-title-#LAST_RELEASE#.zip` from last release and unpack it into your vault by
   path: `.obsidian/plugins`
 
 ## Examples
@@ -45,17 +45,37 @@ additional:
 
 ```
 
+### Simple path
+
+- Use only one key from yaml block
+
 |       Meta title path        | Original filename |    Displayed filename     |                        Comment                        |
 |:----------------------------:|:-----------------:|:-------------------------:|:-----------------------------------------------------:|
 |           `short`            |   202110151351    |           `PI`            |                       All is ok                       |
 |      `additional.title`      |   202110151351    |      `Project Ideas`      |                       All is ok                       |
 |         `not_exists`         |   202110151351    |      `202110151351`       |         Original because path does not exist          |
 |         `additional`         |   202110151351    |      `202110151351`       | Original because value is not string, number or array |
-|         `{{short}}`          |   202110151351    |           `PI`            |                       All is ok                       |
-|   `{{short}} - {{status}}`   |   202110151351    |        `PI - open`        |                       All is ok                       |
-| `{{short}} - {{not_exists}}` |   202110151351    |          `PI - `          |               The second part is empty                |
 |            `tags`            |   202110151351    |        `#project`         |       First value is used (depends on settings)       |
 |            `tags`            |   202110151351    | `#project - #improvement` |  Values are joined by delimiter defined in settings   |
+
+### Path as a template
+
+- Use one or more keys with static value
+- Use keys from original path:
+    - _**_basename**_ - base name of file without extension
+    - _**_name**_ - name of file with extension
+    - _**_path**_ - path to file with folders and extension
+
+|        Meta title path        |  Original filename  |     Displayed filename     |               Comment                |
+|:-----------------------------:|:-------------------:|:--------------------------:|:------------------------------------:|
+|          `{{short}}`          |    202110151351     |            `PI`            |              All is ok               |
+|   `{{short}} - {{status}}`    |    202110151351     |        `PI - open`         |              All is ok               |
+| `{{short}} - {{not_exists}}`  |    202110151351     |          `PI - `           |       The second part is empty       |
+| `{{short}} - {{not_exists}}`  |    202110151351     |          `PI - `           |       The second part is empty       |
+| `{{short}} - {{ _basename }}` | folder/202110151351 |    `PI - 202110151351`     | The second part is original basename |
+|   `{{short}} - {{ _path }}`   | folder/202110151351 | `PI - folder/202110151351` |   The second part is original path   |
+|   `{{short}} - {{ _name }}`   | folder/202110151351 |   `PI - 202110151351.md`   |   The second part is original name   |
+
 > **If you use the only one value, use `short` instead of `{{short}}` to have a better performance**
 
 ## Result

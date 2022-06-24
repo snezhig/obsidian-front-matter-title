@@ -4,6 +4,7 @@ import {Settings, SettingsTab} from "./src/Settings";
 import Composer from "./src/Title/Manager/Composer";
 import {Leaves} from "./src/enum";
 import FrontMatterParser from "./src/Title/FrontMatterParser";
+import VaultFacade from "./src/Obsidian/VaultFacade";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -26,7 +27,7 @@ export default class MetaTitlePlugin extends Plugin {
             this.resolver.revokeAll();
         }
 
-        this.resolver.setMetaPath(settings.path);
+        this.resolver.changePath(settings.path);
         this.resolver.setExcluded(settings.excluded_folders);
 
         this.composer.setState(settings.m_graph, Leaves.G);
@@ -45,6 +46,7 @@ export default class MetaTitlePlugin extends Plugin {
         this.resolver = new Resolver(
             this.app.metadataCache,
             this.parser,
+            new VaultFacade(this.app.vault),
             {
                 metaPath: this.settings.get('path'),
                 excluded: this.settings.get('excluded_folders')
