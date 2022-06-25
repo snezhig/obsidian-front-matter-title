@@ -54,7 +54,6 @@ export class Settings {
     }
 
     public get<K extends keyof TSettings>(key: K): TSettings[K] {
-        this.set('m_markdown', true)
         return this.settings[key];
     }
 
