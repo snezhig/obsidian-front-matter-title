@@ -1,5 +1,5 @@
 import 'obsidian';
-import {MarkdownView, TAbstractFile, View, WorkspaceLeaf} from "obsidian";
+import {MarkdownView, SuggestModal, TAbstractFile, View, WorkspaceLeaf} from "obsidian";
 
 declare module 'obsidian' {
     export interface TFileExplorerItem {
@@ -41,5 +41,13 @@ declare module 'obsidian' {
 
     export class MarkdownViewExt extends MarkdownView {
         titleEl: HTMLDivElement
+    }
+
+    export abstract class SuggestModalExt<T> extends SuggestModal<T> {
+        chooser?: SuggestModalChooser<any> | any
+    }
+
+    export abstract class SuggestModalChooser<T> {
+        setSuggestions(e: T): any;
     }
 }
