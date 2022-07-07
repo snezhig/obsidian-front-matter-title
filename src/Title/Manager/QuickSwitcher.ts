@@ -1,5 +1,5 @@
 // Example
-import {SuggestModalExt, SuggestModalChooser, TAbstractFile, SuggestModal, TFile} from "obsidian";
+import {SuggestModalExt, SuggestModalChooser, TAbstractFile, SuggestModal} from "obsidian";
 import FunctionReplacer from "../../Utils/FunctionReplacer";
 import Manager from "./Manager";
 import Resolver from "../Resolver/Resolver";
