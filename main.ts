@@ -1,12 +1,9 @@
 import {debounce, Plugin, TAbstractFile} from 'obsidian';
 import Resolver from "./src/Title/Resolver/Resolver";
 import {Settings, SettingsTab} from "./src/Settings";
-import Composer from "./src/Title/Manager/Composer";
-import {Leaves} from "./src/enum";
+import Composer, {ManagerType} from "./src/Title/Manager/Composer";
 import FrontMatterParser from "./src/Title/FrontMatterParser";
 import VaultFacade from "./src/Obsidian/VaultFacade";
-import QuickSwitcher from "./src/Title/Manager/QuickSwitcher";
-import ResolverAdapter from "./src/Title/Resolver/ResolverAdapter";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -31,10 +28,10 @@ export default class MetaTitlePlugin extends Plugin {
 
         this.resolver.changePath(settings.path);
         this.resolver.setExcluded(settings.excluded_folders);
-
-        this.composer.setState(settings.m_graph, Leaves.G);
-        this.composer.setState(settings.m_explorer, Leaves.FE);
-        this.composer.setState(settings.m_markdown, Leaves.MD);
+        this.composer.setState(settings.m_graph, ManagerType.Graph);
+        this.composer.setState(settings.m_explorer, ManagerType.Explorer);
+        this.composer.setState(settings.m_markdown, ManagerType.Markdown);
+        this.composer.setState(settings.m_quick_switcher, ManagerType.QuickSwitcher);
         await this.runManagersUpdate();
     }
 
@@ -53,14 +50,14 @@ export default class MetaTitlePlugin extends Plugin {
                 metaPath: this.settings.get('path'),
                 excluded: this.settings.get('excluded_folders')
             });
-        new QuickSwitcher(new ResolverAdapter(this.resolver));
         this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
 
         this.composer = new Composer(this.app.workspace, this.resolver);
         this.app.workspace.onLayoutReady(() => {
-            this.composer.setState(this.settings.get('m_graph'), Leaves.G);
-            this.composer.setState(this.settings.get('m_explorer'), Leaves.FE);
-            this.composer.setState(this.settings.get('m_markdown'), Leaves.MD)
+            this.composer.setState(this.settings.get('m_graph'), ManagerType.Graph);
+            this.composer.setState(this.settings.get('m_explorer'), ManagerType.Explorer);
+            this.composer.setState(this.settings.get('m_markdown'), ManagerType.Markdown)
+            this.composer.setState(this.settings.get('m_quick_switcher'), ManagerType.QuickSwitcher)
             this.composer.update();
         });
 

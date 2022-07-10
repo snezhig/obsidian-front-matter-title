@@ -8,6 +8,13 @@ export default class ResolverAdapter implements ResolverInterface {
     }
 
     resolve(path: string): string | null {
-        return this.resolver.isResolved(path) ? this.resolver.getResolved(path) : null;
+        let title = null;
+        if (!this.resolver.isResolved(path)) {
+            title = this.resolver.makeTitle(path);
+            this.resolver.resolve(path);
+        } else {
+            title = this.resolver.getResolved(path);
+        }
+        return title;
     }
 }

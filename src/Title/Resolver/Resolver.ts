@@ -137,7 +137,7 @@ export default class Resolver {
             if (!this.collection.has(path)) {
                 const item = new Item();
 
-                item.process(this.makeTitle(path));
+                item.process((async () => this.makeTitle(path))());
 
                 this.collection.set(path, item);
 
@@ -148,7 +148,8 @@ export default class Resolver {
         return null;
     }
 
-    private async makeTitle(path: string): Promise<string | null> {
+    //TODO:: temp public to support quick switcher
+    public  makeTitle(path: string): string | null {
         const metadata: Meta = this.cache.getCache(path)?.frontmatter ?? {};
         const paths = this.template.getMetaPaths();
 

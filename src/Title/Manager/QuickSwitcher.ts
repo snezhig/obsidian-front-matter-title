@@ -48,7 +48,7 @@ export default class QuickSwitcher implements Manager {
 
     private static hasValidItem(items: SuggestModalChooserFileItem[]): boolean {
         const first = items?.[0];
-        const allowedType = ['alias', 'file'];
+        const allowedType = [/*'alias',*/ 'file'];
         return first && allowedType.includes(first?.type) && first.file instanceof TFile;
 
     }
@@ -61,7 +61,7 @@ export default class QuickSwitcher implements Manager {
     }
 
     public enable(): Promise<void> | void {
-        if (!this.replacers?.chooser.enable()) {
+        if (!this.replacers?.chooser?.enable()) {
             this.replacers.modal.enable()
         }
 
@@ -74,14 +74,13 @@ export default class QuickSwitcher implements Manager {
     }
 
     public update(abstract?: TAbstractFile | null): Promise<boolean> {
-        return Promise.resolve(false);
+        return Promise.resolve(true);
     }
 
     private createModalReplacer() {
         this.replacers.modal = new FunctionReplacer<SuggestModalExt<any>, "open", QuickSwitcher>(
             SuggestModal.prototype, 'open', this, QuickSwitcher.openCallback
         )
-        this.replacers.modal.enable()
     }
 
     private createChooserReplacer(modal: SuggestModalExt<any>): void {
@@ -98,6 +97,7 @@ export default class QuickSwitcher implements Manager {
             QuickSwitcher.setSuggestionsCallback
         )
         this.replacers.chooser.enable();
+        this.replacers.modal.disable();
     }
 
     private replaceAliases(items: SuggestModalChooserFileItem[]): SuggestModalChooserFileItem[] {

@@ -15,6 +15,7 @@ type TSettings = {
     m_markdown: boolean,
     m_graph: boolean,
     m_explorer: boolean,
+    m_quick_switcher: boolean,
     explorer_enabled?: boolean,
     graph_enabled?: boolean,
 }
@@ -45,11 +46,13 @@ export class Settings {
             m_graph: true,
             m_explorer: true,
             m_markdown: true,
+            m_quick_switcher: true
         };
     }
 
     public set<K extends keyof TSettings>(key: K, value: TSettings[K]): void {
         this.settings[key] = value;
+        console.log(key, value);
         this.cb(this.getAll());
     }
 
@@ -126,6 +129,14 @@ export class SettingsTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.get('m_markdown'))
                 .onChange(async v => {
                     this.plugin.settings.set('m_markdown', v);
+                }));
+        new Setting(this.containerEl)
+            .setName('Enable quick switcher titles')
+            .setDesc('If it is on, plugin will replace titles in quick switcher modal if items are not aliases. It won`t affect on search logic')
+            .addToggle(e => e
+                .setValue(this.plugin.settings.get('m_quick_switcher'))
+                .onChange(async v => {
+                    this.plugin.settings.set('m_quick_switcher', v);
                 }));
     }
 

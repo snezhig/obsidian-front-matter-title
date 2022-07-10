@@ -3,10 +3,16 @@ import Resolver from "../Resolver/Resolver";
 import Manager from "./Manager";
 import MarkdownManager from "./MarkdownManager";
 import GraphManager from "./GraphManager";
-import {Leaves} from "../../enum";
 import ExplorerManager from "./ExplorerManager";
+import QuickSwitcher from "./QuickSwitcher";
+import ResolverAdapter from "../Resolver/ResolverAdapter";
 
-type ManagerType = Leaves;
+export enum ManagerType {
+    Graph = 'g',
+    Explorer = 'e',
+    Markdown = 'm',
+    QuickSwitcher = 'qs'
+}
 
 export default class Composer {
     private managers = new Map<ManagerType, Manager>();
@@ -16,12 +22,13 @@ export default class Composer {
         rs: Resolver,
     ) {
         this.managers
-            .set(Leaves.MD, new MarkdownManager(ws, rs))
-            .set(Leaves.G, new GraphManager(ws, rs))
-            .set(Leaves.FE, new ExplorerManager(ws, rs))
+            .set(ManagerType.Markdown, new MarkdownManager(ws, rs))
+            .set(ManagerType.Graph, new GraphManager(ws, rs))
+            .set(ManagerType.Explorer, new ExplorerManager(ws, rs))
+            .set(ManagerType.QuickSwitcher, new QuickSwitcher(new ResolverAdapter(rs)))
     }
 
-    public update(file?: TAbstractFile, type?: ManagerType): Promise<{ manager: Leaves, result: boolean }[]> {
+    public update(file?: TAbstractFile, type?: ManagerType): Promise<{ manager: ManagerType, result: boolean }[]> {
         const promises = [];
         for (const [t, manager] of this.determine(type)) {
             promises.push(manager.update(file).then(result => ({manager: t, result})));
@@ -36,7 +43,7 @@ export default class Composer {
         }
     }
 
-    private determine(type?: ManagerType): Iterable<[Leaves, Manager]> {
+    private determine(type?: ManagerType): Iterable<[ManagerType, Manager]> {
         return type ? [[type, this.managers.get(type)]] : this.managers;
     }
 }

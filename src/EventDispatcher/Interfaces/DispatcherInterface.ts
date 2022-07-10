@@ -1,4 +1,3 @@
-import {EventEnum} from "../EventEnum";
 import EventInterface from "./EventInterface";
 import CallbackInterface from "./CallbackInterface";
 
