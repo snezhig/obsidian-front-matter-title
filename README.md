@@ -13,7 +13,7 @@ it just uses specific value from meta-block of markdown file as displayed filena
 
 # Functional
 
-* Display title from frontmatter in `graph`, `explorer`, `markdown leaf header`
+* Display title from frontmatter in `graph`, `explorer`, `markdown leaf header`, `quick switcher`
 * Settings to switch on\off each of type from above separately
 * Settings to exclude folders or files
 * Option to use `template like` title path
@@ -99,6 +99,12 @@ additional:
 * [x] Add local-graph compatibility
 * [x] Add support for leaf's header
 
+## Thank you
+
+If you like this plugin and would like to buy me a coffee, you can!
+
+<a href="https://www.buymeacoffee.com/snezhig" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 180px !important;" ></a>
+
 ## Note
 
-Feel free to write about bugs, mistakes or ideas for this plugin
+Feel free to write about bugs, mistakes or ideas for this plugin.

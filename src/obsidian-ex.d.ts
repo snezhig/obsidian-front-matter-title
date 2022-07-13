@@ -1,5 +1,5 @@
 import 'obsidian';
-import {MarkdownView, TAbstractFile, View, WorkspaceLeaf} from "obsidian";
+import {MarkdownView, SuggestModal, TAbstractFile, TFile, View, WorkspaceLeaf} from "obsidian";
 
 declare module 'obsidian' {
     export interface TFileExplorerItem {
@@ -29,17 +29,32 @@ declare module 'obsidian' {
     }
 
     export class GraphView extends View {
-        getDisplayText(): string;
-
-        getViewType(): string;
-
         renderer?: {
             nodes?: GraphNode[],
             onIframeLoad(): void
         }
+
+        getDisplayText(): string;
+
+        getViewType(): string;
     }
 
     export class MarkdownViewExt extends MarkdownView {
         titleEl: HTMLDivElement
+    }
+
+    export abstract class SuggestModalExt<T> extends SuggestModal<T> {
+        chooser?: SuggestModalChooser<any> | any
+    }
+
+    export abstract class SuggestModalChooser<T> {
+        setSuggestions(e: T): any;
+    }
+
+    export interface SuggestModalChooserFileItem {
+        downranked: boolean,
+        file: TFile,
+        type: "alias" | "file",
+        alias?: string
     }
 }
