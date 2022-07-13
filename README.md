@@ -103,7 +103,9 @@ additional:
 
 If you like this plugin and would like to buy me a coffee, you can!
 
-<a href="https://www.buymeacoffee.com/snezhig" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 180px !important;" ></a>
+<a href="https://www.buymeacoffee.com/snezhig" target="_blank">
+<img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+</a>
 
 ## Note
 

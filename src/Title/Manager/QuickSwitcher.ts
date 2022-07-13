@@ -29,14 +29,14 @@ export default class QuickSwitcher implements Manager {
     }
 
     private static get openCallback() {
-        return function (self, defaultArgs, vanilla) {
+        return function (self: QuickSwitcher, defaultArgs: unknown[], vanilla: Function) {
             self.createChooserReplacer.call(self, this);
             return vanilla.call(this, ...defaultArgs);
         };
     }
 
     private static get setSuggestionsCallback() {
-        return function (self, defaultArgs, vanilla) {
+        return function (self: QuickSwitcher, defaultArgs: unknown[], vanilla: Function) {
             self.replacers.modal.disable();
 
             if (Array.isArray(defaultArgs?.[0])) {
@@ -55,7 +55,7 @@ export default class QuickSwitcher implements Manager {
 
     public disable(): Promise<void> | void {
         this.replacers.modal.disable();
-        this.replacers?.chooser.disable();
+        this.replacers?.chooser?.disable();
         this.state = false;
         return;
     }
