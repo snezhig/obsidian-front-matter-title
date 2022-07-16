@@ -1,4 +1,4 @@
-import ResolverInterface from "./ResolverInterface";
+import ResolverInterface from "../../Interfaces/ResolverInterface";
 import Resolver from "./Resolver";
 
 export default class ResolverAdapter implements ResolverInterface {

@@ -26,7 +26,7 @@
 		"eslint": "^8.14.0",
 		"jest": "^27.5.1",
 		"jest-mock-extended": "^2.0.6",
-		"obsidian": "latest",
+		"obsidian": "^0.15.4",
 		"ts-debounce": "^4.0.0",
 		"ts-jest": "^27.1.4",
 		"ts-node": "^10.7.0",
