@@ -1,7 +1,9 @@
-export default interface CacheInterface {
-    get<T>(key: string): T | null;
+import CacheItemInterface from "./CacheItemInterface";
 
-    set<T>(key: string, value: T): void;
+export default interface CacheInterface {
+    getItem<T>(key: string): CacheItemInterface<T>;
+
+    save<T>(item: CacheItemInterface<T>): void;
 
     clear(): void;
 
