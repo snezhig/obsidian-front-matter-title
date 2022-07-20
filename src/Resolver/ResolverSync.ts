@@ -16,16 +16,17 @@ export default class ResolverSync implements ResolverInterface {
     }
 
     private get(path: string): string | null {
-        let title = null;
+        let title: string | null;
         const item = this.cache.getItem<string | null>(path);
 
         if (item.isHit() === false) {
-
-            item.set(this.creator.create(path));
-            this.cache.save(item);
+            title = this.creator.create(path);
+            this.cache.save(item.set(title));
+        } else {
+            title = item.get();
         }
 
-        return item.get();
+        return title;
     }
 
     private valid(path: string): boolean {
