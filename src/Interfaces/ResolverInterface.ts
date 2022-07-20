@@ -3,7 +3,7 @@ export enum Resolving {
     Async
 }
 
-type Return<T> = T extends Resolving.Async ? Promise<string | null> : string | null;
+export type Return<T> = T extends Resolving.Async ? Promise<string | null> : string | null;
 export default interface ResolverInterface<T extends Resolving = Resolving.Sync> {
     resolve(path: string): Return<T>;
 }
