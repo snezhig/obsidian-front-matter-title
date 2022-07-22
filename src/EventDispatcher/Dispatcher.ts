@@ -1,10 +1,15 @@
 import DispatcherInterface from "./Interfaces/DispatcherInterface";
 import EventInterface from "./Interfaces/EventInterface";
 import CallbackInterface from "./Interfaces/CallbackInterface";
+import {injectable} from "inversify";
 
+@injectable()
 export default class Dispatcher<E> implements DispatcherInterface<E> {
     private listeners: { [K in keyof E]?: CallbackInterface<E[K]>[] } = {};
 
+    constructor() {
+        console.log('created');
+    }
     addListener<T extends keyof E>(name: T, cb: CallbackInterface<E[T]>): void {
 
         if (this.listeners[name] === undefined) {
