@@ -1,15 +1,16 @@
 import {inject, injectable} from "inversify";
 import TemplatePlaceholderInterface from "../../../Interfaces/TemplatePlaceholderInterface";
+import TYPES from "../../../../config/inversify.types";
 
 @injectable()
-export default class Factory{
+export default class Factory {
     constructor(
-        @inject("Factory<Placeholder>")
+        @inject(TYPES['creator.template.placeholder.factory.resolver'])
         private factory: (type: string, placeholder: string) => TemplatePlaceholderInterface
     ) {
-        console.log(factory('meta', 'test'));
     }
-    public create(placeholder: string): TemplatePlaceholderInterface{
-        return  this.factory('meta', placeholder);
+
+    public create(placeholder: string): TemplatePlaceholderInterface {
+        return this.factory('meta', placeholder);
     }
 }
