@@ -41,6 +41,7 @@ declare module 'obsidian' {
 
     export class MarkdownViewExt extends MarkdownView {
         titleEl: HTMLDivElement
+        titleContainerEl: HTMLDivElement
     }
 
     export abstract class SuggestModalExt<T> extends SuggestModal<T> {
