@@ -2,6 +2,7 @@ import {inject, injectable} from "inversify";
 import TemplatePlaceholderInterface from "../../../Interfaces/TemplatePlaceholderInterface";
 import TYPES from "../../../../config/inversify.types";
 
+
 @injectable()
 export default class Factory {
     constructor(

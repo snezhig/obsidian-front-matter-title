@@ -1,5 +1,6 @@
 const TYPES = {
     dispatcher: '',
+    'factory.meta': '',
     'creator.template.factory': '',
     'creator.template': '',
     'creator': '',
