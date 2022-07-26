@@ -125,7 +125,7 @@ export class SettingsTab extends PluginSettingTab {
                 }));
         new Setting(this.containerEl)
             .setName('Enable leaf`s header titles')
-            .setDesc('If it is on, plugin will replace titles in graph and update them. Also it will prevent click on header to avoid accidentally renaming')
+            .setDesc('If it is on, plugin will replace titles in graph and update them.')
             .addToggle(e => e
                 .setValue(this.plugin.settings.get('m_markdown'))
                 .onChange(async v => {
