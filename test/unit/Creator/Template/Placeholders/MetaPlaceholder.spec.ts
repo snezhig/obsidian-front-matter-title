@@ -1,5 +1,5 @@
-import MetaPlaceholder from "../../../../../src/Creator/Template/Placeholders/MetaPlaceholder";
-import FrontMatterParser, {Meta} from "../../../../../src/Title/FrontMatterParser";
+import MetaPlaceholder from "@src/Creator/Template/Placeholders/MetaPlaceholder";
+import FrontMatterParser, {Meta} from "@src/Title/FrontMatterParser";
 
 jest.mock("../../../../../src/Title/FrontMatterParser");
 

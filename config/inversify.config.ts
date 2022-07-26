@@ -8,6 +8,7 @@ import bindCreator from './services/creator.config';
 const container = new Container();
 container.bind<DispatcherInterface<any>>(TYPES.dispatcher).to(Dispatcher).inSingletonScope();
 container.bind<string>("template").toDynamicValue(context => 'private_template');
+container.bind<string>(TYPES['template.regexp']).toDynamicValue(context => '(?<placeholder>{{(?<title>.*?)}})');
 
 //START CREATOR
 bindCreator(container);

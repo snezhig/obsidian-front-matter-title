@@ -9,18 +9,28 @@ import MetaPlaceholder from "../../src/Creator/Template/Placeholders/MetaPlaceho
 import CreatorInterface from "../../src/Interfaces/CreatorInterface";
 import Creator from "../../src/Creator/Creator";
 import PlaceholderFactory from "../../src/Creator/Template/Placeholders/Factory";
+import Composite from "@src/Creator/Template/Composite";
+import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlaceholder";
 
 export default (container: Container) => {
     container.bind<TemplateInterface>(TYPES["creator.template"])
         .toDynamicValue(context => context.container.get<TemplateFactory>(TYPES["creator.template.factory"]).create())
         .whenTargetNamed('auto');
+
     container
         .bind<interfaces.Factory<TemplateInterface>>(TYPES['creator.template.factory.resolver'])
         .toAutoNamedFactory<TemplateInterface>(TYPES['creator.template']);
+
     container.bind<TemplateFactory>(TYPES['creator.template.factory']).to(TemplateFactory).inSingletonScope();
     container.bind<TemplateInterface>(TYPES["creator.template"]).to(Simple).whenTargetNamed('simple');
-    container.bind<TemplatePlaceholderInterface>('meta').to(MetaPlaceholder);
+
+    container.bind<TemplateInterface>(TYPES["creator.template"]).to(Composite).whenTargetNamed('composite');
+
+    container.bind<TemplatePlaceholderInterface>(TYPES['placeholder.meta']).to(MetaPlaceholder);
+    container.bind<TemplatePlaceholderInterface>(TYPES['placeholder.brackets']).to(BracketsPlaceholder);
+
     container.bind<CreatorInterface>(TYPES.creator).to(Creator);
+
     container
         .bind<interfaces.Factory<TemplatePlaceholderInterface>>(TYPES["creator.template.placeholder.factory.resolver"])
         .toFactory<TemplatePlaceholderInterface, [string, string]>(context => (type: string, placeholder: string) => {

@@ -1,7 +1,7 @@
 import CreatorInterface from "../Interfaces/CreatorInterface";
 import TemplateInterface from "../Interfaces/TemplateInterface";
 import {inject, injectable, named} from "inversify";
-import TYPES from "../../config/inversify.types";
+import TYPES from '@config/inversify.types';
 
 @injectable()
 export default class Creator implements CreatorInterface {

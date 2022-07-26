@@ -1,5 +1,9 @@
 const TYPES = {
     dispatcher: '',
+    'placeholder.meta': '',
+    'placeholder.brackets': '',
+    'template': '',
+    'template.regexp': '',
     'factory.meta': '',
     'creator.template.factory': '',
     'creator.template': '',

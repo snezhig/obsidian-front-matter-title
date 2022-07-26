@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
@@ -27,9 +27,13 @@
       "reflect-metadata",
       "node",
       "jest"
-    ]
+    ],
+    "paths": {
+      "@config/*": ["config/*"],
+      "@src/*": ["src/*"]
+    }
   },
   "include": [
-    "./**/*.ts"
+    "./**/*.ts", "./src", "./config"
   ]
 }
