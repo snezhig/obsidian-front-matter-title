@@ -12,6 +12,12 @@ export default class Factory {
     }
 
     public create(placeholder: string): TemplatePlaceholderInterface {
-        return this.factory('meta', placeholder);
+        let type = 'meta';
+        if (placeholder.startsWith('{{') && placeholder.endsWith('}}')) {
+            type = 'brackets';
+        } else if (placeholder.startsWith('_')) {
+            type = 'file';
+        }
+        return this.factory(type, placeholder);
     }
 }
