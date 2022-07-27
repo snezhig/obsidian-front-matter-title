@@ -24,7 +24,7 @@ export default class BracketsPlaceholder implements TemplatePlaceholderInterface
     setPlaceholder(placeholder: string): void {
         this.placeholder = placeholder;
         const {groups: {inside}} = this.placeholder.match(new RegExp(`^{{(?<inside>.*?)}}`));
-        this.child.setPlaceholder(inside.trim());
+        this.child = this.factory.create(inside);
     }
 
 }
