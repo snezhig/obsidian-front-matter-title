@@ -3,7 +3,7 @@ const TYPES = {
     'placeholder.meta': '',
     'placeholder.brackets': '',
     'template': '',
-    'template.regexp': '',
+    'template.pattern': '',
     'factory.meta': '',
     'creator.template.factory': '',
     'creator.template': '',

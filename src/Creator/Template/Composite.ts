@@ -6,7 +6,7 @@ import TYPES from "@config/inversify.types";
 
 export default class Composite implements TemplateInterface {
     constructor(
-        @inject(TYPES['template.regexp'])
+        @inject(TYPES['template.pattern'])
         private pattern: string,
         @inject('template')
         private template: string,
@@ -20,8 +20,8 @@ export default class Composite implements TemplateInterface {
         const placeholders = [];
 
         for (const part of parts) {
-            const {groups: {title}} = part.match(this.pattern);
-            placeholders.push(this.factory.create(title))
+            const {groups: {placeholder}} = part.match(this.pattern);
+            placeholders.push(this.factory.create(placeholder))
         }
 
         return placeholders;

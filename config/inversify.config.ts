@@ -1,17 +1,17 @@
 import 'reflect-metadata';
-import {Container} from 'inversify';
+import {Container as _Container} from 'inversify';
 import DispatcherInterface from "../src/EventDispatcher/Interfaces/DispatcherInterface";
 import Dispatcher from "../src/EventDispatcher/Dispatcher";
 import TYPES from "./inversify.types";
 import bindCreator from './services/creator.config';
 
-const container = new Container();
-container.bind<DispatcherInterface<any>>(TYPES.dispatcher).to(Dispatcher).inSingletonScope();
-container.bind<string>("template").toDynamicValue(context => 'private_template');
-container.bind<string>(TYPES['template.regexp']).toDynamicValue(context => '(?<placeholder>{{(?<title>.*?)}})');
+const Container = new _Container();
+Container.bind<DispatcherInterface<any>>(TYPES.dispatcher).to(Dispatcher).inSingletonScope();
+Container.bind<string>("template").toDynamicValue(context => 'private_template');
+Container.bind<string>(TYPES['template.pattern']).toConstantValue('(?<placeholder>{{(\\w|\\s)+?}})');
 
 //START CREATOR
-bindCreator(container);
+bindCreator(Container);
 //END CREATOR
 
-export default container;
+export default Container;
