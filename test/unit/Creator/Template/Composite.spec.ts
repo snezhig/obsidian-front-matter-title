@@ -29,8 +29,10 @@ describe('Composite Test', () => {
         for (const item of data) {
             test(`Test template [${item.template}]`, () => {
                 const composite = create(item.template);
+                composite.getPlaceholders();
                 const placeholders = composite.getPlaceholders();
                 expect(placeholders.length).toEqual(item.placeholders.length);
+                expect(factory.create).toHaveBeenCalledTimes(item.placeholders.length);
                 for (const p of item.placeholders) {
                     expect(factory.create).toHaveBeenCalledWith(p);
                 }

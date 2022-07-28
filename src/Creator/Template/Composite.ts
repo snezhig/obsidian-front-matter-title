@@ -5,6 +5,8 @@ import Factory from "@src/Creator/Template/Placeholders/Factory";
 import TYPES from "@config/inversify.types";
 
 export default class Composite implements TemplateInterface {
+    private placeholders: TemplatePlaceholderInterface[] = [];
+
     constructor(
         @inject(TYPES['template.pattern'])
         private pattern: string,
@@ -16,15 +18,16 @@ export default class Composite implements TemplateInterface {
     }
 
     getPlaceholders(): TemplatePlaceholderInterface[] {
-        const parts = this.template.match(new RegExp(this.pattern, 'g'));
-        const placeholders = [];
+        if (this.placeholders.length === 0) {
+            const parts = this.template.match(new RegExp(this.pattern, 'g'));
 
-        for (const part of parts) {
-            const {groups: {placeholder}} = part.match(this.pattern);
-            placeholders.push(this.factory.create(placeholder))
+            for (const part of parts) {
+                const {groups: {placeholder}} = part.match(this.pattern);
+                this.placeholders.push(this.factory.create(placeholder))
+            }
         }
 
-        return placeholders;
+        return this.placeholders;
     }
 
     getTemplate(): string {
