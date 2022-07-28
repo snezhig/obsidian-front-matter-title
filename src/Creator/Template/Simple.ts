@@ -6,6 +6,7 @@ import TYPES from "../../../config/inversify.types";
 
 @injectable()
 export default class Simple implements TemplateInterface {
+    private placeholder: TemplatePlaceholderInterface = null;
     constructor(
         @inject('template')
         private template: string,
@@ -15,7 +16,10 @@ export default class Simple implements TemplateInterface {
     }
 
     getPlaceholders(): TemplatePlaceholderInterface[] {
-        return [this.factory.create(this.template)];
+        if(this.placeholder === null){
+            this.placeholder = this.factory.create(this.template);
+        }
+        return [this.placeholder];
     }
 
     getTemplate(): string {
