@@ -11,7 +11,9 @@ const config: Config.InitialOptions = {
     moduleNameMapper: {
         '@src/(.*)': '<rootDir>/src/$1',
         '@config/(.*)': '<rootDir>/config/$1',
-    }
+    },
+    collectCoverage: true,
+    coverageDirectory: "<root>/coverage/"
 };
 
 export default config;
