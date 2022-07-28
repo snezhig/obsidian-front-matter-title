@@ -47,13 +47,13 @@ describe('Dispatcher Test', () => {
         }
         for (const [name, event] of Object.entries(events)) {
             test(`Dispatch [${name}] event and check result`, () => {
-                expect(dispatcher.dispatch(name, event).get()).toEqual(data[name as keyof Events].expected);
+                expect(dispatcher.dispatch(name as keyof Events, event).get()).toEqual(data[name as keyof Events].expected);
             })
         }
         for (const [name, items] of Object.entries(callbacks)) {
             test(`Events of [${name}] has been called once`, () => {
                 for (const callback of items) {
-                    expect(callback.execute).toHaveBeenCalledTimes(1);
+                    expect((callback as CallbackInterface<any>).execute).toHaveBeenCalledTimes(1);
                 }
             })
         }
