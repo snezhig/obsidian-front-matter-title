@@ -20,4 +20,18 @@ describe('Extractor Test', () => {
         }
     });
 
+    describe(`Throws ${TypeNotSupportedException.name}`, () => {
+        const data = [{path: 'path', obj: {path: ''}}];
+        beforeAll(() => {
+            fooStrategy.support.mockReturnValue(false);
+            barStrategy.support.mockReturnValue(false);
+
+        })
+        for (const item of data) {
+            test(`Data type by path ${item.path} in ${JSON.stringify(item.obj)} will not be supported`, () => {
+                const cb = () => extractor.extract(item.path, item.obj);
+                expect(cb).toThrowError(TypeNotSupportedException);
+            })
+        }
+    });
 });
