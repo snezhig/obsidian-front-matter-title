@@ -8,7 +8,7 @@ import TYPES from "../../../config/inversify.types";
 export default class Simple implements TemplateInterface {
     private placeholder: TemplatePlaceholderInterface = null;
     constructor(
-        @inject('template')
+        @inject(TYPES.template)
         private template: string,
         @inject<Factory>(TYPES['creator.template.placeholder.factory'])
         private factory: Factory

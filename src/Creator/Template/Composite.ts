@@ -10,7 +10,7 @@ export default class Composite implements TemplateInterface {
     constructor(
         @inject(TYPES['template.pattern'])
         private pattern: string,
-        @inject('template')
+        @inject(TYPES.template)
         private template: string,
         @inject<Factory>(TYPES['creator.template.placeholder.factory'])
         private factory: Factory
