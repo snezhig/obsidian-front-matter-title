@@ -28,13 +28,16 @@ export default class Extractor implements ExtractorInterface {
         let strategy: StrategyInterface = null;
         const type = typeof extracted;
         for (const item of this.strategies) {
-            strategy = item.support(type) ? item : null;
+            if (item.support(type)) {
+                strategy = item;
+                break;
+            }
         }
         if (strategy === null) {
             throw new TypeNotSupportedException();
         }
 
-        return undefined;
+        return strategy.process(extracted);
     }
 
     /**

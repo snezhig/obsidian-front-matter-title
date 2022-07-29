@@ -7,8 +7,8 @@ import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotF
 
 describe('Extractor Test', () => {
     const strategies = {
-        literal: mock<StrategyInterface>(),
-        array: mock<StrategyInterface>()
+        string: mock<StrategyInterface>(),
+        number: mock<StrategyInterface>()
     };
     const extractor = new Extractor(Object.values(strategies));
 
@@ -25,30 +25,32 @@ describe('Extractor Test', () => {
     describe(`Throws ${TypeNotSupportedException.name}`, () => {
         const data = [{path: 'path', obj: {path: ''}}];
         beforeAll(() => {
-            strategies.literal.support.mockReturnValue(false);
-            strategies.array.support.mockReturnValue(false);
+            strategies.string.support.mockReturnValue(false);
+            strategies.number.support.mockReturnValue(false);
 
         })
         afterEach(() => {
-            strategies.literal.support.mockClear();
-            strategies.array.support.mockClear();
+            strategies.string.support.mockClear();
+            strategies.number.support.mockClear();
         })
         for (const item of data) {
             test(`Data type by path ${item.path} in ${JSON.stringify(item.obj)} will not be supported`, () => {
                 const cb = () => extractor.extract(item.path, item.obj);
                 expect(cb).toThrowError(TypeNotSupportedException);
-                expect(strategies.literal.support).toHaveBeenCalledTimes(1);
-                expect(strategies.array.support).toHaveBeenCalledTimes(1);
+                expect(strategies.string.support).toHaveBeenCalledTimes(1);
+                expect(strategies.number.support).toHaveBeenCalledTimes(1);
             })
         }
     });
 
     describe('Test extract', () => {
         const data = [
-            {path: 'foo.bar', obj: {foo: {bar: 2}}, expected: '2', strategy: 'literal'}
+            {path: 'foo.bar', obj: {foo: {bar: 2}}, expected: 2, strategy: 'number'},
+            {path: 'foo.bar.deep', obj: {foo: {bar: {deep: 'foobar'}}}, expected: 'foobar', strategy: 'string'},
         ];
         beforeEach(() => {
             for (const s of Object.values(strategies)) {
+                s.process.mockClear();
                 s.support.mockReturnValue(false);
             }
         })
