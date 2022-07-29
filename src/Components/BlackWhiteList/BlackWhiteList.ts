@@ -1,9 +1,11 @@
 import BlackWhiteListInterface, {Mode} from "./BlackWhiteListInterface";
+import {injectable} from "inversify";
 
+@injectable()
 export default class BlackWhiteList implements BlackWhiteListInterface {
 
-    private mode: Mode;
-    private list: string[];
+    private mode: Mode = 'black';
+    private list: string[] = [];
 
     private get default(): boolean {
         return this.mode === 'black';

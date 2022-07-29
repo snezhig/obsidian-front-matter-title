@@ -2,7 +2,9 @@ import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorIn
 import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInterface";
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
 import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
+import {injectable} from "inversify";
 
+@injectable()
 export default class Extractor implements ExtractorInterface {
     constructor(
         private strategies: StrategyInterface[]

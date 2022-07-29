@@ -1,8 +1,9 @@
 import CacheInterface from "./CacheInterface";
 import CacheItemInterface from "./CacheItemInterface";
 import CacheItem from "./CacheItem";
-import {Obj} from "tern";
+import {injectable} from "inversify";
 
+@injectable()
 export default class Cache implements CacheInterface {
     private pool = new Map<string, any>();
     private serialized = new Map<string, string>();

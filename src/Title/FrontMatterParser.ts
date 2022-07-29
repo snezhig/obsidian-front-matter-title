@@ -1,6 +1,8 @@
 import EmptyMetaPathError from "../Errors/EmptyMetaPathError";
+import {injectable} from "inversify";
 
 export type Meta = { [k: string]: any };
+@injectable()
 export default class FrontMatterParser {
     private delimiter: null | string = null;
 

@@ -1,6 +1,13 @@
-import BlackWhiteList from "../../../../src/Components/BlackWhiteList/BlackWhiteList";
-import {Mode} from "../../../../src/Components/BlackWhiteList/BlackWhiteListInterface";
+import {Mode} from "@src/Components/BlackWhiteList/BlackWhiteListInterface";
+import BlackWhiteList from "@src/Components/BlackWhiteList/BlackWhiteList";
 
+
+describe('Test default behaviour', () => {
+    const list = new BlackWhiteList();
+    test('Allow true by default', () => {
+        expect(list.isFileAllowed('path')).toBeTruthy();
+    })
+})
 
 describe('Black-White List test', () => {
     const path = [

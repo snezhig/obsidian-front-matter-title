@@ -2,11 +2,17 @@ import FilterInterface from "../Interfaces/FilterInterface";
 import CacheInterface from "../Components/Cache/CacheInterface";
 import ResolverInterface, {Resolving, Return} from "../Interfaces/ResolverInterface";
 import CreatorInterface from "../Interfaces/CreatorInterface";
+import {inject, injectable, multiInject} from "inversify";
+import TYPES from "../../config/inversify.types";
 
+@injectable()
 export default class ResolverSync implements ResolverInterface {
     constructor(
+        @multiInject(TYPES.filter)
         private filters: FilterInterface[],
+        @inject(TYPES.cache)
         private cache: CacheInterface,
+        @inject(TYPES.creator)
         private creator: CreatorInterface
     ) {
     }

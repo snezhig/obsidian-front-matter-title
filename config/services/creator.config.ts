@@ -26,15 +26,15 @@ export default (container: Container) => {
 
     container.bind<TemplateInterface>(TYPES["creator.template"]).to(Composite).whenTargetNamed('composite');
 
-    container.bind<TemplatePlaceholderInterface>(TYPES['placeholder.meta']).to(MetaPlaceholder);
-    container.bind<TemplatePlaceholderInterface>(TYPES['placeholder.brackets']).to(BracketsPlaceholder);
+    container.bind<TemplatePlaceholderInterface>(TYPES.placeholder).to(MetaPlaceholder).whenTargetNamed('meta');
+    container.bind<TemplatePlaceholderInterface>(TYPES.placeholder).to(BracketsPlaceholder).whenTargetNamed('brackets');
 
     container.bind<CreatorInterface>(TYPES.creator).to(Creator);
 
     container
         .bind<interfaces.Factory<TemplatePlaceholderInterface>>(TYPES["creator.template.placeholder.factory.resolver"])
         .toFactory<TemplatePlaceholderInterface, [string, string]>(context => (type: string, placeholder: string) => {
-            const item = context.container.get<TemplatePlaceholderInterface>(type);
+            const item = context.container.getNamed<TemplatePlaceholderInterface>(TYPES.placeholder, type);
             item.setPlaceholder(placeholder);
             return item;
         });
