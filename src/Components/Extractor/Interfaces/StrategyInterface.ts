@@ -1,5 +1,5 @@
 export default interface StrategyInterface {
-    support(): boolean;
+    support(type: string): boolean;
 
     process(v: any): string | null;
 }

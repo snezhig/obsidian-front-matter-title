@@ -1,6 +1,7 @@
 import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorInterface";
 import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInterface";
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
+import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
 
 export default class Extractor implements ExtractorInterface {
     constructor(
@@ -9,7 +10,8 @@ export default class Extractor implements ExtractorInterface {
     }
 
     /**
-     *
+     * @throws {PathNotFoundException}
+     * @throws {TypeNotSupportedException}
      * @param path
      * @param obj
      */
@@ -21,6 +23,15 @@ export default class Extractor implements ExtractorInterface {
 
         while ((part = parts.shift())) {
             extracted = this.extractInternal(part, extracted);
+        }
+
+        let strategy: StrategyInterface = null;
+        const type = typeof extracted;
+        for (const item of this.strategies) {
+            strategy = item.support(type) ? item : null;
+        }
+        if (strategy === null) {
+            throw new TypeNotSupportedException();
         }
 
         return undefined;
