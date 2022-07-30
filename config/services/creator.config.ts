@@ -14,14 +14,14 @@ import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlac
 
 export default (container: Container) => {
     container.bind<TemplateInterface>(TYPES["creator.template"])
-        .toDynamicValue(context => context.container.get<TemplateFactory>(TYPES["creator.template.factory"]).create())
+        .toDynamicValue(context => context.container.get<TemplateFactory>(TYPES["factory.template"]).create())
         .whenTargetNamed('auto');
 
     container
-        .bind<interfaces.Factory<TemplateInterface>>(TYPES['creator.template.factory.resolver'])
+        .bind<interfaces.Factory<TemplateInterface>>(TYPES['factory.template.resolver'])
         .toAutoNamedFactory<TemplateInterface>(TYPES['creator.template']);
 
-    container.bind<TemplateFactory>(TYPES['creator.template.factory']).to(TemplateFactory).inSingletonScope();
+    container.bind<TemplateFactory>(TYPES['factory.template']).to(TemplateFactory).inSingletonScope();
     container.bind<TemplateInterface>(TYPES["creator.template"]).to(Simple).whenTargetNamed('simple');
 
     container.bind<TemplateInterface>(TYPES["creator.template"]).to(Composite).whenTargetNamed('composite');
@@ -32,12 +32,12 @@ export default (container: Container) => {
     container.bind<CreatorInterface>(TYPES.creator).to(Creator);
 
     container
-        .bind<interfaces.Factory<TemplatePlaceholderInterface>>(TYPES["creator.template.placeholder.factory.resolver"])
+        .bind<interfaces.Factory<TemplatePlaceholderInterface>>(TYPES["factory.placeholder.resolver"])
         .toFactory<TemplatePlaceholderInterface, [string, string]>(context => (type: string, placeholder: string) => {
             const item = context.container.getNamed<TemplatePlaceholderInterface>(TYPES.placeholder, type);
             item.setPlaceholder(placeholder);
             return item;
         });
 
-    container.bind<PlaceholderFactory>(TYPES['creator.template.placeholder.factory']).to(PlaceholderFactory).inSingletonScope();
+    container.bind<PlaceholderFactory>(TYPES['factory.placeholder']).to(PlaceholderFactory).inSingletonScope();
 }

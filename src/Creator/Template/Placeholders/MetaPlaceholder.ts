@@ -6,7 +6,7 @@ import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorIn
 @injectable()
 export default class MetaPlaceholder extends AbstractPlaceholder {
     constructor(
-        @inject(TYPES['components.extractor'])
+        @inject(TYPES['component.extractor'])
         private extractor: ExtractorInterface,
         @inject(TYPES['factory.meta'])
         private metaFactory: (path: string) => ({[k: string]: any})

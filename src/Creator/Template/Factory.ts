@@ -9,7 +9,7 @@ export default class Factory {
         private template: string,
         @inject(TYPES['template.pattern'])
         private pattern: string,
-        @inject(TYPES['creator.template.factory.resolver'])
+        @inject(TYPES['factory.template.resolver'])
         private factory: (named: string) => TemplateInterface
     ) {
     }

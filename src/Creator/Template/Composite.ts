@@ -12,7 +12,7 @@ export default class Composite implements TemplateInterface {
         private pattern: string,
         @inject(TYPES.template)
         private template: string,
-        @inject<Factory>(TYPES['creator.template.placeholder.factory'])
+        @inject<Factory>(TYPES['factory.placeholder'])
         private factory: Factory
     ) {
     }

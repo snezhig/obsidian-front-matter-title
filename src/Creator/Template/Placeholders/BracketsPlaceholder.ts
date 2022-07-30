@@ -8,7 +8,7 @@ export default class BracketsPlaceholder implements TemplatePlaceholderInterface
     private child: TemplatePlaceholderInterface;
 
     constructor(
-        @inject<Factory>(TYPES['creator.template.placeholder.factory'])
+        @inject<Factory>(TYPES['factory.placeholder'])
         private factory: Factory
     ) {
     }
