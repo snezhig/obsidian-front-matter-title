@@ -9,7 +9,7 @@ interface ObjectItemInterface<T extends object> extends PrimitiveItemInterface<T
 }
 
 
-export default class Storage<T extends object> {
+export default class Storage<T extends {[k: string]: any}> {
     private item: ObjectItemInterface<T>;
 
     constructor(data: T) {
@@ -26,44 +26,37 @@ export default class Storage<T extends object> {
 }
 
 
-class StorageItem<T extends object> implements ObjectItemInterface<T> {
-    private items: {[K in keyof T]: ObjectItemInterface<any>|PrimitiveItemInterface<any>}
-        = {} as {[K in keyof T]: ObjectItemInterface<any>|PrimitiveItemInterface<any>};
+class StorageItem<T extends { [k: string]: any }> implements ObjectItemInterface<T> {
+    private items?: { [k: string]: ObjectItemInterface<any> | PrimitiveItemInterface<any> }
+    private _value?: T;
 
     constructor(data: T) {
-        for (const [k, v] of Object.entries(data)) {
-            if (typeof v === 'object') {
-                this.items[k as keyof T] = new StorageItem(v);
-            } else {
-                this.items[k as keyof T] = new PrimitiveItem<unknown>(v);
-            }
-        }
+        this.set(data);
     }
 
     get<K extends keyof T>(k: K): T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]> {
-        return this.items[k] as  T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]>;
+        return this.items[k as string] as T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]>;
     }
 
-    set(v: T): void {
-    }
-
-    value(): T {
-        return undefined;
-    }
-}
-
-class PrimitiveItem<T> implements PrimitiveItemInterface<T> {
-    constructor(
-        private _value: T
-    ) {
-    }
-
-    set(v: T): void {
-        this._value = v;
+    set(value: T): void {
+        if (typeof value === "object") {
+            this.items = {};
+            for (const [k, v] of Object.entries(value)) {
+                this.items[k] = new StorageItem(v as T[keyof T]);
+            }
+        } else {
+            this._value = value;
+        }
     }
 
     value(): T {
+        if (this.items) {
+            const data: { [k: string]: any } = {};
+            for (const [k, v] of Object.entries(this.items)) {
+                data[k] = v.value();
+            }
+            return data as T;
+        }
         return this._value;
     }
-
 }
