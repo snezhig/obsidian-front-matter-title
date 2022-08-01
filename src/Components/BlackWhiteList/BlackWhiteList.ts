@@ -12,6 +12,9 @@ export default class BlackWhiteList implements BlackWhiteListInterface {
     }
 
     isFileAllowed(path: string): boolean {
+        if (this.list.length === 0) {
+            return true;
+        }
 
         for (const item of this.list) {
             if (path.startsWith(item)) {
