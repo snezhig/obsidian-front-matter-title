@@ -5,6 +5,10 @@ import CreatorInterface from "../../../src/Interfaces/CreatorInterface";
 import ResolverSync from "../../../src/Resolver/ResolverSync";
 import CacheItemInterface from "../../../src/Components/Cache/CacheItemInterface";
 import {expect} from "@jest/globals";
+import {ResolverEvents} from "@src/Resolver/ResolverType";
+import Event from "@src/EventDispatcher/Event";
+import CallbackInterface from "@src/EventDispatcher/Interfaces/CallbackInterface";
+import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
 
 describe('Resolver Sync Test', () => {
     const path = '/test/path/file.md';
@@ -18,8 +22,10 @@ describe('Resolver Sync Test', () => {
     cacheItem.isHit.mockReturnValue(false);
     const cache = mock<CacheInterface>(undefined, {deep: true});
     cache.getItem.mockReturnValue(cacheItem);
-
-    const resolver = new ResolverSync([filter], cache, creator);
+    const dispatcher = mock<DispatcherInterface<ResolverEvents>>();
+    let eventCallback: CallbackInterface<ResolverEvents['resolver.clear']> = null;
+    dispatcher.addListener.mockImplementation((name: string, cb) => eventCallback = cb);
+    const resolver = new ResolverSync([filter], cache, creator, dispatcher);
 
     afterEach(() => {
         mockClear(filter);
@@ -34,12 +40,12 @@ describe('Resolver Sync Test', () => {
             creator.create.mockReturnValue(title);
         })
 
-        test('Title will be null because filter will return false', () => {
+        test('Should return null because filter will return false', () => {
             filter.check.mockReturnValueOnce(false);
             expect(resolver.resolve(path)).toBeNull();
             expect(filter.check).toHaveBeenNthCalledWith(1, path);
         })
-        test('Title will be resolved because filter will return true', () => {
+        test('Should return value because filter will return true', () => {
             filter.check.mockReturnValue(true);
             expect(resolver.resolve(path)).toEqual(title);
             expect(filter.check).toHaveBeenNthCalledWith(1, path);
@@ -76,5 +82,31 @@ describe('Resolver Sync Test', () => {
         })
     })
 
+    describe('Test events', () => {
+        beforeEach(() => {
+            cache.clear.mockClear();
+            cache.delete.mockClear();
+            dispatcher.dispatch.mockClear();
+        })
+        test('Should add listener', () => {
+            expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
+            expect(dispatcher.addListener).toHaveBeenCalledWith('resolver.clear', expect.anything());
+        })
+        test('Should delete one item from cache and dispatch "resolver.unresolved" with path', () => {
+            const path = '/path/to/file.md';
+            eventCallback.execute(new Event({path}));
+            expect(cache.delete).toHaveBeenCalledTimes(1);
+            expect(cache.delete).toHaveBeenCalledWith(path);
+            expect(cache.clear).not.toHaveBeenCalled();
+            expect(dispatcher.dispatch).toHaveBeenCalledTimes(1);
+            expect(dispatcher.dispatch).toHaveBeenCalledWith('resolver.unresolved', new Event({path}));
+        })
 
+        test('Should clear cache and dispatch "resolver.unresolved" with all', () => {
+            eventCallback.execute(new Event({all: true}));
+            expect(cache.clear).toHaveBeenCalledTimes(1);
+            expect(dispatcher.dispatch).toHaveBeenCalledTimes(1);
+            expect(dispatcher.dispatch).toHaveBeenCalledWith('resolver.unresolved', new Event({all: true}));
+        })
+    })
 })
