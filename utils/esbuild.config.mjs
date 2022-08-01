@@ -14,7 +14,7 @@ esbuild.build({
 	banner: {
 		js: banner,
 	},
-	entryPoints: ['./src/tmp.ts'],
+	entryPoints: ['./main.ts'],
 	minify: prod,
 	bundle: true,
 	external: [
@@ -48,5 +48,5 @@ esbuild.build({
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
-	outfile: 'src/tmp.js',
+	outfile: 'main.js',
 }).catch(() => process.exit(1));

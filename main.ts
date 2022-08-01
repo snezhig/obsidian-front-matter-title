@@ -1,17 +1,23 @@
 import {debounce, Plugin, TAbstractFile} from 'obsidian';
 import Resolver from "./src/Title/Resolver/Resolver";
-import {Settings, SettingsTab} from "./src/Settings";
 import Composer, {ManagerType} from "./src/Title/Manager/Composer";
 import FrontMatterParser from "./src/Title/FrontMatterParser";
 import VaultFacade from "./src/Obsidian/VaultFacade";
+import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
+import SettingsTab from "@src/Settings/SettingsTab";
+import Storage from "@src/Settings/Storage";
+import Container from "@config/inversify.config";
+import Dispatcher from "@src/EventDispatcher/Dispatcher";
+import TYPES from "@config/inversify.types";
+import EventInterface from "@src/EventDispatcher/Interfaces/EventInterface";
+import {interfaces} from "inversify";
 
 
 export default class MetaTitlePlugin extends Plugin {
-    public settings: Settings;
     private resolver: Resolver;
     private composer: Composer = null;
     private parser: FrontMatterParser;
-
+    private container: interfaces.Container = Container;
 
     public async saveSettings() {
         const settings = this.settings.getAll();
@@ -35,33 +41,67 @@ export default class MetaTitlePlugin extends Plugin {
         await this.runManagersUpdate();
     }
 
+    private get defaultSettings(): SettingsType {
+        return {
+            path: 'title',
+            managers: {
+                explorer: false,
+                graph: false,
+                header: false,
+                quick_switcher: false
+            }
+        }
+    }
+
+    private async loadSettings(): Promise<void>{
+        const data: SettingsType = this.defaultSettings;
+        const current = await this.loadData();
+        for(const [k,v] of Object.entries(current as SettingsType)){
+            if(k in data){
+                //@ts-ignore
+                data[k] = v;
+            }
+        }
+        const storage = new Storage<SettingsType>(data);
+        const dispatcher = this.container.get<Dispatcher<SettingsEvent>>(TYPES.dispatcher);
+        this.addSettingTab(new SettingsTab(this.app, this, storage, dispatcher));
+        const self = this;
+        dispatcher.addListener('settings.changed', {
+            execute(e: EventInterface<SettingsEvent['settings.changed']>): EventInterface<SettingsEvent['settings.changed']> {
+                self.saveData(e.get());
+                return e;
+            }
+        })
+    }
     public async onload() {
-        this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
+        await this.loadSettings();
 
-        this.settings = new Settings(await this.loadData(), this.saveSettings.bind(this));
-        this.bind();
-
-        this.parser = new FrontMatterParser();
-        this.resolver = new Resolver(
-            this.app.metadataCache,
-            this.parser,
-            new VaultFacade(this.app.vault),
-            {
-                metaPath: this.settings.get('path'),
-                excluded: this.settings.get('excluded_folders')
-            });
-        this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
-
-        this.composer = new Composer(this.app.workspace, this.resolver);
-        this.app.workspace.onLayoutReady(() => {
-            this.composer.setState(this.settings.get('m_graph'), ManagerType.Graph);
-            this.composer.setState(this.settings.get('m_explorer'), ManagerType.Explorer);
-            this.composer.setState(this.settings.get('m_markdown'), ManagerType.Markdown)
-            this.composer.setState(this.settings.get('m_quick_switcher'), ManagerType.QuickSwitcher)
-            this.composer.update();
-        });
-
-        this.addSettingTab(new SettingsTab(this.app, this));
+        // this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
+        //
+        // this.settings = new Settings(await this.loadData(), this.saveSettings.bind(this));
+        // this.bind();
+        //
+        // this.parser = new FrontMatterParser();
+        // this.resolver = new Resolver(
+        //     this.app.metadataCache,
+        //     this.parser,
+        //     new VaultFacade(this.app.vault),
+        //     {
+        //         metaPath: this.settings.get('path'),
+        //         excluded: this.settings.get('excluded_folders')
+        //     });
+        // this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
+        //
+        // this.composer = new Composer(this.app.workspace, this.resolver);
+        // this.app.workspace.onLayoutReady(() => {
+        //     this.composer.setState(this.settings.get('m_graph'), ManagerType.Graph);
+        //     this.composer.setState(this.settings.get('m_explorer'), ManagerType.Explorer);
+        //     this.composer.setState(this.settings.get('m_markdown'), ManagerType.Markdown)
+        //     this.composer.setState(this.settings.get('m_quick_switcher'), ManagerType.QuickSwitcher)
+        //     this.composer.update();
+        // });
+        //
+        // this.addSettingTab(new SettingsTab(this.app, this));
     }
 
     public onunload() {
