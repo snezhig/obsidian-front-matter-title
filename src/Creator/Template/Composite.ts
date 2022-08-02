@@ -1,9 +1,10 @@
 import TemplateInterface from "@src/Interfaces/TemplateInterface";
 import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
 import TYPES from "@config/inversify.types";
 
+@injectable()
 export default class Composite implements TemplateInterface {
     private placeholders: TemplatePlaceholderInterface[] = [];
 

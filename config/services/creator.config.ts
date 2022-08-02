@@ -21,7 +21,7 @@ export default (container: Container) => {
         .bind<interfaces.Factory<TemplateInterface>>(TYPES['factory.template.resolver'])
         .toAutoNamedFactory<TemplateInterface>(TYPES['creator.template']);
 
-    container.bind<TemplateFactory>(TYPES['factory.template']).to(TemplateFactory).inSingletonScope();
+    container.bind<TemplateFactory>(TYPES['factory.template']).to(TemplateFactory);
     container.bind<TemplateInterface>(TYPES["creator.template"]).to(Simple).whenTargetNamed('simple');
 
     container.bind<TemplateInterface>(TYPES["creator.template"]).to(Composite).whenTargetNamed('composite');

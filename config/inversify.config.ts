@@ -20,12 +20,12 @@ import LiteralStrategy from "@src/Components/Extractor/LiteralStrategy";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(TYPES.dispatcher).to(Dispatcher).inSingletonScope();
-Container.bind<string>(TYPES.template).toDynamicValue(context => 'private_template');
+Container.bind<string>(TYPES.template).toConstantValue('title');
 Container.bind<string>(TYPES['template.pattern']).toConstantValue('(?<placeholder>{{(\\w|\\s)+?}})');
 Container.bind<ResolverInterface>(TYPES.resolver).to(ResolverSync).whenTargetNamed('sync');
 Container.bind<FilterInterface>(TYPES.filter).to(ExtensionFilter);
 Container.bind<FilterInterface>(TYPES.filter).to(PathListFilter);
-Container.bind<BlackWhiteListInterface>(TYPES["component.black_white_list"]).to(BlackWhiteList);
+Container.bind<BlackWhiteListInterface>(TYPES["component.black_white_list"]).to(BlackWhiteList).inSingletonScope();
 Container.bind<CacheInterface>(TYPES.cache).to(Cache);
 Container.bind<ExtractorInterface>(TYPES['component.extractor']).to(Extractor);
 Container.bind<interfaces.Factory<string[]>>(TYPES['factory.meta']).toFactory(context => (path: string) => ({private_template: 'r_private_template'}))
