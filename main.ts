@@ -11,6 +11,9 @@ import Dispatcher from "@src/EventDispatcher/Dispatcher";
 import TYPES from "@config/inversify.types";
 import EventInterface from "@src/EventDispatcher/Interfaces/EventInterface";
 import {interfaces} from "inversify";
+import Callback from "@src/EventDispatcher/Callback";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import ObjectHelper from "@src/Utils/ObjectHelper";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -18,6 +21,10 @@ export default class MetaTitlePlugin extends Plugin {
     private composer: Composer = null;
     private parser: FrontMatterParser;
     private container: interfaces.Container = Container;
+    private storage: Storage<SettingsType>;
+    private resolvers: {
+        sync?: ResolverInterface<Resolving.Sync>
+    } = {};
 
     public async saveSettings() {
         const settings = this.settings.getAll();
@@ -53,28 +60,51 @@ export default class MetaTitlePlugin extends Plugin {
         }
     }
 
-    private async loadSettings(): Promise<void>{
-        const data: SettingsType = this.defaultSettings;
+    private async loadSettings(): Promise<void> {
+        let data: SettingsType = this.defaultSettings;
         const current = await this.loadData();
-        for(const [k,v] of Object.entries(current as SettingsType)){
-            if(k in data){
+        for (const [k, v] of Object.entries(current as SettingsType)) {
+            if (k in data) {
                 //@ts-ignore
                 data[k] = v;
             }
         }
-        const storage = new Storage<SettingsType>(data);
+        this.storage = new Storage<SettingsType>(data);
         const dispatcher = this.container.get<Dispatcher<SettingsEvent>>(TYPES.dispatcher);
-        this.addSettingTab(new SettingsTab(this.app, this, storage, dispatcher));
-        const self = this;
-        dispatcher.addListener('settings.changed', {
-            execute(e: EventInterface<SettingsEvent['settings.changed']>): EventInterface<SettingsEvent['settings.changed']> {
-                self.saveData(e.get());
-                return e;
-            }
-        })
+        this.addSettingTab(new SettingsTab(this.app, this, this.storage, dispatcher));
+        dispatcher.addListener('settings.changed', new Callback(e => {
+            this.saveData(e.get());
+            this.processSettingsChange(data, e.get());
+            data = e.get();
+            return e;
+        }));
     }
+
+    private processSettingsChange(old: SettingsType, actual: SettingsType): void {
+
+        const changed = ObjectHelper.compare<SettingsType>(old, actual);
+        const recreateResolvers = false;
+        if (changed.path) {
+            this.updateTemplate();
+        }
+        if (recreateResolvers) {
+            this.createResolvers();
+        }
+    }
+
+    private createResolvers(): void {
+        this.resolvers.sync = this.container.getNamed<ResolverInterface>(TYPES.resolver, 'sync');
+    }
+
+    private updateTemplate(): void {
+        this.container.rebind<string>(TYPES.template).toConstantValue(this.storage.get('path').value());
+    }
+
     public async onload() {
         await this.loadSettings();
+        this.updateTemplate();
+        this.createResolvers();
+
 
         // this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
         //
@@ -105,8 +135,8 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     public onunload() {
-        this.composer.setState(false);
-        this.resolver.removeAllListeners('unresolved');
+        // this.composer.setState(false);
+        // this.resolver.removeAllListeners('unresolved');
     }
 
     private bind() {

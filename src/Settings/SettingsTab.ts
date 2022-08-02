@@ -31,6 +31,7 @@ export default class SettingsTab extends PluginSettingTab {
                 .setValue(this.storage.get('path').value())
                 .onChange(async (value) => {
                     this.storage.get('path').set(value);
+                    this.changed = true;
                 }));
 
         this.buildManagers();
