@@ -7,6 +7,7 @@ import Event from "@src/EventDispatcher/Event";
 
 export default class SettingsTab extends PluginSettingTab {
     changed = false;
+    private previous: SettingsType;
 
     constructor(
         app: App,
@@ -15,6 +16,7 @@ export default class SettingsTab extends PluginSettingTab {
         private dispatcher: Dispatcher<SettingsEvent>
     ) {
         super(app, plugin);
+        this.keepPrevious();
     }
 
     display(): any {
@@ -99,11 +101,19 @@ export default class SettingsTab extends PluginSettingTab {
         }
     }
 
+    private updatePrevious(): void {
+        this.previous = JSON.parse(JSON.stringify(this.storage.collect()));
+    }
+
     hide(): any {
         super.hide();
         if (this.changed) {
             this.changed = false;
-            this.dispatcher.dispatch('settings.changed', new Event(this.storage.collect()));
+            this.dispatcher.dispatch('settings.changed', new Event({
+                old: this.previous,
+                actual: this.storage.collect()
+            }));
+            this.updatePrevious();
         }
     }
 }

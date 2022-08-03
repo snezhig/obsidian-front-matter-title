@@ -2,11 +2,11 @@ export type SettingsManagersType = 'graph' | 'explorer' | 'header' | 'quick_swit
 export type SettingsType = {
     path: string,
     rules: {
-      paths: {mode: 'black'|'white', values: string[]}
+        paths: { mode: 'black' | 'white', values: string[] }
     },
     managers: { [k in SettingsManagersType]: boolean }
 };
 
 export type SettingsEvent = {
-    'settings.changed': SettingsType
+    'settings.changed': { old: SettingsType, actual: SettingsType }
 }
