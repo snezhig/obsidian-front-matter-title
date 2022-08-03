@@ -7,12 +7,14 @@ describe('Storage Test', () => {
                 value: number
             }
         },
-        foobar: boolean
+        foobar: boolean,
+        array: string[]
     }
 
     const data: d = {
         foo: {bar: {value: 10}},
-        foobar: true
+        foobar: true,
+        array: []
     }
 
     const storage = new Storage<d>(data);
@@ -29,5 +31,9 @@ describe('Storage Test', () => {
 
     test('Collect values', () => {
         expect(storage.collect()).toEqual(data);
+    })
+
+    test('Should return empty array', () => {
+        expect(storage.get('array').value()).toEqual([]);
     })
 })

@@ -1,3 +1,5 @@
+import {Arr} from "tern";
+
 interface PrimitiveItemInterface<T> {
     value(): T;
 
@@ -39,7 +41,7 @@ class StorageItem<T extends { [k: string]: any }> implements ObjectItemInterface
     }
 
     set(value: T): void {
-        if (typeof value === "object") {
+        if (typeof value === "object" && !Array.isArray(value)) {
             this.items = {};
             for (const [k, v] of Object.entries(value)) {
                 this.items[k] = new StorageItem(v as T[keyof T]);
