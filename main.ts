@@ -56,6 +56,12 @@ export default class MetaTitlePlugin extends Plugin {
                 graph: false,
                 header: false,
                 quick_switcher: false
+            },
+            rules: {
+                paths: {
+                    mode: 'black',
+                    values: []
+                }
             }
         }
     }
@@ -63,12 +69,11 @@ export default class MetaTitlePlugin extends Plugin {
     private async loadSettings(): Promise<void> {
         let data: SettingsType = this.defaultSettings;
         const current = await this.loadData();
-        for (const [k, v] of Object.entries(current as SettingsType)) {
-            if (k in data) {
-                //@ts-ignore
-                data[k] = v;
-            }
+        for (const k of Object.keys(data) as (keyof SettingsType)[]) {
+            console.log(k, current[k]);
+            data[k] = current[k] ?? data[k];
         }
+
         this.storage = new Storage<SettingsType>(data);
         const dispatcher = this.container.get<Dispatcher<SettingsEvent>>(TYPES.dispatcher);
         this.addSettingTab(new SettingsTab(this.app, this, this.storage, dispatcher));

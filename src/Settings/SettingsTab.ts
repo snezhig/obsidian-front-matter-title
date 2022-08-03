@@ -33,8 +33,40 @@ export default class SettingsTab extends PluginSettingTab {
                     this.storage.get('path').set(value);
                     this.changed = true;
                 }));
-
+        this.buildRules();
         this.buildManagers();
+    }
+
+    private buildRules(): void {
+        this.containerEl.createEl('h4', {text: 'Rules'});
+        const descriptions = {
+            white: 'Files that are located by paths will be processed by plugin',
+            black: 'Files that are located by paths will be ignored by plugin'
+        };
+        const setting = new Setting(this.containerEl).setName('File path rule');
+        const getActual = () => this.storage.get('rules').get('paths').get('mode');
+        const updateDesc = () => setting.setDesc(descriptions[getActual().value()]);
+        updateDesc();
+        console.log(this.storage.get('rules').get('paths').get('values').value());
+        console.log(setting.controlEl);
+        setting
+            .addDropdown(e =>
+                e.addOptions({white: 'White list mode', black: 'Black list mode'})
+                    .setValue(getActual().value())
+                    .onChange(e => {
+                        this.changed = true;
+                        getActual().set(e as 'black' | 'white');
+                        updateDesc();
+                    }).selectEl.style['marginRight'] = '10px')
+            .addTextArea(e => e
+                .setValue(this.storage.get('rules').get('paths').get('values').value().join('\n'))
+                .onChange(v => {
+                    this.changed = true;
+                    this.storage.get('rules').get('paths').get('values').set(v.split('\n').filter(e => e));
+                })
+            )
+
+
     }
 
     private buildManagers(): void {
