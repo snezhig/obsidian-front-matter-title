@@ -1,6 +1,6 @@
 export enum Resolving {
-    Sync,
-    Async
+    Sync ='sync',
+    Async = 'async'
 }
 
 export type Return<T> = T extends Resolving.Async ? Promise<string | null> : string | null;

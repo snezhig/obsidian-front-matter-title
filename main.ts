@@ -14,6 +14,7 @@ import {interfaces} from "inversify";
 import Callback from "@src/EventDispatcher/Callback";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import ObjectHelper from "@src/Utils/ObjectHelper";
+import CallbackVoid from "@src/EventDispatcher/CallbackVoid";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -67,7 +68,7 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private async loadSettings(): Promise<void> {
-        let data: SettingsType = this.defaultSettings;
+        const data: SettingsType = this.defaultSettings;
         const current = await this.loadData();
         for (const k of Object.keys(data) as (keyof SettingsType)[]) {
             console.log(k, current[k]);
@@ -77,24 +78,7 @@ export default class MetaTitlePlugin extends Plugin {
         this.storage = new Storage<SettingsType>(data);
         const dispatcher = this.container.get<Dispatcher<SettingsEvent>>(TYPES.dispatcher);
         this.addSettingTab(new SettingsTab(this.app, this, this.storage, dispatcher));
-        dispatcher.addListener('settings.changed', new Callback(e => {
-            this.saveData(e.get());
-            this.processSettingsChange(data, e.get());
-            data = e.get();
-            return e;
-        }));
-    }
-
-    private processSettingsChange(old: SettingsType, actual: SettingsType): void {
-
-        const changed = ObjectHelper.compare<SettingsType>(old, actual);
-        const recreateResolvers = false;
-        if (changed.path) {
-            this.updateTemplate();
-        }
-        if (recreateResolvers) {
-            this.createResolvers();
-        }
+        dispatcher.addListener('settings.changed', new CallbackVoid(e => this.saveData(e.get().actual)));
     }
 
     private createResolvers(): void {

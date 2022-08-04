@@ -16,7 +16,7 @@ export default class SettingsTab extends PluginSettingTab {
         private dispatcher: Dispatcher<SettingsEvent>
     ) {
         super(app, plugin);
-        this.keepPrevious();
+        this.updatePrevious();
     }
 
     display(): any {
