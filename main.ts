@@ -8,7 +8,7 @@ import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
 import Dispatcher from "@src/EventDispatcher/Dispatcher";
-import TYPES from "@config/inversify.types";
+import SI from "@config/inversify.types";
 import EventInterface from "@src/EventDispatcher/Interfaces/EventInterface";
 import {interfaces} from "inversify";
 import Callback from "@src/EventDispatcher/Callback";
@@ -76,17 +76,17 @@ export default class MetaTitlePlugin extends Plugin {
         }
 
         this.storage = new Storage<SettingsType>(data);
-        const dispatcher = this.container.get<Dispatcher<SettingsEvent>>(TYPES.dispatcher);
+        const dispatcher = this.container.get<Dispatcher<SettingsEvent>>(SI.dispatcher);
         this.addSettingTab(new SettingsTab(this.app, this, this.storage, dispatcher));
         dispatcher.addListener('settings.changed', new CallbackVoid(e => this.saveData(e.get().actual)));
     }
 
     private createResolvers(): void {
-        this.resolvers.sync = this.container.getNamed<ResolverInterface>(TYPES.resolver, 'sync');
+        this.resolvers.sync = this.container.getNamed<ResolverInterface>(SI.resolver, 'sync');
     }
 
     private updateTemplate(): void {
-        this.container.rebind<string>(TYPES.template).toConstantValue(this.storage.get('path').value());
+        this.container.rebind<string>(SI.template).toConstantValue(this.storage.get('path').value());
     }
 
     public async onload() {

@@ -3,7 +3,7 @@ import CacheInterface from "../Components/Cache/CacheInterface";
 import ResolverInterface, {Resolving, Return} from "../Interfaces/ResolverInterface";
 import CreatorInterface from "../Interfaces/CreatorInterface";
 import {inject, injectable, multiInject} from "inversify";
-import TYPES from "../../config/inversify.types";
+import SI from "../../config/inversify.types";
 import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
 import EventInterface from "@src/EventDispatcher/Interfaces/EventInterface";
@@ -12,13 +12,13 @@ import Event from "@src/EventDispatcher/Event";
 @injectable()
 export default class ResolverSync implements ResolverInterface {
     constructor(
-        @multiInject(TYPES.filter)
+        @multiInject(SI.filter)
         private filters: FilterInterface[],
-        @inject(TYPES.cache)
+        @inject(SI.cache)
         private cache: CacheInterface,
-        @inject(TYPES.creator)
+        @inject(SI.creator)
         private creator: CreatorInterface,
-        @inject(TYPES.dispatcher)
+        @inject(SI.dispatcher)
         private dispatcher: DispatcherInterface<ResolverEvents>
     ) {
         const exec = this.handleClear.bind(this);

@@ -1,12 +1,12 @@
 import Composite from "@src/Creator/Template/Composite";
 import Container from "../../../../config/inversify.config";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
-import TYPES from "@config/inversify.types";
+import SI from "@config/inversify.types";
 import {mock} from "jest-mock-extended";
 import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
 
 const factory = mock<Factory>();
-const create = (template: string) => new Composite(Container.get(TYPES['template.pattern']), template, factory);
+const create = (template: string) => new Composite(Container.get(SI['template.pattern']), template, factory);
 describe('Composite Test', () => {
     test('Get Template', () => {
         const template = 'foo {{plc}} bar';

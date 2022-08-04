@@ -1,15 +1,15 @@
 import TemplateInterface from "../../Interfaces/TemplateInterface";
 import {inject, injectable} from "inversify";
-import TYPES from "../../../config/inversify.types";
+import SI from "../../../config/inversify.types";
 
 @injectable()
 export default class Factory {
     constructor(
-        @inject(TYPES.template)
+        @inject(SI.template)
         private template: string,
-        @inject(TYPES['template.pattern'])
+        @inject(SI['template.pattern'])
         private pattern: string,
-        @inject(TYPES['factory.template.resolver'])
+        @inject(SI['factory.template.resolver'])
         private factory: (named: string) => TemplateInterface
     ) {
     }

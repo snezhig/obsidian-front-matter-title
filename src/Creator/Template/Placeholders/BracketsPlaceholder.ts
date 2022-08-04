@@ -1,14 +1,14 @@
 import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
 import {inject} from "inversify";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
-import TYPES from "@config/inversify.types";
+import SI from "@config/inversify.types";
 
 export default class BracketsPlaceholder implements TemplatePlaceholderInterface {
     private placeholder: string;
     private child: TemplatePlaceholderInterface;
 
     constructor(
-        @inject<Factory>(TYPES['factory.placeholder'])
+        @inject<Factory>(SI['factory.placeholder'])
         private factory: Factory
     ) {
     }

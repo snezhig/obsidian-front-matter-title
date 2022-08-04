@@ -3,12 +3,12 @@ import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInte
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
 import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
 import {injectable, multiInject} from "inversify";
-import TYPES from "@config/inversify.types";
+import SI from "@config/inversify.types";
 
 @injectable()
 export default class Extractor implements ExtractorInterface {
     constructor(
-        @multiInject(TYPES['component.extractor.strategy'])
+        @multiInject(SI['component.extractor.strategy'])
         private strategies: StrategyInterface[]
     ) {
     }
@@ -52,7 +52,7 @@ export default class Extractor implements ExtractorInterface {
      */
     private extractInternal(key: string, obj: { [p: string]: any }): any | never {
         if (!obj.hasOwnProperty(key)) {
-            throw new PathNotFoundException(`Key ${key} not found in ${obj.toString()}`);
+            throw new PathNotFoundException(`Key ${key} not found in ${JSON.stringify(obj)}`);
         }
         return obj[key];
     }

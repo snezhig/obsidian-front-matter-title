@@ -1,5 +1,6 @@
-const TYPES = {
+const SI = {
     dispatcher: '',
+    storage: '',
     cache: '',
     filter: '',
     placeholder: '',
@@ -20,9 +21,9 @@ const TYPES = {
     resolver: '',
 };
 
-for (const key of Object.keys(TYPES)) {
+for (const key of Object.keys(SI)) {
     //@ts-ignore
-    TYPES[key] = Symbol.for(key);
+    SI[key] = Symbol.for(key);
 }
 
-export default TYPES;
+export default SI;
