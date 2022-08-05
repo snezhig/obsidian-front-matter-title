@@ -19,10 +19,7 @@ export default class App {
 
     constructor() {
         this.processResolvers();
-    }
-
-    private getStorage(): Storage<SettingsEvent> {
-        return this.container.get<Storage<SettingsEvent>>(SI.storage);
+        this.bind();
     }
 
     private processResolvers(): void {
