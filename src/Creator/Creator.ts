@@ -2,14 +2,28 @@ import CreatorInterface from "../Interfaces/CreatorInterface";
 import TemplateInterface from "../Interfaces/TemplateInterface";
 import {inject, injectable, named} from "inversify";
 import SI from '@config/inversify.types';
+import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import {AppEvents} from "@src/Types";
+import CallbackVoid from "@src/EventDispatcher/CallbackVoid";
 
 @injectable()
 export default class Creator implements CreatorInterface {
+    private template: TemplateInterface;
 
     constructor(
-        @inject(SI['creator.template']) @named('auto')
-        private template: TemplateInterface
+        @inject(SI.dispatcher)
+        private dispatcher: DispatcherInterface<AppEvents>,
+        @inject(SI['creator.template']) @named('callback')
+        private resolver: () => TemplateInterface
     ) {
+        this.template = resolver();
+        this.bind();
+    }
+    private bind(): void{
+        this.dispatcher.addListener(
+            'template:changed',
+            new CallbackVoid((): void => {this.template = this. resolver()})
+        )
     }
 
     create(path: string): string | null {
