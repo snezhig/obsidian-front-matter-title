@@ -4,7 +4,7 @@ import DispatcherInterface from "../src/EventDispatcher/Interfaces/DispatcherInt
 import Dispatcher from "../src/EventDispatcher/Dispatcher";
 import SI from "./inversify.types";
 import bindCreator from './services/creator.config';
-import ResolverInterface from "../src/Interfaces/ResolverInterface";
+import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
 import ResolverSync from "../src/Resolver/ResolverSync";
 import FilterInterface from "../src/Interfaces/FilterInterface";
 import ExtensionFilter from "../src/Filters/ExtensionFilter";
@@ -17,12 +17,14 @@ import Extractor from "@src/Components/Extractor/Extractor";
 import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorInterface";
 import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInterface";
 import LiteralStrategy from "@src/Components/Extractor/LiteralStrategy";
+import ResolverAsync from "@src/Resolver/ResolverAsync";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
 Container.bind<string>(SI.template).toConstantValue('title');
 Container.bind<string>(SI['template.pattern']).toConstantValue('(?<placeholder>{{(\\w|\\s)+?}})');
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).whenTargetNamed('sync');
+Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver).to(ResolverAsync).whenTargetNamed('async');
 Container.bind<FilterInterface>(SI.filter).to(ExtensionFilter);
 Container.bind<FilterInterface>(SI.filter).to(PathListFilter);
 Container.bind<BlackWhiteListInterface>(SI["component.black_white_list"]).to(BlackWhiteList).inSingletonScope();
