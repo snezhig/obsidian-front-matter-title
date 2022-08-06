@@ -1,4 +1,3 @@
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import Container from "@config/inversify.config";
 import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
 import {SettingsEvent} from "@src/Settings/SettingsType";
@@ -8,24 +7,14 @@ import SI from "@config/inversify.types";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
 import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteListInterface";
 import Event from "@src/EventDispatcher/Event";
-import Storage from "@src/Settings/Storage";
+import {AppEvents} from "@src/Types";
 
 export default class App {
     private container = Container;
-    private resolvers: {
-        [Resolving.Sync]?: ResolverInterface
-        [Resolving.Async]?: ResolverInterface<Resolving.Async>
-    } = {};
 
     constructor() {
-        this.processResolvers();
         this.bind();
     }
-
-    private processResolvers(): void {
-        this.resolvers[Resolving.Sync] = this.container.getNamed(SI.resolver, Resolving.Sync);
-    }
-
 
     private bind(): void {
         const dispatcher: DispatcherInterface<SettingsEvent> = this.container.get(SI.dispatcher);
@@ -34,11 +23,11 @@ export default class App {
 
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {
         const changed = ObjectHelper.compare(old, actual);
-        type events = ResolverEvents;
+        type events = ResolverEvents & AppEvents;
         const queue: { [K in keyof events]?: events[K] } = {};
         if (changed.path) {
+            queue['template:changed'] = {new: actual.path, old: old.path};
             this.container.rebind(SI.template).toConstantValue(actual.path);
-            this.processResolvers();
         }
         if (changed?.rules?.paths) {
             const list = this.container.get<BlackWhiteListInterface>(SI['component.black_white_list']);
@@ -55,9 +44,5 @@ export default class App {
         for (const event of Object.keys(queue) as (keyof events)[]) {
             dispatcher.dispatch(event, new Event(queue[event]));
         }
-    }
-
-    public getResolver<T extends Resolving>(type: T): ResolverInterface<T> {
-        return this.resolvers[type] as ResolverInterface<T>;
     }
 }
