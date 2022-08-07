@@ -18,6 +18,7 @@ const SI = {
     'factory.template.resolver': '',
     'factory.placeholder': '',
     'factory.placeholder.resolver': '',
+    'factory:obsidian:file': '',
     resolver: '',
 };
 
