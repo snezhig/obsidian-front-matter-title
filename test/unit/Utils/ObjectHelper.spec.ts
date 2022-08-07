@@ -3,15 +3,15 @@ import ObjectHelper, {Changed} from "@src/Utils/ObjectHelper";
 describe('Test compare', () => {
 
     type d = {
-        number: number,
-        string: string,
-        boolean: boolean,
-        array: string[],
-        object: {
-            foo: string,
-            bar: string,
-            nested: {
-                item: string
+        number?: number,
+        string?: string,
+        boolean?: boolean,
+        array?: string[],
+        object?: {
+            foo?: string,
+            bar?: string,
+            nested?: {
+                item?: string
             }
         }
     }
@@ -42,5 +42,21 @@ describe('Test compare', () => {
         actual.object.nested.item = Math.random().toString();
 
         expect(ObjectHelper.compare(data, actual)).toEqual(changed);
+        expect(ObjectHelper.compare(actual, data)).toEqual(changed);
+    })
+    test('Should return diff for undefined', () => {
+        const actual = JSON.parse(JSON.stringify(data));
+        delete actual.object;
+        const expected = {object: {foo: true, bar: true, nested: {item: true}}};
+        expect(ObjectHelper.compare(data, actual)).toEqual(expected);
+        expect(ObjectHelper.compare(actual,data)).toEqual(expected);
+    })
+
+    test('Should return diff for array', () => {
+        const second = JSON.parse(JSON.stringify(data));
+        second.array = ['foo'];
+        const expected = {array: true};
+        expect(ObjectHelper.compare(data, second)).toEqual(expected);
+        expect(ObjectHelper.compare(second, data)).toEqual(expected);
     })
 })
