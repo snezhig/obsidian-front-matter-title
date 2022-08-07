@@ -27,6 +27,7 @@ export default class App {
         const queue: { [K in keyof events]?: events[K] } = {};
         if (changed.path) {
             queue['template:changed'] = {new: actual.path, old: old.path};
+            queue['resolver.clear'] = {all: true};
             this.container.rebind(SI.template).toConstantValue(actual.path);
         }
         if (changed?.rules?.paths) {

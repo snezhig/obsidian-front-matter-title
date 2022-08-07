@@ -13,7 +13,8 @@ const config: Config.InitialOptions = {
         '@config/(.*)': '<rootDir>/config/$1',
     },
     collectCoverage: true,
-    coverageDirectory: "<rootDir>/coverage/"
+    coverageDirectory: "<rootDir>/coverage/",
+    modulePathIgnorePatterns: ["<rootDir>/test/unit/Title"]
 };
 
 export default config;
