@@ -8,5 +8,6 @@ export type SettingsType = {
 };
 
 export type SettingsEvent = {
-    'settings.changed': { old: SettingsType, actual: SettingsType }
+    'settings.changed': { old: SettingsType, actual: SettingsType },
+    'settings.loaded': { settings: SettingsType }
 }

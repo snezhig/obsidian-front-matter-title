@@ -1,6 +1,6 @@
 import Container from "@config/inversify.config";
 import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
-import {SettingsEvent} from "@src/Settings/SettingsType";
+import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import CallbackVoid from "@src/EventDispatcher/CallbackVoid";
 import SI from "@config/inversify.types";
@@ -19,8 +19,11 @@ export default class App {
     private bind(): void {
         const dispatcher: DispatcherInterface<SettingsEvent> = this.container.get(SI.dispatcher);
         dispatcher.addListener('settings.changed', new CallbackVoid<SettingsEvent['settings.changed']>(e => this.onSettingsChanged(e.get())))
+        dispatcher.addListener('settings.loaded', new CallbackVoid(e => this.init(e.get().settings)))
     }
 
+    private init(settings: SettingsType): void {
+    }
 
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {
         const changed = ObjectHelper.compare(old, actual);

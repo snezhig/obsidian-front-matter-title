@@ -6,6 +6,7 @@ import ObjectHelper from "@src/Utils/ObjectHelper";
 import Event from "@src/EventDispatcher/Event";
 import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteListInterface";
 import BlackWhiteList from "@src/Components/BlackWhiteList/BlackWhiteList";
+import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 
 Container.rebind(SI.template).toConstantValue('title');
 
@@ -19,21 +20,55 @@ const spy = {
     }
 }
 
-const dispatcher = Container.get<DispatcherInterface<any>>(SI.dispatcher);
+const dispatcher = Container.get<DispatcherInterface<SettingsEvent>>(SI.dispatcher);
+const createDefaultSettings = (): SettingsType => ({
+    template: '',
+    managers: {
+        quick_switcher: false,
+        header: false,
+        graph: false,
+        explorer: false
+    },
+    rules: {
+        paths: {mode: "black", values: []}
+    }
+});
 describe('Test App', () => {
     new App();
+    // test('Template should not exist', () => {
+    //     expect(Container.isBound(SI.template)).toBeFalsy();
+    // })
     test('Should subscribe on events', () => {
         expect(spy.addListener).toHaveBeenCalledWith('settings.changed', expect.anything());
+        expect(spy.addListener).toHaveBeenCalledWith('settings.loaded', expect.anything());
     })
+
+    // describe('Test "settings.loaded" event', () => {
+    //     beforeAll(() => spy.dispatch.mockClear());
+    //     afterAll(() => spy.dispatch.mockClear());
+    //     test('Dispatch event', () => {
+    //         const settings = createDefaultSettings();
+    //         settings.template = 'title';
+    //         settings.rules.paths = {values: ['foo'], mode: "black"};
+    //         dispatcher.dispatch('settings.loaded', new Event({settings}));
+    //         expect.assertions(1);
+    //     })
+    //     test('Should set template', () => {
+    //
+    //     })
+    // })
 
     describe('Test "settings.changed event"', () => {
         afterEach(() => spy.dispatch.mockClear())
         beforeAll(() => spy.dispatch.mockClear())
         test('Should change template and dispatch new event', () => {
-            dispatcher.dispatch('settings.changed', new Event({old: {template: 'title'}, actual: {template: 'actual_title'}}));
+            const old = createDefaultSettings();
+            const actual = createDefaultSettings();
+            actual.template = 'actual_title';
+            dispatcher.dispatch('settings.changed', new Event({old, actual}));
             expect(Container.get<string>(SI.template)).toEqual('actual_title');
             expect(spy.dispatch).toHaveBeenCalledWith('template:changed', new Event({
-                old: 'title',
+                old: '',
                 new: 'actual_title'
             }));
             expect(spy.dispatch).toHaveBeenCalledWith('resolver.clear', new Event({all: true}));
@@ -41,10 +76,11 @@ describe('Test App', () => {
         })
 
         test('Should change list mode and dispatch new event', () => {
-            dispatcher.dispatch('settings.changed', new Event({
-                old: {rules: {paths: {mode: 'black'}}},
-                actual: {rules: {paths: {mode: 'white'}}}
-            }));
+            const old = createDefaultSettings();
+            old.rules.paths.mode = 'black';
+            const actual = createDefaultSettings();
+            actual.rules.paths.mode = 'white';
+            dispatcher.dispatch('settings.changed', new Event({old, actual}));
             expect(spy.list.setMode).toHaveBeenCalledTimes(1);
             expect(spy.list.setMode).toHaveBeenCalledWith('white');
             expect(spy.list.setList).not.toHaveBeenCalled();
@@ -54,10 +90,11 @@ describe('Test App', () => {
 
         test('Should change list values and dispatch new event', () => {
             spy.list.setMode.mockClear();
-            dispatcher.dispatch('settings.changed', new Event({
-                old: {rules: {paths: {values: []}}},
-                actual: {rules: {paths: {values: ['foo', 'bar']}}}
-            }));
+            const old = createDefaultSettings();
+            old.rules.paths.values = [];
+            const actual = createDefaultSettings();
+            actual.rules.paths.values = ['foo', 'bar'];
+            dispatcher.dispatch('settings.changed', new Event({old, actual}));
             expect(spy.list.setList).toHaveBeenCalledTimes(1);
             expect(spy.list.setList).toHaveBeenCalledWith(['foo', 'bar']);
             expect(spy.list.setMode).not.toHaveBeenCalled();
