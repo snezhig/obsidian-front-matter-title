@@ -12,6 +12,28 @@ describe('Extractor Test', () => {
     };
     const extractor = new Extractor(Object.values(strategies));
 
+    describe('Test types for strategies', () => {
+       const types = {
+           number: [1, 2.3],
+           string: ['', '1', 'foo', 'false'],
+           boolean: [false, true],
+           array: [[], [1,2]],
+           object: [{}, {foo: []}, {foo: 'bar'}]
+       }
+       const strategy = mock<StrategyInterface>();
+       strategy.support.mockReturnValue(true);
+       const extractor = new Extractor([strategy]);
+       beforeEach(() => strategy.support.mockClear());
+       for(const [type, values] of Object.entries(types)){
+           for (const v of values){
+               test(`Test ${type} with ${typeof  v === 'object' ? JSON.stringify(v) : v}`, () => {
+                   extractor.extract('path', {path: v});
+                   expect(strategy.support).toHaveBeenCalledWith(type);
+               })
+           }
+       }
+    });
+
     describe(`Throws ${PathNotFoundException.name}`, () => {
         const data = [{path: 'path', obj: {}}];
         for (const item of data) {
