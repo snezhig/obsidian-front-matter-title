@@ -1,5 +1,4 @@
 import MetaPlaceholder from "@src/Creator/Template/Placeholders/MetaPlaceholder";
-import FrontMatterParser, {Meta} from "@src/Title/FrontMatterParser";
 import {mock} from "jest-mock-extended";
 import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorInterface";
 
@@ -11,8 +10,8 @@ describe('Meta Placeholder Test', () => {
     const path = '/path/to/file.md';
     const extractor = mock<ExtractorInterface>();
     extractor.extract.mockReturnValue(expected);
-    const meta: Meta = {};
-    const metaFactory = jest.fn((path: string) => meta);
+    const meta: {[k: string]: any} = {};
+    const metaFactory = jest.fn((path: string, type: string) => meta);
     const metaPlaceholder = new MetaPlaceholder(extractor, metaFactory);
 
     test('Set and get placeholder', () => {
@@ -26,7 +25,7 @@ describe('Meta Placeholder Test', () => {
     })
 
     test('Dependencies have been called', () => {
-        expect(metaFactory).toHaveBeenCalledWith(path);
+        expect(metaFactory).toHaveBeenCalledWith(path, 'meta');
         expect(extractor.extract).toHaveBeenCalledWith(placeholder, meta);
     })
 })
