@@ -30,9 +30,9 @@ export default class SettingsTab extends PluginSettingTab {
             .setDesc('Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}". See Readme to find out')
             .addText(text => text
                 .setPlaceholder('Type path')
-                .setValue(this.storage.get('path').value())
+                .setValue(this.storage.get('template').value())
                 .onChange(async (value) => {
-                    this.storage.get('path').set(value);
+                    this.storage.get('template').set(value);
                     this.changed = true;
                 }));
         this.buildRules();

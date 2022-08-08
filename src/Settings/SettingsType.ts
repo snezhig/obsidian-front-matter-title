@@ -1,6 +1,6 @@
 export type SettingsManagersType = 'graph' | 'explorer' | 'header' | 'quick_switcher'
 export type SettingsType = {
-    path: string,
+    template: string,
     rules: {
         paths: { mode: 'black' | 'white', values: string[] }
     },

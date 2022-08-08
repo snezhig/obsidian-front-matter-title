@@ -15,6 +15,7 @@ import Callback from "@src/EventDispatcher/Callback";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import CallbackVoid from "@src/EventDispatcher/CallbackVoid";
+import App from "@src/App";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -51,7 +52,7 @@ export default class MetaTitlePlugin extends Plugin {
 
     private get defaultSettings(): SettingsType {
         return {
-            path: 'title',
+            template: 'title',
             managers: {
                 explorer: false,
                 graph: false,
@@ -81,18 +82,12 @@ export default class MetaTitlePlugin extends Plugin {
         dispatcher.addListener('settings.changed', new CallbackVoid(e => this.saveData(e.get().actual)));
     }
 
-    private createResolvers(): void {
-        this.resolvers.sync = this.container.getNamed<ResolverInterface>(SI.resolver, 'sync');
-    }
 
-    private updateTemplate(): void {
-        this.container.rebind<string>(SI.template).toConstantValue(this.storage.get('path').value());
-    }
 
     public async onload() {
         await this.loadSettings();
-        this.updateTemplate();
-        this.createResolvers();
+        this.container.rebind<string>(SI.template).toConstantValue(this.storage.get('template').value());
+        const core = new App();
 
 
         // this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>

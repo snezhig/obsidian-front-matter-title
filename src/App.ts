@@ -21,14 +21,15 @@ export default class App {
         dispatcher.addListener('settings.changed', new CallbackVoid<SettingsEvent['settings.changed']>(e => this.onSettingsChanged(e.get())))
     }
 
+
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {
         const changed = ObjectHelper.compare(old, actual);
         type events = ResolverEvents & AppEvents;
         const queue: { [K in keyof events]?: events[K] } = {};
-        if (changed.path) {
-            queue['template:changed'] = {new: actual.path, old: old.path};
+        if (changed.template) {
+            this.container.rebind(SI.template).toConstantValue(actual.template);
+            queue['template:changed'] = {new: actual.template, old: old.template};
             queue['resolver.clear'] = {all: true};
-            this.container.rebind(SI.template).toConstantValue(actual.path);
         }
         if (changed?.rules?.paths) {
             const list = this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']);

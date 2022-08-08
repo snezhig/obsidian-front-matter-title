@@ -30,7 +30,7 @@ describe('Test App', () => {
         afterEach(() => spy.dispatch.mockClear())
         beforeAll(() => spy.dispatch.mockClear())
         test('Should change template and dispatch new event', () => {
-            dispatcher.dispatch('settings.changed', new Event({old: {path: 'title'}, actual: {path: 'actual_title'}}));
+            dispatcher.dispatch('settings.changed', new Event({old: {template: 'title'}, actual: {template: 'actual_title'}}));
             expect(Container.get<string>(SI.template)).toEqual('actual_title');
             expect(spy.dispatch).toHaveBeenCalledWith('template:changed', new Event({
                 old: 'title',
