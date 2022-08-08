@@ -18,6 +18,7 @@ import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorIn
 import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInterface";
 import LiteralStrategy from "@src/Components/Extractor/LiteralStrategy";
 import ResolverAsync from "@src/Resolver/ResolverAsync";
+import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -30,6 +31,7 @@ Container.bind<BlackWhiteListInterface>(SI["component:black_white_list"]).to(Bla
 Container.bind<CacheInterface>(SI.cache).to(Cache);
 Container.bind<ExtractorInterface>(SI['component:extractor']).to(Extractor);
 Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(LiteralStrategy);
+Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(ArrayStrategy);
 
 Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory:obsidian:file'])
     .toFactory<{[k: string]: any}, [string]>(context => (path: string) => {throw new Error('Factory for obsidian file is not defined')})

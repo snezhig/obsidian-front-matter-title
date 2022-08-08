@@ -19,6 +19,7 @@ const SI = {
     'factory:placeholder': '',
     'factory:placeholder:resolver': '',
     'factory:obsidian:file': '',
+    'delimiter': ''
 };
 
 for (const key of Object.keys(SI)) {
