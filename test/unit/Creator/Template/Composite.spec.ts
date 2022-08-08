@@ -6,7 +6,7 @@ import {mock} from "jest-mock-extended";
 import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
 
 const factory = mock<Factory>();
-const create = (template: string) => new Composite(Container.get(SI['template.pattern']), template, factory);
+const create = (template: string) => new Composite(Container.get(SI['template:pattern']), template, factory);
 describe('Composite Test', () => {
     test('Get Template', () => {
         const template = 'foo {{plc}} bar';

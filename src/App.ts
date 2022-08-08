@@ -31,7 +31,7 @@ export default class App {
             this.container.rebind(SI.template).toConstantValue(actual.path);
         }
         if (changed?.rules?.paths) {
-            const list = this.container.get<BlackWhiteListInterface>(SI['component.black_white_list']);
+            const list = this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']);
             if (changed.rules.paths?.mode) {
                 list.setMode(actual.rules.paths.mode);
             }

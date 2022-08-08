@@ -13,17 +13,17 @@ import Composite from "@src/Creator/Template/Composite";
 import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlaceholder";
 
 export default (container: Container) => {
-    container.bind<TemplateInterface>(SI["creator.template"])
-        .toFactory<TemplateInterface>(context => () => context.container.get<TemplateFactory>(SI["factory.template"]).create())
+    container.bind<TemplateInterface>(SI["creator:template"])
+        .toFactory<TemplateInterface>(context => () => context.container.get<TemplateFactory>(SI["factory:template"]).create())
         .whenTargetNamed('callback')
-    container.bind<TemplateFactory>(SI['factory.template']).to(TemplateFactory);
+    container.bind<TemplateFactory>(SI['factory:template']).to(TemplateFactory);
     container
-        .bind<interfaces.Factory<TemplateInterface>>(SI['factory.template.resolver'])
-        .toAutoNamedFactory<TemplateInterface>(SI['creator.template']);
+        .bind<interfaces.Factory<TemplateInterface>>(SI['factory:template:resolver'])
+        .toAutoNamedFactory<TemplateInterface>(SI['creator:template']);
 
-    container.bind<TemplateInterface>(SI["creator.template"]).to(Simple).whenTargetNamed('simple');
+    container.bind<TemplateInterface>(SI["creator:template"]).to(Simple).whenTargetNamed('simple');
 
-    container.bind<TemplateInterface>(SI["creator.template"]).to(Composite).whenTargetNamed('composite');
+    container.bind<TemplateInterface>(SI["creator:template"]).to(Composite).whenTargetNamed('composite');
 
     container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(MetaPlaceholder).whenTargetNamed('meta');
     container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(BracketsPlaceholder).whenTargetNamed('brackets');
@@ -31,12 +31,12 @@ export default (container: Container) => {
     container.bind<CreatorInterface>(SI.creator).to(Creator);
 
     container
-        .bind<interfaces.Factory<TemplatePlaceholderInterface>>(SI["factory.placeholder.resolver"])
+        .bind<interfaces.Factory<TemplatePlaceholderInterface>>(SI["factory:placeholder:resolver"])
         .toFactory<TemplatePlaceholderInterface, [string, string]>(context => (type: string, placeholder: string) => {
             const item = context.container.getNamed<TemplatePlaceholderInterface>(SI.placeholder, type);
             item.setPlaceholder(placeholder);
             return item;
         });
 
-    container.bind<PlaceholderFactory>(SI['factory.placeholder']).to(PlaceholderFactory).inSingletonScope();
+    container.bind<PlaceholderFactory>(SI['factory:placeholder']).to(PlaceholderFactory).inSingletonScope();
 }

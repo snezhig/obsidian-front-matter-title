@@ -7,9 +7,9 @@ export default class Factory {
     constructor(
         @inject(SI.template)
         private template: string,
-        @inject(SI['template.pattern'])
+        @inject(SI['template:pattern'])
         private pattern: string,
-        @inject(SI['factory.template.resolver'])
+        @inject(SI['factory:template:resolver'])
         private factory: (named: string) => TemplateInterface
     ) {
     }

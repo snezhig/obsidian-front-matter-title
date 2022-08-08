@@ -8,7 +8,7 @@ import SI from "@config/inversify.types";
 @injectable()
 export default class Extractor implements ExtractorInterface {
     constructor(
-        @multiInject(SI['component.extractor.strategy'])
+        @multiInject(SI['component:extractor:strategy'])
         private strategies: StrategyInterface[]
     ) {
     }

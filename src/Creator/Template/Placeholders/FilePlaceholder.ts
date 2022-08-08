@@ -10,7 +10,7 @@ export default class FilePlaceholder extends AbstractPlaceholder {
     constructor(
         @inject(SI['factory:obsidian:file'])
         private factory: (path: string, type: string) => ({ [k: string]: any }),
-        @inject(SI['component.extractor'])
+        @inject(SI['component:extractor'])
         private extractor: ExtractorInterface
     ) {
         super();

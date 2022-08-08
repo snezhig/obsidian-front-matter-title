@@ -9,11 +9,11 @@ export default class Composite implements TemplateInterface {
     private placeholders: TemplatePlaceholderInterface[] = [];
 
     constructor(
-        @inject(SI['template.pattern'])
+        @inject(SI['template:pattern'])
         private pattern: string,
         @inject(SI.template)
         private template: string,
-        @inject<Factory>(SI['factory.placeholder'])
+        @inject<Factory>(SI['factory:placeholder'])
         private factory: Factory
     ) {
     }

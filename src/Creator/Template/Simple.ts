@@ -10,7 +10,7 @@ export default class Simple implements TemplateInterface {
     constructor(
         @inject(SI.template)
         private template: string,
-        @inject<Factory>(SI['factory.placeholder'])
+        @inject<Factory>(SI['factory:placeholder'])
         private factory: Factory
     ) {
     }

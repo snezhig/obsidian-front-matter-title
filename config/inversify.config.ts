@@ -22,18 +22,18 @@ import ResolverAsync from "@src/Resolver/ResolverAsync";
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
 Container.bind<string>(SI.template).toConstantValue('title');
-Container.bind<string>(SI['template.pattern']).toConstantValue('(?<placeholder>{{(\\w|\\s)+?}})');
+Container.bind<string>(SI['template:pattern']).toConstantValue('(?<placeholder>{{(\\w|\\s)+?}})');
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed('sync');
 Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver).to(ResolverAsync).inSingletonScope().whenTargetNamed('async');
 Container.bind<FilterInterface>(SI.filter).to(ExtensionFilter);
 Container.bind<FilterInterface>(SI.filter).to(PathListFilter);
-Container.bind<BlackWhiteListInterface>(SI["component.black_white_list"]).to(BlackWhiteList).inSingletonScope();
+Container.bind<BlackWhiteListInterface>(SI["component:black_white_list"]).to(BlackWhiteList).inSingletonScope();
 Container.bind<CacheInterface>(SI.cache).to(Cache);
-Container.bind<ExtractorInterface>(SI['component.extractor']).to(Extractor);
-Container.bind<StrategyInterface>(SI['component.extractor.strategy']).to(LiteralStrategy);
+Container.bind<ExtractorInterface>(SI['component:extractor']).to(Extractor);
+Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(LiteralStrategy);
 
-Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory.meta'])
-    .toFactory<{[k: string]: any}, [string]>(context => (path: string) => {throw new Error('Factory for meta is not defined')})
+Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory:obsidian:file'])
+    .toFactory<{[k: string]: any}, [string]>(context => (path: string) => {throw new Error('Factory for obsidian file is not defined')})
 //START CREATOR
 bindCreator(Container);
 //END CREATOR

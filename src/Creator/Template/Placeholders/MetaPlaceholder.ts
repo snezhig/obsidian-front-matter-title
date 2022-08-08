@@ -6,7 +6,7 @@ import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorIn
 @injectable()
 export default class MetaPlaceholder extends AbstractPlaceholder {
     constructor(
-        @inject(SI['component.extractor'])
+        @inject(SI['component:extractor'])
         private extractor: ExtractorInterface,
         @inject(SI['factory:obsidian:file'])
         private factory: (path: string, type: string) => ({ [k: string]: any }),

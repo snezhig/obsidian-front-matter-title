@@ -13,7 +13,7 @@ export default class Creator implements CreatorInterface {
     constructor(
         @inject(SI.dispatcher)
         private dispatcher: DispatcherInterface<AppEvents>,
-        @inject(SI['creator.template']) @named('callback')
+        @inject(SI['creator:template']) @named('callback')
         private resolver: () => TemplateInterface
     ) {
         this.template = resolver();

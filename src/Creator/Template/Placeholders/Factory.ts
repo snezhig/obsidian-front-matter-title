@@ -6,7 +6,7 @@ import SI from "../../../../config/inversify.types";
 @injectable()
 export default class Factory {
     constructor(
-        @inject(SI['factory.placeholder.resolver'])
+        @inject(SI['factory:placeholder:resolver'])
         private factory: (type: string, placeholder: string) => TemplatePlaceholderInterface
     ) {
     }

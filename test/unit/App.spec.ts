@@ -1,8 +1,6 @@
 import App from "@src/App";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
-import {interfaces} from "inversify";
-import Simple from "@src/Creator/Template/Simple";
 import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import Event from "@src/EventDispatcher/Event";
@@ -20,10 +18,7 @@ const spy = {
         setList: jest.spyOn<BlackWhiteListInterface, 'setList'>(BlackWhiteList.prototype, 'setList'),
     }
 }
-const factory = {
-    meta: jest.fn((context: interfaces.Context): any => (path: string) => ({title: 'resolved_title'}))
-}
-Container.rebind<interfaces.Factory<string[]>>(SI['factory.meta']).toFactory(factory.meta);
+
 const dispatcher = Container.get<DispatcherInterface<any>>(SI.dispatcher);
 describe('Test App', () => {
     new App();

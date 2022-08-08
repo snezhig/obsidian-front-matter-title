@@ -6,7 +6,7 @@ import SI from "@config/inversify.types";
 @injectable()
 export default class PathListFilter implements FilterInterface {
     constructor(
-        @inject(SI['component.black_white_list'])
+        @inject(SI['component:black_white_list'])
         private list: BlackWhiteListInterface
     ) {
     }
