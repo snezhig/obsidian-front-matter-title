@@ -17,6 +17,7 @@ export default class SettingsTab extends PluginSettingTab {
     ) {
         super(app, plugin);
         this.updatePrevious();
+        this.dispatcher.dispatch('settings.loaded', new Event({settings: this.storage.collect()}))
     }
 
     display(): any {
