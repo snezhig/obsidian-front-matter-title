@@ -23,6 +23,7 @@ export default class App {
     }
 
     private init(settings: SettingsType): void {
+        this.container.bind(SI.template).toConstantValue(settings.template);
     }
 
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {

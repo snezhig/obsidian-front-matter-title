@@ -21,7 +21,6 @@ import ResolverAsync from "@src/Resolver/ResolverAsync";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
-Container.bind<string>(SI.template).toConstantValue('title');
 Container.bind<string>(SI['template:pattern']).toConstantValue('(?<placeholder>{{(\\w|\\s)+?}})');
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed('sync');
 Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver).to(ResolverAsync).inSingletonScope().whenTargetNamed('async');

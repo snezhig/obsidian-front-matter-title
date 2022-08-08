@@ -8,7 +8,6 @@ import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteLi
 import BlackWhiteList from "@src/Components/BlackWhiteList/BlackWhiteList";
 import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 
-Container.rebind(SI.template).toConstantValue('title');
 
 const spy = {
     addListener: jest.spyOn<DispatcherInterface<any>, 'addListener'>(Container.get(SI.dispatcher), 'addListener'),
@@ -35,28 +34,28 @@ const createDefaultSettings = (): SettingsType => ({
 });
 describe('Test App', () => {
     new App();
-    // test('Template should not exist', () => {
-    //     expect(Container.isBound(SI.template)).toBeFalsy();
-    // })
+    test('Template should not exist', () => {
+        expect(Container.isBound(SI.template)).toBeFalsy();
+    })
     test('Should subscribe on events', () => {
         expect(spy.addListener).toHaveBeenCalledWith('settings.changed', expect.anything());
         expect(spy.addListener).toHaveBeenCalledWith('settings.loaded', expect.anything());
     })
 
-    // describe('Test "settings.loaded" event', () => {
-    //     beforeAll(() => spy.dispatch.mockClear());
-    //     afterAll(() => spy.dispatch.mockClear());
-    //     test('Dispatch event', () => {
-    //         const settings = createDefaultSettings();
-    //         settings.template = 'title';
-    //         settings.rules.paths = {values: ['foo'], mode: "black"};
-    //         dispatcher.dispatch('settings.loaded', new Event({settings}));
-    //         expect.assertions(1);
-    //     })
-    //     test('Should set template', () => {
-    //
-    //     })
-    // })
+    describe('Test "settings.loaded" event', () => {
+        beforeAll(() => spy.dispatch.mockClear());
+        afterAll(() => spy.dispatch.mockClear());
+        test('Dispatch event', () => {
+            const settings = createDefaultSettings();
+            settings.template = 'title';
+            settings.rules.paths = {values: ['foo'], mode: "black"};
+            dispatcher.dispatch('settings.loaded', new Event({settings}));
+        })
+        test('Should set template', () => {
+            expect(Container.get(SI.template)).toEqual('title');
+        })
+
+    })
 
     describe('Test "settings.changed event"', () => {
         afterEach(() => spy.dispatch.mockClear())
