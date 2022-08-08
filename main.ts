@@ -72,22 +72,27 @@ export default class MetaTitlePlugin extends Plugin {
         const data: SettingsType = this.defaultSettings;
         const current = await this.loadData();
         for (const k of Object.keys(data) as (keyof SettingsType)[]) {
-            console.log(k, current[k]);
             data[k] = current[k] ?? data[k];
         }
 
         this.storage = new Storage<SettingsType>(data);
         const dispatcher = this.container.get<Dispatcher<SettingsEvent>>(SI.dispatcher);
         this.addSettingTab(new SettingsTab(this.app, this, this.storage, dispatcher));
-        dispatcher.addListener('settings.changed', new CallbackVoid(e => this.saveData(e.get().actual)));
+        dispatcher.addListener('settings.changed', new CallbackVoid(e => this.onSettingsChange(e.get().actual)));
     }
 
-
+    private async onSettingsChange(settings: SettingsType): Promise<void>{
+        await this.saveData(settings);
+        this.composer.setState(settings.managers.graph, ManagerType.Graph);
+        this.composer.setState(settings.managers.explorer, ManagerType.Explorer);
+        this.composer.setState(settings.managers.header, ManagerType.Markdown);
+        this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
+        await this.runManagersUpdate();
+    }
 
     public async onload() {
+        new App();
         await this.loadSettings();
-        this.container.rebind<string>(SI.template).toConstantValue(this.storage.get('template').value());
-        const core = new App();
 
 
         // this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
