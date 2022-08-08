@@ -24,6 +24,8 @@ export default class App {
 
     private init(settings: SettingsType): void {
         this.container.bind(SI.template).toConstantValue(settings.template);
+        this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setMode(settings.rules.paths.mode);
+        this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setList(settings.rules.paths.values);
     }
 
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {

@@ -44,7 +44,11 @@ describe('Test App', () => {
 
     describe('Test "settings.loaded" event', () => {
         beforeAll(() => spy.dispatch.mockClear());
-        afterAll(() => spy.dispatch.mockClear());
+        afterAll(() => {
+            spy.dispatch.mockClear()
+            spy.list.setMode.mockClear();
+            spy.list.setList.mockClear();
+        });
         test('Dispatch event', () => {
             const settings = createDefaultSettings();
             settings.template = 'title';
@@ -54,7 +58,14 @@ describe('Test App', () => {
         test('Should set template', () => {
             expect(Container.get(SI.template)).toEqual('title');
         })
-
+        test('Should set mode for list', () => {
+            expect(spy.list.setMode).toHaveBeenCalledTimes(1);
+            expect(spy.list.setMode).toHaveBeenCalledWith('black');
+        })
+        test('Should set list for list', () => {
+            expect(spy.list.setList).toHaveBeenCalledTimes(1);
+            expect(spy.list.setList).toHaveBeenCalledWith(['foo']);
+        })
     })
 
     describe('Test "settings.changed event"', () => {
