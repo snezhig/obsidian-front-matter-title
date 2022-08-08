@@ -4,6 +4,7 @@ import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotF
 import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
 import {injectable, multiInject} from "inversify";
 import SI from "@config/inversify.types";
+import {Arr} from "tern";
 
 @injectable()
 export default class Extractor implements ExtractorInterface {
@@ -30,7 +31,8 @@ export default class Extractor implements ExtractorInterface {
         }
 
         let strategy: StrategyInterface = null;
-        const type = typeof extracted;
+        let type = typeof extracted as string;
+        type = type === 'object' && Array.isArray(extracted) ? 'array' : type;
         for (const item of this.strategies) {
             if (item.support(type)) {
                 strategy = item;
