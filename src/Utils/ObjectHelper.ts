@@ -2,24 +2,28 @@ type obj = { [k: string]: any };
 
 export type Changed<T> = { [K in keyof T]?: T[K] extends object ? Changed<T[K]> : boolean};
 export default class ObjectHelper {
-    public static compare<T extends { [k: string]: any }>(old: T, actual: T): Changed<T> {
+    public static compare<T extends { [k: string]: any }>(old: T = {} as T, actual: T = {} as T): Changed<T> {
         const changed: obj = {};
-        for (const [k, v] of Object.entries(old)) {
-            if (typeof v === "object") {
-                if (Array.isArray(v)) {
-                    const hasDiff = v.some(x => !actual[k].includes(x));
-                    const isChanged = hasDiff ? true : actual[k].some((x: string | number) => !v.includes(x));
+        const keys = [...Object.keys(old), ...Object.keys(actual)].filter((e,i,s) => s.indexOf(e) === i);
+        for (const k of keys) {
+            const first = old[k];
+            const second = actual[k];
+            const type = typeof (first !== undefined ? first : second);
+            if (type === "object") {
+                if (Array.isArray(first)) {
+                    const hasDiff = first.some(x => !second.includes(x));
+                    const isChanged = hasDiff ? true : second.some((x: string | number) => !first.includes(x));
                     if(isChanged){
                         changed[k] = true;
                     }
                 } else {
-                    const c = ObjectHelper.compare(old[k], actual[k]);
+                    const c = ObjectHelper.compare(first, second);
                     if(Object.values(c).some(e => e !== false)){
                         changed[k] = c;
                     }
                 }
             } else {
-                if(v !== actual[k]){
+                if(first !== second){
                     changed[k] = true;
                 }
             }
