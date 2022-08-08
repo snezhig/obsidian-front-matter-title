@@ -20,12 +20,14 @@ export default class Dispatcher<E> implements DispatcherInterface<E> {
     }
 
     dispatch<T extends keyof E>(name: T, e: EventInterface<E[T]>): EventInterface<E[T]> {
+        //TODO add condition to debug info
         const listeners = this.listeners[name] ?? [];
-
+        console.debug(`====[${name}][start]====`);
         for (const l of listeners) {
+            console.debug(name, e);
             e = l.execute(e);
         }
-
+        console.debug(`====[${name}][end]====`);
         return e;
     }
 }
