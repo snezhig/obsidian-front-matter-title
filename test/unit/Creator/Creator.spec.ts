@@ -34,15 +34,32 @@ describe('Test Creator', () => {
         expect(template.getPlaceholders).toHaveBeenCalledTimes(1);
     })
 
-    test('Should add listener', () => {
-        expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
-        expect(dispatcher.addListener).toHaveBeenCalledWith('template:changed', expect.anything());
+    test('Should return null', () => {
+        placeholder.makeValue.mockReturnValue(null);
+        placeholder.getPlaceholder.mockReturnValue('(static)');
+        template.getTemplate.mockReturnValueOnce('(static)');
+        const creator = new Creator(dispatcher, templateCallback);
+        const actual = creator.create(path);
+        expect(actual).toBeNull();
+    })
+    describe('Test events', () => {
+        beforeAll(() => {
+            dispatcher.addListener.mockClear();
+            templateCallback.mockClear();
+            new Creator(dispatcher, templateCallback);
+        })
+        test('Should add listener', () => {
+            expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
+            expect(dispatcher.addListener).toHaveBeenCalledWith('template:changed', expect.anything());
+        })
+
+        test('Should update template after event', () => {
+            templateCallback.mockClear();
+            expect(events['template:changed']).not.toBeUndefined();
+            events["template:changed"].execute(new Event<AppEvents['template:changed']>({old: '', new: ''}));
+            expect(templateCallback).toHaveBeenCalledTimes(1);
+        })
     })
 
-    test('Should update template after event', () => {
-        templateCallback.mockClear();
-        expect(events['template:changed']).not.toBeUndefined();
-        events["template:changed"].execute(new Event<AppEvents['template:changed']>({old: '', new: ''}));
-        expect(templateCallback).toHaveBeenCalledTimes(1);
-    })
+
 })
