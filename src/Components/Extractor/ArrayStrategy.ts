@@ -6,7 +6,7 @@ import SI from "@config/inversify.types";
 export default class ArrayStrategy implements StrategyInterface {
     constructor(
         @inject(SI['getter:delimiter'])
-        private delimiterGetter: () => string | null
+        private delimiterGetter: () => ({enabled: boolean, value: string})
     ) {
     }
 
@@ -15,7 +15,7 @@ export default class ArrayStrategy implements StrategyInterface {
             return null;
         }
         const delimiter = this.delimiterGetter();
-        return delimiter === null ? v[0] : v.join(delimiter);
+        return !delimiter.enabled ? v[0] : v.join(delimiter.value);
     }
 
     support(type: string): boolean {

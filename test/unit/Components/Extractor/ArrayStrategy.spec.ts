@@ -1,7 +1,8 @@
 import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
 import {expect} from "@jest/globals";
 
-const delimiterGetter = jest.fn(() => null);
+const delimiter = {enabled: false, value: '_'};
+const delimiterGetter = jest.fn(() => delimiter);
 describe('Test support', () => {
     const notSupported = [1, '1', 1.2, 'foo', '', false, true, {}, {foo: 'bar'}];
     for (const v of notSupported){
@@ -29,7 +30,7 @@ describe('Test process', () => {
     })
 
     test('Should return all values split by _', () => {
-        delimiterGetter.mockReturnValueOnce('_');
+        delimiter.enabled = true;
         expect((new ArrayStrategy(delimiterGetter).process(['foo', 'bar']))).toEqual('foo_bar');
     })
 })
