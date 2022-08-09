@@ -35,7 +35,10 @@ describe('Extractor Test', () => {
     });
 
     describe(`Throws ${PathNotFoundException.name}`, () => {
-        const data = [{path: 'path', obj: {}}];
+        const data = [
+            {path: 'path', obj: {}},
+            {path: 'path.obj', obj: {path: undefined as any}},
+        ];
         for (const item of data) {
             test(`Path ${item.path} will be not found in ${JSON.stringify(item.obj)}`, () => {
                 const cb = () => extractor.extract(item.path, item.obj);
