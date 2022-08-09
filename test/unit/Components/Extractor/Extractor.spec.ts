@@ -18,7 +18,8 @@ describe('Extractor Test', () => {
            string: ['', '1', 'foo', 'false'],
            boolean: [false, true],
            array: [[], [1,2]],
-           object: [{}, {foo: []}, {foo: 'bar'}]
+           object: [{}, {foo: []}, {foo: 'bar'}],
+           null: [null as null],
        }
        const strategy = mock<StrategyInterface>();
        strategy.support.mockReturnValue(true);

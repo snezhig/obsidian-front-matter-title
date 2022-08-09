@@ -5,6 +5,7 @@ import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/Type
 import {injectable, multiInject} from "inversify";
 import SI from "@config/inversify.types";
 import {Arr} from "tern";
+import exp from "constants";
 
 @injectable()
 export default class Extractor implements ExtractorInterface {
@@ -29,9 +30,10 @@ export default class Extractor implements ExtractorInterface {
         while ((part = parts.shift())) {
             extracted = this.extractInternal(part, extracted);
         }
+        console.log('extracted', path, obj);
 
         let strategy: StrategyInterface = null;
-        let type = typeof extracted as string;
+        let type = extracted === null ? 'null' : typeof extracted as string;
         type = type === 'object' && Array.isArray(extracted) ? 'array' : type;
         for (const item of this.strategies) {
             if (item.support(type)) {
@@ -40,7 +42,7 @@ export default class Extractor implements ExtractorInterface {
             }
         }
         if (strategy === null) {
-            throw new TypeNotSupportedException();
+            throw new TypeNotSupportedException(`Type ${type} is not supported`);
         }
 
         return strategy.process(extracted);
