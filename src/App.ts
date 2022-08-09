@@ -48,6 +48,10 @@ export default class App {
             }
             queue['resolver.clear'] = {all: true};
         }
+        if(changed?.rules?.delimiter){
+            this.container.rebind(SI.delimiter).toConstantValue(actual.rules.delimiter);
+            queue['resolver.clear'] = {all: true};
+        }
 
         const dispatcher = this.container.get<DispatcherInterface<events>>(SI.dispatcher);
         for (const event of Object.keys(queue) as (keyof events)[]) {

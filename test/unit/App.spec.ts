@@ -95,7 +95,6 @@ describe('Test App', () => {
 
         test('Should change list mode and dispatch new event', () => {
             const old = createDefaultSettings();
-            old.rules.paths.mode = 'black';
             const actual = createDefaultSettings();
             actual.rules.paths.mode = 'white';
             dispatcher.dispatch('settings.changed', new Event({old, actual}));
@@ -109,13 +108,23 @@ describe('Test App', () => {
         test('Should change list values and dispatch new event', () => {
             spy.list.setMode.mockClear();
             const old = createDefaultSettings();
-            old.rules.paths.values = [];
             const actual = createDefaultSettings();
             actual.rules.paths.values = ['foo', 'bar'];
             dispatcher.dispatch('settings.changed', new Event({old, actual}));
             expect(spy.list.setList).toHaveBeenCalledTimes(1);
             expect(spy.list.setList).toHaveBeenCalledWith(['foo', 'bar']);
             expect(spy.list.setMode).not.toHaveBeenCalled();
+            expect(spy.dispatch).toHaveBeenCalledTimes(2);
+            expect(spy.dispatch).toHaveBeenCalledWith('resolver.clear', new Event({all: true}));
+        })
+
+        test('Should change delimiter', () => {
+            const old = createDefaultSettings();
+            const actual = createDefaultSettings();
+            const value = Math.random().toString() + '_';
+            actual.rules.delimiter = {value, enabled: true};
+            dispatcher.dispatch('settings.changed', new Event({old, actual}));
+            expect(Container.get(SI.delimiter)).toEqual({value, enabled: true});
             expect(spy.dispatch).toHaveBeenCalledTimes(2);
             expect(spy.dispatch).toHaveBeenCalledWith('resolver.clear', new Event({all: true}));
         })
