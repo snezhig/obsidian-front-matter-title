@@ -19,6 +19,7 @@ import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInte
 import LiteralStrategy from "@src/Components/Extractor/LiteralStrategy";
 import ResolverAsync from "@src/Resolver/ResolverAsync";
 import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
+import NullStrategy from "@src/Components/Extractor/NullStrategy";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -32,9 +33,10 @@ Container.bind<CacheInterface>(SI.cache).to(Cache);
 Container.bind<ExtractorInterface>(SI['component:extractor']).to(Extractor);
 Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(LiteralStrategy);
 Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(ArrayStrategy);
+Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(NullStrategy);
 
 Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory:obsidian:file'])
-    .toFactory<{[k: string]: any}, [string]>(context => (path: string) => {throw new Error('Factory for obsidian file is not defined')})
+    .toFactory<{[k: string]: any}, [string, string]>(context => (path: string, type: string): any => {throw new Error('Factory for obsidian file is not defined')})
 //START CREATOR
 bindCreator(Container);
 //END CREATOR
