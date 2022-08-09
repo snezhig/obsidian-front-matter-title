@@ -29,13 +29,17 @@ const createDefaultSettings = (): SettingsType => ({
         explorer: false
     },
     rules: {
-        paths: {mode: "black", values: []}
+        paths: {mode: "black", values: []},
+        delimiter: {enabled: false, value: ''}
     }
 });
 describe('Test App', () => {
     new App();
     test('Template should not exist', () => {
         expect(Container.isBound(SI.template)).toBeFalsy();
+    })
+    test('Delimiter should not exist', () => {
+        expect(Container.isBound(SI.delimiter)).toBeFalsy();
     })
     test('Should subscribe on events', () => {
         expect(spy.addListener).toHaveBeenCalledWith('settings.changed', expect.anything());
@@ -55,7 +59,7 @@ describe('Test App', () => {
             settings.rules.paths = {values: ['foo'], mode: "black"};
             dispatcher.dispatch('settings.loaded', new Event({settings}));
         })
-        test('Should set template', () => {
+        test('Should bind template', () => {
             expect(Container.get(SI.template)).toEqual('title');
         })
         test('Should set mode for list', () => {
@@ -65,6 +69,10 @@ describe('Test App', () => {
         test('Should set list for list', () => {
             expect(spy.list.setList).toHaveBeenCalledTimes(1);
             expect(spy.list.setList).toHaveBeenCalledWith(['foo']);
+        })
+        test('Should bind delimiter', () => {
+            expect(Container.isBound(SI.delimiter)).toBeTruthy();
+            expect(Container.get(SI.delimiter)).toEqual({enabled: false, value: ''});
         })
     })
 

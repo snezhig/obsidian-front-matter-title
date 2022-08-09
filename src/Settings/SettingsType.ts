@@ -2,7 +2,8 @@ export type SettingsManagersType = 'graph' | 'explorer' | 'header' | 'quick_swit
 export type SettingsType = {
     template: string,
     rules: {
-        paths: { mode: 'black' | 'white', values: string[] }
+        paths: { mode: 'black' | 'white', values: string[] },
+        delimiter: {enabled: boolean, value: string},
     },
     managers: { [k in SettingsManagersType]: boolean }
 };
