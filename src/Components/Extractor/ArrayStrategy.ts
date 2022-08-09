@@ -5,15 +5,17 @@ import SI from "@config/inversify.types";
 @injectable()
 export default class ArrayStrategy implements StrategyInterface {
     constructor(
-        @inject(SI['delimiter'])
-        private delimiter: string | null
+        @inject(SI['getter:delimiter'])
+        private delimiterGetter: () => string | null
     ) {
     }
 
     process(v: any[]): string | null {
-        return v.length === 0
-            ? null
-            : (this.delimiter === null ? v[0] : v.join(this.delimiter));
+        if (v.length === 0) {
+            return null;
+        }
+        const delimiter = this.delimiterGetter();
+        return delimiter === null ? v[0] : v.join(delimiter);
     }
 
     support(type: string): boolean {
