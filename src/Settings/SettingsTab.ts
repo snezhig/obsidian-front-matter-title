@@ -1,4 +1,4 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
+import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../../main";
 import Storage from "@src/Settings/Storage";
 import {SettingsEvent, SettingsManagersType, SettingsType} from "@src/Settings/SettingsType";
@@ -42,6 +42,12 @@ export default class SettingsTab extends PluginSettingTab {
 
     private buildRules(): void {
         this.containerEl.createEl('h4', {text: 'Rules'});
+        this.buildRulePaths();
+        this.buildRuleDelimiter();
+
+    }
+
+    private buildRulePaths(): void {
         const descriptions = {
             white: 'Files that are located by paths will be processed by plugin',
             black: 'Files that are located by paths will be ignored by plugin'
@@ -50,8 +56,6 @@ export default class SettingsTab extends PluginSettingTab {
         const getActual = () => this.storage.get('rules').get('paths').get('mode');
         const updateDesc = () => setting.setDesc(descriptions[getActual().value()]);
         updateDesc();
-        console.log(this.storage.get('rules').get('paths').get('values').value());
-        console.log(setting.controlEl);
         setting
             .addDropdown(e =>
                 e.addOptions({white: 'White list mode', black: 'Black list mode'})
@@ -68,8 +72,28 @@ export default class SettingsTab extends PluginSettingTab {
                     this.storage.get('rules').get('paths').get('values').set(v.split('\n').filter(e => e));
                 })
             )
+    }
 
+    private buildRuleDelimiter(): void {
+        const setting = new Setting(this.containerEl).setName('List values');
+        let text: TextComponent = null;
+        const isEnabled = () => this.storage.get('rules').get('delimiter').get('enabled').value();
+        const getPlaceholder = () => isEnabled() ? 'Type a delimiter' : 'First value will be used';
 
+        const onDropdownChange = (e: boolean) => {
+            this.changed = true;
+            this.storage.get('rules').get('delimiter').get('enabled').set(e);
+            text.setValue('').setPlaceholder(getPlaceholder()).setDisabled(!e).onChanged();
+        }
+        setting.addDropdown(e => e
+            .addOptions({N: 'Use first value', Y: 'Join all by delimiter'})
+            .setValue(this.storage.get('rules').get('delimiter').get('enabled').value() ? 'Y' : 'N')
+            .onChange(e => onDropdownChange(e === 'Y')).selectEl.style['marginRight'] = '10px')
+            .addText(e =>
+                text = e.onChange(e => {
+                    this.changed = true;
+                    this.storage.get('rules').get('delimiter').get('value').set(e);
+                }).setDisabled(!isEnabled()).setPlaceholder(getPlaceholder()));
     }
 
     private buildManagers(): void {

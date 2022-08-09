@@ -63,6 +63,10 @@ export default class MetaTitlePlugin extends Plugin {
                 paths: {
                     mode: 'black',
                     values: []
+                },
+                delimiter: {
+                    enabled: false,
+                    value: ''
                 }
             }
         }
@@ -83,11 +87,11 @@ export default class MetaTitlePlugin extends Plugin {
 
     private async onSettingsChange(settings: SettingsType): Promise<void>{
         await this.saveData(settings);
-        this.composer.setState(settings.managers.graph, ManagerType.Graph);
-        this.composer.setState(settings.managers.explorer, ManagerType.Explorer);
-        this.composer.setState(settings.managers.header, ManagerType.Markdown);
-        this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
-        await this.runManagersUpdate();
+        // this.composer.setState(settings.managers.graph, ManagerType.Graph);
+        // this.composer.setState(settings.managers.explorer, ManagerType.Explorer);
+        // this.composer.setState(settings.managers.header, ManagerType.Markdown);
+        // this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
+        // await this.runManagersUpdate();
     }
 
     public async onload() {
