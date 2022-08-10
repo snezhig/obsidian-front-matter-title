@@ -85,7 +85,7 @@ export default class ExplorerManager{
         }
     }
 
-    private isTitleEmpty = (title: string): boolean => title === null || title === '';
+    private isTitleEmpty = (title: string): boolean => title === null || title === '' || title === undefined;
 
     private keepOrigin(item: TFileExplorerItem): void {
         if (!this.originTitles.has(item.file.path)) {
