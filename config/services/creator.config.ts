@@ -38,6 +38,6 @@ export default (container: Container) => {
             return item;
         });
 
-    container.bind(SI['getter:delimiter']).toConstantValue(() => container.get(SI.delimiter));
+    container.bind(SI['getter:delimiter']).toFunction(() => container.get(SI.delimiter));
     container.bind<PlaceholderFactory>(SI['factory:placeholder']).to(PlaceholderFactory).inSingletonScope();
 }

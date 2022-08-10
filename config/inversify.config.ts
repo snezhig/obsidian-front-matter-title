@@ -34,7 +34,8 @@ Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(Literal
 Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(ArrayStrategy);
 
 Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory:obsidian:file'])
-    .toFactory<{[k: string]: any}, [string]>(context => (path: string) => {throw new Error('Factory for obsidian file is not defined')})
+    .toFactory<{[k: string]: any}, [string, string]>(context => (path: string, type: string):any => {throw new Error('Factory for obsidian file is not defined')})
+
 //START CREATOR
 bindCreator(Container);
 //END CREATOR
