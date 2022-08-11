@@ -65,22 +65,67 @@ describe('Test flow', () => {
         expect(items['/path/first.md'].titleInnerEl.innerText).toEqual('first');
         expect(items['/path/second.md'].titleInnerEl.innerText).toEqual('second');
     })
-    test('Should update only first item', async () => {
-        const path = items['/path/first.md'].file.path;
-        resolverMock.resolve.mockResolvedValueOnce('first_resolved' as any);
-        await manager.update(path);
-        expect(items['/path/first.md'].titleInnerEl.innerText).toEqual('first_resolved');
-        expect(items['/path/second.md'].titleInnerEl.innerText).toEqual('second');
-        expect(resolverMock.resolve).toHaveBeenCalledTimes(1);
-        expect(resolverMock.resolve).toHaveBeenCalledWith(path);
-    })
-    test('Should update only second item', async () => {
-        const path = items['/path/second.md'].file.path;
-        resolverMock.resolve.mockResolvedValueOnce('second_resolved' as any);
-        await manager.update(path);
-        expect(items['/path/second.md'].titleInnerEl.innerText).toEqual('second_resolved');
-        expect(items['/path/first.md'].titleInnerEl.innerText).toEqual('first_resolved');
-        expect(resolverMock.resolve).toHaveBeenCalledTimes(1);
-        expect(resolverMock.resolve).toHaveBeenCalledWith(path);
+    describe('Should update and restore only first item', () => {
+        const item = items['/path/first.md'];
+
+        for (const v of ['first_resolved', 'first_resolved_again']) {
+            test(`Should update only first item with "${v}" value`, async () => {
+                resolverMock.resolve.mockResolvedValueOnce(v as any);
+                await manager.update(item.file.path);
+                expect(item.titleInnerEl.innerText).toEqual(v);
+                expect(resolverMock.resolve).toHaveBeenCalledTimes(1);
+                expect(resolverMock.resolve).toHaveBeenCalledWith(item.file.path);
+                expect(items['/path/second.md'].titleInnerEl.innerText).toEqual('second');
+                resolverMock.resolve.mockClear();
+            })
+        }
+        test('Should restore first value', async () => {
+            resolverMock.resolve.mockResolvedValueOnce(null);
+            await manager.update(item.file.path);
+            expect(item.titleInnerEl.innerText).toEqual('first');
+            expect(resolverMock.resolve).toHaveBeenCalledTimes(1);
+            expect(resolverMock.resolve).toHaveBeenCalledWith(item.file.path);
+        })
+
+        test('Should update and restore because of resolver reject', async () => {
+            resolverMock.resolve.mockResolvedValueOnce('first_reject' as any);
+            await manager.update(item.file.path);
+            expect(item.titleInnerEl.innerText).toEqual('first_reject');
+            resolverMock.resolve.mockRejectedValueOnce(new Error() as any);
+            await manager.update(item.file.path);
+            expect(item.titleInnerEl.innerText).toEqual('first');
+        })
+    });
+
+    describe('Should update and restore all', () => {
+        beforeEach(() => resolverMock.resolve.mockClear());
+        test('Should update all', async () => {
+            resolverMock.resolve.mockImplementation(async (v) => `${v}_resolved`);
+            await manager.update();
+            for (const v of Object.values(items)) {
+                expect(v.titleInnerEl.innerText).toEqual(`${v.file.path}_resolved`);
+                expect(resolverMock.resolve).toHaveBeenCalledWith(v.file.path);
+            }
+            expect(resolverMock.resolve).toHaveBeenCalledTimes(2);
+        })
+        test('Should restore all', async () => {
+            resolverMock.resolve.mockResolvedValue(null);
+            await manager.update();
+            expect(items["/path/first.md"].titleInnerEl.innerText).toEqual('first');
+            expect(items["/path/second.md"].titleInnerEl.innerText).toEqual('second');
+            expect(resolverMock.resolve).toHaveBeenCalledTimes(2);
+            expect(resolverMock.resolve).toHaveBeenCalledWith("/path/first.md");
+            expect(resolverMock.resolve).toHaveBeenCalledWith("/path/second.md");
+        })
+
+        test('Should update and resolve by disabling', async () => {
+            resolverMock.resolve.mockImplementation(async () => Math.random().toString());
+            await manager.update();
+            expect(items["/path/first.md"].titleInnerEl.innerText).not.toEqual('first');
+            expect(items["/path/second.md"].titleInnerEl.innerText).not.toEqual('second');
+            await manager.disable();
+            expect(items["/path/first.md"].titleInnerEl.innerText).toEqual('first');
+            expect(items["/path/second.md"].titleInnerEl.innerText).toEqual('second');
+        })
     })
 })
