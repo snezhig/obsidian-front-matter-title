@@ -21,6 +21,7 @@ const SI = {
     'factory:obsidian:file': '',
     delimiter: '',
     'getter:delimiter': '',
+    'getter:obsidian:leaves': ''
 };
 
 for (const key of Object.keys(SI)) {
