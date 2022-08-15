@@ -1,9 +1,9 @@
 import App from "@src/App";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
-import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import ObjectHelper from "@src/Utils/ObjectHelper";
-import Event from "@src/EventDispatcher/Event";
+import Event from "@src/Components/EventDispatcher/Event";
 import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteListInterface";
 import BlackWhiteList from "@src/Components/BlackWhiteList/BlackWhiteList";
 import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";

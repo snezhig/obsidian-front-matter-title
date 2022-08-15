@@ -1,6 +1,4 @@
 import TemplatePlaceholderInterface from "../../../Interfaces/TemplatePlaceholderInterface";
-import DispatcherInterface from "../../../EventDispatcher/Interfaces/DispatcherInterface";
-import MetaPlaceholder from "./MetaPlaceholder";
 import {injectable} from "inversify";
 
 // const PREFIXES_LINK = {};

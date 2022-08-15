@@ -1,12 +1,12 @@
 import Container from "@config/inversify.config";
-import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import ObjectHelper from "@src/Utils/ObjectHelper";
-import CallbackVoid from "@src/EventDispatcher/CallbackVoid";
+import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import SI from "@config/inversify.types";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
 import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteListInterface";
-import Event from "@src/EventDispatcher/Event";
+import Event from "@src/Components/EventDispatcher/Event";
 import {AppEvents} from "@src/Types";
 import LoggerComposer from "@src/Components/Logger/LoggerComposer";
 

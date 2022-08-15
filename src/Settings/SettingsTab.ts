@@ -2,8 +2,8 @@ import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../../main";
 import Storage from "@src/Settings/Storage";
 import {SettingsEvent, SettingsManagersType, SettingsType} from "@src/Settings/SettingsType";
-import Dispatcher from "@src/EventDispatcher/Dispatcher";
-import Event from "@src/EventDispatcher/Event";
+import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
+import Event from "@src/Components/EventDispatcher/Event";
 
 export default class SettingsTab extends PluginSettingTab {
     changed = false;

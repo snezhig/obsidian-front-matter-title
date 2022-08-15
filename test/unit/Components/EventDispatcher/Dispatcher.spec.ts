@@ -1,7 +1,7 @@
 import {mock} from 'jest-mock-extended';
-import Dispatcher from "../../../src/EventDispatcher/Dispatcher";
-import EventInterface from "../../../src/EventDispatcher/Interfaces/EventInterface";
-import CallbackInterface from "../../../src/EventDispatcher/Interfaces/CallbackInterface";
+import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
+import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
+import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 
 type Events = {
     test: { value: string },

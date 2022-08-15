@@ -1,5 +1,5 @@
-import CallbackInterface from "@src/EventDispatcher/Interfaces/CallbackInterface";
-import EventInterface from "@src/EventDispatcher/Interfaces/EventInterface";
+import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
+import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 
 export default class Callback<T> implements CallbackInterface<T> {
     constructor(

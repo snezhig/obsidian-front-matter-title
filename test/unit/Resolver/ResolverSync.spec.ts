@@ -6,9 +6,9 @@ import ResolverSync from "../../../src/Resolver/ResolverSync";
 import CacheItemInterface from "../../../src/Components/Cache/CacheItemInterface";
 import {expect} from "@jest/globals";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
-import Event from "@src/EventDispatcher/Event";
-import CallbackInterface from "@src/EventDispatcher/Interfaces/CallbackInterface";
-import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import Event from "@src/Components/EventDispatcher/Event";
+import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import LoggerInterface from "../../../src/Components/Logger/LoggerInterface";
 
 describe('Resolver Sync Test', () => {

@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 import {Container as _Container, interfaces} from 'inversify';
-import DispatcherInterface from "../src/EventDispatcher/Interfaces/DispatcherInterface";
-import Dispatcher from "../src/EventDispatcher/Dispatcher";
 import SI from "./inversify.types";
 import bindCreator from './services/creator.config';
 import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
@@ -22,6 +20,8 @@ import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
 import NullStrategy from "@src/Components/Extractor/NullStrategy";
 import LoggerInterface from "@src/Components/Logger/LoggerInterface";
 import LoggerComposer from "@src/Components/Logger/LoggerComposer";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
+import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -38,7 +38,7 @@ Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(ArraySt
 Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(NullStrategy);
 
 Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory:obsidian:file'])
-    .toFactory<{[k: string]: any}, [string, string]>(context => (path: string, type: string): any => {throw new Error('Factory for obsidian file is not defined')})
+    .toFactory<{[k: string]: any}, [string, string]>(() => (path: string, type: string): any => {throw new Error('Factory for obsidian file is not defined')})
 
 Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
 Container.bind<LoggerInterface>(SI.logger)

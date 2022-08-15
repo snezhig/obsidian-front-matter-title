@@ -4,16 +4,16 @@ import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
-import Dispatcher from "@src/EventDispatcher/Dispatcher";
+import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 import SI from "@config/inversify.types";
 import {interfaces} from "inversify";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
-import CallbackVoid from "@src/EventDispatcher/CallbackVoid";
+import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import App from "@src/App";
-import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {AppEvents} from "@src/Types";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
-import Event from "@src/EventDispatcher/Event";
+import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 
 
@@ -48,7 +48,7 @@ export default class MetaTitlePlugin extends Plugin {
 
     public async onload() {
         Container.rebind<interfaces.Factory<{ [k: string]: any }>>(SI['factory:obsidian:file'])
-            .toFactory<{ [k: string]: any }, [string, string]>(context => (path: string, type: string): any => {
+            .toFactory<{ [k: string]: any }, [string, string]>(() => (path: string, type: string): any => {
                 switch (type) {
                     case 'meta':
                         return this.app.metadataCache.getCache(path).frontmatter;

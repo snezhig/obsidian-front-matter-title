@@ -2,9 +2,9 @@ import CreatorInterface from "../Interfaces/CreatorInterface";
 import TemplateInterface from "../Interfaces/TemplateInterface";
 import {inject, injectable, named} from "inversify";
 import SI from '@config/inversify.types';
-import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {AppEvents} from "@src/Types";
-import CallbackVoid from "@src/EventDispatcher/CallbackVoid";
+import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 
 @injectable()
 export default class Creator implements CreatorInterface {

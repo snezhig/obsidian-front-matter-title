@@ -4,10 +4,10 @@ import ResolverInterface, {Resolving, Return} from "../Interfaces/ResolverInterf
 import CreatorInterface from "../Interfaces/CreatorInterface";
 import {inject, injectable, multiInject, named} from "inversify";
 import SI from "../../config/inversify.types";
-import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
-import EventInterface from "@src/EventDispatcher/Interfaces/EventInterface";
-import Event from "@src/EventDispatcher/Event";
+import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
+import Event from "@src/Components/EventDispatcher/Event";
 import LoggerInterface from "@src/Components/Logger/LoggerInterface";
 
 @injectable()

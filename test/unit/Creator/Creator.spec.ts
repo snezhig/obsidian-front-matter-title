@@ -2,10 +2,10 @@ import {mock} from "jest-mock-extended";
 import TemplateInterface from "../../../src/Interfaces/TemplateInterface";
 import TemplatePlaceholderInterface from "../../../src/Interfaces/TemplatePlaceholderInterface";
 import Creator from "../../../src/Creator/Creator";
-import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInterface";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {AppEvents} from "@src/Types";
-import CallbackInterface from "@src/EventDispatcher/Interfaces/CallbackInterface";
-import Event from "@src/EventDispatcher/Event";
+import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
+import Event from "@src/Components/EventDispatcher/Event";
 
 describe('Test Creator', () => {
     const path = '/path/to/file.md';
