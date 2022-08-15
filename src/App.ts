@@ -8,6 +8,7 @@ import {ResolverEvents} from "@src/Resolver/ResolverType";
 import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteListInterface";
 import Event from "@src/EventDispatcher/Event";
 import {AppEvents} from "@src/Types";
+import LoggerComposer from "@src/Components/Logger/LoggerComposer";
 
 export default class App {
     private container = Container;
@@ -23,10 +24,12 @@ export default class App {
     }
 
     private init(settings: SettingsType): void {
+        console.log(settings);
         this.container.bind(SI.template).toConstantValue(settings.template);
         this.container.bind(SI.delimiter).toConstantValue(settings.rules.delimiter);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setMode(settings.rules.paths.mode);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setList(settings.rules.paths.values);
+        this.container.get<LoggerComposer>(SI["logger:composer"]).setInitialState(settings.debug)[settings.debug ? 'enable' : 'disable']();
     }
 
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {
@@ -51,6 +54,12 @@ export default class App {
         if(changed?.rules?.delimiter){
             this.container.rebind(SI.delimiter).toConstantValue(actual.rules.delimiter);
             queue['resolver.clear'] = {all: true};
+        }
+
+        if(changed.debug){
+            this.container.get<LoggerComposer>(SI["logger:composer"])
+                .setInitialState(actual.debug)
+                [actual.debug ? 'enable' : 'disable']();
         }
 
         const dispatcher = this.container.get<DispatcherInterface<events>>(SI.dispatcher);
