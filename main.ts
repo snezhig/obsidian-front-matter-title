@@ -28,6 +28,7 @@ export default class MetaTitlePlugin extends Plugin {
         const data: SettingsType = {...PluginHelper.createDefaultSettings(), ...{template: 'title'}} ;
         const current = await this.loadData();
         for (const k of Object.keys(data) as (keyof SettingsType)[]) {
+            //@ts-ignore
             data[k] = current[k] ?? data[k];
         }
 
