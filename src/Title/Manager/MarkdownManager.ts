@@ -1,7 +1,7 @@
 import Manager from "./Manager";
 import {MarkdownViewExt, TAbstractFile, Workspace} from "obsidian";
 import {Leaves} from "../../enum";
-import Resolver from "../Resolver/Resolver";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 
 export default class MarkdownManager implements Manager {
     private original = new Map<string, string>();
@@ -13,7 +13,7 @@ export default class MarkdownManager implements Manager {
 
     constructor(
         private workspace: Workspace,
-        private resolver: Resolver
+        private resolver: ResolverInterface<Resolving.Async>
     ) {
     }
 
@@ -53,9 +53,9 @@ export default class MarkdownManager implements Manager {
         for (const leaf of leaves) {
             const view: MarkdownViewExt = (leaf.view as MarkdownViewExt);
             if (view.file.path === abstract?.path) {
-                this.setTitle(view, await this.resolver.resolve(view.file));
+                this.setTitle(view, await this.resolver.resolve(view.file.path));
             } else if (!abstract) {
-                promises.push(this.resolver.resolve(view.file).then(r => [view, r]));
+                promises.push(this.resolver.resolve(view.file.path).then(r => [view, r]));
             }
         }
 

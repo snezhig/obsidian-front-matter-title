@@ -1,11 +1,10 @@
 import {TAbstractFile, Workspace} from "obsidian";
-import Resolver from "../Resolver/Resolver";
 import Manager from "./Manager";
 import MarkdownManager from "./MarkdownManager";
 import GraphManager from "./GraphManager";
 import ExplorerManager from "./ExplorerManager";
 import QuickSwitcher from "./QuickSwitcher";
-import ResolverAdapter from "../Resolver/ResolverAdapter";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 
 export enum ManagerType {
     Graph = 'g',
@@ -19,13 +18,14 @@ export default class Composer {
 
     constructor(
         ws: Workspace,
-        rs: Resolver,
+        rss: ResolverInterface,
+        rsa: ResolverInterface<Resolving.Async>,
     ) {
         this.managers
-            .set(ManagerType.Markdown, new MarkdownManager(ws, rs))
-            .set(ManagerType.Graph, new GraphManager(ws, rs))
-            .set(ManagerType.Explorer, new ExplorerManager(ws, rs))
-            .set(ManagerType.QuickSwitcher, new QuickSwitcher(new ResolverAdapter(rs)))
+            .set(ManagerType.Markdown, new MarkdownManager(ws, rsa))
+            .set(ManagerType.Graph, new GraphManager(ws, rsa))
+            .set(ManagerType.Explorer, new ExplorerManager(ws, rsa))
+            .set(ManagerType.QuickSwitcher, new QuickSwitcher(rss))
     }
 
     public update(file?: TAbstractFile, type?: ManagerType): Promise<{ manager: ManagerType, result: boolean }[]> {

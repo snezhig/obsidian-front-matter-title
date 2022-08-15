@@ -1,9 +1,9 @@
-import Resolver from "src/Title/Resolver/Resolver";
 import FunctionReplacer from "../../Utils/FunctionReplacer";
 import {GraphLeaf, GraphNode, TAbstractFile, Workspace} from "obsidian";
 import Queue from "../../Utils/Queue";
 import Manager from "./Manager";
 import {Leaves} from "../../enum";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 
 type State = 'disabled' | 'enabled';
 export default class GraphManager implements Manager {
@@ -15,21 +15,21 @@ export default class GraphManager implements Manager {
 
     constructor(
         private workspace: Workspace,
-        private resolver: Resolver,
+        private resolver: ResolverInterface<Resolving.Async>,
     ) {
         this.queue = new Queue<string, void>(this.runQueue.bind(this), 50)
     }
 
     private static getReplaceFunction() {
         return function (self: GraphManager, defaultArgs: unknown[], vanilla: () => string) {
-            if (self.resolver.isSupported(this.id)) {
+            // if (self.resolver.isSupported(this.id)) {
                 const title = self.resolved.get(this.id);
                 if (title) {
                     return title;
                 } else if (!self.resolved.has(this.id)) {
                     self.queue.add(this.id).catch(console.error);
                 }
-            }
+            // }
             return vanilla.call(this, ...defaultArgs);
         };
     }
@@ -44,7 +44,6 @@ export default class GraphManager implements Manager {
     async enable(): Promise<void> {
         this.state = "enabled";
         await this.initReplacement();
-
         if (!this.bound) {
             this.workspace.on('layout-change', this.initReplacement.bind(this));
             this.bound = true;
