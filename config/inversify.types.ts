@@ -1,3 +1,5 @@
+import File from "@src/Obsidian/File";
+
 const SI = {
     dispatcher: '',
     storage: '',
@@ -20,6 +22,7 @@ const SI = {
     'factory:template:resolver': '',
     'factory:placeholder': '',
     'factory:placeholder:resolver': '',
+    'factory:obsidian:file_modifiable': '',
     'factory:obsidian:file': '',
     delimiter: '',
     'getter:delimiter': '',
@@ -32,3 +35,8 @@ for (const key of Object.keys(SI)) {
 }
 
 export default SI;
+
+export type FactoriesType = {
+    'factory:obsidian:file': (path: string, type: string) => ({[k: string]: any}),
+    'factory:obsidian:file_modifiable': (path: string) => File|null
+}
