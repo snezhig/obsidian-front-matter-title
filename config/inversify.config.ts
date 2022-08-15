@@ -20,6 +20,8 @@ import LiteralStrategy from "@src/Components/Extractor/LiteralStrategy";
 import ResolverAsync from "@src/Resolver/ResolverAsync";
 import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
 import NullStrategy from "@src/Components/Extractor/NullStrategy";
+import LoggerInterface from "@src/Components/Logger/LoggerInterface";
+import LoggerComposer from "@src/Components/Logger/LoggerComposer";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -37,6 +39,13 @@ Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(NullStr
 
 Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory:obsidian:file'])
     .toFactory<{[k: string]: any}, [string, string]>(context => (path: string, type: string): any => {throw new Error('Factory for obsidian file is not defined')})
+
+Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
+Container.bind<LoggerInterface>(SI.logger)
+    .toDynamicValue(context => {
+        return context.container.get<LoggerComposer>(SI['logger:composer']).create(context.currentRequest.target.getNamedTag().value)
+    })
+    .when(() => true);
 //START CREATOR
 bindCreator(Container);
 //END CREATOR

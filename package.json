@@ -16,6 +16,7 @@
 	"author": "",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/debug": "^4.1.7",
 		"@types/jest": "^27.4.1",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "^5.2.0",
@@ -36,6 +37,7 @@
 		"yaml": "^2.0.1"
 	},
 	"dependencies": {
+		"debug": "^4.3.4",
 		"inversify": "^6.0.1",
 		"reflect-metadata": "^0.1.13"
 	}

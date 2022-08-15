@@ -7,6 +7,8 @@ const SI = {
     template: '',
     creator: '',
     resolver: '',
+    logger: '',
+    'logger:composer': '',
     'component:extractor:strategy': '',
     'component:extractor': '',
     'component:black_white_list': '',
