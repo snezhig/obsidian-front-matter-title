@@ -1,5 +1,4 @@
 import {Plugin, TAbstractFile} from 'obsidian';
-import Resolver from "./src/Title/Resolver/Resolver";
 import Composer, {ManagerType} from "./src/Title/Manager/Composer";
 import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
@@ -15,40 +14,18 @@ import DispatcherInterface from "@src/EventDispatcher/Interfaces/DispatcherInter
 import {AppEvents} from "@src/Types";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
 import Event from "@src/EventDispatcher/Event";
+import PluginHelper from "@src/Utils/PluginHelper";
 
 
 export default class MetaTitlePlugin extends Plugin {
-    private resolver: Resolver;
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents>;
     private composer: Composer = null;
     private container: interfaces.Container = Container;
     private storage: Storage<SettingsType>;
 
-    private get defaultSettings(): SettingsType {
-        return {
-            template: 'title',
-            managers: {
-                explorer: false,
-                graph: false,
-                header: false,
-                quick_switcher: false
-            },
-            rules: {
-                paths: {
-                    mode: 'black',
-                    values: []
-                },
-                delimiter: {
-                    enabled: false,
-                    value: ''
-                }
-            },
-            debug: false
-        }
-    }
 
     private async loadSettings(): Promise<void> {
-        const data: SettingsType = this.defaultSettings;
+        const data: SettingsType = {...PluginHelper.createDefaultSettings(), ...{template: 'title'}} ;
         const current = await this.loadData();
         for (const k of Object.keys(data) as (keyof SettingsType)[]) {
             data[k] = current[k] ?? data[k];

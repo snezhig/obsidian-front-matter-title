@@ -7,6 +7,7 @@ import Event from "@src/EventDispatcher/Event";
 import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteListInterface";
 import BlackWhiteList from "@src/Components/BlackWhiteList/BlackWhiteList";
 import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
+import PluginHelper from "../../src/Utils/PluginHelper";
 
 
 const spy = {
@@ -20,19 +21,7 @@ const spy = {
 }
 
 const dispatcher = Container.get<DispatcherInterface<SettingsEvent>>(SI.dispatcher);
-const createDefaultSettings = (): SettingsType => ({
-    template: '',
-    managers: {
-        quick_switcher: false,
-        header: false,
-        graph: false,
-        explorer: false
-    },
-    rules: {
-        paths: {mode: "black", values: []},
-        delimiter: {enabled: false, value: ''}
-    }
-});
+const createDefaultSettings = (): SettingsType => PluginHelper.createDefaultSettings();
 describe('Test App', () => {
     new App();
     test('Template should not exist', () => {

@@ -58,8 +58,7 @@ export default class App {
 
         if(changed.debug){
             this.container.get<LoggerComposer>(SI["logger:composer"])
-                .setInitialState(actual.debug)
-                [actual.debug ? 'enable' : 'disable']();
+                .setInitialState(actual.debug)[actual.debug ? 'enable' : 'disable']();
         }
 
         const dispatcher = this.container.get<DispatcherInterface<events>>(SI.dispatcher);
