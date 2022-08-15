@@ -5,7 +5,8 @@ export type SettingsType = {
         paths: { mode: 'black' | 'white', values: string[] },
         delimiter: {enabled: boolean, value: string},
     },
-    managers: { [k in SettingsManagersType]: boolean }
+    managers: { [k in SettingsManagersType]: boolean },
+    debug: boolean
 };
 
 export type SettingsEvent = {

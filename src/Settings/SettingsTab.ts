@@ -38,6 +38,18 @@ export default class SettingsTab extends PluginSettingTab {
                 }));
         this.buildRules();
         this.buildManagers();
+        containerEl.createEl('h4', {text: 'Debug'});
+        new Setting(containerEl)
+            .setName('Debug info')
+            .setDesc('Show debug info and caught errors in console')
+            .addToggle(e =>
+                e.setValue(this.storage.get('debug').value())
+                    .onChange(e => {
+                        this.changed = true;
+                        this.storage.get('debug').set(e)
+                    })
+            );
+
     }
 
     private buildRules(): void {
