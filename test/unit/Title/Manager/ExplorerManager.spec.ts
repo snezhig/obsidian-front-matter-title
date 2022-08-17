@@ -3,7 +3,7 @@ import {TFile, TFileExplorerView, TFileExplorerItem, MetadataCache, Workspace, W
 import {expect} from "@jest/globals";
 import Resolver from "../../../../src/Title/Resolver/Resolver";
 import FrontMatterParser from "../../../../src/Title/FrontMatterParser";
-import VaultFacade from "../../../../src/Obsidian/VaultFacade";
+import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 
 Array.prototype.first = function () {
     return this[0];
@@ -25,7 +25,7 @@ const createItem = (text: string): TFileExplorerItem => {
 const resolver = new Resolver(
     new MetadataCache(),
     new FrontMatterParser(),
-    new VaultFacade(new Vault()),
+    new ObsidianFacade(new Vault()),
     {metaPath: 'title', excluded: []}
 );
 const resolve = jest.fn().mockImplementation(async () => titles.resolved);

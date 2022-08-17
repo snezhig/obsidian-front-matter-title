@@ -4,17 +4,14 @@ import SI, {FactoriesType} from "@config/inversify.types";
 import {inject, named} from "inversify";
 import {getLeavesOfType} from "@src/Obsidian/Types";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 
 export default class LinkNoteManager implements Manager {
     private enabled = false;
 
     constructor(
-        @inject(SI['factory:obsidian:file_modifiable'])
-        private fileModifiableFactory: FactoriesType['factory:obsidian:file_modifiable'],
-        @inject(SI['factory:obsidian:file'])
-        private fileFactory: FactoriesType['factory:obsidian:file'],
-        @inject(SI['getter:obsidian:leaves'])
-        private leavesGetter: getLeavesOfType,
+        @inject(SI['facade:obsidian'])
+        private facade: ObsidianFacade,
         @inject(SI['resolver']) @named(Resolving.Sync)
         private resolver: ResolverInterface
     ) {
@@ -33,20 +30,43 @@ export default class LinkNoteManager implements Manager {
     }
 
     async update(abstract?: TAbstractFile | null): Promise<boolean> {
-        const leaves = this.leavesGetter('markdown');
-        if(!leaves.length){
+        if (!this.isEnabled()) {
+            return false;
+        }
+        const views = this.facade.getViewsOfType<MarkdownView>('markdown');
+        if (!views.length) {
             return false;
         }
         const promises = [];
-        for(const leaf of leaves){
-            if((leaf.view as MarkdownView)?.file){
-                promises.push(this.process((leaf.view as MarkdownView).file))
+        for (const view of views) {
+            if (view.file) {
+                promises.push(this.process(view.file))
             }
         }
 
         return false;
     }
-    private async process(file: TFile){
+
+    private async process(file: TFile) {
+        const links = this.facade.getFileLinksCache(file.path);
+        const found: { [k: string]: { placeholder: string, file: TFile } } = {};
+        for (const link of links) {
+            if (!/^\[\[\w+\|*\w+]]$/.test(link.link) || found[link.link]) {
+                continue;
+            }
+            const file = this.facade.getFirstLinkpathDest(link.link);
+            if (file) {
+                found[link.link] = {placeholder: link.original, file}
+            }
+        }
+        const replace: [string, string][] = [];
+        for (const item of Object.values(found)) {
+            const title = this.resolver.resolve(item.file.path);
+            if (title) {
+                replace.push([title, item.placeholder]);
+            }
+        }
     }
+
 
 }
