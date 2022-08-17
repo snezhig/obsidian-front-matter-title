@@ -30,7 +30,6 @@ export default class Extractor implements ExtractorInterface {
         while ((part = parts.shift())) {
             extracted = this.extractInternal(part, extracted);
         }
-        console.log('extracted', path, obj);
 
         let strategy: StrategyInterface = null;
         let type = extracted === null ? 'null' : typeof extracted as string;

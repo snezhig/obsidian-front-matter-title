@@ -24,7 +24,6 @@ export default class App {
     }
 
     private init(settings: SettingsType): void {
-        console.log(settings);
         this.container.bind(SI.template).toConstantValue(settings.template);
         this.container.bind(SI.delimiter).toConstantValue(settings.rules.delimiter);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setMode(settings.rules.paths.mode);
