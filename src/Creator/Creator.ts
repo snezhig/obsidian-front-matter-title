@@ -36,14 +36,18 @@ export default class Creator implements CreatorInterface {
     }
 
     create(path: string): string | null {
-        for(const t of this.templates) {
-            let template = t.getTemplate();
+        for (const t of this.templates) {
+            try {
+                let template = t.getTemplate();
 
-            for (const placeholder of t.getPlaceholders()) {
-                template = template.replace(placeholder.getPlaceholder(), placeholder.makeValue(path) ?? '');
-            }
-            if(template?.length){
-                return  template;
+                for (const placeholder of t.getPlaceholders()) {
+                    template = template.replace(placeholder.getPlaceholder(), placeholder.makeValue(path) ?? '');
+                }
+                if (template?.length) {
+                    return template;
+                }
+            } catch (e) {
+                //TODO: logs or exception handler
             }
         }
         return null;
