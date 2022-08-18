@@ -7,12 +7,11 @@ import SI from "@config/inversify.types";
 @injectable()
 export default class Composite implements TemplateInterface {
     private placeholders: TemplatePlaceholderInterface[] = [];
+    private template: string;
 
     constructor(
         @inject(SI['template:pattern'])
         private pattern: string,
-        @inject(SI.template)
-        private template: string,
         @inject<Factory>(SI['factory:placeholder'])
         private factory: Factory
     ) {
@@ -33,5 +32,9 @@ export default class Composite implements TemplateInterface {
 
     getTemplate(): string {
         return this.template;
+    }
+
+    setTemplate(template: string) {
+        this.template = template;
     }
 }

@@ -8,32 +8,45 @@ import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 
 @injectable()
 export default class Creator implements CreatorInterface {
-    private template: TemplateInterface;
+    private templates: TemplateInterface[];
 
     constructor(
         @inject(SI.dispatcher)
         private dispatcher: DispatcherInterface<AppEvents>,
-        @inject(SI['creator:template']) @named('callback')
-        private resolver: () => TemplateInterface
+        @inject(SI['creator:template']) @named('all')
+        private resolver: () => TemplateInterface[]
     ) {
-        this.template = resolver();
+        this.templates = resolver();
         this.bind();
     }
-    private bind(): void{
+
+    private bind(): void {
         this.dispatcher.addListener(
             'template:changed',
-            new CallbackVoid((): void => {this.template = this. resolver()})
+            new CallbackVoid((): void => {
+                this.templates = this.resolver()
+            })
+        )
+        this.dispatcher.addListener(
+            'template_fallback:changed',
+            new CallbackVoid((): void => {
+                this.templates = this.resolver()
+            })
         )
     }
 
     create(path: string): string | null {
-        let template = this.template.getTemplate();
+        for(const t of this.templates) {
+            let template = t.getTemplate();
 
-        for (const placeholder of this.template.getPlaceholders()) {
-            template = template.replace(placeholder.getPlaceholder(), placeholder.makeValue(path) ?? '');
+            for (const placeholder of t.getPlaceholders()) {
+                template = template.replace(placeholder.getPlaceholder(), placeholder.makeValue(path) ?? '');
+            }
+            if(template?.length){
+                return  template;
+            }
         }
-
-        return template?.length ? template : null;
+        return null;
     }
 
 

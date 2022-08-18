@@ -5,8 +5,6 @@ import SI from "../../../config/inversify.types";
 @injectable()
 export default class Factory {
     constructor(
-        @inject(SI.template)
-        private template: string,
         @inject(SI['template:pattern'])
         private pattern: string,
         @inject(SI['factory:template:resolver'])
@@ -14,9 +12,11 @@ export default class Factory {
     ) {
     }
 
-    public create(): TemplateInterface {
-        const type = (new RegExp(this.pattern)).test(this.template) ? 'composite' : 'simple';
-        return this.factory(type);
+    public create(template: string): TemplateInterface {
+        const type = (new RegExp(this.pattern)).test(template) ? 'composite' : 'simple';
+        const obj = this.factory(type);
+        obj.setTemplate(template);
+        return obj;
     }
 
 }

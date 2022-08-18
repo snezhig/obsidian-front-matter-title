@@ -13,8 +13,8 @@ describe('Factory Test', () => {
 
     for (const item of data) {
         test(`Test [${item.template}] with [${item.pattern}], expecting [${item.type}]`, () => {
-            const factory = new Factory(item.template, item.pattern, resolver);
-            factory.create();
+            const factory = new Factory(item.pattern, resolver);
+            factory.create(item.template);
             expect(resolver).toHaveBeenLastCalledWith(item.type);
         })
     }

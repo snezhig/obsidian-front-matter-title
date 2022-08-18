@@ -15,8 +15,8 @@ describe('Test Creator', () => {
     const placeholder = mock<TemplatePlaceholderInterface>();
     const dispatcher = mock<DispatcherInterface<AppEvents>>();
     const events: { [K in keyof AppEvents]?: CallbackInterface<AppEvents[K]> } = {};
-    const templateCallback = jest.fn(() => template);
-    dispatcher.addListener.mockImplementationOnce((name, cb) => events['template:changed'] = cb);
+    const templateCallback = jest.fn(() => [template]);
+    dispatcher.addListener.mockImplementation((name, cb) => events[name] = cb);
     template.getPlaceholders.mockReturnValue([placeholder]);
     template.getTemplate.mockReturnValue(templateStr);
 
@@ -49,14 +49,21 @@ describe('Test Creator', () => {
             new Creator(dispatcher, templateCallback);
         })
         test('Should add listener', () => {
-            expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
+            expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
             expect(dispatcher.addListener).toHaveBeenCalledWith('template:changed', expect.anything());
+            expect(dispatcher.addListener).toHaveBeenCalledWith('template_fallback:changed', expect.anything());
         })
 
-        test('Should update template after event', () => {
+        test('Should update template after template:changed event', () => {
             templateCallback.mockClear();
             expect(events['template:changed']).not.toBeUndefined();
             events["template:changed"].execute(new Event<AppEvents['template:changed']>({old: '', new: ''}));
+            expect(templateCallback).toHaveBeenCalledTimes(1);
+        })
+        test('Should update template after template_fallback:changed event', () => {
+            templateCallback.mockClear();
+            expect(events['template_fallback:changed']).not.toBeUndefined();
+            events["template_fallback:changed"].execute(new Event<AppEvents['template_fallback:changed']>({old: '', new: ''}));
             expect(templateCallback).toHaveBeenCalledTimes(1);
         })
     })

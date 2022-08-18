@@ -6,8 +6,9 @@ describe('Simple Test', () => {
     const data = ['foo', 'bar', 'foobar'];
     for (const item of data) {
         const factory = mock<Factory>();
-        const simple = new Simple(item, factory);
+        const simple = new Simple(factory);
         test(`Test placeholder  [${item}]`, () => {
+            simple.setTemplate(item);
             expect(simple.getTemplate()).toEqual(item);
             expect(simple.getPlaceholders()).toHaveLength(1);
             expect(factory.create).toHaveBeenCalledTimes(1);
