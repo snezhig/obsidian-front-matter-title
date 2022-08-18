@@ -4,6 +4,7 @@ export default class PluginHelper{
     public static createDefaultSettings(): SettingsType{
         return {
             template: '',
+            template_fallback: '',
             managers: {
                 explorer: false,
                 graph: false,

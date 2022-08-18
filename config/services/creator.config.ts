@@ -14,8 +14,14 @@ import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlac
 
 export default (container: Container) => {
     container.bind<TemplateInterface>(SI["creator:template"])
-        .toFactory<TemplateInterface>(context => () => context.container.get<TemplateFactory>(SI["factory:template"]).create())
-        .whenTargetNamed('callback')
+        .toFactory<TemplateInterface[]>(context => () => {
+            const container = context.container;
+            return [
+                container.get<TemplateFactory>(SI["factory:template"]).create(container.get(SI.template)),
+                container.get<TemplateFactory>(SI["factory:template"]).create(container.get(SI["template:fallback"]))
+            ];
+        })
+        .whenTargetNamed('all')
     container.bind<TemplateFactory>(SI['factory:template']).to(TemplateFactory);
     container
         .bind<interfaces.Factory<TemplateInterface>>(SI['factory:template:resolver'])

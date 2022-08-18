@@ -27,15 +27,27 @@ export default class SettingsTab extends PluginSettingTab {
         containerEl.createEl('h2', {text: 'Settings for plugin.'});
 
         new Setting(containerEl)
-            .setName('Front matter title path')
+            .setName('Template')
             .setDesc('Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}". See Readme to find out')
             .addText(text => text
-                .setPlaceholder('Type path')
+                .setPlaceholder('Type a template')
                 .setValue(this.storage.get('template').value())
                 .onChange(async (value) => {
                     this.storage.get('template').set(value);
                     this.changed = true;
                 }));
+
+        new Setting(containerEl)
+            .setName('Template fallback')
+            .setDesc('This template will be used as a fallback option if the main template is not resolved')
+            .addText(text => text
+                .setPlaceholder('Type a template')
+                .setValue(this.storage.get('template_fallback').value())
+                .onChange(v => {
+                    this.storage.get('template_fallback').set(v);
+                    this.changed = true;
+                })
+            );
         this.buildRules();
         this.buildManagers();
         containerEl.createEl('h4', {text: 'Debug'});

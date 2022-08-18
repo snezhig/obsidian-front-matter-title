@@ -25,6 +25,7 @@ export default class App {
 
     private init(settings: SettingsType): void {
         this.container.bind(SI.template).toConstantValue(settings.template);
+        this.container.bind(SI["template:fallback"]).toConstantValue(settings.template_fallback);
         this.container.bind(SI.delimiter).toConstantValue(settings.rules.delimiter);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setMode(settings.rules.paths.mode);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setList(settings.rules.paths.values);
@@ -40,6 +41,11 @@ export default class App {
             queue['template:changed'] = {new: actual.template, old: old.template};
             queue['resolver.clear'] = {all: true};
         }
+        if (changed.template_fallback) {
+            this.container.rebind(SI["template:fallback"]).toConstantValue(actual.template_fallback);
+            queue['template_fallback:changed'] = {new: actual.template_fallback, old: old.template_fallback};
+            queue['resolver.clear'] = {all: true};
+        }
         if (changed?.rules?.paths) {
             const list = this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']);
             if (changed.rules.paths?.mode) {
@@ -50,12 +56,12 @@ export default class App {
             }
             queue['resolver.clear'] = {all: true};
         }
-        if(changed?.rules?.delimiter){
+        if (changed?.rules?.delimiter) {
             this.container.rebind(SI.delimiter).toConstantValue(actual.rules.delimiter);
             queue['resolver.clear'] = {all: true};
         }
 
-        if(changed.debug){
+        if (changed.debug) {
             this.container.get<LoggerComposer>(SI["logger:composer"])
                 .setInitialState(actual.debug)[actual.debug ? 'enable' : 'disable']();
         }
