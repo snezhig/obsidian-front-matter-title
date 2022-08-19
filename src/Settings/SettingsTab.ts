@@ -31,9 +31,9 @@ export default class SettingsTab extends PluginSettingTab {
             .setDesc('Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}". See Readme to find out')
             .addText(text => text
                 .setPlaceholder('Type a template')
-                .setValue(this.storage.get('template').value())
+                .setValue(this.storage.get('templates').value()?.[0] ?? '')
                 .onChange(async (value) => {
-                    this.storage.get('template').set(value);
+                    this.storage.get('templates').value().splice(0, 1, value);
                     this.changed = true;
                 }));
 
@@ -42,9 +42,9 @@ export default class SettingsTab extends PluginSettingTab {
             .setDesc('This template will be used as a fallback option if the main template is not resolved')
             .addText(text => text
                 .setPlaceholder('Type a template')
-                .setValue(this.storage.get('template_fallback').value())
+                .setValue(this.storage.get('templates').value()?.[1] ?? '')
                 .onChange(v => {
-                    this.storage.get('template_fallback').set(v);
+                    this.storage.get('templates').value().splice(1, 1, v);
                     this.changed = true;
                 })
             );

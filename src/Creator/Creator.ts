@@ -5,6 +5,8 @@ import SI from '@config/inversify.types';
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {AppEvents} from "@src/Types";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
+import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
 
 @injectable()
 export default class Creator implements CreatorInterface {
@@ -22,13 +24,7 @@ export default class Creator implements CreatorInterface {
 
     private bind(): void {
         this.dispatcher.addListener(
-            'template:changed',
-            new CallbackVoid((): void => {
-                this.templates = this.resolver()
-            })
-        )
-        this.dispatcher.addListener(
-            'template_fallback:changed',
+            'templates:changed',
             new CallbackVoid((): void => {
                 this.templates = this.resolver()
             })
@@ -37,17 +33,20 @@ export default class Creator implements CreatorInterface {
 
     create(path: string): string | null {
         for (const t of this.templates) {
-            try {
-                let template = t.getTemplate();
+            let template = t.getTemplate();
 
-                for (const placeholder of t.getPlaceholders()) {
+            for (const placeholder of t.getPlaceholders()) {
+                try {
+
                     template = template.replace(placeholder.getPlaceholder(), placeholder.makeValue(path) ?? '');
+                } catch (e) {
+                    if (!(e instanceof PathNotFoundException) && !(e instanceof TypeNotSupportedException)) {
+                        console.error(e);
+                    }
                 }
-                if (template?.length) {
-                    return template;
-                }
-            } catch (e) {
-                //TODO: logs or exception handler
+            }
+            if (template?.length) {
+                return template;
             }
         }
         return null;

@@ -11,16 +11,14 @@ import Creator from "../../src/Creator/Creator";
 import PlaceholderFactory from "../../src/Creator/Template/Placeholders/Factory";
 import Composite from "@src/Creator/Template/Composite";
 import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlaceholder";
+import FilePlaceholder from "@src/Creator/Template/Placeholders/FilePlaceholder";
 
 export default (container: Container) => {
     container.bind<TemplateInterface>(SI["creator:template"])
-        .toFactory<TemplateInterface[]>(context => () => {
-            const container = context.container;
-            return [
-                container.get<TemplateFactory>(SI["factory:template"]).create(container.get(SI.template)),
-                container.get<TemplateFactory>(SI["factory:template"]).create(container.get(SI["template:fallback"]))
-            ];
-        })
+        .toFactory<TemplateInterface[]>(context => () =>
+            context.container.get<string[]>(SI.templates)
+                .map(e => context.container.get<TemplateFactory>(SI["factory:template"]).create(e))
+        )
         .whenTargetNamed('all')
     container.bind<TemplateFactory>(SI['factory:template']).to(TemplateFactory);
     container
@@ -32,6 +30,7 @@ export default (container: Container) => {
     container.bind<TemplateInterface>(SI["creator:template"]).to(Composite).whenTargetNamed('composite');
 
     container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(MetaPlaceholder).whenTargetNamed('meta');
+    container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(FilePlaceholder).whenTargetNamed('file');
     container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(BracketsPlaceholder).whenTargetNamed('brackets');
 
     container.bind<CreatorInterface>(SI.creator).to(Creator);

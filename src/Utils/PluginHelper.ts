@@ -3,8 +3,7 @@ import {SettingsType} from "@src/Settings/SettingsType";
 export default class PluginHelper{
     public static createDefaultSettings(): SettingsType{
         return {
-            template: '',
-            template_fallback: '',
+            templates: [],
             managers: {
                 explorer: false,
                 graph: false,

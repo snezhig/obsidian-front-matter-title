@@ -1,12 +1,11 @@
 
 const SI = {
+    templates: '',
     dispatcher: '',
     storage: '',
     cache: '',
     filter: '',
     placeholder: '',
-    template: '',
-    'template:fallback': '',
     creator: '',
     'creator:fallback': '',
     resolver: '',

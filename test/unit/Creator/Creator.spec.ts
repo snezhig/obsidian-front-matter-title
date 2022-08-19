@@ -49,21 +49,14 @@ describe('Test Creator', () => {
             new Creator(dispatcher, templateCallback);
         })
         test('Should add listener', () => {
-            expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
-            expect(dispatcher.addListener).toHaveBeenCalledWith('template:changed', expect.anything());
-            expect(dispatcher.addListener).toHaveBeenCalledWith('template_fallback:changed', expect.anything());
+            expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
+            expect(dispatcher.addListener).toHaveBeenCalledWith('templates:changed', expect.anything());
         })
 
         test('Should update template after template:changed event', () => {
             templateCallback.mockClear();
-            expect(events['template:changed']).not.toBeUndefined();
-            events["template:changed"].execute(new Event<AppEvents['template:changed']>({old: '', new: ''}));
-            expect(templateCallback).toHaveBeenCalledTimes(1);
-        })
-        test('Should update template after template_fallback:changed event', () => {
-            templateCallback.mockClear();
-            expect(events['template_fallback:changed']).not.toBeUndefined();
-            events["template_fallback:changed"].execute(new Event<AppEvents['template_fallback:changed']>({old: '', new: ''}));
+            expect(events['templates:changed']).not.toBeUndefined();
+            events["templates:changed"].execute(new Event<AppEvents['templates:changed']>({old: [], new: []}));
             expect(templateCallback).toHaveBeenCalledTimes(1);
         })
     })

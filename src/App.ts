@@ -24,8 +24,7 @@ export default class App {
     }
 
     private init(settings: SettingsType): void {
-        this.container.bind(SI.template).toConstantValue(settings.template);
-        this.container.bind(SI["template:fallback"]).toConstantValue(settings.template_fallback);
+        this.container.bind(SI.templates).toConstantValue(settings.templates);
         this.container.bind(SI.delimiter).toConstantValue(settings.rules.delimiter);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setMode(settings.rules.paths.mode);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setList(settings.rules.paths.values);
@@ -36,14 +35,9 @@ export default class App {
         const changed = ObjectHelper.compare(old, actual);
         type events = ResolverEvents & AppEvents;
         const queue: { [K in keyof events]?: events[K] } = {};
-        if (changed.template) {
-            this.container.rebind(SI.template).toConstantValue(actual.template);
-            queue['template:changed'] = {new: actual.template, old: old.template};
-            queue['resolver.clear'] = {all: true};
-        }
-        if (changed.template_fallback) {
-            this.container.rebind(SI["template:fallback"]).toConstantValue(actual.template_fallback);
-            queue['template_fallback:changed'] = {new: actual.template_fallback, old: old.template_fallback};
+        if (changed.templates) {
+            this.container.rebind(SI.templates).toConstantValue(actual.templates);
+            queue['templates:changed'] = {new: actual.templates, old: old.templates};
             queue['resolver.clear'] = {all: true};
         }
         if (changed?.rules?.paths) {

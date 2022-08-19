@@ -24,11 +24,8 @@ const dispatcher = Container.get<DispatcherInterface<SettingsEvent>>(SI.dispatch
 const createDefaultSettings = (): SettingsType => PluginHelper.createDefaultSettings();
 describe('Test App', () => {
     new App();
-    test('Template should not exist', () => {
-        expect(Container.isBound(SI.template)).toBeFalsy();
-    })
-    test('Template fallback should not exist', () => {
-        expect(Container.isBound(SI['template:fallback'])).toBeFalsy();
+    test('Templates should not exist', () => {
+        expect(Container.isBound(SI.templates)).toBeFalsy();
     })
     test('Delimiter should not exist', () => {
         expect(Container.isBound(SI.delimiter)).toBeFalsy();
@@ -47,16 +44,12 @@ describe('Test App', () => {
         });
         test('Dispatch event', () => {
             const settings = createDefaultSettings();
-            settings.template = 'title';
-            settings.template_fallback = 'title_fallback';
+            settings.templates = ['title', 'fallback_title'];
             settings.rules.paths = {values: ['foo'], mode: "black"};
             dispatcher.dispatch('settings.loaded', new Event({settings}));
         })
-        test('Should bind template', () => {
-            expect(Container.get(SI.template)).toEqual('title');
-        })
-        test('Should bind template fallback', () => {
-            expect(Container.get(SI["template:fallback"])).toEqual('title_fallback');
+        test('Should bind templates', () => {
+            expect(Container.get(SI.templates)).toEqual(['title', 'fallback_title']);
         })
         test('Should set mode for list', () => {
             expect(spy.list.setMode).toHaveBeenCalledTimes(1);
@@ -75,29 +68,15 @@ describe('Test App', () => {
     describe('Test "settings.changed event"', () => {
         afterEach(() => spy.dispatch.mockClear())
         beforeAll(() => spy.dispatch.mockClear())
-        test('Should change template and dispatch new event', () => {
+        test('Should change templates and dispatch new event', () => {
             const old = createDefaultSettings();
             const actual = createDefaultSettings();
-            actual.template = 'actual_title';
+            actual.templates = ['actual_title'];
             dispatcher.dispatch('settings.changed', new Event({old, actual}));
-            expect(Container.get<string>(SI.template)).toEqual('actual_title');
-            expect(spy.dispatch).toHaveBeenCalledWith('template:changed', new Event({
-                old: '',
-                new: 'actual_title'
-            }));
-            expect(spy.dispatch).toHaveBeenCalledWith('resolver.clear', new Event({all: true}));
-            expect(spy.dispatch).toHaveBeenCalledTimes(3);
-        })
-
-        test('Should change template fallback and dispatch new event', () => {
-            const old = createDefaultSettings();
-            const actual = createDefaultSettings();
-            actual.template_fallback = 'actual_template_fallback';
-            dispatcher.dispatch('settings.changed', new Event({old, actual}));
-            expect(Container.get<string>(SI["template:fallback"])).toEqual('actual_template_fallback');
-            expect(spy.dispatch).toHaveBeenCalledWith('template_fallback:changed', new Event({
-                old: '',
-                new: 'actual_template_fallback'
+            expect(Container.get<string>(SI.templates)).toEqual(['actual_title']);
+            expect(spy.dispatch).toHaveBeenCalledWith('templates:changed', new Event({
+                old: [],
+                new: ['actual_title']
             }));
             expect(spy.dispatch).toHaveBeenCalledWith('resolver.clear', new Event({all: true}));
             expect(spy.dispatch).toHaveBeenCalledTimes(3);
