@@ -36,14 +36,15 @@ export default class Creator implements CreatorInterface {
             let template = t.getTemplate();
 
             for (const placeholder of t.getPlaceholders()) {
+                let value = '';
                 try {
-
-                    template = template.replace(placeholder.getPlaceholder(), placeholder.makeValue(path) ?? '');
+                    value = placeholder.makeValue(path) ?? '';
                 } catch (e) {
                     if (!(e instanceof PathNotFoundException) && !(e instanceof TypeNotSupportedException)) {
                         console.error(e);
                     }
                 }
+                template = template.replace(placeholder.getPlaceholder(), value);
             }
             if (template?.length) {
                 return template;

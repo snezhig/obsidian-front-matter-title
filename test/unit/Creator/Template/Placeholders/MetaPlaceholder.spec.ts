@@ -25,7 +25,7 @@ describe('Meta Placeholder Test', () => {
     })
 
     test('Dependencies have been called', () => {
-        expect(metaFactory).toHaveBeenCalledWith(path, 'meta');
+        expect(metaFactory).toHaveBeenCalledWith(path, 'frontmatter');
         expect(extractor.extract).toHaveBeenCalledWith(placeholder, meta);
     })
 })

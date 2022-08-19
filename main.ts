@@ -1,4 +1,4 @@
-import {Plugin, TAbstractFile} from 'obsidian';
+import {CachedMetadata, Plugin, TAbstractFile} from 'obsidian';
 import Composer, {ManagerType} from "./src/Title/Manager/Composer";
 import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
@@ -25,7 +25,7 @@ export default class MetaTitlePlugin extends Plugin {
 
 
     private async loadSettings(): Promise<void> {
-        const data: SettingsType = {...PluginHelper.createDefaultSettings(), ...{template: 'title'}} ;
+        const data: SettingsType = {...PluginHelper.createDefaultSettings(), ...{template: 'title'}};
         const current = await this.loadData();
         for (const k of Object.keys(data) as (keyof SettingsType)[]) {
             //@ts-ignore
@@ -48,17 +48,7 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     public async onload() {
-        Container.rebind<interfaces.Factory<{ [k: string]: any }>>(SI['factory:obsidian:file'])
-            .toFactory<{ [k: string]: any }, [string, string]>(() => (path: string, type: string): any => {
-                switch (type) {
-                    case 'meta':
-                        return this.app.metadataCache.getCache(path).frontmatter;
-                    case 'file':
-                        return this.app.vault.getAbstractFileByPath(path);
-                    default:
-                        throw new Error('Obsidian factory does not support type [' + type + ']')
-                }
-            })
+        this.bindServices();
         this.dispatcher = this.container.get(SI.dispatcher);
         this.bind();
         new App();
@@ -77,8 +67,13 @@ export default class MetaTitlePlugin extends Plugin {
             this.composer.setState(this.storage.get('managers').get('quick_switcher').value(), ManagerType.QuickSwitcher)
             this.composer.update();
         });
+    }
 
-
+    private bindServices(): void {
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI['factory:obsidian:file'])
+            .toFactory<{ [k: string]: any }, [string]>(() => (path: string): any => this.app.vault.getAbstractFileByPath(path));
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI['factory:obsidian:meta'])
+            .toFactory<{ [k: string]: any }, [string, string]>(() => (path: string, type: string): any => this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]);
     }
 
     public onunload() {

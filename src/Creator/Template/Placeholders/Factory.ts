@@ -17,6 +17,8 @@ export default class Factory {
             type = 'brackets';
         } else if (placeholder.startsWith('_')) {
             type = 'file';
+        }else if (placeholder === '#heading'){
+            type = 'heading';
         }
         return this.factory(type, placeholder);
     }

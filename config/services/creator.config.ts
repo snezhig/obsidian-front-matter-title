@@ -12,6 +12,7 @@ import PlaceholderFactory from "../../src/Creator/Template/Placeholders/Factory"
 import Composite from "@src/Creator/Template/Composite";
 import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlaceholder";
 import FilePlaceholder from "@src/Creator/Template/Placeholders/FilePlaceholder";
+import HeadingPlaceholder from "@src/Creator/Template/Placeholders/HeadingPlaceholder";
 
 export default (container: Container) => {
     container.bind<TemplateInterface>(SI["creator:template"])
@@ -32,6 +33,7 @@ export default (container: Container) => {
     container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(MetaPlaceholder).whenTargetNamed('meta');
     container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(FilePlaceholder).whenTargetNamed('file');
     container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(BracketsPlaceholder).whenTargetNamed('brackets');
+    container.bind<TemplatePlaceholderInterface>(SI.placeholder).to(HeadingPlaceholder).whenTargetNamed('heading');
 
     container.bind<CreatorInterface>(SI.creator).to(Creator);
 

@@ -1,8 +1,7 @@
 import Manager from "@src/Title/Manager/Manager";
 import {MarkdownView, TAbstractFile, TFile} from "obsidian";
-import SI, {FactoriesType} from "@config/inversify.types";
+import SI from "@config/inversify.types";
 import {inject, named} from "inversify";
-import {getLeavesOfType} from "@src/Obsidian/Types";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 

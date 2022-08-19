@@ -42,6 +42,16 @@ describe('Test Creator', () => {
         const actual = creator.create(path);
         expect(actual).toBeNull();
     })
+
+    test('Should return null because of exception in makeValue', () => {
+        placeholder.makeValue.mockImplementation(() => {
+            throw new Error();
+        });
+        placeholder.getPlaceholder.mockReturnValueOnce('title');
+        template.getTemplate.mockReturnValueOnce('title');
+        const actual = (new Creator(dispatcher, templateCallback)).create(path);
+        expect(actual).toBeNull();
+    })
     describe('Test events', () => {
         beforeAll(() => {
             dispatcher.addListener.mockClear();

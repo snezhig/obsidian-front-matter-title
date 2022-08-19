@@ -3,7 +3,6 @@ import {mock} from "jest-mock-extended";
 import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import {LinkCache, MarkdownView, TFile, View, WorkspaceLeaf} from "obsidian";
-import exp from "constants";
 
 describe('Test test change', () => {
     const manager = new LinkNoteManager(mock<ObsidianFacade>(), mock<ResolverInterface>());

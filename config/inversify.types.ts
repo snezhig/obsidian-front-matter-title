@@ -24,6 +24,7 @@ const SI = {
     'factory:placeholder:resolver': '',
     'factory:obsidian:file_modifiable': '',
     'factory:obsidian:file': '',
+    'factory:obsidian:meta': '',
     delimiter: '',
     'getter:delimiter': '',
     'getter:obsidian:leaves': '',
@@ -37,6 +38,3 @@ for (const key of Object.keys(SI)) {
 
 export default SI;
 
-export type FactoriesType = {
-    'factory:obsidian:file': (path: string, type: string) => ({[k: string]: any}),
-}

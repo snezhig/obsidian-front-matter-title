@@ -37,9 +37,6 @@ Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(Literal
 Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(ArrayStrategy);
 Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(NullStrategy);
 
-Container.bind<interfaces.Factory<{[k: string]: any}>>(SI['factory:obsidian:file'])
-    .toFactory<{[k: string]: any}, [string, string]>(() => (path: string, type: string): any => {throw new Error('Factory for obsidian file is not defined')})
-
 Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
 Container.bind<LoggerInterface>(SI.logger)
     .toDynamicValue(context => {

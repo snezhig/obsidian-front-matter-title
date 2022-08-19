@@ -3,10 +3,10 @@ import {mock} from "jest-mock-extended";
 import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorInterface";
 
 const obj = {test: 'test'};
-const factory = jest.fn((path: string, type: string) => obj);
+const factory = jest.fn((path: string) => obj);
 const placeholder = '_basename';
 const mockExtractor = mock<ExtractorInterface>();
-const filePlaceholder = new FilePlaceholder(factory, mockExtractor);
+const filePlaceholder = new FilePlaceholder(mockExtractor, factory);
 
 describe('Test Placeholder', () => {
     test(`Should save "${placeholder}" placeholder`, () => {
@@ -25,7 +25,7 @@ describe('Test Placeholder', () => {
         })
         test(`Should call factory with file type and ${path} path`, () => {
             expect(factory).toHaveBeenCalledTimes(1);
-            expect(factory).toHaveBeenCalledWith(path, 'file');
+            expect(factory).toHaveBeenCalledWith(path);
         })
         test('Should call extractor with basename placeholder and object', () => {
             expect(mockExtractor.extract).toHaveBeenCalledTimes(1);
