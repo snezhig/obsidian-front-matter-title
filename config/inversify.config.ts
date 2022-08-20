@@ -18,8 +18,8 @@ import LiteralStrategy from "@src/Components/Extractor/LiteralStrategy";
 import ResolverAsync from "@src/Resolver/ResolverAsync";
 import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
 import NullStrategy from "@src/Components/Extractor/NullStrategy";
-import LoggerInterface from "@src/Components/Logger/LoggerInterface";
-import LoggerComposer from "@src/Components/Logger/LoggerComposer";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 

@@ -6,6 +6,8 @@ import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/Disp
 import {AppEvents} from "@src/Types";
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import Event from "@src/Components/EventDispatcher/Event";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
 
 describe('Test Creator', () => {
     const path = '/path/to/file.md';
@@ -16,6 +18,7 @@ describe('Test Creator', () => {
     const dispatcher = mock<DispatcherInterface<AppEvents>>();
     const events: { [K in keyof AppEvents]?: CallbackInterface<AppEvents[K]> } = {};
     const templateCallback = jest.fn(() => [template]);
+    const logger = mock<LoggerInterface>();
     dispatcher.addListener.mockImplementation((name, cb) => events[name] = cb);
     template.getPlaceholders.mockReturnValue([placeholder]);
     template.getTemplate.mockReturnValue(templateStr);
@@ -24,7 +27,7 @@ describe('Test Creator', () => {
         placeholder.makeValue.mockReturnValue('(static)');
         placeholder.getPlaceholder.mockReturnValue('dynamic');
 
-        const creator = new Creator(dispatcher, templateCallback);
+        const creator = new Creator(dispatcher, templateCallback, logger);
         const actual = creator.create(path);
 
         expect(actual).toEqual(expected);
@@ -38,25 +41,25 @@ describe('Test Creator', () => {
         placeholder.makeValue.mockReturnValue(null);
         placeholder.getPlaceholder.mockReturnValue('(static)');
         template.getTemplate.mockReturnValueOnce('(static)');
-        const creator = new Creator(dispatcher, templateCallback);
+        const creator = new Creator(dispatcher, templateCallback, logger);
         const actual = creator.create(path);
         expect(actual).toBeNull();
     })
 
     test('Should return null because of exception in makeValue', () => {
         placeholder.makeValue.mockImplementation(() => {
-            throw new Error();
+            throw new PathNotFoundException();
         });
         placeholder.getPlaceholder.mockReturnValueOnce('title');
         template.getTemplate.mockReturnValueOnce('title');
-        const actual = (new Creator(dispatcher, templateCallback)).create(path);
+        const actual = (new Creator(dispatcher, templateCallback, logger)).create(path);
         expect(actual).toBeNull();
     })
     describe('Test events', () => {
         beforeAll(() => {
             dispatcher.addListener.mockClear();
             templateCallback.mockClear();
-            new Creator(dispatcher, templateCallback);
+            new Creator(dispatcher, templateCallback, logger);
         })
         test('Should add listener', () => {
             expect(dispatcher.addListener).toHaveBeenCalledTimes(1);

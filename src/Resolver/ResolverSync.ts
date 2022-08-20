@@ -8,7 +8,7 @@ import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/Disp
 import {ResolverEvents} from "@src/Resolver/ResolverType";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 import Event from "@src/Components/EventDispatcher/Event";
-import LoggerInterface from "@src/Components/Logger/LoggerInterface";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 @injectable()
 export default class ResolverSync implements ResolverInterface {
@@ -53,8 +53,7 @@ export default class ResolverSync implements ResolverInterface {
             try {
                 title = this.creator.create(path);
             } catch (e) {
-                this.logger.log(`Error by path ${path}`);
-                this.logger.log(e);
+                this.logger.log(`Error by path ${path}`, e);
                 title = null;
             }
             this.cache.save(item.set(title));

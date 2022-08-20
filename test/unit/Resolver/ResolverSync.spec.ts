@@ -9,7 +9,7 @@ import {ResolverEvents} from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import LoggerInterface from "../../../src/Components/Logger/LoggerInterface";
+import LoggerInterface from "../../../src/Components/Debug/LoggerInterface";
 
 describe('Resolver Sync Test', () => {
     const path = '/test/path/file.md';

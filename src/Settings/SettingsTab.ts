@@ -2,8 +2,8 @@ import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../../main";
 import Storage from "@src/Settings/Storage";
 import {SettingsEvent, SettingsManagersType, SettingsType} from "@src/Settings/SettingsType";
-import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 import Event from "@src/Components/EventDispatcher/Event";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 
 export default class SettingsTab extends PluginSettingTab {
     changed = false;
@@ -13,7 +13,7 @@ export default class SettingsTab extends PluginSettingTab {
         app: App,
         plugin: MetaTitlePlugin,
         private storage: Storage<SettingsType>,
-        private dispatcher: Dispatcher<SettingsEvent>
+        private dispatcher: DispatcherInterface<SettingsEvent>
     ) {
         super(app, plugin);
         this.updatePrevious();
@@ -50,7 +50,7 @@ export default class SettingsTab extends PluginSettingTab {
             );
         this.buildRules();
         this.buildManagers();
-        containerEl.createEl('h4', {text: 'Debug'});
+        containerEl.createEl('h4', {text: 'Util'});
         new Setting(containerEl)
             .setName('Debug info')
             .setDesc('Show debug info and caught errors in console')
@@ -59,6 +59,18 @@ export default class SettingsTab extends PluginSettingTab {
                     .onChange(e => {
                         this.changed = true;
                         this.storage.get('debug').set(e)
+                    })
+            );
+        new Setting(containerEl)
+            .setName('Boot delay')
+            .setDesc('Plugin will be loaded with specified delay in ms')
+            .addText(e =>
+                e.setValue(this.storage.get('boot').get('delay').value().toString())
+                    .onChange(s => {
+                        this.changed = true;
+                        const v = !isNaN(parseInt(s)) ? parseInt(s) : 0;
+                        this.storage.get('boot').get('delay').set(v);
+                        e.setValue(v.toString());
                     })
             );
 

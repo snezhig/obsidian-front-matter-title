@@ -7,6 +7,7 @@ import {AppEvents} from "@src/Types";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
 import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 @injectable()
 export default class Creator implements CreatorInterface {
@@ -16,7 +17,9 @@ export default class Creator implements CreatorInterface {
         @inject(SI.dispatcher)
         private dispatcher: DispatcherInterface<AppEvents>,
         @inject(SI['creator:template']) @named('all')
-        private resolver: () => TemplateInterface[]
+        private resolver: () => TemplateInterface[],
+        @inject(SI.logger) @named('creator')
+        private logger: LoggerInterface,
     ) {
         this.templates = resolver();
         this.bind();
@@ -40,8 +43,10 @@ export default class Creator implements CreatorInterface {
                 try {
                     value = placeholder.makeValue(path) ?? '';
                 } catch (e) {
-                    if (!(e instanceof PathNotFoundException) && !(e instanceof TypeNotSupportedException)) {
-                        console.error(e);
+                    if ((e instanceof PathNotFoundException) || (e instanceof TypeNotSupportedException)) {
+                        this.logger.log(e);
+                    } else {
+                        throw e;
                     }
                 }
                 template = template.replace(placeholder.getPlaceholder(), value);

@@ -1,7 +1,7 @@
 import {SettingsType} from "@src/Settings/SettingsType";
 
-export default class PluginHelper{
-    public static createDefaultSettings(): SettingsType{
+export default class PluginHelper {
+    public static createDefaultSettings(): SettingsType {
         return {
             templates: [],
             managers: {
@@ -20,7 +20,10 @@ export default class PluginHelper{
                     value: ''
                 }
             },
-            debug: false
+            debug: false,
+            boot: {
+                delay: 0
+            }
         }
     }
 }

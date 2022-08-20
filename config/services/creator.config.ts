@@ -18,6 +18,7 @@ export default (container: Container) => {
     container.bind<TemplateInterface>(SI["creator:template"])
         .toFactory<TemplateInterface[]>(context => () =>
             context.container.get<string[]>(SI.templates)
+                .filter(e => e)
                 .map(e => context.container.get<TemplateFactory>(SI["factory:template"]).create(e))
         )
         .whenTargetNamed('all')

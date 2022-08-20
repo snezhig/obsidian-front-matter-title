@@ -6,7 +6,10 @@ export type SettingsType = {
         delimiter: {enabled: boolean, value: string},
     },
     managers: { [k in SettingsManagersType]: boolean },
-    debug: boolean
+    debug: boolean,
+    boot: {
+        delay: number
+    }
 };
 
 export type SettingsEvent = {
