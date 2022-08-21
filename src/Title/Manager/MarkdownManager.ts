@@ -7,8 +7,7 @@ export default class MarkdownManager implements Manager {
     private original = new Map<string, string>();
     private bound = false;
     private handlers = {
-        'layout-change': () => this.update(),
-        'mousedown': (e: Event) => e.preventDefault()
+        'layout-change': () => this.update()
     };
 
     constructor(
@@ -67,17 +66,46 @@ export default class MarkdownManager implements Manager {
     }
 
     private setTitle(view: MarkdownViewExt, title: string | null): void {
-        if (title && title !== view.titleEl.innerText) {
-            this.original.set(view.file.path, view.titleEl.innerText);
-            view.titleEl.innerText = title;
-            view.titleEl.contentEditable = 'false';
-            view.titleEl.addEventListener('mousedown', this.handlers.mousedown);
-
-        } else if (!title && this.original.has(view.file.path)) {
-            view.titleEl.innerText = this.original.get(view.file.path);
-            view.titleEl.contentEditable = 'true';
-            view.titleEl.removeEventListener('mousedown', this.handlers.mousedown);
+        const container = (view.titleContainerEl as HTMLDivElement);
+        let el: HTMLDivElement = null;
+        for (const i of Array.from(container.children)) {
+            if (i.hasAttribute('data-ofmt') && i instanceof HTMLDivElement) {
+                el = i;
+                break;
+            }
         }
+        if (!title) {
+            if (el) {
+                container.removeChild(el);
+            }
+            view.titleEl.hidden = false;
+            return;
+        }
+        if (title && el && el.innerText === title && !el.hidden) {
+            return;
+        }
+        if (el === null) {
+            el = document.createElement('div')
+            el.className = 'view-header-title';
+            el.dataset['ofmt'] = 'true';
+            el.innerText = title;
+            el.hidden = true;
+            el.onclick = (e) => {
+                el.hidden = true;
+                view.titleEl.hidden = false;
+                view.titleEl.focus();
+                view.titleEl.onblur = () => {
+                    view.titleEl.hidden = true;
+                    el.hidden = false;
+                }
+            }
+            container.appendChild(el);
+        }
+
+        el.innerText = title;
+        el.hidden = false;
+        view.titleEl.hidden = true;
+        return;
     }
 
 }
