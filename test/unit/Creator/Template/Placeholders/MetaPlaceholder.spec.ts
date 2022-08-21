@@ -2,8 +2,6 @@ import MetaPlaceholder from "@src/Creator/Template/Placeholders/MetaPlaceholder"
 import {mock} from "jest-mock-extended";
 import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorInterface";
 
-jest.mock("../../../../../src/Title/FrontMatterParser");
-
 describe('Meta Placeholder Test', () => {
     const placeholder = 'foobar';
     const expected = 'barfoo';

@@ -1,5 +1,4 @@
 import {TAbstractFile, TFileExplorerItem, TFileExplorerView, Workspace} from "obsidian";
-import Resolver from "@src/Title/Resolver/Resolver";
 import {Leaves} from "@src/enum";
 import {inject, injectable, named} from "inversify";
 import SI from "@config/inversify.types";

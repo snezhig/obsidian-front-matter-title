@@ -9,7 +9,6 @@ import {ResolverEvents} from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import LoggerInterface from "../../../src/Components/Debug/LoggerInterface";
 
 describe('Resolver Sync Test', () => {
     const path = '/test/path/file.md';
@@ -17,7 +16,6 @@ describe('Resolver Sync Test', () => {
 
     const filter = mock<FilterInterface>();
     const creator = mock<CreatorInterface>();
-    const logger = mock<LoggerInterface>();
 
     const cacheItem = mock<CacheItemInterface<string>>();
     cacheItem.get.mockReturnValue(null);
@@ -27,7 +25,7 @@ describe('Resolver Sync Test', () => {
     const dispatcher = mock<DispatcherInterface<ResolverEvents>>();
     let eventCallback: CallbackInterface<ResolverEvents['resolver.clear']> = null;
     dispatcher.addListener.mockImplementation((name: string, cb) => eventCallback = cb);
-    const resolver = new ResolverSync([filter], cache, creator, dispatcher, logger);
+    const resolver = new ResolverSync([filter], cache, creator, dispatcher);
 
     afterEach(() => {
         mockClear(filter);
