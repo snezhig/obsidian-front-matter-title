@@ -1,12 +1,12 @@
 import {Arr} from "tern";
 
-interface PrimitiveItemInterface<T> {
+export interface PrimitiveItemInterface<T> {
     value(): T;
 
     set(v: T): void;
 }
 
-interface ObjectItemInterface<T extends object> extends PrimitiveItemInterface<T> {
+export interface ObjectItemInterface<T extends object> extends PrimitiveItemInterface<T> {
     get<K extends keyof T>(k: K): T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]>
 }
 

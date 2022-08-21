@@ -1,6 +1,6 @@
 import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../../main";
-import Storage from "@src/Settings/Storage";
+import Storage, {PrimitiveItemInterface} from "@src/Settings/Storage";
 import {SettingsEvent, SettingsManagersType, SettingsType} from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
@@ -56,10 +56,7 @@ export default class SettingsTab extends PluginSettingTab {
             .setDesc('Show debug info and caught errors in console')
             .addToggle(e =>
                 e.setValue(this.storage.get('debug').value())
-                    .onChange(e => {
-                        this.changed = true;
-                        this.storage.get('debug').set(e)
-                    })
+                    .onChange(e => this.change(this.storage.get('debug'), e))
             );
         new Setting(containerEl)
             .setName('Boot delay')
@@ -67,10 +64,9 @@ export default class SettingsTab extends PluginSettingTab {
             .addText(e =>
                 e.setValue(this.storage.get('boot').get('delay').value().toString())
                     .onChange(s => {
-                        this.changed = true;
                         const v = !isNaN(parseInt(s)) ? parseInt(s) : 0;
-                        this.storage.get('boot').get('delay').set(v);
                         e.setValue(v.toString());
+                        this.change(this.storage.get('boot').get('delay'), v);
                     })
             );
 
@@ -97,8 +93,7 @@ export default class SettingsTab extends PluginSettingTab {
                 e.addOptions({white: 'White list mode', black: 'Black list mode'})
                     .setValue(getActual().value())
                     .onChange(e => {
-                        this.changed = true;
-                        getActual().set(e as 'black' | 'white');
+                        this.change(getActual(), e as ('black' | 'white'));
                         updateDesc();
                     }).selectEl.style['marginRight'] = '10px')
             .addTextArea(e => e
@@ -118,8 +113,7 @@ export default class SettingsTab extends PluginSettingTab {
         const getPlaceholder = () => isEnabled() ? 'Type a delimiter' : 'First value will be used';
 
         const onDropdownChange = (e: boolean) => {
-            this.changed = true;
-            delimiter.get('enabled').set(e);
+            this.change(delimiter.get('enabled'), e);
             text.setValue('').setPlaceholder(getPlaceholder()).setDisabled(!e).onChanged();
             text.inputEl.hidden = !isEnabled();
         }
@@ -129,10 +123,7 @@ export default class SettingsTab extends PluginSettingTab {
             .onChange(e => onDropdownChange(e === 'Y')).selectEl.style['marginRight'] = '10px')
             .addText(e =>
                 text = e
-                    .onChange(e => {
-                        this.changed = true;
-                        delimiter.get('value').set(e);
-                    })
+                    .onChange(e => this.change(delimiter.get('value'), e))
                     .setValue(delimiter.get('value').value())
                     .setDisabled(!isEnabled())
                     .setPlaceholder(getPlaceholder())
@@ -162,10 +153,7 @@ export default class SettingsTab extends PluginSettingTab {
                 .setDesc(item.desc)
                 .addToggle(e => e
                     .setValue(this.storage.get("managers").get(item.manager).value())
-                    .onChange(v => {
-                        this.storage.get('managers').get(item.manager).set(v)
-                        this.changed = true;
-                    })
+                    .onChange(v => this.change(this.storage.get('managers').get(item.manager), v))
                 )
         }
     }
@@ -174,15 +162,27 @@ export default class SettingsTab extends PluginSettingTab {
         this.previous = JSON.parse(JSON.stringify(this.storage.collect()));
     }
 
+    private change<T>(o: PrimitiveItemInterface<T>, v: T) {
+        o.set(v);
+        this.changed = true;
+    }
+
     hide(): any {
         super.hide();
-        if (this.changed) {
-            this.changed = false;
-            this.dispatcher.dispatch('settings.changed', new Event({
-                old: this.previous,
-                actual: this.storage.collect()
-            }));
-            this.updatePrevious();
+        this.dispatch();
+
+    }
+
+    private dispatch(): void {
+        if (!this.changed) {
+            return;
         }
+
+        this.changed = false;
+        this.dispatcher.dispatch('settings.changed', new Event({
+            old: this.previous,
+            actual: this.storage.collect()
+        }));
+        this.updatePrevious();
     }
 }
