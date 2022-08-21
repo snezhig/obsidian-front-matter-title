@@ -85,8 +85,8 @@ export default class SettingsTab extends PluginSettingTab {
 
     private buildRulePaths(): void {
         const descriptions = {
-            white: 'Files that are located by paths will be processed by plugin',
-            black: 'Files that are located by paths will be ignored by plugin'
+            white: 'Files that are located by paths will be processed by plugin. Each path must be written with new line.',
+            black: 'Files that are located by paths will be ignored by plugin. Each path must be written with new line.'
         };
         const setting = new Setting(this.containerEl).setName('File path rule');
         const getActual = () => this.storage.get('rules').get('paths').get('mode');
@@ -111,25 +111,33 @@ export default class SettingsTab extends PluginSettingTab {
     }
 
     private buildRuleDelimiter(): void {
-        const setting = new Setting(this.containerEl).setName('List values');
+        const setting = new Setting(this.containerEl).setName('List values').setDesc('Set the rule about how to process list values');
         let text: TextComponent = null;
-        const isEnabled = () => this.storage.get('rules').get('delimiter').get('enabled').value();
+        const delimiter = this.storage.get('rules').get('delimiter');
+        const isEnabled = () => delimiter.get('enabled').value();
         const getPlaceholder = () => isEnabled() ? 'Type a delimiter' : 'First value will be used';
 
         const onDropdownChange = (e: boolean) => {
             this.changed = true;
-            this.storage.get('rules').get('delimiter').get('enabled').set(e);
+            delimiter.get('enabled').set(e);
             text.setValue('').setPlaceholder(getPlaceholder()).setDisabled(!e).onChanged();
+            text.inputEl.hidden = !isEnabled();
         }
         setting.addDropdown(e => e
             .addOptions({N: 'Use first value', Y: 'Join all by delimiter'})
-            .setValue(this.storage.get('rules').get('delimiter').get('enabled').value() ? 'Y' : 'N')
+            .setValue(delimiter.get('enabled').value() ? 'Y' : 'N')
             .onChange(e => onDropdownChange(e === 'Y')).selectEl.style['marginRight'] = '10px')
             .addText(e =>
-                text = e.onChange(e => {
-                    this.changed = true;
-                    this.storage.get('rules').get('delimiter').get('value').set(e);
-                }).setDisabled(!isEnabled()).setPlaceholder(getPlaceholder()));
+                text = e
+                    .onChange(e => {
+                        this.changed = true;
+                        delimiter.get('value').set(e);
+                    })
+                    .setValue(delimiter.get('value').value())
+                    .setDisabled(!isEnabled())
+                    .setPlaceholder(getPlaceholder())
+            );
+        text.inputEl.hidden = !isEnabled();
     }
 
     private buildManagers(): void {
