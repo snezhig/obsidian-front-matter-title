@@ -137,14 +137,14 @@ export default class SettingsTab extends PluginSettingTab {
         const data: { manager: SettingsManagersType, name: string, desc: string }[] = [
             {
                 manager: 'header',
-                name: 'Enable header title',
-                desc: 'If it is on, plugin will replace titles in header of leaves and update them'
+                name: 'Header title',
+                desc: 'Replace titles in header of leaves and update them'
             },
-            {manager: 'explorer', name: 'Enable explorer title', desc: 'Replace shown titles in the file explorer'},
-            {manager: 'graph', name: 'Enable graph title', desc: 'Replace shown titles in the graph/local-graph'},
+            {manager: 'explorer', name: 'Explorer title', desc: 'Replace shown titles in the file explorer'},
+            {manager: 'graph', name: 'Graph title', desc: 'Replace shown titles in the graph/local-graph'},
             {
                 manager: 'quick_switcher',
-                name: 'Enable quick switches title',
+                name: 'Quick switches title',
                 desc: 'Replace shown titles in the quick switcher modal'
             },
         ]
