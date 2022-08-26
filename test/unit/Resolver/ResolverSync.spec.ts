@@ -82,6 +82,26 @@ describe('Resolver Sync Test', () => {
         })
     })
 
+    describe('Throw exception', () => {
+        beforeAll(() => {
+            cacheItem.isHit.mockReturnValueOnce(false);
+        })
+        test('Should not save item to cache', () => {
+            creator.create.mockImplementation(() => {
+                throw new Error()
+            });
+            expect(resolver.resolve('/path/to/file_exception.md')).toBeNull();
+            expect(creator.create).toHaveBeenCalledTimes(1);
+            expect(cache.getItem).toHaveBeenCalledTimes(1);
+            expect(cacheItem.isHit).toHaveBeenCalledTimes(1);
+            expect(cache.save).not.toHaveBeenCalled();
+        })
+        afterAll(() => {
+            creator.create.mockClear();
+            cacheItem.isHit.mockClear();
+        })
+    })
+
     describe('Test events', () => {
         beforeEach(() => {
             cache.clear.mockClear();
