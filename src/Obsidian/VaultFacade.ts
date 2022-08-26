@@ -11,4 +11,13 @@ export default class VaultFacade {
         const file = this.vault.getAbstractFileByPath(path);
         return file instanceof TFile ? file : null;
     }
+
+    public getFileContent(file: TFile): Promise<string> {
+        return this.vault.cachedRead(file);
+    }
+
+    public modifyFile(file: TFile, c: string): Promise<void>{
+        return this.vault.modify(file, c);
+    }
+
 }

@@ -1,94 +1,107 @@
-import {debounce, Plugin, TAbstractFile} from 'obsidian';
-import Resolver from "./src/Title/Resolver/Resolver";
-import {Settings, SettingsTab} from "./src/Settings";
+import {CachedMetadata, Plugin, TAbstractFile} from 'obsidian';
 import Composer, {ManagerType} from "./src/Title/Manager/Composer";
-import FrontMatterParser from "./src/Title/FrontMatterParser";
-import VaultFacade from "./src/Obsidian/VaultFacade";
+import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
+import SettingsTab from "@src/Settings/SettingsTab";
+import Storage from "@src/Settings/Storage";
+import Container from "@config/inversify.config";
+import SI from "@config/inversify.types";
+import {interfaces} from "inversify";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import App from "@src/App";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
+import {AppEvents} from "@src/Types";
+import {ResolverEvents} from "@src/Resolver/ResolverType";
+import Event from "@src/Components/EventDispatcher/Event";
+import PluginHelper from "@src/Utils/PluginHelper";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 
 export default class MetaTitlePlugin extends Plugin {
-    public settings: Settings;
-    private resolver: Resolver;
+    private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private composer: Composer = null;
-    private parser: FrontMatterParser;
+    private container: interfaces.Container = Container;
+    private storage: Storage<SettingsType>;
+    private logger: LoggerInterface;
 
 
-    public async saveSettings() {
-        const settings = this.settings.getAll();
-        await this.saveData(settings);
-
-        //TODO: refactor
-        if (
-            settings.list_pattern === true && this.parser.getDelimiter() !== null
-            || settings.list_pattern !== true && settings.list_pattern !== this.parser.getDelimiter()
-        ) {
-            this.parser.setDelimiter(settings.list_pattern === true ? null : settings.list_pattern);
-            this.resolver.revokeAll();
+    private async loadSettings(): Promise<void> {
+        const data: SettingsType = {...PluginHelper.createDefaultSettings(), ...{templates: ['title']}};
+        const current = await this.loadData() ?? {};
+        for (const k of Object.keys(data) as (keyof SettingsType)[]) {
+            //@ts-ignore
+            data[k] = current[k] ?? data[k];
         }
+        this.storage = new Storage<SettingsType>(data);
+        this.addSettingTab(new SettingsTab(this.app, this, this.storage, this.dispatcher));
+    }
 
-        this.resolver.changePath(settings.path);
-        this.resolver.setExcluded(settings.excluded_folders);
-        this.composer.setState(settings.m_graph, ManagerType.Graph);
-        this.composer.setState(settings.m_explorer, ManagerType.Explorer);
-        this.composer.setState(settings.m_markdown, ManagerType.Markdown);
-        this.composer.setState(settings.m_quick_switcher, ManagerType.QuickSwitcher);
+    private async onSettingsChange(settings: SettingsType): Promise<void> {
+        await this.saveData(settings);
+        this.composer.setState(settings.managers.graph, ManagerType.Graph);
+        this.composer.setState(settings.managers.explorer, ManagerType.Explorer);
+        this.composer.setState(settings.managers.header, ManagerType.Markdown);
+        this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
         await this.runManagersUpdate();
     }
 
     public async onload() {
-        this.saveSettings = debounce(this.saveSettings, 500, true) as unknown as () => Promise<void>
+        this.bindServices();
+        this.dispatcher = this.container.get(SI.dispatcher);
+        this.logger = this.container.getNamed(SI.logger, 'main');
+        new App();
+        await this.loadSettings();
 
-        this.settings = new Settings(await this.loadData(), this.saveSettings.bind(this));
+        const delay = this.storage.get('boot').get('delay').value();
+        this.logger.log(`Plugin manual delay ${delay}`);
+        await new Promise(r => setTimeout(r, delay));
+
+        this.composer = new Composer(
+            this.app.workspace,
+            this.container.getNamed<ResolverInterface>(SI.resolver, Resolving.Sync),
+            this.container.getNamed<ResolverInterface<Resolving.Async>>(SI.resolver, Resolving.Async),
+        );
         this.bind();
+    }
 
-        this.parser = new FrontMatterParser();
-        this.resolver = new Resolver(
-            this.app.metadataCache,
-            this.parser,
-            new VaultFacade(this.app.vault),
-            {
-                metaPath: this.settings.get('path'),
-                excluded: this.settings.get('excluded_folders')
-            });
-        this.resolver.on('unresolved', debounce(() => this.onUnresolvedHandler(), 200));
-
-        this.composer = new Composer(this.app.workspace, this.resolver);
-        this.app.workspace.onLayoutReady(() => {
-            this.composer.setState(this.settings.get('m_graph'), ManagerType.Graph);
-            this.composer.setState(this.settings.get('m_explorer'), ManagerType.Explorer);
-            this.composer.setState(this.settings.get('m_markdown'), ManagerType.Markdown)
-            this.composer.setState(this.settings.get('m_quick_switcher'), ManagerType.QuickSwitcher)
-            this.composer.update();
-        });
-
-        this.addSettingTab(new SettingsTab(this.app, this));
+    private bindServices(): void {
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI['factory:obsidian:file'])
+            .toFactory<{ [k: string]: any }, [string]>(() => (path: string): any => this.app.vault.getAbstractFileByPath(path));
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI['factory:obsidian:meta'])
+            .toFactory<{ [k: string]: any }, [string, string]>(() => (path: string, type: string): any => this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]);
     }
 
     public onunload() {
         this.composer.setState(false);
-        this.resolver.removeAllListeners('unresolved');
     }
 
     private bind() {
         this.registerEvent(this.app.metadataCache.on('changed', file => {
-            this.resolver?.revoke(file);
-            this.runManagersUpdate(file).catch(console.error)
+            this.dispatcher.dispatch('resolver.clear', new Event({path: file.path}));
         }));
         this.app.workspace.onLayoutReady(() =>
             this.registerEvent(this.app.vault.on('rename', (e, o) => {
-                this.resolver?.revoke(o);
-                this.runManagersUpdate(e).catch(console.error);
+                this.dispatcher.dispatch('resolver.clear', new Event({path: o}));
             }))
         );
+        this.dispatcher.addListener('resolver.unresolved', new CallbackVoid<ResolverEvents['resolver.unresolved']>(e => {
+            const file = e.get().path ? this.app.vault.getAbstractFileByPath(e.get().path) : null;
+            this.runManagersUpdate(file).catch(console.error);
+        }))
+
+        this.app.workspace.onLayoutReady(() => {
+            this.composer.setState(this.storage.get('managers').get('graph').value(), ManagerType.Graph);
+            this.composer.setState(this.storage.get('managers').get('explorer').value(), ManagerType.Explorer);
+            this.composer.setState(this.storage.get('managers').get('header').value(), ManagerType.Markdown)
+            this.composer.setState(this.storage.get('managers').get('quick_switcher').value(), ManagerType.QuickSwitcher)
+            this.composer.update().catch(console.error);
+        });
+
+        this.dispatcher.addListener('settings.changed', new CallbackVoid<SettingsEvent['settings.changed']>(e => this.onSettingsChange(e.get().actual)));
     }
 
 
     private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
         await this.composer.update(file);
-    }
-
-
-    private async onUnresolvedHandler(): Promise<void> {
-        await this.runManagersUpdate();
     }
 }

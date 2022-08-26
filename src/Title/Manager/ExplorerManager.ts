@@ -2,6 +2,7 @@ import {TAbstractFile, TFileExplorerItem, TFileExplorerView, Workspace} from "ob
 import Resolver from "src/Title/Resolver/Resolver";
 import Manager from "./Manager";
 import {Leaves} from "../../enum";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 
 export default class ExplorerManager implements Manager {
     private explorerView: TFileExplorerView = null;
@@ -10,7 +11,7 @@ export default class ExplorerManager implements Manager {
 
     constructor(
         private workspace: Workspace,
-        private resolver: Resolver
+        private resolver: ResolverInterface<Resolving.Async>
     ) {
     }
 
@@ -65,7 +66,10 @@ export default class ExplorerManager implements Manager {
     }
 
     private async setTitle(item: TFileExplorerItem): Promise<void> {
-        const title = await this.resolver.resolve(item.file).catch(() => null);
+        const title = await this.resolver.resolve(item.file.path).catch((e) => {
+            console.error(e);
+            return e;
+        });
 
         if (this.isTitleEmpty(title)) {
             return this.restore(item);

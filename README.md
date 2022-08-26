@@ -1,32 +1,62 @@
-## Front Matter Title
+# Front Matter Title
 
 __Also known as `Meta Title Filename`__
 
 This is a plugin for [Obsidian](https://obsidian.md).
 
-## Introduction
+# Introduction
 
 Plugin **does not rename files**,
 it just uses specific value from meta-block of markdown file as displayed filename in explorer or graph.
 
 > Value from specific key **must be** a string or a number or an array(list)
 
-# Functional
-
-* Display title from frontmatter in `graph`, `explorer`, `markdown leaf header`, `quick switcher`
-* Settings to switch on\off each of type from above separately
-* Settings to exclude folders or files
-* Option to use `template like` title path
-* List values support
-
-## Installation (one of)
+# Installation (one of)
 
 * Download in from Obsidian through `Community plugins`
 * Use [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
-* Download `obsidian-front-matter-title-#LAST_RELEASE#.zip` from last release and unpack it into your vault by
-  path: `.obsidian/plugins`
+* Download `obsidian-front-matter-title-#LAST_RELEASE#.zip`
+  from [last release](https://github.com/Snezhig/obsidian-front-matter-title/releases/latest/) and unpack it into your
+  vault by path: `.obsidian/plugins`
 
-## Examples
+# Template
+
+## Values
+
+Plugin can use extract values from meta-block, file info or headings.
+
+Also, template can be set as `path.to.value` and plugin will try to get value from `path` field, then from `to` field
+and, finally from `value` field. [See more](#Examples).
+
+### Meta block
+
+Template is a string that will be used to resolve a title for file
+
+Any value in the template is meant to be key from file's meta block
+
+### File info
+
+If you add `_` prefix in your template, plugin will use values
+from [TFile](https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts) object
+
+For example: `_basename` means that plugin will use value from `basename` field
+
+### Heading
+
+If you set template as `#heading`, plugin will you first heading from file
+
+## Types
+
+### Simple template
+
+Any string in you template will be used like a single key
+
+### Composite template
+
+If you want to use some values for title you can use `{{ }}` to make plugin use each value inside ``{{ }}`` as an
+individual key
+
+# Examples
 
 For example, you can have the following meta-block:
 
@@ -45,59 +75,62 @@ additional:
 
 ```
 
-### Simple path
+And the following content:
 
-- Use only one key from yaml block
+```markdown
+# First Heading
 
-|       Meta title path        | Original filename |    Displayed filename     |                        Comment                        |
-|:----------------------------:|:-----------------:|:-------------------------:|:-----------------------------------------------------:|
-|           `short`            |   202110151351    |           `PI`            |                       All is ok                       |
-|      `additional.title`      |   202110151351    |      `Project Ideas`      |                       All is ok                       |
-|         `not_exists`         |   202110151351    |      `202110151351`       |         Original because path does not exist          |
-|         `additional`         |   202110151351    |      `202110151351`       | Original because value is not string, number or array |
-|            `tags`            |   202110151351    |        `#project`         |       First value is used (depends on settings)       |
-|            `tags`            |   202110151351    | `#project - #improvement` |  Values are joined by delimiter defined in settings   |
+Some info
 
-### Path as a template
+# Second Heading
+```
 
-- Use one or more keys with static value
-- Use keys from original path:
-    - _**_basename**_ - base name of file without extension
-    - _**_name**_ - name of file with extension
-    - _**_path**_ - path to file with folders and extension
-
-|       Meta title path        |  Original filename  |     Displayed filename     |               Comment                |
-|:----------------------------:|:-------------------:|:--------------------------:|:------------------------------------:|
-|         `{{short}}`          |    202110151351     |            `PI`            |              All is ok               |
-|   `{{short}} - {{status}}`   |    202110151351     |        `PI - open`         |              All is ok               |
-| `{{short}} - {{not_exists}}` |    202110151351     |          `PI - `           |       The second part is empty       |
-| `{{short}} - {{not_exists}}` |    202110151351     |          `PI - `           |       The second part is empty       |
-| `{{short}} - {{_basename}}`  | folder/202110151351 |    `PI - 202110151351`     | The second part is original basename |
-|   `{{short}} - {{_path}}`    | folder/202110151351 | `PI - folder/202110151351` |   The second part is original path   |
-|   `{{short}} - {{_name}}`    | folder/202110151351 |   `PI - 202110151351.md`   |   The second part is original name   |
+|          Template           | Original filename | Displayed filename |
+|:---------------------------:|:-----------------:|:------------------:|
+|           `short`           |   202110151351    |        `PI`        |
+|     `additional.title`      |   202110151351    |  `Project Ideas`   |
+|        `not_exists`         |   202110151351    |   `202110151351`   |
+|        `additional`         |   202110151351    |   `202110151351`   |
+|           `tags`            |   202110151351    |     `#project`     |
+|         `#heading`          |   202110151351    |  `First Heading`   |
+|  `{{short}} - {{status}}`   |   202110151351    |    `PI - open`     |
+| `{{tags}} - {{additional}}` |   202110151351    |   `# project - `   |
 
 > **If you use the only one value, use `short` instead of `{{short}}` to have a better performance**
 
-## Result
+# Managers
 
-|                My folder                 |               My folder with plugin                |
+## Explorer
+
+> Display titles in app`s file explorer
+
+|                 Disabled                 |                      Enabled                       |
 |:----------------------------------------:|:--------------------------------------------------:|
 | ![](./github/images/Common%20Folder.png) | ![](./github/images/Structure%20with%20plugin.png) |
 
-|                  Graph                  |               Graph with plugin                |
+## Graph
+
+> Display titles in app's graph and local-graph
+
+|                Disabled                 |                    Enabled                     |
 |:---------------------------------------:|:----------------------------------------------:|
 | ![](./github/images/Common%20graph.png) | ![](./github/images/Graph%20with%20plugin.png) |
 
-## Todo
+## Quick switcher
 
-* [x] Add a possibility to make a template for file name
-* [ ] Add markers to distinguish the same titles
-* [ ] Add titles for search view
-* [ ] Add commands to update titles manually
-* [ ] Add settings for title's length
-* [x] Fix the problem that titles in graph were not changed, in case application opens with graph
-* [x] Add local-graph compatibility
-* [x] Add support for leaf's header
+> Display titles in app's quick switcher modal
+
+|                    Disabled                     |                    Enabled                     |
+|:-----------------------------------------------:|:----------------------------------------------:|
+| ![](./github/images/Quick%20Switcher%20off.png) | ![](./github/images/Quick%20Switcher%20on.png) |
+
+## File header
+
+> Display title in opened file's header
+
+|                   Disabled                   |                   Enabled                   |
+|:--------------------------------------------:|:-------------------------------------------:|
+| ![](./github/images/File%20header%20off.png) | ![](./github/images/File%20header%20on.png) |
 
 ## Thank you
 

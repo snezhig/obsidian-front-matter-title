@@ -1,13 +1,13 @@
 {
 	"name": "obsidian-sample-plugin",
-	"version": "1.7.1",
+	"version": "2.0.0",
 	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
 	"main": "main.js",
 	"scripts": {
 		"pack.beta": "node utils/pack-release.mjs beta",
 		"pack.release": "node utils/pack-release.mjs release",
 		"dev": "node utils/esbuild.config.mjs",
-		"build": "tsc --project tsconfig.build.json -noEmit -skipLibCheck && node utils/esbuild.config.mjs production",
+		"build": " node utils/esbuild.config.mjs production",
 		"version": "node utils/version-bump.mjs && git add manifest.json versions.json",
 		"test": "jest",
 		"eslint": "eslint src"
@@ -33,8 +33,13 @@
 		"ts-debounce": "^4.0.0",
 		"ts-jest": "^27.1.4",
 		"ts-node": "^10.7.0",
+		"tsconfig-paths": "^4.0.0",
 		"tslib": "2.3.1",
 		"typescript": "4.6.3",
 		"yaml": "^2.0.1"
+	},
+	"dependencies": {
+		"inversify": "^6.0.1",
+		"reflect-metadata": "^0.1.13"
 	}
 }

@@ -9,7 +9,7 @@ import {
 } from "obsidian";
 import FunctionReplacer from "../../Utils/FunctionReplacer";
 import Manager from "./Manager";
-import ResolverInterface from "../Resolver/ResolverInterface";
+import ResolverInterface from "../../Interfaces/ResolverInterface";
 
 
 type Replacers = {
