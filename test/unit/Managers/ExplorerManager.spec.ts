@@ -8,11 +8,14 @@ import ExplorerSort from "@src/Managers/Features/ExplorerSort";
 
 const resolverMock = mock<ResolverInterface<Resolving.Async>>();
 const getFileItems = jest.fn(() => ({}));
+//@ts-ignore
 const viewMock: TFileExplorerView = {
+    requestSort: jest.fn(() => {}),
     get fileItems() {
         return getFileItems() as any
     }
 } as TFileExplorerView;
+
 const facade = mock<ObsidianFacade>();
 facade.getLeavesOfType.mockReturnValue([]);
 
