@@ -29,6 +29,9 @@ const SI = {
     'getter:delimiter': '',
     'getter:obsidian:leaves': '',
     'facade:obsidian': '',
+    'features:explorer:sort': '',
+    'manager': '',
+    'composer': '',
 };
 
 for (const key of Object.keys(SI)) {

@@ -1,5 +1,6 @@
 import {CachedMetadata, Plugin, TAbstractFile} from 'obsidian';
 import Composer, {ManagerType} from "./src/Title/Manager/Composer";
+import MComposer from "./src/Managers/Composer";
 import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
@@ -15,6 +16,8 @@ import {ResolverEvents} from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
+import {Manager} from "@src/enum";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -23,6 +26,7 @@ export default class MetaTitlePlugin extends Plugin {
     private container: interfaces.Container = Container;
     private storage: Storage<SettingsType>;
     private logger: LoggerInterface;
+    private c: MComposer
 
 
     private async loadSettings(): Promise<void> {
@@ -38,8 +42,7 @@ export default class MetaTitlePlugin extends Plugin {
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
         await this.saveData(settings);
-        this.composer.setState(settings.managers.graph, ManagerType.Graph);
-        this.composer.setState(settings.managers.explorer, ManagerType.Explorer);
+        this.composer.setState(settings.managers.header, ManagerType.Graph);
         this.composer.setState(settings.managers.header, ManagerType.Markdown);
         this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
         await this.runManagersUpdate();
@@ -61,6 +64,7 @@ export default class MetaTitlePlugin extends Plugin {
             this.container.getNamed<ResolverInterface>(SI.resolver, Resolving.Sync),
             this.container.getNamed<ResolverInterface<Resolving.Async>>(SI.resolver, Resolving.Async),
         );
+        this.c = Container.get(SI.composer);
         this.bind();
     }
 
@@ -69,10 +73,16 @@ export default class MetaTitlePlugin extends Plugin {
             .toFactory<{ [k: string]: any }, [string]>(() => (path: string): any => this.app.vault.getAbstractFileByPath(path));
         Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI['factory:obsidian:meta'])
             .toFactory<{ [k: string]: any }, [string, string]>(() => (path: string, type: string): any => this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]);
+        Container.bind<ObsidianFacade>(SI["facade:obsidian"]).toConstantValue(new ObsidianFacade(
+            this.app.vault,
+            this.app.metadataCache,
+            this.app.workspace
+        ));
     }
 
     public onunload() {
         this.composer.setState(false);
+        this.c.setState(false).catch(console.error);
     }
 
     private bind() {
@@ -90,10 +100,14 @@ export default class MetaTitlePlugin extends Plugin {
         }))
 
         this.app.workspace.onLayoutReady(() => {
-            this.composer.setState(this.storage.get('managers').get('graph').value(), ManagerType.Graph);
-            this.composer.setState(this.storage.get('managers').get('explorer').value(), ManagerType.Explorer);
-            this.composer.setState(this.storage.get('managers').get('header').value(), ManagerType.Markdown)
-            this.composer.setState(this.storage.get('managers').get('quick_switcher').value(), ManagerType.QuickSwitcher)
+            this.composer.setState(this.storage.get('managers').get(Manager.Graph).value(), ManagerType.Graph);
+            this.composer.setState(this.storage.get('managers').get(Manager.Header).value(), ManagerType.Markdown)
+            this.composer.setState(this.storage.get('managers').get(Manager.QuickSwitcher).value(), ManagerType.QuickSwitcher)
+            const promises = [];
+            for(const [id, state] of Object.entries(this.storage.get('managers').value())){
+                promises.push(this.c.setState(state, id as Manager));
+            }
+            Promise.all(promises).then(() => this.c.update()).catch(console.error);
             this.composer.update().catch(console.error);
         });
 
@@ -103,5 +117,6 @@ export default class MetaTitlePlugin extends Plugin {
 
     private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
         await this.composer.update(file);
+        await this.c.update(file.path);
     }
 }

@@ -4,3 +4,10 @@ export enum Leaves  {
     LG = 'localgraph',
     MD = 'markdown',
 }
+
+export enum Manager {
+    Explorer = 'explorer',
+    Graph = 'graph',
+    Header = 'header',
+    QuickSwitcher = 'quick_switcher'
+}
