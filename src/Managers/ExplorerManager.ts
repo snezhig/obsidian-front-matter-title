@@ -5,7 +5,6 @@ import SI from "@config/inversify.types";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ExplorerSort from "@src/Managers/Features/ExplorerSort";
 import ManagerInterface from "@src/Interfaces/ManagerInterface";
 
 @injectable()
@@ -19,8 +18,6 @@ export default class ExplorerManager implements ManagerInterface {
         private resolver: ResolverInterface<Resolving.Async>,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI["features:explorer:sort"])
-        private sort: ExplorerSort
     ) {
     }
 
@@ -33,22 +30,24 @@ export default class ExplorerManager implements ManagerInterface {
     }
 
     async disable(): Promise<void> {
+        if (!this.isEnabled()) {
+            return;
+        }
         if (this.explorerView) {
             this.restoreTitles();
             this.explorerView = null;
         }
         this.enabled = false;
-        //TODO: add toggle
-        this.sort.disable();
     }
 
     async enable(): Promise<void> {
+        if (this.isEnabled()) {
+            return;
+        }
         this.explorerView = this.getExplorerView();
         this.enabled = true;
-        this.sort.setView(this.explorerView);
-        //TODO: add toggle
-        this.sort.enable();
     }
+
 
 
     private getExplorerView(): TFileExplorerView | null {
@@ -82,7 +81,7 @@ export default class ExplorerManager implements ManagerInterface {
 
         const promises = items.map(e => this.setTitle(e));
 
-        return Promise.all(promises).then(() => this.explorerView.requestSort()).then(() => true);
+        return Promise.all(promises).then(() => true);
     }
 
     private async setTitle(item: TFileExplorerItem): Promise<void> {

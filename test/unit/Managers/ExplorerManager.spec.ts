@@ -4,7 +4,6 @@ import ExplorerManager from "@src/Managers/ExplorerManager";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import {TFileExplorerItem, TFileExplorerView} from "obsidian";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ExplorerSort from "@src/Managers/Features/ExplorerSort";
 
 const resolverMock = mock<ResolverInterface<Resolving.Async>>();
 const getFileItems = jest.fn(() => ({}));
@@ -21,7 +20,7 @@ facade.getLeavesOfType.mockReturnValue([]);
 
 
 describe('Test enable exceptions', () => {
-    const manager = new ExplorerManager(resolverMock, facade, mock<ExplorerSort>());
+    const manager = new ExplorerManager(resolverMock, facade);
     test('Should throw error with undefined view', () => {
         facade.getLeavesOfType.mockReturnValueOnce([]);
         expect(() => manager.enable()).rejects.toThrow(ExplorerViewUndefined);
@@ -37,7 +36,7 @@ describe('Test enable exceptions', () => {
 })
 
 test('Should do nothing because it is not enabled', () => {
-    const manager = new ExplorerManager(resolverMock, facade, mock<ExplorerSort>());
+    const manager = new ExplorerManager(resolverMock, facade);
     expect(manager.update()).resolves.toBeFalsy();
     expect(resolverMock.resolve).not.toHaveBeenCalled();
 })
@@ -51,7 +50,7 @@ describe('Test flow', () => {
     getFileItems.mockReturnValue(items);
     //@ts-ignore
     facade.getLeavesOfType.mockReturnValue([{view: viewMock}]);
-    const manager = new ExplorerManager(resolverMock, facade, mock<ExplorerSort>());
+    const manager = new ExplorerManager(resolverMock, facade);
     test('Should be enabled', async() => {
         await manager.enable();
         expect(manager.isEnabled()).toBeTruthy();
