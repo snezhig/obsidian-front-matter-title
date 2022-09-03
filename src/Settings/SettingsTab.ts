@@ -4,6 +4,8 @@ import Storage, {PrimitiveItemInterface} from "@src/Settings/Storage";
 import {SettingsEvent, SettingsManagersType, SettingsType} from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
+import {Feature, Manager} from "@src/enum";
+import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 
 export default class SettingsTab extends PluginSettingTab {
     changed = false;
@@ -17,7 +19,7 @@ export default class SettingsTab extends PluginSettingTab {
     ) {
         super(app, plugin);
         this.updatePrevious();
-        this.dispatcher.dispatch('settings.loaded', new Event({settings: this.storage.collect()}))
+        dispatcher.dispatch('settings.loaded', new Event({settings: this.storage.collect()}))
     }
 
     display(): any {
@@ -50,6 +52,7 @@ export default class SettingsTab extends PluginSettingTab {
             );
         this.buildRules();
         this.buildManagers();
+        this.buildFeatures();
         containerEl.createEl('h4', {text: 'Util'});
         new Setting(containerEl)
             .setName('Debug info')
@@ -73,12 +76,31 @@ export default class SettingsTab extends PluginSettingTab {
         this.buildDonation();
     }
 
+    private buildFeatures(): void {
+        this.containerEl.createEl('h4', {text: 'Features'});
+        const features = this.storage.get('features');
+        const setting = new Setting(this.containerEl)
+            .setName('Explorer sort')
+            .setDesc('Enable alphabetical sort by custom titles')
+            .addToggle(t => t
+                .setValue(features.get(Feature.ExplorerSort).get('enabled').value())
+                .onChange(v => this.change(features.get(Feature.ExplorerSort).get('enabled'), v))
+            )
+        this.dispatcher.addListener('settings:tab:manager:changed', new CallbackVoid(e => {
+            if (e.get().id === Manager.Explorer) {
+                setting.setDisabled(e.get().value);
+                this.change(features.get(Feature.ExplorerSort).get('enabled'), false);
+            }
+        }))
+    }
+
     private buildRules(): void {
         this.containerEl.createEl('h4', {text: 'Rules'});
         this.buildRulePaths();
         this.buildRuleDelimiter();
 
     }
+
 
     private buildRulePaths(): void {
         const descriptions = {
@@ -136,14 +158,14 @@ export default class SettingsTab extends PluginSettingTab {
         this.containerEl.createEl('h4', {text: 'Managers'});
         const data: { manager: SettingsManagersType, name: string, desc: string }[] = [
             {
-                manager: 'header',
+                manager: Manager.Header,
                 name: 'Header title',
                 desc: 'Replace titles in header of leaves and update them'
             },
-            {manager: 'explorer', name: 'Explorer title', desc: 'Replace shown titles in the file explorer'},
-            {manager: 'graph', name: 'Graph title', desc: 'Replace shown titles in the graph/local-graph'},
+            {manager: Manager.Explorer, name: 'Explorer title', desc: 'Replace shown titles in the file explorer'},
+            {manager: Manager.Graph, name: 'Graph title', desc: 'Replace shown titles in the graph/local-graph'},
             {
-                manager: 'quick_switcher',
+                manager: Manager.QuickSwitcher,
                 name: 'Quick switches title',
                 desc: 'Replace shown titles in the quick switcher modal'
             },
@@ -173,8 +195,6 @@ export default class SettingsTab extends PluginSettingTab {
         anchor.setAttribute('href', 'https://www.buymeacoffee.com/snezhig')
         anchor.appendChild((new DOMParser()).parseFromString(coffee, 'text/xml').documentElement)
         div.appendChild(anchor);
-
-
     }
 
     private updatePrevious(): void {

@@ -1,31 +1,46 @@
-import {TFileExplorerItem, TFileExplorerView, TFolder} from "obsidian";
+import {debounce, TFileExplorerItem, TFileExplorerView, TFolder} from "obsidian";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import {inject, injectable, named} from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
+import FeatureInterface from "@src/Interfaces/FeatureInterface";
+import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
+import {Feature, Leaves} from "@src/enum";
+import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
+import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import {AppEvents} from "@src/Types";
 
 @injectable()
-export default class ExplorerSort {
+export default class ExplorerSortFeature implements FeatureInterface<Feature> {
     private view: TFileExplorerView;
     private enabled = false;
-    private replacer: FunctionReplacer<TFileExplorerItem, 'sort', ExplorerSort>;
+    private replacer: FunctionReplacer<TFileExplorerItem, 'sort', ExplorerSortFeature>;
 
     constructor(
         @inject(SI.resolver) @named(Resolving.Sync)
         private resolver: ResolverInterface<Resolving.Sync>,
         @inject(SI.logger) @named('explorer:feature:sort')
-        private logger: LoggerInterface
+        private logger: LoggerInterface,
+        @inject(SI["facade:obsidian"])
+        private facade: ObsidianFacade,
+        @inject(SI.dispatcher)
+        private dispatcher: DispatcherInterface<AppEvents>
     ) {
+        this.initView();
+        const s = debounce(() => this.isEnabled() && this.view.requestSort(), 1000);
+        this.dispatcher.addListener('manager:explorer:update', new CallbackVoid(s));
     }
 
-    public setView(view: TFileExplorerView): ExplorerSort {
-        this.view = view;
-        return this;
+    private initView(): void {
+        this.view = (this.facade.getLeavesOfType(Leaves.FE)?.[0]?.view as TFileExplorerView ?? null);
     }
 
     private tryToReplaceOriginalSort(): void {
+        if (!this.isEnabled()) {
+            return;
+        }
         if (this.replacer) {
             this.logger.log(`Replacer is exist already. State is ${this.replacer.isEnabled()}`);
             if (!this.replacer.isEnabled()) {
@@ -42,7 +57,7 @@ export default class ExplorerSort {
         }
         this.logger.log('Init replacer');
 
-        this.replacer = new FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>(
+        this.replacer = new FunctionReplacer<TFileExplorerItem, "sort", ExplorerSortFeature>(
             item,
             'sort',
             this,
@@ -111,24 +126,26 @@ export default class ExplorerSort {
         }
     }
 
-    public enable(): ExplorerSort {
-        if (!this.view) {
+    public async enable(): Promise<void> {
+        if (!this.view && (this.initView(), !this.view)) {
             throw new ExplorerViewUndefined();
         }
-        this.tryToReplaceOriginalSort();
         this.enabled = true;
+        this.tryToReplaceOriginalSort();
         this.logger.log('enabled');
-        return this;
     }
 
-    public disable(): ExplorerSort {
+    public async disable(): Promise<void> {
         this.enabled = false;
-        this.replacer.disable();
+        this.replacer?.disable();
         this.logger.log('disabled');
-        return this;
     }
 
     public isEnabled(): boolean {
         return this.enabled;
+    }
+
+    getId(): Feature {
+        return Feature.ExplorerSort;
     }
 }

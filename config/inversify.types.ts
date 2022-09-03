@@ -1,4 +1,3 @@
-
 const SI = {
     templates: '',
     dispatcher: '',
@@ -29,9 +28,10 @@ const SI = {
     'getter:delimiter': '',
     'getter:obsidian:leaves': '',
     'facade:obsidian': '',
-    'features:explorer:sort': '',
-    'manager': '',
-    'composer': '',
+    feature: '',
+    'feature_toggle': '',
+    manager: '',
+    composer: '',
 };
 
 for (const key of Object.keys(SI)) {

@@ -23,9 +23,13 @@ import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 import ExplorerManager from "@src/Managers/ExplorerManager";
-import ExplorerSort from "@src/Managers/Features/ExplorerSort";
+import ExplorerSortFeature from "@src/Managers/Features/ExplorerSortFeature";
 import ManagerInterface from "@src/Interfaces/ManagerInterface";
 import Composer from "@src/Managers/Composer";
+import FeatureInterface from "@src/Interfaces/FeatureInterface";
+import {Feature} from "@src/enum";
+import FeatureToggle from "@src/Managers/Features/FeatureToggle";
+import App from "@src/App";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -49,7 +53,8 @@ Container.bind<LoggerInterface>(SI.logger)
     .when(() => true);
 
 Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
-Container.bind<ExplorerSort>(SI["features:explorer:sort"]).to(ExplorerSort);
+Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).inSingletonScope();
+Container.bind<FeatureToggle>(SI.feature_toggle).to(FeatureToggle).inSingletonScope();
 Container.bind<Composer>(SI.composer).to(Composer);
 //START CREATOR
 bindCreator(Container);

@@ -45,6 +45,7 @@ export default class MetaTitlePlugin extends Plugin {
         this.composer.setState(settings.managers.header, ManagerType.Graph);
         this.composer.setState(settings.managers.header, ManagerType.Markdown);
         this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
+        await this.processManagers();
         await this.runManagersUpdate();
     }
 
@@ -103,20 +104,24 @@ export default class MetaTitlePlugin extends Plugin {
             this.composer.setState(this.storage.get('managers').get(Manager.Graph).value(), ManagerType.Graph);
             this.composer.setState(this.storage.get('managers').get(Manager.Header).value(), ManagerType.Markdown)
             this.composer.setState(this.storage.get('managers').get(Manager.QuickSwitcher).value(), ManagerType.QuickSwitcher)
-            const promises = [];
-            for(const [id, state] of Object.entries(this.storage.get('managers').value())){
-                promises.push(this.c.setState(state, id as Manager));
-            }
-            Promise.all(promises).then(() => this.c.update()).catch(console.error);
+            this.processManagers().catch(console.error);
             this.composer.update().catch(console.error);
         });
 
         this.dispatcher.addListener('settings.changed', new CallbackVoid<SettingsEvent['settings.changed']>(e => this.onSettingsChange(e.get().actual)));
     }
 
+    private async processManagers(): Promise<void> {
+        const promises = [];
+        for(const [id, state] of Object.entries(this.storage.get('managers').value())){
+            promises.push(this.c.setState(state, id as Manager));
+        }
+        await Promise.all(promises)
+        await this.c.update();
+    }
 
     private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
         await this.composer.update(file);
-        await this.c.update(file.path);
+        await this.c.update(file?.path ?? null);
     }
 }
