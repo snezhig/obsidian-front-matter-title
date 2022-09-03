@@ -2,6 +2,7 @@ import {mock} from 'jest-mock-extended';
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 type Events = {
     test: { value: string },
@@ -32,7 +33,7 @@ const data: { [T in keyof Events]?: DataItem<T> } =
     };
 describe('Dispatcher Test', () => {
     describe('Test data', () => {
-        const dispatcher = new Dispatcher<Events>();
+        const dispatcher = new Dispatcher<Events>(mock<LoggerInterface>());
         const events: { [K in keyof Events]?: EventInterface<any> } = {};
         const callbacks: { [K in keyof Events]?: unknown[] } = {};
         for (const [name, item] of Object.entries(data) as [keyof Events, DataItem<any>][]) {
