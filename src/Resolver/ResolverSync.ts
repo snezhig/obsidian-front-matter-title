@@ -45,19 +45,18 @@ export default class ResolverSync implements ResolverInterface {
     private get(path: string): string | null {
         let title: string | null;
         const item = this.cache.getItem<string | null>(path);
-
-        if (item.isHit() === false) {
-            try {
+        try {
+            if (item.isHit() === false) {
                 title = this.creator.create(path);
-            } catch (e) {
-                console.error(`Error by path ${path}`, e);
+                this.cache.save(item.set(title));
+            } else {
+                title = item.get();
             }
-            this.cache.save(item.set(title));
-        } else {
-            title = item.get();
+        } catch (e) {
+            console.error(`Error by path ${path}`, e);
         }
 
-        return title;
+        return title ?? null;
     }
 
     private valid(path: string): boolean {

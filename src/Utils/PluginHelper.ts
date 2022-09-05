@@ -1,4 +1,5 @@
 import {SettingsType} from "@src/Settings/SettingsType";
+import {Feature} from "@src/enum";
 
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
@@ -23,6 +24,9 @@ export default class PluginHelper {
             debug: false,
             boot: {
                 delay: 0
+            },
+            features: {
+                [Feature.ExplorerSort]: {enabled: false}
             }
         }
     }

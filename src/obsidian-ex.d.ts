@@ -1,21 +1,26 @@
 import 'obsidian';
-import {MarkdownView, SuggestModal, TAbstractFile, TFile, View, WorkspaceLeaf} from "obsidian";
+import {MarkdownView, SuggestModal, TAbstractFile, TFile, TFolder, View, WorkspaceLeaf} from "obsidian";
 
 declare module 'obsidian' {
     export interface TFileExplorerItem {
-        file: TAbstractFile,
+        file: TFile|TFolder,
         titleEl: HTMLDivElement,
         titleInnerEl: HTMLDivElement,
+        sort?: () => void,
+        vChildren?: {
+            setChildren(items: any[]): void
+        }
     }
 
     export class TFileExplorerView extends View {
         fileItems: {
             [K: string]: TFileExplorerItem
         };
-
+        sortOrder: string;
         getDisplayText(): string;
 
         getViewType(): string;
+        requestSort: () => void;
     }
 
     export class GraphNode {

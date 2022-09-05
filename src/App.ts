@@ -9,18 +9,22 @@ import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteLi
 import Event from "@src/Components/EventDispatcher/Event";
 import {AppEvents} from "@src/Types";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
+import FeatureToggle from "@src/Managers/Features/FeatureToggle";
+import {injectable} from "inversify";
 
+@injectable()
 export default class App {
     private container = Container;
-
-    constructor() {
+    private featureToggle: FeatureToggle;
+    constructor(
+    ) {
         this.bind();
     }
 
     private bind(): void {
         const dispatcher: DispatcherInterface<SettingsEvent> = this.container.get(SI.dispatcher);
-        dispatcher.addListener('settings.changed', new CallbackVoid<SettingsEvent['settings.changed']>(e => this.onSettingsChanged(e.get())))
-        dispatcher.addListener('settings.loaded', new CallbackVoid(e => this.init(e.get().settings)))
+        dispatcher.addListener('settings.changed', new CallbackVoid<SettingsEvent['settings.changed']>(e => this.onSettingsChanged(e.get())));
+        dispatcher.addListener('settings.loaded', new CallbackVoid(e => this.init(e.get().settings)));
     }
 
     private init(settings: SettingsType): void {
@@ -29,7 +33,10 @@ export default class App {
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setMode(settings.rules.paths.mode);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setList(settings.rules.paths.values);
         this.container.get<LoggerComposer>(SI["logger:composer"])[settings.debug ? 'enable' : 'disable']();
+        this.featureToggle = this.container.get<FeatureToggle>(SI.feature_toggle);
     }
+
+
 
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {
         const changed = ObjectHelper.compare(old, actual);
