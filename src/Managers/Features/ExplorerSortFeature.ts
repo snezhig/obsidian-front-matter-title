@@ -104,8 +104,8 @@ export default class ExplorerSortFeature implements FeatureInterface<Feature> {
             } else if (!i && r) {
                 k = 1;
             } else {
-                const at = i ? a.name : this.resolver.resolve(a.path);
-                const bt = r ? b.name : this.resolver.resolve(b.path);
+                const at = i ? a.name : (this.resolver.resolve(a.path) ?? a.name);
+                const bt = r ? b.name : (this.resolver.resolve(b.path) ?? b.name);
                 k = at.localeCompare(bt);
                 k = this.isAsc(sortOrder) ? k : -k;
             }
