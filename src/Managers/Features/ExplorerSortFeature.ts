@@ -28,8 +28,10 @@ export default class ExplorerSortFeature implements FeatureInterface<Feature> {
         @inject(SI.dispatcher)
         private dispatcher: DispatcherInterface<AppEvents>
     ) {
-        this.initView();
-        const s = debounce(() => this.isEnabled() && this.view.requestSort(), 1000);
+        const s = debounce(() => {
+            logger.log('Try to request sort by event')
+            this.isEnabled() && this.view.requestSort()
+        }, 1000);
         this.dispatcher.addListener('manager:explorer:update', new CallbackVoid(s));
     }
 
@@ -138,6 +140,7 @@ export default class ExplorerSortFeature implements FeatureInterface<Feature> {
     public async disable(): Promise<void> {
         this.enabled = false;
         this.replacer?.disable();
+        this.view?.requestSort();
         this.logger.log('disabled');
     }
 

@@ -1,7 +1,7 @@
 import {CachedMetadata, Plugin, TAbstractFile} from 'obsidian';
 import Composer, {ManagerType} from "./src/Title/Manager/Composer";
 import MComposer from "./src/Managers/Composer";
-import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
+import {SettingsEvent, SettingsFeatures, SettingsType} from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
@@ -17,7 +17,8 @@ import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import {Manager} from "@src/enum";
+import {Feature, Manager} from "@src/enum";
+import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -27,6 +28,7 @@ export default class MetaTitlePlugin extends Plugin {
     private storage: Storage<SettingsType>;
     private logger: LoggerInterface;
     private c: MComposer
+    private featureToggle: FeatureToggle;
 
 
     private async loadSettings(): Promise<void> {
@@ -47,6 +49,7 @@ export default class MetaTitlePlugin extends Plugin {
         this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
         await this.processManagers();
         await this.runManagersUpdate();
+        this.processFeatures(settings.features);
     }
 
     public async onload() {
@@ -66,6 +69,7 @@ export default class MetaTitlePlugin extends Plugin {
             this.container.getNamed<ResolverInterface<Resolving.Async>>(SI.resolver, Resolving.Async),
         );
         this.c = Container.get(SI.composer);
+        this.featureToggle = Container.get(SI.feature_toggle);
         this.bind();
     }
 
@@ -105,6 +109,7 @@ export default class MetaTitlePlugin extends Plugin {
             this.composer.setState(this.storage.get('managers').get(Manager.Header).value(), ManagerType.Markdown)
             this.composer.setState(this.storage.get('managers').get(Manager.QuickSwitcher).value(), ManagerType.QuickSwitcher)
             this.processManagers().catch(console.error);
+            this.processFeatures(this.storage.get('features').value());
             this.composer.update().catch(console.error);
         });
 
@@ -113,11 +118,17 @@ export default class MetaTitlePlugin extends Plugin {
 
     private async processManagers(): Promise<void> {
         const promises = [];
-        for(const [id, state] of Object.entries(this.storage.get('managers').value())){
+        for (const [id, state] of Object.entries(this.storage.get('managers').value())) {
             promises.push(this.c.setState(state, id as Manager));
         }
         await Promise.all(promises)
         await this.c.update();
+    }
+
+    private processFeatures(options: SettingsFeatures<Feature>): void {
+        for (const [id, {enabled}] of Object.entries(options)) {
+            this.featureToggle.toggle(id as Feature, enabled).catch(console.error);
+        }
     }
 
     private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {

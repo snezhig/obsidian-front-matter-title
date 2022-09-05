@@ -1,6 +1,6 @@
 import Container from "@config/inversify.config";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {SettingsEvent, SettingsFeatures, SettingsType} from "@src/Settings/SettingsType";
+import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import SI from "@config/inversify.types";
@@ -9,7 +9,6 @@ import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteLi
 import Event from "@src/Components/EventDispatcher/Event";
 import {AppEvents} from "@src/Types";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
-import {Feature} from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import {injectable} from "inversify";
 
@@ -35,15 +34,9 @@ export default class App {
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setList(settings.rules.paths.values);
         this.container.get<LoggerComposer>(SI["logger:composer"])[settings.debug ? 'enable' : 'disable']();
         this.featureToggle = this.container.get<FeatureToggle>(SI.feature_toggle);
-        this.processFeatures(settings.features);
-
     }
 
-    private processFeatures(options: SettingsFeatures<Feature>): void {
-        for (const [id, {enabled}] of Object.entries(options)) {
-            this.featureToggle.toggle(id as Feature, enabled).catch(console.error);
-        }
-    }
+
 
     private onSettingsChanged({old, actual}: SettingsEvent['settings.changed']): void {
         const changed = ObjectHelper.compare(old, actual);
@@ -71,9 +64,6 @@ export default class App {
 
         if (changed.debug) {
             this.container.get<LoggerComposer>(SI["logger:composer"])[actual.debug ? 'enable' : 'disable']();
-        }
-        if (changed.features) {
-            this.processFeatures(actual.features);
         }
 
         const dispatcher = this.container.get<DispatcherInterface<events>>(SI.dispatcher);
