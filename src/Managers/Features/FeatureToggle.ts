@@ -25,4 +25,11 @@ export default class FeatureToggle {
         const feature = this.features[id];
         feature && await feature[state ? 'enable' : 'disable']();
     }
+    async toggleAll(state: boolean): Promise<void>{
+        const promises = [];
+        for(const feature of Object.values(this.features)){
+            promises.push(feature[state ? 'enable': 'disable']());
+        }
+        await Promise.all(promises);
+    }
 }

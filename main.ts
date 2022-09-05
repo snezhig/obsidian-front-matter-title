@@ -91,6 +91,7 @@ export default class MetaTitlePlugin extends Plugin {
     public onunload() {
         this.composer.setState(false);
         this.c.setState(false).catch(console.error);
+        this.featureToggle.toggleAll(false).catch(console.error);
     }
 
     private bind() {
