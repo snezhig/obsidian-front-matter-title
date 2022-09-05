@@ -23,7 +23,7 @@ export default class PluginHelper {
             },
             debug: false,
             boot: {
-                delay: 0
+                delay: 1000
             },
             features: {
                 [Feature.ExplorerSort]: {enabled: false}
