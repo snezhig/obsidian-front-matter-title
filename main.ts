@@ -19,6 +19,7 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import {Feature, Manager} from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
+import ObjectHelper from "@src/Utils/ObjectHelper";
 
 
 export default class MetaTitlePlugin extends Plugin {
@@ -32,12 +33,14 @@ export default class MetaTitlePlugin extends Plugin {
 
 
     private async loadSettings(): Promise<void> {
-        const data: SettingsType = {...PluginHelper.createDefaultSettings(), ...{templates: ['title']}};
-        const current = await this.loadData() ?? {};
-        for (const k of Object.keys(data) as (keyof SettingsType)[]) {
-            //@ts-ignore
-            data[k] = current[k] ?? data[k];
-        }
+        let data: SettingsType = {
+            ...PluginHelper.createDefaultSettings(),
+            ...{
+                templates: ['title'],
+                boot: {delay: 1000}
+            }
+        };
+        data = ObjectHelper.fillFrom(data, await this.loadData() ?? {});
         this.storage = new Storage<SettingsType>(data);
         this.addSettingTab(new SettingsTab(this.app, this, this.storage, this.dispatcher));
     }
