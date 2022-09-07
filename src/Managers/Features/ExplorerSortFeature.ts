@@ -60,7 +60,8 @@ export default class ExplorerSortFeature implements FeatureInterface<Feature> {
         this.logger.log('Init replacer');
 
         this.replacer = new FunctionReplacer<TFileExplorerItem, "sort", ExplorerSortFeature>(
-            item,
+            //@ts-ignore
+            item.__proto__,
             'sort',
             this,
             function (args, defaultArgs, vanilla) {
