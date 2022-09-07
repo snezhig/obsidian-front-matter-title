@@ -40,6 +40,7 @@ describe('Black-White List test', () => {
     const list = new BlackWhiteList();
     list.setList(path);
     for (const item of items) {
+        
         test(`Path "${item.path}" is expected to be ${item.expected.toString()} [${item.mode} mode]`, () => {
             list.setMode(item.mode);
             expect(list.isFileAllowed(item.path)).toBe(item.expected);

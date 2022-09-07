@@ -22,6 +22,14 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
+import ExplorerManager from "@src/Managers/ExplorerManager";
+import ExplorerSortFeature from "@src/Managers/Features/ExplorerSortFeature";
+import ManagerInterface from "@src/Interfaces/ManagerInterface";
+import Composer from "@src/Managers/Composer";
+import FeatureInterface from "@src/Interfaces/FeatureInterface";
+import {Feature} from "@src/enum";
+import FeatureToggle from "@src/Managers/Features/FeatureToggle";
+import App from "@src/App";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -43,6 +51,11 @@ Container.bind<LoggerInterface>(SI.logger)
         return context.container.get<LoggerComposer>(SI['logger:composer']).create(context.currentRequest.target.getNamedTag().value)
     })
     .when(() => true);
+
+Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
+Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).inSingletonScope();
+Container.bind<FeatureToggle>(SI.feature_toggle).to(FeatureToggle).inSingletonScope();
+Container.bind<Composer>(SI.composer).to(Composer);
 //START CREATOR
 bindCreator(Container);
 //END CREATOR

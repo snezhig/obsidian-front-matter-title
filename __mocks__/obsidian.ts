@@ -2,6 +2,10 @@ import * as fs from "fs";
 import {EventEmitter} from "events";
 import {CachedMetadata, TFileExplorerItem, WorkspaceLeaf} from "obsidian";
 
+export function debounce(cb: () => any){
+    return (...args: []) => cb(...args);
+}
+
 export abstract class TAbstractFile {
     path: string;
     vault: Vault;

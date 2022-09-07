@@ -1,40 +1,43 @@
-
 export default class FunctionReplacer<T, K extends keyof T, O> {
-	private vanilla: T[K] = null;
+    private vanilla: T[K] = null;
 
-	public constructor(
-		private proto: T,
-		private method: K,
-		private args: O,
-		private implementation: (args: O, defaultArgs: unknown[], vanilla: T[K]) => any
-	) {
-		this.valid();
-	}
+    public constructor(
+        private proto: T,
+        private method: K,
+        private args: O,
+        private implementation: (args: O, defaultArgs: unknown[], vanilla: T[K]) => any
+    ) {
+        this.valid();
+    }
 
-	private valid(): void {
-		if (typeof this.proto[this.method] !== "function") {
-			throw new Error(`Method ${this.method} is not a function`)
-		}
-	}
+    private valid(): void {
+        if (typeof this.proto[this.method] !== "function") {
+            throw new Error(`Method ${this.method} is not a function`)
+        }
+    }
 
-	public enable(): boolean {
-		if (this.vanilla !== null) {
-			return false;
-		}
+    public enable(): boolean {
+        if (this.vanilla !== null) {
+            return false;
+        }
 
-		const self = this;
-		this.vanilla = this.proto[this.method];
-		this.proto[this.method] = function (...args: unknown[]): unknown {
-			return self.implementation.call(this, self.args, args, self.vanilla);
-		} as unknown as T[K];
+        const self = this;
+        this.vanilla = this.proto[this.method];
+        this.proto[this.method] = function (...args: unknown[]): unknown {
+            return self.implementation.call(this, self.args, args, self.vanilla);
+        } as unknown as T[K];
 
-		return true;
-	}
+        return true;
+    }
 
-	public disable(): void {
-		if (this.vanilla !== null) {
-			this.proto[this.method] = this.vanilla;
-			this.vanilla = null;
-		}
-	}
+    public disable(): void {
+        if (this.vanilla !== null) {
+            this.proto[this.method] = this.vanilla;
+            this.vanilla = null;
+        }
+    }
+
+    public isEnabled(): boolean {
+        return this.vanilla !== null;
+    }
 }

@@ -1,13 +1,14 @@
-import {TAbstractFile, TFileExplorerItem, TFileExplorerView, Workspace} from "obsidian";
-import {Leaves} from "@src/enum";
+import {TFileExplorerItem, TFileExplorerView} from "obsidian";
+import {Leaves, Manager} from "@src/enum";
 import {inject, injectable, named} from "inversify";
 import SI from "@config/inversify.types";
 import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
-import {getLeavesOfType} from "@src/Obsidian/Types";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
+import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
+import ManagerInterface from "@src/Interfaces/ManagerInterface";
 
 @injectable()
-export default class ExplorerManager{
+export default class ExplorerManager implements ManagerInterface {
     private explorerView: TFileExplorerView = null;
     private originTitles = new Map<string, string>();
     private enabled = false;
@@ -15,32 +16,42 @@ export default class ExplorerManager{
     constructor(
         @inject(SI.resolver) @named(Resolving.Async)
         private resolver: ResolverInterface<Resolving.Async>,
-        @inject(SI["getter:obsidian:leaves"])
-        private leavesGetter: getLeavesOfType
-
+        @inject(SI["facade:obsidian"])
+        private facade: ObsidianFacade,
     ) {
+    }
+
+    getId(): Manager {
+        return Manager.Explorer;
     }
 
     isEnabled(): boolean {
         return this.enabled;
     }
 
-    disable(): void {
-        if(this.explorerView) {
+    async disable(): Promise<void> {
+        if (!this.isEnabled()) {
+            return;
+        }
+        if (this.explorerView) {
             this.restoreTitles();
             this.explorerView = null;
         }
         this.enabled = false;
     }
 
-    enable(): void {
+    async enable(): Promise<void> {
+        if (this.isEnabled()) {
+            return;
+        }
         this.explorerView = this.getExplorerView();
         this.enabled = true;
     }
 
 
+
     private getExplorerView(): TFileExplorerView | null {
-        const leaves = this.leavesGetter(Leaves.FE);
+        const leaves = this.facade.getLeavesOfType(Leaves.FE);
 
         if (leaves.length > 1) {
             throw new Error("There are some explorers' leaves");
@@ -64,8 +75,8 @@ export default class ExplorerManager{
             ? [this.explorerView.fileItems[path]]
             : Object.values(this.explorerView.fileItems);
 
-        if(!items.filter(e => e).length){
-            return  false;
+        if (!items.filter(e => e).length) {
+            return false;
         }
 
         const promises = items.map(e => this.setTitle(e));

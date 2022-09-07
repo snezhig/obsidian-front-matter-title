@@ -19,6 +19,7 @@ describe('Test Creator', () => {
     const events: { [K in keyof AppEvents]?: CallbackInterface<AppEvents[K]> } = {};
     const templateCallback = jest.fn(() => [template]);
     const logger = mock<LoggerInterface>();
+    // @ts-ignore
     dispatcher.addListener.mockImplementation((name, cb) => events[name] = cb);
     template.getPlaceholders.mockReturnValue([placeholder]);
     template.getTemplate.mockReturnValue(templateStr);

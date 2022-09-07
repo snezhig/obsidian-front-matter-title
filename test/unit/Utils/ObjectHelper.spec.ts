@@ -49,7 +49,7 @@ describe('Test compare', () => {
         delete actual.object;
         const expected = {object: {foo: true, bar: true, nested: {item: true}}};
         expect(ObjectHelper.compare(data, actual)).toEqual(expected);
-        expect(ObjectHelper.compare(actual,data)).toEqual(expected);
+        expect(ObjectHelper.compare(actual, data)).toEqual(expected);
     })
 
     test('Should return diff for array', () => {
@@ -59,4 +59,30 @@ describe('Test compare', () => {
         expect(ObjectHelper.compare(data, second)).toEqual(expected);
         expect(ObjectHelper.compare(second, data)).toEqual(expected);
     })
+})
+
+describe('Test fillFrom', () => {
+    type obj = {
+        foo: { bar?: number },
+        baz: string,
+        qux: any[],
+        thud: number
+    }
+    type dynamic<T> = { [K in keyof T]?: T[K] | null }
+    const def = (): dynamic<obj> => ({
+        foo: {bar: 23},
+        baz: 'quux',
+        qux: ['corge']
+    })
+
+    test('Should return def without changes', () => {
+        expect(ObjectHelper.fillFrom(def(), {})).toEqual(def());
+        expect(ObjectHelper.fillFrom(def(), {foo: null, qux: null})).toEqual(def());
+        expect(ObjectHelper.fillFrom(def(), {thud: 32})).toEqual(def());
+    })
+
+    test('Should change bar to null', () => {
+        expect(ObjectHelper.fillFrom(def(), {foo: {bar: null}})).toHaveProperty('foo.bar', null);
+    })
+
 })
