@@ -62,11 +62,12 @@ test('Should call requestSort', () => {
     view.requestSort.mockClear();
 })
 
-test('Should be disabled and do not call requestSort', async () => {
+test('Should switch off, requestSort and do not call requestSort by event', async () => {
     await sort.disable();
     expect(sort.isEnabled()).toBeFalsy();
+    expect(view.requestSort).toHaveBeenCalledTimes(1)
     callback.execute(new Event({}));
-    expect(view.requestSort).not.toHaveBeenCalled();
+    expect(view.requestSort).toHaveBeenCalledTimes(1)
 })
 
 test('Should not init times after disabling', () => {
