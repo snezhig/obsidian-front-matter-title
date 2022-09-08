@@ -1,3 +1,5 @@
+import {Arr} from "tern";
+
 type obj = { [k: string]: any };
 
 export type Changed<T> = { [K in keyof T]?: T[K] extends object ? Changed<T[K]> : boolean };
@@ -39,7 +41,7 @@ export default class ObjectHelper {
                 continue;
             }
             const type = typeof v;
-            if (type === "object") {
+            if (type === "object" && !Array.isArray(fv)) {
                 if (fv !== null) {
                     ObjectHelper.fillFrom(v, fv);
                 }
