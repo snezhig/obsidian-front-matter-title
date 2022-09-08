@@ -47,6 +47,7 @@ export default class LinkNoteManager implements Manager {
     }
 
     private async process(file: TFile) {
+        //TODO: remove logic and use new service
         const links = this.facade.getFileLinksCache(file.path);
         const found: { [k: string]: { placeholder: string, file: TFile } } = {};
         for (const link of links) {

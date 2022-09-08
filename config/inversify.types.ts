@@ -29,9 +29,10 @@ const SI = {
     'getter:obsidian:leaves': '',
     'facade:obsidian': '',
     feature: '',
-    'feature_toggle': '',
+    feature_toggle: '',
     manager: '',
     composer: '',
+    'obsidian:app': ''
 };
 
 for (const key of Object.keys(SI)) {
