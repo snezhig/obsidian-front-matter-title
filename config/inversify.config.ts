@@ -30,6 +30,10 @@ import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import {Feature} from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import App from "@src/App";
+import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
+import LinkNoteManager from "@src/Managers/FileNoteLinkManager";
+import ChangeApproveModal from '@src/UI/ChangeApproveModal';
+import LinkNoteApproveFeature from '@src/Managers/Features/LinkNoteApproveFeature';
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -53,9 +57,14 @@ Container.bind<LoggerInterface>(SI.logger)
     .when(() => true);
 
 Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
+Container.bind<ManagerInterface>("test").to(LinkNoteManager);
+Container.bind<LinkNoteApproveFeature>("t").to(LinkNoteApproveFeature);
 Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).inSingletonScope();
 Container.bind<FeatureToggle>(SI.feature_toggle).to(FeatureToggle).inSingletonScope();
 Container.bind<Composer>(SI.composer).to(Composer);
+
+Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
+Container.bind(SI['modal:change:approve']).to(ChangeApproveModal).inSingletonScope();
 //START CREATOR
 bindCreator(Container);
 //END CREATOR

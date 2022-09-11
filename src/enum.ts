@@ -10,10 +10,10 @@ export enum Manager {
   Graph = "graph",
   Header = "header",
   QuickSwitcher = "quick_switcher",
-  FilteNoteLink = "file_note_link",
+  FileNoteLink = "file_note_link",
 }
 
 export enum Feature {
   ExplorerSort = "explorer:sort",
-  FileNoteLink = "file:note:link",
+  FileNoteLinkApproval = "file:note:link:approval",
 }

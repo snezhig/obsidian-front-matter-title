@@ -28,7 +28,7 @@ export default class PluginHelper {
       },
       features: {
         [Feature.ExplorerSort]: { enabled: false },
-        [Feature.FileNoteLink]: { enabled: false },
+        [Feature.FileNoteLinkApproval]: { enabled: false },
       },
     };
   }
