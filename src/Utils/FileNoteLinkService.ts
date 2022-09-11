@@ -1,9 +1,8 @@
-import { TFile } from "obsidian";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import SI from "@config/inversify.types";
 import { inject, injectable } from "inversify";
 
-type NoteLinks = { link: string; original: string; dest: TFile };
+type NoteLinks = { link: string; original: string; dest: string };
 @injectable()
 export default class FileNoteLinkService {
   constructor(
@@ -19,7 +18,7 @@ export default class FileNoteLinkService {
         continue;
       }
       const f = this.facade.getFirstLinkpathDest(link.link);
-      result.push({ dest: f, link: link.link, original: link.original });
+      result.push({ dest: f.path, link: link.link, original: link.original });
     }
     return result;
   }
