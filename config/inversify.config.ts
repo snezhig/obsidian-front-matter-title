@@ -1,8 +1,8 @@
-import 'reflect-metadata';
-import {Container as _Container, interfaces} from 'inversify';
+import "reflect-metadata";
+import { Container as _Container, interfaces } from "inversify";
 import SI from "./inversify.types";
-import bindCreator from './services/creator.config';
-import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
+import bindCreator from "./services/creator.config";
+import ResolverInterface, { Resolving } from "../src/Interfaces/ResolverInterface";
 import ResolverSync from "../src/Resolver/ResolverSync";
 import FilterInterface from "../src/Interfaces/FilterInterface";
 import ExtensionFilter from "../src/Filters/ExtensionFilter";
@@ -27,44 +27,46 @@ import ExplorerSortFeature from "@src/Managers/Features/ExplorerSortFeature";
 import ManagerInterface from "@src/Interfaces/ManagerInterface";
 import Composer from "@src/Managers/Composer";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import {Feature} from "@src/enum";
+import { Feature } from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import App from "@src/App";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import LinkNoteManager from "@src/Managers/FileNoteLinkManager";
-import ChangeApproveModal from '@src/UI/ChangeApproveModal';
-import LinkNoteApproveFeature from '@src/Managers/Features/LinkNoteApproveFeature';
+import ChangeApproveModal from "@src/UI/ChangeApproveModal";
+import LinkNoteApproveFeature from "@src/Managers/Features/LinkNoteApproveFeature";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
-Container.bind<string>(SI['template:pattern']).toConstantValue('(?<placeholder>{{(\\w|\\s)+?}})');
-Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed('sync');
-Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver).to(ResolverAsync).inSingletonScope().whenTargetNamed('async');
+Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{(\\w|\\s)+?}})");
+Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("sync");
+Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver).to(ResolverAsync).inSingletonScope().whenTargetNamed("async");
 Container.bind<FilterInterface>(SI.filter).to(ExtensionFilter);
 Container.bind<FilterInterface>(SI.filter).to(PathListFilter);
 Container.bind<BlackWhiteListInterface>(SI["component:black_white_list"]).to(BlackWhiteList).inSingletonScope();
 Container.bind<CacheInterface>(SI.cache).to(Cache);
-Container.bind<ExtractorInterface>(SI['component:extractor']).to(Extractor);
-Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(LiteralStrategy);
-Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(ArrayStrategy);
-Container.bind<StrategyInterface>(SI['component:extractor:strategy']).to(NullStrategy);
+Container.bind<ExtractorInterface>(SI["component:extractor"]).to(Extractor);
+Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(LiteralStrategy);
+Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(ArrayStrategy);
+Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(NullStrategy);
 
 Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
 Container.bind<LoggerInterface>(SI.logger)
-    .toDynamicValue(context => {
-        return context.container.get<LoggerComposer>(SI['logger:composer']).create(context.currentRequest.target.getNamedTag().value)
-    })
-    .when(() => true);
+  .toDynamicValue((context) => {
+    return context.container.get<LoggerComposer>(SI["logger:composer"]).create(context.currentRequest.target.getNamedTag().value);
+  })
+  .when(() => true);
 
 Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
+Container.bind<ManagerInterface>(SI["manager"]).to(LinkNoteManager);
 Container.bind<ManagerInterface>("test").to(LinkNoteManager);
 Container.bind<LinkNoteApproveFeature>("t").to(LinkNoteApproveFeature);
 Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).inSingletonScope();
+Container.bind<FeatureInterface<Feature>>(SI.feature).to(LinkNoteApproveFeature).inSingletonScope();
 Container.bind<FeatureToggle>(SI.feature_toggle).to(FeatureToggle).inSingletonScope();
 Container.bind<Composer>(SI.composer).to(Composer);
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
-Container.bind(SI['modal:change:approve']).to(ChangeApproveModal).inSingletonScope();
+Container.bind(SI["modal:change:approve"]).to(ChangeApproveModal).inSingletonScope();
 //START CREATOR
 bindCreator(Container);
 //END CREATOR
