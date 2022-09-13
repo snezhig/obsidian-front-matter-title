@@ -20,11 +20,7 @@ export default class ChangeApproveModal {
     @inject(SI.dispatcher)
     dispatcher: DispatcherInterface<AppEvents>
   ) {}
-  create(
-    path: string,
-    changes: [string, string][],
-    approve: (approved: boolean) => void
-  ): Modal {
+  create(path: string, changes: [string, string][], approve: (approved: boolean) => void): Modal {
     const modal = new Modal(this.app);
     modal.onOpen = () => this.onOpen(modal);
     modal.onClose = () => this.approve(modal, false);
@@ -44,12 +40,19 @@ export default class ChangeApproveModal {
       modal.close();
     }
     const { path, changes } = this.instances.get(modal);
-    modal.contentEl.createEl("h4", {
-      text: "Approving file's content changes:",
+    modal.titleEl.setText("Approving file's content changes");
+
+    modal.contentEl.createDiv({}, (d) => {
+      const span = d.createDiv().createSpan();
+      span.createEl("b", { text: "File path: " });
+      span.createSpan({ text: path });
+      d.createSpan({ text: "The following links will be replaced:" });
+      const ul = d.createEl("ul");
+      changes.forEach(([after, before]) => ul.createEl("li").setText(`${before} => ${after}`));
     });
-    const div = modal.contentEl.createDiv();
+
     modal.contentEl.createEl("div", {}, (d) => {
-      new Setting(div).addButton((c) =>
+      new Setting(d).addButton((c) =>
         c
           .setButtonText("Approve")
           .setClass("mod-cta")
@@ -58,14 +61,14 @@ export default class ChangeApproveModal {
             modal.close();
           })
       ).settingEl.className = "";
-      new Setting(div).addButton((c) =>
+      new Setting(d).addButton((c) =>
         c
           .setButtonText("Discard")
           .setClass("mod-cta")
           .onClick(() => modal.close())
       ).settingEl.className = "";
+      d.style.display = "flex";
+      d.style.justifyContent = "space-between";
     });
-    div.style.display = "flex";
-    div.style.justifyContent = "space-around";
   }
 }
