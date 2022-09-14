@@ -35,6 +35,7 @@ const SI = {
   "obsidian:app": "",
   "service:note:link": "",
   "modal:change:approve": "",
+  "getter:file:link:note:manager:config": ""
 };
 
 for (const key of Object.keys(SI)) {
