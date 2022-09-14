@@ -21,6 +21,9 @@ export default class PluginHelper {
           enabled: false,
           value: "",
         },
+          file_note_link: {
+            replace_all: false
+          }
       },
       debug: false,
       boot: {

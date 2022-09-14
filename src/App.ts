@@ -30,6 +30,7 @@ export default class App {
     private init(settings: SettingsType): void {
         this.container.bind(SI.templates).toConstantValue(settings.templates);
         this.container.bind(SI.delimiter).toConstantValue(settings.rules.delimiter);
+        this.container.bind(SI["getter:file:link:note:manager:config"]).toFunction(() => settings.rules.file_note_link);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setMode(settings.rules.paths.mode);
         this.container.get<BlackWhiteListInterface>(SI['component:black_white_list']).setList(settings.rules.paths.values);
         this.container.get<LoggerComposer>(SI["logger:composer"])[settings.debug ? 'enable' : 'disable']();
@@ -62,9 +63,14 @@ export default class App {
             queue['resolver.clear'] = {all: true};
         }
 
+        if(changed?.rules?.file_note_link){
+          this.container.rebind(SI["getter:file:link:note:manager:config"]).toFunction(() => actual.rules.file_note_link);
+        }
+
         if (changed.debug) {
             this.container.get<LoggerComposer>(SI["logger:composer"])[actual.debug ? 'enable' : 'disable']();
         }
+
 
         const dispatcher = this.container.get<DispatcherInterface<events>>(SI.dispatcher);
         for (const event of Object.keys(queue) as (keyof events)[]) {
