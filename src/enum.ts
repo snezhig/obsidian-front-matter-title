@@ -16,4 +16,5 @@ export enum Manager {
 export enum Feature {
   ExplorerSort = "explorer:sort",
   FileNoteLinkApproval = "file:note:link:approval",
+  FileNoteLinkFilter = "file:note:link:filter",
 }

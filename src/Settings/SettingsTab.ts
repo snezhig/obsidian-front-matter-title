@@ -99,6 +99,13 @@ export default class SettingsTab extends PluginSettingTab {
           id: Feature.FileNoteLinkApproval,
           default: true,
         },
+        {
+          name: "Replace only links without names",
+          desc: "If it is on File Note Link will replace only [[link-to-file]] link, otherwise [[link-to-file]] and [[link-to-file|with-alias]] links",
+          default: true,
+          id: Feature.FileNoteLinkFilter,
+          toggle: null,
+        },
       ],
     };
     for (const [manager, items] of Object.entries(features)) {
@@ -138,19 +145,8 @@ export default class SettingsTab extends PluginSettingTab {
     this.containerEl.createEl("h4", { text: "Rules" });
     this.buildRulePaths();
     this.buildRuleDelimiter();
-    this.buildFileNoteLinkRule();
   }
 
-  private buildFileNoteLinkRule(){
-      const rule = this.storage.get('rules').get('file_note_link');
-      new Setting(this.containerEl)
-          .setName("Replace all links to notes")
-          .setDesc("If it is off File Note Link will replace only [[link-to-file]] link, otherwise [[link-to-file]] and [[link-to-file|with-alias]] links")
-          .addToggle(c => c
-              .setValue(rule.get('replace_all').value())
-              .onChange((v) => this.change(rule.get('replace_all'), v))
-          )
-  }
   private buildRulePaths(): void {
     const descriptions = {
       white: "Files that are located by paths will be processed by plugin. Each path must be written with new line.",

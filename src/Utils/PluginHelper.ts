@@ -21,9 +21,6 @@ export default class PluginHelper {
           enabled: false,
           value: "",
         },
-          file_note_link: {
-            replace_all: false
-          }
       },
       debug: false,
       boot: {
@@ -32,6 +29,7 @@ export default class PluginHelper {
       features: {
         [Feature.ExplorerSort]: { enabled: false },
         [Feature.FileNoteLinkApproval]: { enabled: false },
+        [Feature.FileNoteLinkFilter]: { enabled: false },
       },
     };
   }

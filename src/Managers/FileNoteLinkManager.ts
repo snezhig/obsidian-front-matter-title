@@ -27,9 +27,7 @@ export default class LinkNoteManager implements ManagerInterface {
     private dispatcher: DispatcherInterface<AppEvents>,
     @inject(SI.logger)
     @named("manager:note:links")
-    private logger: LoggerInterface,
-    @inject(SI["getter:file:link:note:manager:config"])
-    private config: () => ({replace_all: boolean})
+    private logger: LoggerInterface
   ) {}
   public getId(): Manager {
     return Manager.FileNoteLink;
@@ -66,10 +64,8 @@ export default class LinkNoteManager implements ManagerInterface {
   }
 
   public async process(file: TFile) {
-    let links = this.service.getNoteLinks(file.path);
-    if(!this.config().replace_all){
-      links = links.filter((e) => !/^\[\[.*\|{1,}.*]]$/.test(e.original));
-    }
+    const links = this.dispatcher.dispatch("note:link:filter", new Event({ links: this.service.getNoteLinks(file.path) })).get().links;
+
     const replace: [string, string][] = [];
     const resolved: Map<string, string> = new Map();
     for (const item of links) {

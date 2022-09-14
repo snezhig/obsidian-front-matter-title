@@ -9,4 +9,7 @@ export type AppEvents = {
     changes: [string, string][];
     approve: Promise<boolean>;
   };
+  "note:link:filter": {
+    links: { link: string; original: string; dest: string }[];
+  };
 };
