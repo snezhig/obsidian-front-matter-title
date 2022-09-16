@@ -3,7 +3,7 @@ import {mock} from "jest-mock-extended";
 import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import {MarkdownView, TFile, View} from "obsidian";
-import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
+import FileNoteLinkService, { NoteLink } from "@src/Utils/FileNoteLinkService";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {AppEvents} from "@src/Types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
@@ -84,7 +84,8 @@ describe("Should not call resolved", () => {
         mockService.getNoteLinks.mockReturnValueOnce([{
             dest: "/path/to/linkfile.md",
             link: "link-to-file",
-            original: "[[original-link]]"
+            original: "[[original-link]]",
+            alias: null
         }]);
         mockResolver.resolve.mockReturnValueOnce(title);
         mockFacade.getViewsOfType.mockReturnValueOnce([view]);
@@ -108,13 +109,13 @@ describe("Should not call resolved", () => {
     [[foo]]
     `;
 
-                const links = [
-                    {dest: "foo", link: "foo", original: "[[foo]]"},
-                    {dest: "bar", link: "bar", original: "[[bar|but_with_name]]"},
-                    {dest: "bar", link: "bar", original: "[[bar]]"},
-                    {dest: "quote", link: "quote", original: "[[quote]]"},
-                    {dest: "foo", link: "foo", original: "[[foo]]"},
-                ];
+                const links: NoteLink[] = [
+                    {dest: "foo", link: "foo", original: "[[foo]]", alias: null},
+                    {dest: "bar", link: "bar", original: "[[bar|but_with_name]]", alias: null},
+                    {dest: "bar", link: "bar", original: "[[bar]]", alias: null},
+                    {dest: "quote", link: "quote", original: "[[quote]]", alias: null},
+                    {dest: "foo", link: "foo", original: "[[foo]]", alias: null},
+                ];;
 
                 const after = `some text with [[foo|foo_alias]], [[bar|but_with_name]] and
     [[bar|bar_alias]].

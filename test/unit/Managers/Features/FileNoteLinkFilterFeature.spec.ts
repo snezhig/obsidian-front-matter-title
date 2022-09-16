@@ -5,6 +5,7 @@ import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilter
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 import {Feature} from "@src/enum";
+import { NoteLink } from "@src/Utils/FileNoteLinkService";
 
 const mockDispatcher = mock<DispatcherInterface<AppEvents>>();
 const feature = new FileNoteLinkFilterFeature(mockDispatcher);
@@ -32,10 +33,10 @@ test('Should not add listener twice', async () => {
     expect(mockDispatcher.addListener).toHaveBeenCalledTimes(1);
 })
 describe('Test callback', () => {
-    const foo = {link: 'foo_link', original: "[[link]]", dest: ''}
-    const bar = {link: 'bar_link', original: "[[bar|alias]]", dest: ''}
-    const quote = {link: 'quote_link', original: "[[quote|]]", dest: ''}
-    const baz = {link: 'baz_link', original: "[[baz]]", dest: ''}
+    const foo: NoteLink = {link: 'foo_link', original: "[[link]]", dest: '', alias: null}
+    const bar: NoteLink = {link: 'bar_link', original: "[[bar|alias]]", dest: '', alias: null}
+    const quote: NoteLink = {link: 'quote_link', original: "[[quote|]]", dest: '', alias: null}
+    const baz: NoteLink = {link: 'baz_link', original: "[[baz]]", dest: '', alias: null}
 
     const event = new Event<AppEvents["note:link:filter"]>({links: [foo, bar, quote, baz]});
     test('Should filter links', () => {

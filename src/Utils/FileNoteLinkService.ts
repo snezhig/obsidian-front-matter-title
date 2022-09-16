@@ -2,7 +2,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import SI from "@config/inversify.types";
 import { inject, injectable } from "inversify";
 
-type NoteLinks = { link: string; original: string; dest: string };
+export type NoteLink = { link: string; original: string; dest: string, alias: string|null };
 @injectable()
 export default class FileNoteLinkService {
   constructor(
@@ -10,15 +10,15 @@ export default class FileNoteLinkService {
     private facade: ObsidianFacade
   ) {}
 
-  public getNoteLinks(path: string): NoteLinks[] {
+  public getNoteLinks(path: string): NoteLink[] {
     const links = this.facade.getFileLinksCache(path);
-    const result: NoteLinks[] = [];
+    const result: NoteLink[] = [];
     for (const link of links) {
-      if (!/^\[\[\w+\|*\w+]]$/.test(link.original)) {
+      if (!/^\[\[\w+(\|*\w+)*]]$/.test(link.original)) {
         continue;
       }
       const f = this.facade.getFirstLinkpathDest(link.link);
-      result.push({ dest: f.path, link: link.link, original: link.original });
+      result.push({ dest: f.path, link: link.link, original: link.original, alias: link?.displayText ?? null });
     }
     return result;
   }

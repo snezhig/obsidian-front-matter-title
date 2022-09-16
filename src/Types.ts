@@ -1,4 +1,5 @@
 import { Feature, Manager } from "@src/enum";
+import { NoteLink } from "./Utils/FileNoteLinkService";
 
 export type AppEvents = {
   "templates:changed": { old: string[]; new: string[] };
@@ -10,6 +11,6 @@ export type AppEvents = {
     approve: Promise<boolean>;
   };
   "note:link:filter": {
-    links: { link: string; original: string; dest: string }[];
+    links: NoteLink[];
   };
 };

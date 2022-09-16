@@ -53,15 +53,22 @@ export default class LinkNoteManager implements ManagerInterface {
     if (!views.length) {
       return false;
     }
+    const updated: string[] = [];
     for (const view of views) {
-      if (view.file && (path === null || path === view.file.path)) {
+      if (
+        view.file 
+        && !updated.includes(view.file.path) 
+        && (path === null || path === view.file.path)
+        ) {
         await this.process(view.file);
+        updated.push(view.file.path);
       }
     }
     return false;
   }
 
   public async process(file: TFile) {
+    this.logger.log(`process ${file.path}`)
     const links = this.dispatcher.dispatch("note:link:filter", new Event({ links: this.service.getNoteLinks(file.path) })).get().links;
 
     const replace: [string, string][] = [];
@@ -69,7 +76,7 @@ export default class LinkNoteManager implements ManagerInterface {
     for (const item of links) {
       const title = resolved.has(item.dest) ? resolved.get(item.dest) : this.resolver.resolve(item.dest);
       resolved.set(item.dest, title);
-      if (title) {
+      if (title && title !== item.alias) {
         replace.push([`[[${item.link}|${title}]]`, item.original]);
       }
     }
