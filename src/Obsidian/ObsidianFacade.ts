@@ -1,5 +1,4 @@
 import {CachedMetadata, LinkCache, MetadataCache, TFile, Vault, View, Workspace, WorkspaceLeaf} from "obsidian";
-import {getLeavesOfType} from "@src/Obsidian/Types";
 
 export default class ObsidianFacade {
     constructor(

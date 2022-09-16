@@ -1,5 +1,3 @@
-import {Arr} from "tern";
-
 type obj = { [k: string]: any };
 
 export type Changed<T> = { [K in keyof T]?: T[K] extends object ? Changed<T[K]> : boolean };

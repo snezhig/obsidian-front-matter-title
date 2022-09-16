@@ -1,5 +1,3 @@
-import {Arr} from "tern";
-
 export interface PrimitiveItemInterface<T> {
     value(): T;
 
