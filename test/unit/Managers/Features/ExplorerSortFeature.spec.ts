@@ -24,26 +24,20 @@ const view = mock<TFileExplorerView>();
 // @ts-ignore
 view.requestSort = jest.fn();
 
-test("Should add listener", () => {
-  expect(dispatcher.addListener).toHaveBeenCalledWith("manager:update", expect.anything());
-  expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
-});
 
 test("Should be disabled", () => expect(sort.isEnabled()).toBeFalsy());
 
 test("Should throw exception because there is no explorer", () => expect(() => sort.enable()).rejects.toThrow(ExplorerViewUndefined));
 
-test("Should not call requestSort", () => {
-  callback.execute(new Event({ id: Manager.Explorer }));
-  expect(view.requestSort).not.toHaveBeenCalled();
-});
 
-test("Should be enabled", async () => {
+test("Should add listener after enabled", async () => {
   const leaf = mock<WorkspaceLeaf>();
   leaf.view = view;
   facade.getLeavesOfType.mockReturnValueOnce([leaf]);
   await sort.enable();
   expect(sort.isEnabled()).toBeTruthy();
+    expect(dispatcher.addListener).toHaveBeenCalledWith("manager:update", expect.anything());
+    expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
 });
 
 test("Should init timer to find item", () => {
@@ -70,3 +64,7 @@ test("Should not init times after disabling", () => {
   jest.runOnlyPendingTimers();
   expect(setTimeout).toHaveBeenCalledTimes(2);
 });
+
+test("Should not dispatch anything", () => {
+    expect(dispatcher.dispatch).not.toHaveBeenCalled();
+})
