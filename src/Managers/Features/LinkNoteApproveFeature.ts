@@ -8,10 +8,12 @@ import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import { AppEvents } from "@src/Types";
 import ChangeApproveModal from "@src/UI/ChangeApproveModal";
 import { inject, injectable, named } from "inversify";
+import BaseFeature from "@src/Managers/Features/BaseFeature";
+import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 
 @injectable()
-export default class LinkNoteApproveFeature implements FeatureInterface<Feature> {
-  private static bound = false;
+export default class LinkNoteApproveFeature extends BaseFeature implements FeatureInterface<Feature> {
+  private cb: CallbackInterface<AppEvents['note:link:change:approve']>;
   private enabled = false;
   constructor(
     @inject(SI.logger)
@@ -22,30 +24,39 @@ export default class LinkNoteApproveFeature implements FeatureInterface<Feature>
     @inject(SI["modal:change:approve"])
     private modal: ChangeApproveModal
   ) {
-    this.bind();
+    super();
+    this.init();
   }
   async enable(): Promise<void> {
-    this.enabled = true;
+    if(!this.isEnabled()) {
+      this.dispatcher.addListener("note:link:change:approve", this.cb);
+      this.enabled = true;
+    }
   }
   async disable(): Promise<void> {
+    this.dispatcher.removeListener("note:link:change:approve", this.cb);
     this.enabled = false;
   }
-  getId(): Feature {
+
+  static id(): Feature {
     return Feature.FileNoteLinkApproval;
+  }
+  getId(): Feature {
+    return LinkNoteApproveFeature.id();
   }
 
   isEnabled(): boolean {
     return this.enabled;
   }
-  private bind(): void {
-    if (LinkNoteApproveFeature.bound) return;
-    this.dispatcher.addListener(
-      "note:link:change:approve",
-      new Callback((e) => {
-        const { path, changes } = e.get();
-        const approve = this.isEnabled() ? new Promise<boolean>((r) => this.modal.create(path, changes, r).open()) : Promise.resolve(false);
-        return new Event({ path, changes, approve });
-      })
-    );
+  private init(): void {
+    this.cb = new Callback<AppEvents["note:link:change:approve"]>((e) => {
+      if(!this.isEnabled()){
+        return e;
+      }
+      const { path, changes } = e.get();
+      const approve = new Promise<boolean>((r) => this.modal.create(path, changes, r).open());
+      return new Event({ path, changes, approve });
+    });
+
   }
 }

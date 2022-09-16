@@ -29,7 +29,6 @@ import Composer from "@src/Managers/Composer";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import { Feature } from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
-import App from "@src/App";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import LinkNoteManager from "@src/Managers/FileNoteLinkManager";
 import ChangeApproveModal from "@src/UI/ChangeApproveModal";
@@ -59,9 +58,11 @@ Container.bind<LoggerInterface>(SI.logger)
 
 Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
 Container.bind<ManagerInterface>(SI["manager"]).to(LinkNoteManager);
-Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).inSingletonScope();
-Container.bind<FeatureInterface<Feature>>(SI.feature).to(LinkNoteApproveFeature).inSingletonScope();
-Container.bind<FeatureInterface<Feature>>(SI.feature).to(FileNoteLinkFilterFeature).inSingletonScope();
+Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).whenTargetNamed(ExplorerSortFeature.id());
+Container.bind<FeatureInterface<Feature>>(SI.feature).to(LinkNoteApproveFeature).whenTargetNamed(LinkNoteApproveFeature.id());
+Container.bind<FeatureInterface<Feature>>(SI.feature).to(FileNoteLinkFilterFeature).whenTargetNamed(FileNoteLinkFilterFeature.id());
+Container.bind<interfaces.Factory<FeatureInterface<Feature>>>(SI["factory:feature"])
+    .toFactory<FeatureInterface<Feature>, [Feature]>((context) => (id: Feature) => context.container.getNamed<FeatureInterface<Feature>>(SI.feature, id))
 Container.bind<FeatureToggle>(SI.feature_toggle).to(FeatureToggle).inSingletonScope();
 Container.bind<Composer>(SI.composer).to(Composer);
 

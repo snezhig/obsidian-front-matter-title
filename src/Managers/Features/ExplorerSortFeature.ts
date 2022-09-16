@@ -1,24 +1,26 @@
-import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
+import {debounce, TFileExplorerItem, TFileExplorerView, TFolder} from "obsidian";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
-import { inject, injectable, named } from "inversify";
+import {inject, injectable, named} from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { Feature, Leaves, Manager } from "@src/enum";
+import {Feature, Leaves, Manager} from "@src/enum";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
-import { AppEvents } from "@src/Types";
+import {AppEvents} from "@src/Types";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
+import BaseFeature from "@src/Managers/Features/BaseFeature";
+import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 
 @injectable()
-export default class ExplorerSortFeature implements FeatureInterface<Feature> {
+export default class ExplorerSortFeature extends BaseFeature implements FeatureInterface<Feature> {
   private view: TFileExplorerView;
   private enabled = false;
   private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSortFeature>;
-
+  private readonly cb: CallbackInterface<AppEvents["manager:update"]>;
   constructor(
     @inject(SI.resolver)
     @named(Resolving.Sync)
@@ -31,13 +33,16 @@ export default class ExplorerSortFeature implements FeatureInterface<Feature> {
     @inject(SI.dispatcher)
     private dispatcher: DispatcherInterface<AppEvents>
   ) {
+    super();
     const s = debounce((e: EventInterface<AppEvents["manager:update"]>) => {
       logger.log("Try to request sort by event");
       e.get().id === Manager.Explorer && this.isEnabled() && this.view.requestSort();
     }, 1000);
-    this.dispatcher.addListener("manager:update", new CallbackVoid(s));
+    this.cb = new CallbackVoid(s);
   }
-
+static id(): Feature{
+    return Feature.ExplorerSort;
+}
   private initView(): void {
     this.view = (this.facade.getLeavesOfType(Leaves.FE)?.[0]?.view as TFileExplorerView) ?? null;
   }
@@ -132,9 +137,13 @@ export default class ExplorerSortFeature implements FeatureInterface<Feature> {
   }
 
   public async enable(): Promise<void> {
+    if(this.isEnabled()){
+      return;
+    }
     if (!this.view && (this.initView(), !this.view)) {
       throw new ExplorerViewUndefined();
     }
+    this.dispatcher.addListener("manager:update", this.cb);
     this.enabled = true;
     this.tryToReplaceOriginalSort();
     this.logger.log("enabled");
@@ -142,6 +151,7 @@ export default class ExplorerSortFeature implements FeatureInterface<Feature> {
 
   public async disable(): Promise<void> {
     this.enabled = false;
+    this.dispatcher.removeListener("manager:update", this.cb);
     this.replacer?.disable();
     this.view?.requestSort();
     this.logger.log("disabled");

@@ -1,4 +1,4 @@
-import { MarkdownView, TAbstractFile, TFile } from "obsidian";
+import { MarkdownView, TFile } from "obsidian";
 import SI from "@config/inversify.types";
 import { inject, injectable, named } from "inversify";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
@@ -53,13 +53,11 @@ export default class LinkNoteManager implements ManagerInterface {
     if (!views.length) {
       return false;
     }
-    const promises = [];
     for (const view of views) {
       if (view.file && (path === null || path === view.file.path)) {
-        promises.push(this.process(view.file));
+        await this.process(view.file);
       }
     }
-    await Promise.all(promises);
     return false;
   }
 

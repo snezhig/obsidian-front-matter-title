@@ -94,7 +94,7 @@ export default class MetaTitlePlugin extends Plugin {
   public onunload() {
     this.composer.setState(false);
     this.c.setState(false).catch(console.error);
-    this.featureToggle.toggleAll(false).catch(console.error);
+    this.featureToggle.disableAll().catch(console.error);
   }
 
   private bind() {
@@ -142,7 +142,7 @@ export default class MetaTitlePlugin extends Plugin {
     await Promise.all(promises);
   }
 
-  private async processFeatures(options: SettingsFeatures<Feature>): void {
+  private async processFeatures(options: SettingsFeatures<Feature>): Promise<void> {
     for (const [id, { enabled }] of Object.entries(options)) {
       await this.featureToggle.toggle(id as Feature, enabled).catch(console.error);
     }

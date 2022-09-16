@@ -1,5 +1,5 @@
 import {Feature} from "@src/enum";
-import {inject, injectable, multiInject, named} from "inversify";
+import {inject, injectable, named} from "inversify";
 import SI from "@config/inversify.types";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
@@ -9,27 +9,33 @@ export default class FeatureToggle {
     private features: { [K in Feature]?: FeatureInterface<Feature> } = {};
 
     constructor(
-        @multiInject(SI.feature)
-            features: FeatureInterface<Feature>[],
-        @inject(SI.logger) @named('feature_toggle')
+        @inject(SI["factory:feature"])
+        private factory: (id: Feature) => FeatureInterface<Feature>,
+    @inject(SI.logger) @named('feature_toggle')
         private logger: LoggerInterface
     ) {
-        for (const feature of features) {
-            this.features[feature.getId()] = feature;
-        }
-        this.logger.log('Features', Object.keys(this.features));
-
     }
 
     async toggle(id: Feature, state: boolean): Promise<void> {
         const feature = this.features[id];
-        feature && await feature[state ? 'enable' : 'disable']();
+        if(!state && !feature){
+            return;
+        }
+        if(!feature){
+            this.features[id] = this.factory(id);
+            return this.toggle(id, state);
+        }
+        await feature[state ? 'enable' : 'disable']();
+        if(!state){
+            delete this.features[id];
+        }
     }
-    async toggleAll(state: boolean): Promise<void>{
+    async disableAll(): Promise<void>{
         const promises = [];
         for(const feature of Object.values(this.features)){
-            promises.push(feature[state ? 'enable': 'disable']());
+            promises.push(feature.disable());
         }
         await Promise.all(promises);
+        this.features = {};
     }
 }

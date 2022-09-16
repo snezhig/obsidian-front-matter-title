@@ -24,6 +24,7 @@ const SI = {
   "factory:obsidian:file_modifiable": "",
   "factory:obsidian:file": "",
   "factory:obsidian:meta": "",
+  "factory:feature": "",
   delimiter: "",
   "getter:delimiter": "",
   "getter:obsidian:leaves": "",
