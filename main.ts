@@ -118,12 +118,12 @@ export default class MetaTitlePlugin extends Plugin {
       })
     );
 
-    this.app.workspace.onLayoutReady(() => {
+    this.app.workspace.onLayoutReady(async () => {
       this.composer.setState(this.storage.get("managers").get(Manager.Graph).value(), ManagerType.Graph);
       this.composer.setState(this.storage.get("managers").get(Manager.Header).value(), ManagerType.Markdown);
       this.composer.setState(this.storage.get("managers").get(Manager.QuickSwitcher).value(), ManagerType.QuickSwitcher);
+      await this.processFeatures(this.storage.get("features").value());
       this.processManagers().catch(console.error);
-      this.processFeatures(this.storage.get("features").value());
       this.runManagersUpdate().catch(console.error);
     });
 

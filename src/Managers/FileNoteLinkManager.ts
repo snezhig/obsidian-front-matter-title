@@ -68,7 +68,7 @@ export default class LinkNoteManager implements ManagerInterface {
   }
 
   public async process(file: TFile) {
-    this.logger.log(`process ${file.path}`)
+    this.logger.log(`Process ${file.path}`)
     const links = this.dispatcher.dispatch("note:link:filter", new Event({ links: this.service.getNoteLinks(file.path) })).get().links;
 
     const replace: [string, string][] = [];
@@ -90,7 +90,7 @@ export default class LinkNoteManager implements ManagerInterface {
         new Event({
           path: file.path,
           changes: replace,
-          approve: Promise.resolve(false),
+          approve: Promise.resolve(true),
         })
       )
       .get().approve;
@@ -99,6 +99,7 @@ export default class LinkNoteManager implements ManagerInterface {
       this.logger.log(`Changes for ${file.path} have been rejected`);
       return;
     }
+    this.logger.log(`Changes for ${file.path} have been approved`)
 
     let content = await this.facade.getFileContent(file);
     for (const [v, r] of replace) {
