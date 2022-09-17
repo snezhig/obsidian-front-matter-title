@@ -23,12 +23,10 @@ export default class Dispatcher<E> implements DispatcherInterface<E> {
         if (!this.listeners[name].includes(cb)) {
             this.listeners[name].push(cb);
         }
-        console.log(this.listeners[name], name);
     }
 
     removeListener<T extends  keyof E>(name: T, cb: CallbackInterface<any>): void{
        this.listeners[name] = this.listeners[name].filter(e => cb !== e);
-        console.log(this.listeners[name], name, 'removeListener');
     }
 
     dispatch<T extends keyof E>(name: T, e: EventInterface<E[T]>): EventInterface<E[T]> {

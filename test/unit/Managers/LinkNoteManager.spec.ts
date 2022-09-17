@@ -87,6 +87,12 @@ describe("Should not call resolved", () => {
             original: "[[original-link]]",
             alias: null
         }]);
+        mockDispatcher.dispatch.mockImplementation(
+            (name: string, e: Event<AppEvents["note:link:change:approve"]>) => name === "note:link:change:approve" ?  new Event({
+                ...e.get(),
+                approve: Promise.resolve(false)
+            }) : e
+        );
         mockResolver.resolve.mockReturnValueOnce(title);
         mockFacade.getViewsOfType.mockReturnValueOnce([view]);
         await manager.update();
@@ -124,12 +130,7 @@ describe("Should not call resolved", () => {
     `;
                 mockDispatcher.dispatch.mockImplementationOnce(
                     (name: string, e: Event<AppEvents["note:link:filter"]>) => new Event({links: e.get().links.filter(e => e.original !== '[[bar|but_with_name]]')}))
-                mockDispatcher.dispatch.mockImplementationOnce(
-                    (name: string, e: Event<AppEvents["note:link:change:approve"]>) => new Event({
-                        ...e.get(),
-                        approve: Promise.resolve(true)
-                    })
-                );
+                mockDispatcher.dispatch.mockImplementationOnce((name: string, e: Event<AppEvents["note:link:change:approve"]>) => e);
                 mockFacade.getFileContent.mockResolvedValueOnce(before);
                 mockService.getNoteLinks.mockReturnValueOnce(links);
                 mockResolver.resolve.mockImplementation((e) => (e === "quote" ? null : `${e}_alias`));
