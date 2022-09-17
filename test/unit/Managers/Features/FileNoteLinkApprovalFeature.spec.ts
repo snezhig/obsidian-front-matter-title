@@ -4,7 +4,7 @@ import {AppEvents} from "@src/Types";
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 import {Feature} from "@src/enum";
-import LinkNoteApproveFeature from "@src/Managers/Features/LinkNoteApproveFeature";
+import LinkNoteApproveFeature from "@src/Managers/Features/FileNoteLinkApproveFeature";
 import ChangeApproveModal from "@src/UI/ChangeApproveModal";
 import {Modal} from "obsidian";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";

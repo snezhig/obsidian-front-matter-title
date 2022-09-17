@@ -32,7 +32,7 @@ import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import LinkNoteManager from "@src/Managers/FileNoteLinkManager";
 import ChangeApproveModal from "@src/UI/ChangeApproveModal";
-import LinkNoteApproveFeature from "@src/Managers/Features/LinkNoteApproveFeature";
+import LinkNoteApproveFeature from "@src/Managers/Features/FileNoteLinkApproveFeature";
 import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilterFeature";
 
 const Container = new _Container();
