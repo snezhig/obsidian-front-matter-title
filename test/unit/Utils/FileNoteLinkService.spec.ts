@@ -25,6 +25,7 @@ describe('Test getNoteLinks', () => {
     test('Should return empty because file does not have link to another files', () => {
         const links = [
             {original: '[link](link)'},
+            {original: '[[|link]](link)'},
             {original: ''},
             {original: '[link]'},
             {original: '[link|name]'},
@@ -42,6 +43,8 @@ describe('Test getNoteLinks', () => {
             {original: '[[foo|alias]]', link: 'foo'},
             {original: '[[bar|a|i|s]]', link: 'bar'},
             {original: '[[quote]]', link: 'quote'},
+            {original: '[[qux corge]]', link: 'qux corge'},
+            {original: '[[waldo thud|quux]]', link: 'waldo thud'},
         ] as LinkCache[];
         const expected = links.map(e => ({original: e.original, link: e.link, dest: `${e.link}_path`, alias: null}));
         mockFacade.getFileLinksCache.mockReturnValueOnce(links);
@@ -52,6 +55,6 @@ describe('Test getNoteLinks', () => {
         expect(actual).toEqual(expected);
         expect(mockFacade.getFileLinksCache).toHaveBeenCalledTimes(1);
         expect(mockFacade.getFileLinksCache).toHaveBeenCalledWith(path);
-        expect(mockFacade.getFirstLinkpathDest).toHaveBeenCalledTimes(3);
+        expect(mockFacade.getFirstLinkpathDest).toHaveBeenCalledTimes(5);
     })
 });

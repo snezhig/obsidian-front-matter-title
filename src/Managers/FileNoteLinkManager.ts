@@ -81,6 +81,7 @@ export default class LinkNoteManager implements ManagerInterface {
       }
     }
     if (replace.length === 0) {
+      this.logger.log(`No replaces for ${file.path}`)
       return;
     }
     this.logger.log(`Request approval for ${file.path}`);

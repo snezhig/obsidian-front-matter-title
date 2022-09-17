@@ -14,7 +14,7 @@ export default class FileNoteLinkService {
     const links = this.facade.getFileLinksCache(path);
     const result: NoteLink[] = [];
     for (const link of links) {
-      if (!/^\[\[\w+(\|*\w+)*]]$/.test(link.original)) {
+      if (!/^\[\[[\w\s]+(\|*[\w\s]+)*]]$/.test(link.original)) {
         continue;
       }
       const f = this.facade.getFirstLinkpathDest(link.link);
