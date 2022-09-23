@@ -1,5 +1,5 @@
 import 'obsidian';
-import {MarkdownView, SuggestModal, TAbstractFile, TFile, TFolder, View, WorkspaceLeaf} from "obsidian";
+import {MarkdownView, SuggestModal, TFile, TFolder, View, WorkspaceLeaf} from "obsidian";
 
 declare module 'obsidian' {
     export interface TFileExplorerItem {

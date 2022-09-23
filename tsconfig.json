@@ -9,7 +9,7 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "esModuleInterop": true,
     "downlevelIteration": true,
     "lib": [
@@ -19,21 +19,17 @@
       "ES7",
       "ES2017.Object",
       "ES2019.Object",
-      "ES2018.Regexp"
+      "ES2018.Regexp",
+      "ES2021.String",
+      "ES2021.Promise"
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": [
-      "reflect-metadata",
-      "node",
-      "jest"
-    ],
+    "types": ["reflect-metadata", "node", "jest"],
     "paths": {
       "@config/*": ["config/*"],
       "@src/*": ["src/*"]
     }
   },
-  "include": [
-    "./**/*.ts", "./src", "./config"
-  ]
+  "include": ["./**/*.ts", "./src", "./config"]
 }

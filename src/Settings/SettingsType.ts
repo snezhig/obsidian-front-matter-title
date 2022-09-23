@@ -1,6 +1,6 @@
 import {Feature, Manager} from "@src/enum";
 
-export type SettingsManagersType = Manager
+export type SettingsManagersType = Manager;
 export type SettingsFeatures<F extends Feature> = { [K in F]: { enabled: boolean } };
 export type SettingsType = {
     templates: string[],

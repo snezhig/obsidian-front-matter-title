@@ -2,7 +2,7 @@ import FilterInterface from "../Interfaces/FilterInterface";
 import CacheInterface from "../Components/Cache/CacheInterface";
 import ResolverInterface, {Resolving, Return} from "../Interfaces/ResolverInterface";
 import CreatorInterface from "../Interfaces/CreatorInterface";
-import {inject, injectable, multiInject, named} from "inversify";
+import {inject, injectable, multiInject} from "inversify";
 import SI from "../../config/inversify.types";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {ResolverEvents} from "@src/Resolver/ResolverType";
