@@ -31,7 +31,9 @@ export default class SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Template")
       .setDesc(
-        'Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}". See Readme to find out'
+        `Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}".
+        Also you can use #heading to use first Heading from a file or _basename and another reserved words. 
+        See Readme to find out more`
       )
       .addText((text) =>
         text
