@@ -66,7 +66,7 @@ export default class StarredManager implements ManagerInterface {
         for (const div of Array.from(listEl)) {
             const item = items.get(div as HTMLDivElement);
             const content = div.getElementsByClassName("nav-file-title-content")?.[0];
-            if (content && (!path || item.path == path)) {
+            if (content && item.type === 'file' && (!path || item.path == path)) {
                 this.process(content as HTMLDivElement, item.path).catch(console.error);
             }
         }
