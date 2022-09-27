@@ -1,7 +1,7 @@
 import CacheInterface from "./CacheInterface";
 import CacheItemInterface from "./CacheItemInterface";
 import CacheItem from "./CacheItem";
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 @injectable()
 export default class Cache implements CacheInterface {
@@ -38,7 +38,7 @@ export default class Cache implements CacheInterface {
         this.pool.delete(key);
         this.serialized.delete(key);
 
-        if (typeof value === 'object') {
+        if (typeof value === "object") {
             this.serialized.set(key, JSON.stringify(value));
         } else {
             this.pool.set(key, value);

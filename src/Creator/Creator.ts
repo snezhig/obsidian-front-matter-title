@@ -1,9 +1,9 @@
 import CreatorInterface from "../Interfaces/CreatorInterface";
 import TemplateInterface from "../Interfaces/TemplateInterface";
-import {inject, injectable, named} from "inversify";
-import SI from '@config/inversify.types';
+import { inject, injectable, named } from "inversify";
+import SI from "@config/inversify.types";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {AppEvents} from "@src/Types";
+import { AppEvents } from "@src/Types";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
 import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
@@ -16,10 +16,12 @@ export default class Creator implements CreatorInterface {
     constructor(
         @inject(SI.dispatcher)
         private dispatcher: DispatcherInterface<AppEvents>,
-        @inject(SI['creator:template']) @named('all')
+        @inject(SI["creator:template"])
+        @named("all")
         private resolver: () => TemplateInterface[],
-        @inject(SI.logger) @named('creator')
-        private logger: LoggerInterface,
+        @inject(SI.logger)
+        @named("creator")
+        private logger: LoggerInterface
     ) {
         this.templates = resolver();
         this.bind();
@@ -27,11 +29,11 @@ export default class Creator implements CreatorInterface {
 
     private bind(): void {
         this.dispatcher.addListener(
-            'templates:changed',
+            "templates:changed",
             new CallbackVoid((): void => {
-                this.templates = this.resolver()
+                this.templates = this.resolver();
             })
-        )
+        );
     }
 
     create(path: string): string | null {
@@ -39,11 +41,11 @@ export default class Creator implements CreatorInterface {
             let template = t.getTemplate();
 
             for (const placeholder of t.getPlaceholders()) {
-                let value = '';
+                let value = "";
                 try {
-                    value = placeholder.makeValue(path) ?? '';
+                    value = placeholder.makeValue(path) ?? "";
                 } catch (e) {
-                    if ((e instanceof PathNotFoundException) || (e instanceof TypeNotSupportedException)) {
+                    if (e instanceof PathNotFoundException || e instanceof TypeNotSupportedException) {
                         this.logger.log(e);
                     } else {
                         throw e;
@@ -57,6 +59,4 @@ export default class Creator implements CreatorInterface {
         }
         return null;
     }
-
-
 }

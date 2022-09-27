@@ -1,2 +1,1 @@
-export default class PathNotFoundException extends Error {
-}
+export default class PathNotFoundException extends Error {}

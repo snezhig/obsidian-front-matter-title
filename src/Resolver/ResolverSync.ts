@@ -1,11 +1,11 @@
 import FilterInterface from "../Interfaces/FilterInterface";
 import CacheInterface from "../Components/Cache/CacheInterface";
-import ResolverInterface, {Resolving, Return} from "../Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving, Return } from "../Interfaces/ResolverInterface";
 import CreatorInterface from "../Interfaces/CreatorInterface";
-import {inject, injectable, multiInject} from "inversify";
+import { inject, injectable, multiInject } from "inversify";
 import SI from "../../config/inversify.types";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {ResolverEvents} from "@src/Resolver/ResolverType";
+import { ResolverEvents } from "@src/Resolver/ResolverType";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 
@@ -22,19 +22,21 @@ export default class ResolverSync implements ResolverInterface {
         private dispatcher: DispatcherInterface<ResolverEvents>
     ) {
         const exec = this.handleClear.bind(this);
-        dispatcher.addListener('resolver.clear', {
-            execute: exec
-        })
+        dispatcher.addListener("resolver.clear", {
+            execute: exec,
+        });
     }
 
-    private handleClear(e: EventInterface<ResolverEvents['resolver.clear']>): EventInterface<ResolverEvents['resolver.clear']> {
-        const {all = false, path} = e.get();
+    private handleClear(
+        e: EventInterface<ResolverEvents["resolver.clear"]>
+    ): EventInterface<ResolverEvents["resolver.clear"]> {
+        const { all = false, path } = e.get();
         if (all) {
             this.cache.clear();
         } else {
             this.cache.delete(path);
         }
-        this.dispatcher.dispatch('resolver.unresolved', new Event(e.get()));
+        this.dispatcher.dispatch("resolver.unresolved", new Event(e.get()));
         return e;
     }
 
@@ -67,5 +69,4 @@ export default class ResolverSync implements ResolverInterface {
         }
         return true;
     }
-
 }

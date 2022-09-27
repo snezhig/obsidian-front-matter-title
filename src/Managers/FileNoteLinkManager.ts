@@ -13,99 +13,97 @@ import { Manager } from "@src/enum";
 
 @injectable()
 export default class LinkNoteManager implements ManagerInterface {
-  private enabled = false;
+    private enabled = false;
 
-  constructor(
-    @inject(SI["facade:obsidian"])
-    private facade: ObsidianFacade,
-    @inject(SI["resolver"])
-    @named(Resolving.Sync)
-    private resolver: ResolverInterface,
-    @inject(SI["service:note:link"])
-    private service: FileNoteLinkService,
-    @inject(SI.dispatcher)
-    private dispatcher: DispatcherInterface<AppEvents>,
-    @inject(SI.logger)
-    @named("manager:note:links")
-    private logger: LoggerInterface
-  ) {}
-  public getId(): Manager {
-    return Manager.FileNoteLink;
-  }
-
-  async disable(): Promise<void> {
-    this.enabled = false;
-  }
-
-  async enable(): Promise<void> {
-    this.enabled = true;
-  }
-
-  isEnabled(): boolean {
-    return this.enabled;
-  }
-
-  async update(path: string | null = null): Promise<boolean> {
-    if (!this.isEnabled()) {
-      return false;
+    constructor(
+        @inject(SI["facade:obsidian"])
+        private facade: ObsidianFacade,
+        @inject(SI["resolver"])
+        @named(Resolving.Sync)
+        private resolver: ResolverInterface,
+        @inject(SI["service:note:link"])
+        private service: FileNoteLinkService,
+        @inject(SI.dispatcher)
+        private dispatcher: DispatcherInterface<AppEvents>,
+        @inject(SI.logger)
+        @named("manager:note:links")
+        private logger: LoggerInterface
+    ) {}
+    public getId(): Manager {
+        return Manager.FileNoteLink;
     }
-    const views = this.facade.getViewsOfType<MarkdownView>("markdown");
-    if (!views.length) {
-      return false;
-    }
-    const updated: string[] = [];
-    for (const view of views) {
-      if (
-        view.file 
-        && !updated.includes(view.file.path) 
-        && (path === null || path === view.file.path)
-        ) {
-        await this.process(view.file);
-        updated.push(view.file.path);
-      }
-    }
-    return false;
-  }
 
-  public async process(file: TFile) {
-    this.logger.log(`Process ${file.path}`)
-    const links = this.dispatcher.dispatch("note:link:filter", new Event({ links: this.service.getNoteLinks(file.path) })).get().links;
+    async disable(): Promise<void> {
+        this.enabled = false;
+    }
 
-    const replace: [string, string][] = [];
-    const resolved: Map<string, string> = new Map();
-    for (const item of links) {
-      const title = resolved.has(item.dest) ? resolved.get(item.dest) : this.resolver.resolve(item.dest);
-      resolved.set(item.dest, title);
-      if (title && title !== item.alias) {
-        replace.push([`[[${item.link}|${title}]]`, item.original]);
-      }
+    async enable(): Promise<void> {
+        this.enabled = true;
     }
-    if (replace.length === 0) {
-      this.logger.log(`No replaces for ${file.path}`)
-      return;
-    }
-    this.logger.log(`Request approval for ${file.path}`);
-    const approved = await this.dispatcher
-      .dispatch(
-        "note:link:change:approve",
-        new Event({
-          path: file.path,
-          changes: replace,
-          approve: Promise.resolve(true),
-        })
-      )
-      .get().approve;
 
-    if (!approved) {
-      this.logger.log(`Changes for ${file.path} have been rejected`);
-      return;
+    isEnabled(): boolean {
+        return this.enabled;
     }
-    this.logger.log(`Changes for ${file.path} have been approved`)
 
-    let content = await this.facade.getFileContent(file);
-    for (const [v, r] of replace) {
-      content = content.replace(r, v);
+    async update(path: string | null = null): Promise<boolean> {
+        if (!this.isEnabled()) {
+            return false;
+        }
+        const views = this.facade.getViewsOfType<MarkdownView>("markdown");
+        if (!views.length) {
+            return false;
+        }
+        const updated: string[] = [];
+        for (const view of views) {
+            if (view.file && !updated.includes(view.file.path) && (path === null || path === view.file.path)) {
+                await this.process(view.file);
+                updated.push(view.file.path);
+            }
+        }
+        return false;
     }
-    await this.facade.modifyFile(file, content);
-  }
+
+    public async process(file: TFile) {
+        this.logger.log(`Process ${file.path}`);
+        const links = this.dispatcher
+            .dispatch("note:link:filter", new Event({ links: this.service.getNoteLinks(file.path) }))
+            .get().links;
+
+        const replace: [string, string][] = [];
+        const resolved: Map<string, string> = new Map();
+        for (const item of links) {
+            const title = resolved.has(item.dest) ? resolved.get(item.dest) : this.resolver.resolve(item.dest);
+            resolved.set(item.dest, title);
+            if (title && title !== item.alias) {
+                replace.push([`[[${item.link}|${title}]]`, item.original]);
+            }
+        }
+        if (replace.length === 0) {
+            this.logger.log(`No replaces for ${file.path}`);
+            return;
+        }
+        this.logger.log(`Request approval for ${file.path}`);
+        const approved = await this.dispatcher
+            .dispatch(
+                "note:link:change:approve",
+                new Event({
+                    path: file.path,
+                    changes: replace,
+                    approve: Promise.resolve(true),
+                })
+            )
+            .get().approve;
+
+        if (!approved) {
+            this.logger.log(`Changes for ${file.path} have been rejected`);
+            return;
+        }
+        this.logger.log(`Changes for ${file.path} have been approved`);
+
+        let content = await this.facade.getFileContent(file);
+        for (const [v, r] of replace) {
+            content = content.replace(r, v);
+        }
+        await this.facade.modifyFile(file, content);
+    }
 }

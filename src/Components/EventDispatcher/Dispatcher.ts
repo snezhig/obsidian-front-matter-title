@@ -1,7 +1,7 @@
 import DispatcherInterface from "./Interfaces/DispatcherInterface";
 import EventInterface from "./Interfaces/EventInterface";
 import CallbackInterface from "./Interfaces/CallbackInterface";
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
@@ -10,10 +10,10 @@ export default class Dispatcher<E> implements DispatcherInterface<E> {
     private listeners: { [K in keyof E]?: CallbackInterface<E[K]>[] } = {};
 
     constructor(
-        @inject(SI.logger) @named('dispatcher')
+        @inject(SI.logger)
+        @named("dispatcher")
         private logger: LoggerInterface
-    ) {
-    }
+    ) {}
 
     addListener<T extends keyof E>(name: T, cb: CallbackInterface<E[T]>): void {
         if (this.listeners[name] === undefined) {
@@ -25,12 +25,12 @@ export default class Dispatcher<E> implements DispatcherInterface<E> {
         }
     }
 
-    removeListener<T extends  keyof E>(name: T, cb: CallbackInterface<any>): void{
-       this.listeners[name] = this.listeners[name].filter(e => cb !== e);
+    removeListener<T extends keyof E>(name: T, cb: CallbackInterface<any>): void {
+        this.listeners[name] = this.listeners[name].filter(e => cb !== e);
     }
 
     dispatch<T extends keyof E>(name: T, e: EventInterface<E[T]>): EventInterface<E[T]> {
-        this.logger.log(`Dispatch ${name}`)
+        this.logger.log(`Dispatch ${name}`);
         const listeners = this.listeners[name] ?? [];
         for (const l of listeners) {
             e = l.execute(e);

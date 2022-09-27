@@ -5,26 +5,23 @@ import {
     SuggestModalChooserFileItem,
     SuggestModalExt,
     TAbstractFile,
-    TFile
+    TFile,
 } from "obsidian";
 import FunctionReplacer from "../../Utils/FunctionReplacer";
 import Manager from "./Manager";
 import ResolverInterface from "../../Interfaces/ResolverInterface";
 
-
 type Replacers = {
-    modal?: FunctionReplacer<SuggestModalExt<any>, 'open', QuickSwitcher>,
-    chooser?: FunctionReplacer<SuggestModalChooser<any>, 'setSuggestions', QuickSwitcher>
-}
+    modal?: FunctionReplacer<SuggestModalExt<any>, "open", QuickSwitcher>;
+    chooser?: FunctionReplacer<SuggestModalChooser<any>, "setSuggestions", QuickSwitcher>;
+};
 
 export default class QuickSwitcher implements Manager {
     private replacers: Replacers = {};
 
     private state: boolean;
 
-    constructor(
-        private resolver: ResolverInterface
-    ) {
+    constructor(private resolver: ResolverInterface) {
         this.createModalReplacer();
     }
 
@@ -48,9 +45,8 @@ export default class QuickSwitcher implements Manager {
 
     private static hasValidItem(items: SuggestModalChooserFileItem[]): boolean {
         const first = items?.[0];
-        const allowedType = [/*'alias',*/ 'file'];
+        const allowedType = [/*'alias',*/ "file"];
         return first && allowedType.includes(first?.type) && first.file instanceof TFile;
-
     }
 
     public disable(): Promise<void> | void {
@@ -62,7 +58,7 @@ export default class QuickSwitcher implements Manager {
 
     public enable(): Promise<void> | void {
         if (!this.replacers?.chooser?.enable()) {
-            this.replacers.modal.enable()
+            this.replacers.modal.enable();
         }
 
         this.state = true;
@@ -79,8 +75,11 @@ export default class QuickSwitcher implements Manager {
 
     private createModalReplacer() {
         this.replacers.modal = new FunctionReplacer<SuggestModalExt<any>, "open", QuickSwitcher>(
-            SuggestModal.prototype, 'open', this, QuickSwitcher.openCallback
-        )
+            SuggestModal.prototype,
+            "open",
+            this,
+            QuickSwitcher.openCallback
+        );
     }
 
     private createChooserReplacer(modal: SuggestModalExt<any>): void {
@@ -92,10 +91,10 @@ export default class QuickSwitcher implements Manager {
         }
         this.replacers.chooser = new FunctionReplacer<SuggestModalChooser<any>, "setSuggestions", QuickSwitcher>(
             modal.chooser.__proto__,
-            'setSuggestions',
+            "setSuggestions",
             this,
             QuickSwitcher.setSuggestionsCallback
-        )
+        );
         this.replacers.chooser.enable();
         this.replacers.modal.disable();
     }
@@ -108,7 +107,7 @@ export default class QuickSwitcher implements Manager {
             const alias = this.resolver.resolve(item.file.path);
             if (alias) {
                 item.alias = alias;
-                item.type = 'alias';
+                item.type = "alias";
             }
         }
         return items;

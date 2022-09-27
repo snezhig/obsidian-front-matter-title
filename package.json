@@ -1,46 +1,47 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "2.2.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
-	"main": "main.js",
-	"scripts": {
-		"pack.beta": "node utils/pack-release.mjs beta",
-		"pack.release": "node utils/pack-release.mjs release",
-		"dev": "node utils/esbuild.config.mjs",
-		"build": " node utils/esbuild.config.mjs production",
-		"version": "node utils/version-bump.mjs && git add manifest.json versions.json",
-		"test": "jest",
-		"eslint": "eslint src"
-	},
-	"keywords": [],
-	"author": "snezhig",
-	"license": "MIT",
-	"overrides": {
-		"moment": ">=2.29.4"
-	},
-	"devDependencies": {
-		"@types/jest": "^27.4.1",
-		"@types/node": "^16.11.6",
-		"@typescript-eslint/eslint-plugin": "^5.2.0",
-		"@typescript-eslint/parser": "^5.2.0",
-		"adm-zip": "^0.5.9",
-		"builtin-modules": "^3.2.0",
-		"esbuild": "0.13.12",
-		"eslint": "^8.14.0",
-		"jest": "^27.5.1",
-		"jest-mock-extended": "^2.0.6",
-		"obsidian": "^0.15.4",
-		"prettier": "2.7.1",
-		"ts-debounce": "^4.0.0",
-		"ts-jest": "^27.1.4",
-		"ts-node": "^10.7.0",
-		"tsconfig-paths": "^4.0.0",
-		"tslib": "2.3.1",
-		"typescript": "4.6.3",
-		"yaml": "^2.0.1"
-	},
-	"dependencies": {
-		"inversify": "^6.0.1",
-		"reflect-metadata": "^0.1.13"
-	}
+  "name": "obsidian-sample-plugin",
+  "version": "2.2.0",
+  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "main": "main.js",
+  "scripts": {
+    "pack.beta": "node utils/pack-release.mjs beta",
+    "pack.release": "node utils/pack-release.mjs release",
+    "dev": "node utils/esbuild.config.mjs",
+    "build": " node utils/esbuild.config.mjs production",
+    "version": "node utils/version-bump.mjs && git add manifest.json versions.json",
+    "test": "jest",
+    "eslint": "eslint src",
+    "pretty": "prettier --write *.ts *.json src test --ignore-path package-lock.json"
+  },
+  "keywords": [],
+  "author": "snezhig",
+  "license": "MIT",
+  "overrides": {
+    "moment": ">=2.29.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.1",
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.2.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "adm-zip": "^0.5.9",
+    "builtin-modules": "^3.2.0",
+    "esbuild": "0.13.12",
+    "eslint": "^8.14.0",
+    "jest": "^27.5.1",
+    "jest-mock-extended": "^2.0.6",
+    "obsidian": "^0.15.4",
+    "prettier": "^2.7.1",
+    "ts-debounce": "^4.0.0",
+    "ts-jest": "^27.1.4",
+    "ts-node": "^10.7.0",
+    "tsconfig-paths": "^4.0.0",
+    "tslib": "2.3.1",
+    "typescript": "4.6.3",
+    "yaml": "^2.0.1"
+  },
+  "dependencies": {
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13"
+  }
 }

@@ -5,18 +5,19 @@ export interface PrimitiveItemInterface<T> {
 }
 
 export interface ObjectItemInterface<T extends object> extends PrimitiveItemInterface<T> {
-    get<K extends keyof T>(k: K): T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]>
+    get<K extends keyof T>(k: K): T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]>;
 }
 
-
-export default class Storage<T extends {[k: string]: any}> {
+export default class Storage<T extends { [k: string]: any }> {
     private item: ObjectItemInterface<T>;
 
     constructor(data: T) {
         this.item = new StorageItem<T>(data);
     }
 
-    public get<K extends keyof T>(k: K): T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]> {
+    public get<K extends keyof T>(
+        k: K
+    ): T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]> {
         return this.item.get(k);
     }
 
@@ -25,9 +26,8 @@ export default class Storage<T extends {[k: string]: any}> {
     }
 }
 
-
 class StorageItem<T extends { [k: string]: any }> implements ObjectItemInterface<T> {
-    private items?: { [k: string]: ObjectItemInterface<any> | PrimitiveItemInterface<any> }
+    private items?: { [k: string]: ObjectItemInterface<any> | PrimitiveItemInterface<any> };
     private _value?: T;
 
     constructor(data: T) {
@@ -35,7 +35,9 @@ class StorageItem<T extends { [k: string]: any }> implements ObjectItemInterface
     }
 
     get<K extends keyof T>(k: K): T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]> {
-        return this.items[k as string] as T[K] extends object ? ObjectItemInterface<T[K]> : PrimitiveItemInterface<T[K]>;
+        return this.items[k as string] as T[K] extends object
+            ? ObjectItemInterface<T[K]>
+            : PrimitiveItemInterface<T[K]>;
     }
 
     set(value: T): void {
