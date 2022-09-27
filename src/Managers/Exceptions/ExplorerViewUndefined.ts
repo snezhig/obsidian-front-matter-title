@@ -1,1 +1,1 @@
-export default class ExplorerViewUndefined extends Error{}
+export default class ExplorerViewUndefined extends Error {}

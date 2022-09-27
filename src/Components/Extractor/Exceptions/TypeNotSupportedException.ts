@@ -1,3 +1,1 @@
-export default class TypeNotSupportedException extends Error {
-
-}
+export default class TypeNotSupportedException extends Error {}

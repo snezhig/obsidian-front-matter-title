@@ -13,50 +13,49 @@ import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/Callba
 
 @injectable()
 export default class LinkNoteApproveFeature extends BaseFeature implements FeatureInterface<Feature> {
-  private cb: CallbackInterface<AppEvents['note:link:change:approve']>;
-  private enabled = false;
-  constructor(
-    @inject(SI.logger)
-    @named("link:note:approve")
-    private logger: LoggerInterface,
-    @inject(SI.dispatcher)
-    private dispatcher: DispatcherInterface<AppEvents>,
-    @inject(SI["modal:change:approve"])
-    private modal: ChangeApproveModal
-  ) {
-    super();
-    this.init();
-  }
-  async enable(): Promise<void> {
-    if(!this.isEnabled()) {
-      this.dispatcher.addListener("note:link:change:approve", this.cb);
-      this.enabled = true;
+    private cb: CallbackInterface<AppEvents["note:link:change:approve"]>;
+    private enabled = false;
+    constructor(
+        @inject(SI.logger)
+        @named("link:note:approve")
+        private logger: LoggerInterface,
+        @inject(SI.dispatcher)
+        private dispatcher: DispatcherInterface<AppEvents>,
+        @inject(SI["modal:change:approve"])
+        private modal: ChangeApproveModal
+    ) {
+        super();
+        this.init();
     }
-  }
-  async disable(): Promise<void> {
-    this.dispatcher.removeListener("note:link:change:approve", this.cb);
-    this.enabled = false;
-  }
+    async enable(): Promise<void> {
+        if (!this.isEnabled()) {
+            this.dispatcher.addListener("note:link:change:approve", this.cb);
+            this.enabled = true;
+        }
+    }
+    async disable(): Promise<void> {
+        this.dispatcher.removeListener("note:link:change:approve", this.cb);
+        this.enabled = false;
+    }
 
-  static id(): Feature {
-    return Feature.FileNoteLinkApproval;
-  }
-  getId(): Feature {
-    return LinkNoteApproveFeature.id();
-  }
+    static id(): Feature {
+        return Feature.FileNoteLinkApproval;
+    }
+    getId(): Feature {
+        return LinkNoteApproveFeature.id();
+    }
 
-  isEnabled(): boolean {
-    return this.enabled;
-  }
-  private init(): void {
-    this.cb = new Callback<AppEvents["note:link:change:approve"]>((e) => {
-      if(!this.isEnabled()){
-        return e;
-      }
-      const { path, changes } = e.get();
-      const approve = new Promise<boolean>((r) => this.modal.create(path, changes, r).open());
-      return new Event({ path, changes, approve });
-    });
-
-  }
+    isEnabled(): boolean {
+        return this.enabled;
+    }
+    private init(): void {
+        this.cb = new Callback<AppEvents["note:link:change:approve"]>(e => {
+            if (!this.isEnabled()) {
+                return e;
+            }
+            const { path, changes } = e.get();
+            const approve = new Promise<boolean>(r => this.modal.create(path, changes, r).open());
+            return new Event({ path, changes, approve });
+        });
+    }
 }

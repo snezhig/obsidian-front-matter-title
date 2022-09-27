@@ -1,4 +1,4 @@
-export type Mode = 'black' | 'white';
+export type Mode = "black" | "white";
 export default interface BlackWhiteListInterface {
     isFileAllowed(path: string): boolean;
 

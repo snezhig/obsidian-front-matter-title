@@ -1,34 +1,31 @@
 import FunctionReplacer from "../../Utils/FunctionReplacer";
-import {GraphLeaf, GraphNode, TAbstractFile, Workspace} from "obsidian";
+import { GraphLeaf, GraphNode, TAbstractFile, Workspace } from "obsidian";
 import Queue from "../../Utils/Queue";
 import Manager from "./Manager";
-import {Leaves} from "../../enum";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import { Leaves } from "../../enum";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 
-type State = 'disabled' | 'enabled';
+type State = "disabled" | "enabled";
 export default class GraphManager implements Manager {
-    private replacement: FunctionReplacer<GraphNode, 'getDisplayText', GraphManager> = null;
+    private replacement: FunctionReplacer<GraphNode, "getDisplayText", GraphManager> = null;
     private queue: Queue<string, void>;
-    private state: State = 'disabled';
+    private state: State = "disabled";
     private bound = false;
     private resolved = new Map<string, string | null | false>();
 
-    constructor(
-        private workspace: Workspace,
-        private resolver: ResolverInterface<Resolving.Async>,
-    ) {
-        this.queue = new Queue<string, void>(this.runQueue.bind(this), 50)
+    constructor(private workspace: Workspace, private resolver: ResolverInterface<Resolving.Async>) {
+        this.queue = new Queue<string, void>(this.runQueue.bind(this), 50);
     }
 
     private static getReplaceFunction() {
         return function (self: GraphManager, defaultArgs: unknown[], vanilla: () => string) {
             // if (self.resolver.isSupported(this.id)) {
-                const title = self.resolved.get(this.id);
-                if (title) {
-                    return title;
-                } else if (!self.resolved.has(this.id)) {
-                    self.queue.add(this.id).catch(console.error);
-                }
+            const title = self.resolved.get(this.id);
+            if (title) {
+                return title;
+            } else if (!self.resolved.has(this.id)) {
+                self.queue.add(this.id).catch(console.error);
+            }
             // }
             return vanilla.call(this, ...defaultArgs);
         };
@@ -45,7 +42,7 @@ export default class GraphManager implements Manager {
         this.state = "enabled";
         await this.initReplacement();
         if (!this.bound) {
-            this.workspace.on('layout-change', this.initReplacement.bind(this));
+            this.workspace.on("layout-change", this.initReplacement.bind(this));
             this.bound = true;
         }
     }
@@ -78,7 +75,6 @@ export default class GraphManager implements Manager {
             }
         }
 
-
         return Promise.resolve(true);
     }
 
@@ -109,9 +105,8 @@ export default class GraphManager implements Manager {
                         r();
                     }
                 }, 20);
-            })
+            });
         }
-
     }
 
     private getFirstGraphNode(): GraphNode | null {
@@ -126,8 +121,8 @@ export default class GraphManager implements Manager {
 
     private getLeaves(): GraphLeaf[] {
         return [
-            ...this.workspace.getLeavesOfType(Leaves.G) as GraphLeaf[],
-            ...this.workspace.getLeavesOfType(Leaves.LG) as GraphLeaf[],
+            ...(this.workspace.getLeavesOfType(Leaves.G) as GraphLeaf[]),
+            ...(this.workspace.getLeavesOfType(Leaves.LG) as GraphLeaf[]),
         ];
     }
 
@@ -135,10 +130,15 @@ export default class GraphManager implements Manager {
         const promises = [];
 
         for (const id of items) {
-            promises.push(this.resolver.resolve(id).then(e => [id, e]).catch(() => [id, false]));
+            promises.push(
+                this.resolver
+                    .resolve(id)
+                    .then(e => [id, e])
+                    .catch(() => [id, false])
+            );
         }
 
-        return await Promise.all(promises) as unknown as Promise<[string, string | null][]>;
+        return (await Promise.all(promises)) as unknown as Promise<[string, string | null][]>;
     }
 
     private async runQueue(items: Set<string>) {
@@ -175,10 +175,10 @@ export default class GraphManager implements Manager {
         }
     }
 
-    private createReplacement(node: GraphNode): FunctionReplacer<GraphNode, 'getDisplayText', GraphManager> {
+    private createReplacement(node: GraphNode): FunctionReplacer<GraphNode, "getDisplayText", GraphManager> {
         return new FunctionReplacer(
             Object.getPrototypeOf(node),
-            'getDisplayText',
+            "getDisplayText",
             this,
             GraphManager.getReplaceFunction()
         );

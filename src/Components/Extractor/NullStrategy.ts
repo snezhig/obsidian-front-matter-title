@@ -1,5 +1,5 @@
 import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInterface";
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 @injectable()
 export default class NullStrategy implements StrategyInterface {
@@ -8,6 +8,6 @@ export default class NullStrategy implements StrategyInterface {
     }
 
     support(type: string): boolean {
-        return type === 'null';
+        return type === "null";
     }
 }

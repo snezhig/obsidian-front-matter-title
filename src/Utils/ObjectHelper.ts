@@ -31,7 +31,6 @@ export default class ObjectHelper {
         return changed as Changed<T>;
     }
 
-
     public static fillFrom<T extends obj>(to: T, from: T): T {
         for (const [k, v] of Object.entries(to)) {
             const fv = from[k];

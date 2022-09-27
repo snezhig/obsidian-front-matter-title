@@ -1,20 +1,16 @@
 import Manager from "./Manager";
-import {MarkdownViewExt, TAbstractFile, Workspace} from "obsidian";
-import {Leaves} from "../../enum";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import { MarkdownViewExt, TAbstractFile, Workspace } from "obsidian";
+import { Leaves } from "../../enum";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 
 export default class MarkdownManager implements Manager {
     private original = new Map<string, string>();
     private bound = false;
     private handlers = {
-        'layout-change': () => this.update()
+        "layout-change": () => this.update(),
     };
 
-    constructor(
-        private workspace: Workspace,
-        private resolver: ResolverInterface<Resolving.Async>
-    ) {
-    }
+    constructor(private workspace: Workspace, private resolver: ResolverInterface<Resolving.Async>) {}
 
     private enabled = false;
 
@@ -25,7 +21,7 @@ export default class MarkdownManager implements Manager {
         this.original.clear();
         this.enabled = false;
         if (this.bound) {
-            this.workspace.off('layout-change', this.handlers['layout-change']);
+            this.workspace.off("layout-change", this.handlers["layout-change"]);
             this.bound = false;
         }
     }
@@ -33,7 +29,7 @@ export default class MarkdownManager implements Manager {
     enable(): void {
         this.enabled = true;
         if (!this.bound) {
-            this.workspace.on('layout-change', this.handlers['layout-change']);
+            this.workspace.on("layout-change", this.handlers["layout-change"]);
             this.bound = true;
         }
     }
@@ -50,7 +46,7 @@ export default class MarkdownManager implements Manager {
         const promises = [];
 
         for (const leaf of leaves) {
-            const view: MarkdownViewExt = (leaf.view as MarkdownViewExt);
+            const view: MarkdownViewExt = leaf.view as MarkdownViewExt;
             if (view.file.path === abstract?.path) {
                 this.setTitle(view, await this.resolver.resolve(view.file.path));
             } else if (!abstract) {
@@ -66,10 +62,10 @@ export default class MarkdownManager implements Manager {
     }
 
     private setTitle(view: MarkdownViewExt, title: string | null): void {
-        const container = (view.titleContainerEl as HTMLDivElement);
+        const container = view.titleContainerEl as HTMLDivElement;
         let el: HTMLDivElement = null;
         for (const i of Array.from(container.children)) {
-            if (i.hasAttribute('data-ofmt') && i instanceof HTMLDivElement) {
+            if (i.hasAttribute("data-ofmt") && i instanceof HTMLDivElement) {
                 el = i;
                 break;
             }
@@ -85,20 +81,20 @@ export default class MarkdownManager implements Manager {
             return;
         }
         if (el === null) {
-            el = document.createElement('div')
-            el.className = 'view-header-title';
-            el.dataset['ofmt'] = 'true';
+            el = document.createElement("div");
+            el.className = "view-header-title";
+            el.dataset["ofmt"] = "true";
             el.innerText = title;
             el.hidden = true;
-            el.onclick = (e) => {
+            el.onclick = e => {
                 el.hidden = true;
                 view.titleEl.hidden = false;
                 view.titleEl.focus();
                 view.titleEl.onblur = () => {
                     view.titleEl.hidden = true;
                     el.hidden = false;
-                }
-            }
+                };
+            };
             container.appendChild(el);
         }
 
@@ -107,5 +103,4 @@ export default class MarkdownManager implements Manager {
         view.titleEl.hidden = true;
         return;
     }
-
 }

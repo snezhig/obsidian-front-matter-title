@@ -1,14 +1,13 @@
-import BlackWhiteListInterface, {Mode} from "./BlackWhiteListInterface";
-import {injectable} from "inversify";
+import BlackWhiteListInterface, { Mode } from "./BlackWhiteListInterface";
+import { injectable } from "inversify";
 
 @injectable()
 export default class BlackWhiteList implements BlackWhiteListInterface {
-
-    private mode: Mode = 'black';
+    private mode: Mode = "black";
     private list: string[] = [];
 
     private get default(): boolean {
-        return this.mode === 'black';
+        return this.mode === "black";
     }
 
     isFileAllowed(path: string): boolean {
@@ -18,7 +17,7 @@ export default class BlackWhiteList implements BlackWhiteListInterface {
 
         for (const item of this.list) {
             if (path.startsWith(item)) {
-                return this.mode === 'white';
+                return this.mode === "white";
             }
         }
         return this.default;
@@ -31,5 +30,4 @@ export default class BlackWhiteList implements BlackWhiteListInterface {
     setList(list: string[]): void {
         this.list = [...list];
     }
-
 }

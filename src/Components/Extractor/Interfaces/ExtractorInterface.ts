@@ -5,5 +5,5 @@ export default interface ExtractorInterface {
      * @param path
      * @param obj
      */
-    extract(path: string, obj: {[k: string]: any}): string|null|never;
+    extract(path: string, obj: { [k: string]: any }): string | null | never;
 }

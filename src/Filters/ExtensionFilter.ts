@@ -1,5 +1,5 @@
 import FilterInterface from "../Interfaces/FilterInterface";
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 @injectable()
 export default class ExtensionFilter implements FilterInterface {

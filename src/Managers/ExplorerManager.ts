@@ -1,8 +1,8 @@
-import {TFileExplorerItem, TFileExplorerView} from "obsidian";
-import {Leaves, Manager} from "@src/enum";
-import {inject, injectable, named} from "inversify";
+import { TFileExplorerItem, TFileExplorerView } from "obsidian";
+import { Leaves, Manager } from "@src/enum";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ManagerInterface from "@src/Interfaces/ManagerInterface";
@@ -14,12 +14,12 @@ export default class ExplorerManager implements ManagerInterface {
     private enabled = false;
 
     constructor(
-        @inject(SI.resolver) @named(Resolving.Async)
+        @inject(SI.resolver)
+        @named(Resolving.Async)
         private resolver: ResolverInterface<Resolving.Async>,
         @inject(SI["facade:obsidian"])
-        private facade: ObsidianFacade,
-    ) {
-    }
+        private facade: ObsidianFacade
+    ) {}
 
     getId(): Manager {
         return Manager.Explorer;
@@ -48,8 +48,6 @@ export default class ExplorerManager implements ManagerInterface {
         this.enabled = true;
     }
 
-
-
     private getExplorerView(): TFileExplorerView | null {
         const leaves = this.facade.getLeavesOfType(Leaves.FE);
 
@@ -60,7 +58,7 @@ export default class ExplorerManager implements ManagerInterface {
         const view = leaves?.[0]?.view;
         //TODO: what if it be later?
         if (view === undefined) {
-            throw new ExplorerViewUndefined('Explorer view is undefined');
+            throw new ExplorerViewUndefined("Explorer view is undefined");
         }
 
         return view as TFileExplorerView;
@@ -71,9 +69,7 @@ export default class ExplorerManager implements ManagerInterface {
             return false;
         }
 
-        const items = path
-            ? [this.explorerView.fileItems[path]]
-            : Object.values(this.explorerView.fileItems);
+        const items = path ? [this.explorerView.fileItems[path]] : Object.values(this.explorerView.fileItems);
 
         if (!items.filter(e => e).length) {
             return false;
@@ -94,7 +90,7 @@ export default class ExplorerManager implements ManagerInterface {
         }
     }
 
-    private isTitleEmpty = (title: string): boolean => title === null || title === '' || title === undefined;
+    private isTitleEmpty = (title: string): boolean => title === null || title === "" || title === undefined;
 
     private keepOrigin(item: TFileExplorerItem): void {
         if (!this.originTitles.has(item.file.path)) {

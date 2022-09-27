@@ -2,16 +2,15 @@ import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorIn
 import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInterface";
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
 import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
-import {injectable, multiInject} from "inversify";
+import { injectable, multiInject } from "inversify";
 import SI from "@config/inversify.types";
 
 @injectable()
 export default class Extractor implements ExtractorInterface {
     constructor(
-        @multiInject(SI['component:extractor:strategy'])
+        @multiInject(SI["component:extractor:strategy"])
         private strategies: StrategyInterface[]
-    ) {
-    }
+    ) {}
 
     /**
      * @throws {PathNotFoundException}
@@ -20,7 +19,7 @@ export default class Extractor implements ExtractorInterface {
      * @param obj
      */
     extract(path: string, obj: { [p: string]: any }): string | null | never {
-        const parts = path.split('.');
+        const parts = path.split(".");
 
         let part: string;
         let extracted = obj;
@@ -30,8 +29,8 @@ export default class Extractor implements ExtractorInterface {
         }
 
         let strategy: StrategyInterface = null;
-        let type = extracted === null ? 'null' : typeof extracted as string;
-        type = type === 'object' && Array.isArray(extracted) ? 'array' : type;
+        let type = extracted === null ? "null" : (typeof extracted as string);
+        type = type === "object" && Array.isArray(extracted) ? "array" : type;
         for (const item of this.strategies) {
             if (item.support(type)) {
                 strategy = item;
@@ -57,7 +56,4 @@ export default class Extractor implements ExtractorInterface {
         }
         return obj[key];
     }
-
-
 }
-

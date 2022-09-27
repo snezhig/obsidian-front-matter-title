@@ -1,5 +1,5 @@
 import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
-import {inject, injectable} from "inversify";
+import { inject, injectable } from "inversify";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
 import SI from "@config/inversify.types";
 
@@ -9,13 +9,12 @@ export default class BracketsPlaceholder implements TemplatePlaceholderInterface
     private child: TemplatePlaceholderInterface;
 
     constructor(
-        @inject<Factory>(SI['factory:placeholder'])
+        @inject<Factory>(SI["factory:placeholder"])
         private factory: Factory
-    ) {
-    }
+    ) {}
 
     getPlaceholder(): string {
-        return this.placeholder
+        return this.placeholder;
     }
 
     makeValue(path: string): string {
@@ -24,8 +23,9 @@ export default class BracketsPlaceholder implements TemplatePlaceholderInterface
 
     setPlaceholder(placeholder: string): void {
         this.placeholder = placeholder;
-        const {groups: {inside}} = this.placeholder.match(new RegExp(`^{{(?<inside>.*?)}}`));
+        const {
+            groups: { inside },
+        } = this.placeholder.match(new RegExp(`^{{(?<inside>.*?)}}`));
         this.child = this.factory.create(inside);
     }
-
 }

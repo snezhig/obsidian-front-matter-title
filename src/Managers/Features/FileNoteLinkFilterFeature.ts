@@ -11,46 +11,43 @@ import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/Callba
 
 @injectable()
 export default class FileNoteLinkFilterFeature extends BaseFeature implements FeatureInterface<Feature> {
-  private enabled = false;
-  private cb: CallbackInterface<AppEvents["note:link:filter"]>;
-  constructor(
-    @inject(SI.dispatcher)
-    private dispatcher: DispatcherInterface<AppEvents>
-  ) {
-    super();
-    this.init();
-  }
-
-  static id(): Feature{
-    return Feature.FileNoteLinkFilter;
-  }
-
-  private init(): void {
-    this.cb = new Callback<AppEvents["note:link:filter"]>((e) => {
-      if (!this.isEnabled()) {
-        return e;
-      }
-      return new Event({ links: e.get().links.filter(
-          (e) => !/^\[\[.*\|+.*]]$/.test(e.original)
-        ) });
-    });
-
-  }
-
-  async enable(): Promise<void> {
-    if(!this.isEnabled()) {
-      this.dispatcher.addListener("note:link:filter", this.cb);
-      this.enabled = true;
+    private enabled = false;
+    private cb: CallbackInterface<AppEvents["note:link:filter"]>;
+    constructor(
+        @inject(SI.dispatcher)
+        private dispatcher: DispatcherInterface<AppEvents>
+    ) {
+        super();
+        this.init();
     }
-  }
-  async disable(): Promise<void> {
-    this.dispatcher.removeListener("note:link:filter", this.cb);
-    this.enabled = false;
-  }
-  getId(): Feature {
-    return Feature.FileNoteLinkFilter;
-  }
-  isEnabled(): boolean {
-    return this.enabled;
-  }
+
+    static id(): Feature {
+        return Feature.FileNoteLinkFilter;
+    }
+
+    private init(): void {
+        this.cb = new Callback<AppEvents["note:link:filter"]>(e => {
+            if (!this.isEnabled()) {
+                return e;
+            }
+            return new Event({ links: e.get().links.filter(e => !/^\[\[.*\|+.*]]$/.test(e.original)) });
+        });
+    }
+
+    async enable(): Promise<void> {
+        if (!this.isEnabled()) {
+            this.dispatcher.addListener("note:link:filter", this.cb);
+            this.enabled = true;
+        }
+    }
+    async disable(): Promise<void> {
+        this.dispatcher.removeListener("note:link:filter", this.cb);
+        this.enabled = false;
+    }
+    getId(): Feature {
+        return Feature.FileNoteLinkFilter;
+    }
+    isEnabled(): boolean {
+        return this.enabled;
+    }
 }

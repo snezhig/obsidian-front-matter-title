@@ -1,5 +1,5 @@
 import TemplatePlaceholderInterface from "../../../Interfaces/TemplatePlaceholderInterface";
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 // const PREFIXES_LINK = {};
 // const PREFIXES = Object.keys(PREFIXES_LINK);
