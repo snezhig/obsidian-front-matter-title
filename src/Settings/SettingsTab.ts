@@ -234,7 +234,12 @@ export default class SettingsTab extends PluginSettingTab {
             {
                 manager: Manager.FileNoteLink,
                 name: "File Note Link",
-                desc: "Change dispay name of links to note in file",
+                desc: "Change display name of links to note in file",
+            },
+            {
+                manager: Manager.Starred,
+                name: "Starred",
+                desc: "Replace shown titles in starred plugin",
             },
         ];
         for (const item of data) {
