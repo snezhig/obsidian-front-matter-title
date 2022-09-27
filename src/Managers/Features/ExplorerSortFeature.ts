@@ -21,6 +21,7 @@ export default class ExplorerSortFeature extends BaseFeature implements FeatureI
   private enabled = false;
   private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSortFeature>;
   private readonly cb: CallbackInterface<AppEvents["manager:update"]>;
+  private readonly triggered: string[] = [];
   constructor(
     @inject(SI.resolver)
     @named(Resolving.Sync)
@@ -34,12 +35,26 @@ export default class ExplorerSortFeature extends BaseFeature implements FeatureI
     private dispatcher: DispatcherInterface<AppEvents>
   ) {
     super();
-    const s = debounce((e: EventInterface<AppEvents["manager:update"]>) => {
-      logger.log("Try to request sort by event");
-      e.get().id === Manager.Explorer && this.isEnabled() && this.view.requestSort();
-    }, 1000);
-    this.cb = new CallbackVoid(s);
+    const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
+    this.cb = new CallbackVoid(e => {
+        this.triggered.push(e.get().id);
+        trigger();
+    });
   }
+
+    private onManagerUpdate(): void {
+        this.logger.log("Try to request sort by event");
+        if (!this.triggered.includes(Manager.Explorer)) {
+            this.logger.log(`Skip because event triggered for ${this.triggered.join(', ')}. Expected ${Manager.Explorer}`);
+            return;
+        }
+        if (!this.isEnabled()) {
+            this.logger.log('Skipped because feature is not enabled');
+            return;
+        }
+        this.view.requestSort();
+        this.triggered.length = 0;
+    }
 static id(): Feature{
     return Feature.ExplorerSort;
 }
