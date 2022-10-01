@@ -26,7 +26,7 @@ export default class Composer {
     }
 
     public async update(path: string | null = null, id: Manager = null): Promise<void> {
-        await this.do(e => e.update(path), id);
+        await this.do(e => e.isEnabled() && e.update(path), id);
         this.logger.log(`Update for [${path}] and [${id}]`);
         for (const manager of this.determineItems(id)) {
             this.dispatcher.dispatch(`manager:update`, new Event({ id: manager.getId() }));

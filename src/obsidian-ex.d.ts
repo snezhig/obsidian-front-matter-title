@@ -1,5 +1,5 @@
 import "obsidian";
-import { MarkdownView, SuggestModal, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
+import { MarkdownView, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
 
 declare module "obsidian" {
     export interface TFileExplorerItem {
@@ -10,6 +10,14 @@ declare module "obsidian" {
         vChildren?: {
             setChildren(items: any[]): void;
         };
+    }
+    export abstract class StarredPluginView extends ViewPluginEventable {
+        itemLookup: Map<HTMLDivElement, { type: string | "file"; title: string; path: string }>;
+        listEl: HTMLDivElement;
+    }
+
+    export abstract class ViewPluginEventable extends View {
+        plugin: Plugin & Events;
     }
 
     export class TFileExplorerView extends View {

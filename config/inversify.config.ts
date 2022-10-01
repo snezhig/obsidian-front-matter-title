@@ -34,6 +34,7 @@ import LinkNoteManager from "@src/Managers/FileNoteLinkManager";
 import ChangeApproveModal from "@src/UI/ChangeApproveModal";
 import LinkNoteApproveFeature from "@src/Managers/Features/FileNoteLinkApproveFeature";
 import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilterFeature";
+import StarredManager from "@src/Managers/StarredManager";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -58,6 +59,7 @@ Container.bind<LoggerInterface>(SI.logger)
 
 Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
 Container.bind<ManagerInterface>(SI["manager"]).to(LinkNoteManager);
+Container.bind<ManagerInterface>(SI["manager"]).to(StarredManager);
 Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).whenTargetNamed(ExplorerSortFeature.id());
 Container.bind<FeatureInterface<Feature>>(SI.feature).to(LinkNoteApproveFeature).whenTargetNamed(LinkNoteApproveFeature.id());
 Container.bind<FeatureInterface<Feature>>(SI.feature).to(FileNoteLinkFilterFeature).whenTargetNamed(FileNoteLinkFilterFeature.id());

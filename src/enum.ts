@@ -11,6 +11,7 @@ export enum Manager {
     Header = "header",
     QuickSwitcher = "quick_switcher",
     FileNoteLink = "file_note_link",
+    Starred = "starred",
 }
 
 export enum Feature {
