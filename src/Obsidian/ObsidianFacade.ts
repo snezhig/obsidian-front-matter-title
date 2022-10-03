@@ -3,9 +3,8 @@ import { CachedMetadata, LinkCache, MetadataCache, TFile, Vault, View, Workspace
 export default class ObsidianFacade {
     constructor(private vault: Vault, private metadataCache: MetadataCache, private workspace: Workspace) {}
 
-    public getTFile(path: string): TFile | null {
-        const file = this.vault.getAbstractFileByPath(path);
-        return file instanceof TFile ? file : null;
+    public getTFile(path: string): TFile | null {const file = this.vault.getAbstractFileByPath(path)
+    return file instanceof TFile ? file : null;
     }
 
     public getFileContent(file: TFile): Promise<string> {
