@@ -11,7 +11,6 @@ import { Feature, Leaves, Manager } from "@src/enum";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import { AppEvents } from "@src/Types";
-import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 import BaseFeature from "@src/Managers/Features/BaseFeature";
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 

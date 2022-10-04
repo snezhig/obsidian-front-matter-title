@@ -12,8 +12,8 @@ declare module "obsidian" {
         };
     }
     export abstract class StarredPluginView extends ViewPluginEventable {
-        itemLookup: Map<HTMLDivElement, { type: string | "file"; title: string; path: string }>;
-        listEl: HTMLDivElement;
+        itemLookup: WeakMap<Element, { type: string | "file"; title: string; path: string }>;
+        listEl: Element;
     }
 
     export abstract class ViewPluginEventable extends View {
