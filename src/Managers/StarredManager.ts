@@ -24,21 +24,21 @@ export default class StarredManager implements ManagerInterface {
         private logger: LoggerInterface
     ) {}
 
-    async update(path: string): Promise<boolean> {
+    async update(path?: string): Promise<boolean> {
         if (!this.isEnabled()) {
             this.logger.log("Update skipped because of disabled");
-            return;
+            return false;
         }
         this.onChanged(path);
     }
 
     private initView(): boolean {
-        const leaf = this.facade.getLeavesOfType("starred")?.[0]?.view ?? null;
-        if (leaf === null) {
-            this.logger.log("Could not find a leaf of starred type");
+        const view = this.facade.getViewsOfType<StarredPluginView>("starred")?.[0] ?? null;
+        if (view === null) {
+            this.logger.log("Could not find a view of starred type");
             return false;
         }
-        this.view = leaf as StarredPluginView;
+        this.view = view;
         return true;
     }
 
@@ -61,18 +61,18 @@ export default class StarredManager implements ManagerInterface {
     }
 
     private onChanged(path: string = null): void {
-        const listEl = this.view.listEl.getElementsByClassName("nav-file");
+        const listEl = this.view.listEl.findAll(".nav-file");
         const items = this.view.itemLookup;
         for (const div of Array.from(listEl)) {
-            const item = items.get(div as HTMLDivElement);
-            const content = div.getElementsByClassName("nav-file-title-content")?.[0];
+            const item = items.get(div);
+            const content = div.find(".nav-file-title-content");
             if (content && item.type === "file" && (!path || item.path == path)) {
-                this.process(content as HTMLDivElement, item.path, item.title).catch(console.error);
+                this.process(content, item.path, item.title).catch(console.error);
             }
         }
     }
 
-    private async process(div: HTMLDivElement, path: string, original: string): Promise<void> {
+    private async process(div: Element, path: string, original: string): Promise<void> {
         const title = this.resolver.resolve(path) ?? original;
         if (div.getText() !== title) {
             div.setText(title);
@@ -80,7 +80,7 @@ export default class StarredManager implements ManagerInterface {
     }
 
     async enable(): Promise<void> {
-        if (this.initView() && this.subscribe()) {
+        if (!this.isEnabled() && this.initView() && this.subscribe()) {
             this.enabled = true;
         }
     }
