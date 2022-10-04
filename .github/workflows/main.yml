@@ -26,6 +26,14 @@ jobs:
     - name: Eslint
       run: npm run eslint
     
+    - name: Run test
+      run: npm run test
+    
+  pretty:
+  
+    runs-on: ubuntu-latest
+    
+    steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
