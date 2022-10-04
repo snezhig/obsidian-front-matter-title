@@ -30,7 +30,7 @@ jobs:
       run: npm run test
     
   pretty:
-  
+    needs: validate
     runs-on: ubuntu-latest
     
     steps:
