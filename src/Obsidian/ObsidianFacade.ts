@@ -28,7 +28,6 @@ export default class ObsidianFacade {
         return this.workspace.getLeavesOfType(type) as T[];
     }
 
-
     public getViewsOfType<T extends View = View>(type: string): T[] {
         return this.getLeavesOfType(type).map(e => e.view) as T[];
     }
