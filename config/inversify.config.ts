@@ -35,6 +35,7 @@ import ChangeApproveModal from "@src/UI/ChangeApproveModal";
 import LinkNoteApproveFeature from "@src/Managers/Features/FileNoteLinkApproveFeature";
 import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilterFeature";
 import StarredManager from "@src/Managers/StarredManager";
+import Api from "@src/Api/Api";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -73,5 +74,7 @@ Container.bind(SI["modal:change:approve"]).to(ChangeApproveModal).inSingletonSco
 //START CREATOR
 bindCreator(Container);
 //END CREATOR
+
+Container.bind(SI.api).to(Api);
 
 export default Container;

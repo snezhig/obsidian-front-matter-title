@@ -1,4 +1,5 @@
 const SI = {
+    api: "",
   templates: "",
   dispatcher: "",
   storage: "",
