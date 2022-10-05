@@ -3,11 +3,7 @@
 
 name: Node.js CI
 
-on:
-  push:
-    branches: [ "**", "*/*" ]
-  pull_request:
-    branches: [ "**", "*/*" ]
+on: {}
 
 jobs:
   validate:
