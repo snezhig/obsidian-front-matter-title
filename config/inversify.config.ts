@@ -36,6 +36,7 @@ import LinkNoteApproveFeature from "@src/Managers/Features/FileNoteLinkApproveFe
 import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilterFeature";
 import StarredManager from "@src/Managers/StarredManager";
 import Api from "@src/Api/Api";
+import Deffer from "@src/Api/Deffer";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -76,5 +77,7 @@ bindCreator(Container);
 //END CREATOR
 
 Container.bind(SI.api).to(Api);
+Container.bind(SI["factory:api"]).toFactory(c => () => c.container.get(SI.api));
+Container.bind(SI.deffer).to(Deffer).inSingletonScope()
 
 export default Container;

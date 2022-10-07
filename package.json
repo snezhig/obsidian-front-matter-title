@@ -30,7 +30,7 @@
     "eslint": "^8.14.0",
     "jest": "^27.5.1",
     "jest-mock-extended": "^2.0.6",
-    "obsidian": "^0.15.4",
+    "obsidian": "^0.15.9",
     "prettier": "^2.7.1",
     "ts-debounce": "^4.0.0",
     "ts-jest": "^27.1.4",
@@ -41,7 +41,7 @@
     "yaml": "^2.0.1"
   },
   "dependencies": {
-    "front-matter-plugin-api-provider": "^0.0.1",
+    "front-matter-plugin-api-provider": "^0.0.2",
     "inversify": "^6.0.1",
     "reflect-metadata": "^0.1.13"
   }

@@ -1,5 +1,7 @@
 const SI = {
     api: "",
+    deffer: "",
+    "factory:api": "",
   templates: "",
   dispatcher: "",
   storage: "",
