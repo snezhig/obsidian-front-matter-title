@@ -1,7 +1,6 @@
-import { Api, BindDeffer, BootDeffer, PluginBindIncompleteError} from 'front-matter-plugin-api-provider';
-import {inject, injectable} from "inversify";
+import { Api, BindDeffer, BootDeffer, PluginBindIncompleteError } from "front-matter-plugin-api-provider";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
-
 
 export const DefferBound = 2;
 export const DefferBooted = 4;
@@ -11,20 +10,20 @@ export default class Deffer implements BindDeffer, BootDeffer {
 
     private promises = {
         bind: null as Promise<Deffer>,
-        boot: null as Promise<void>
+        boot: null as Promise<void>,
     };
 
     private resolves = {
         bind: null as (v?: unknown) => void,
-        boot: null as (v?: unknown) => void
+        boot: null as (v?: unknown) => void,
     };
 
     constructor(
         @inject(SI["factory:api"])
         private factory: () => Api
     ) {
-        this.promises.bind = new Promise(r => this.resolves.bind = r);
-        this.promises.boot = new Promise(r => this.resolves.boot = r);
+        this.promises.bind = new Promise(r => (this.resolves.bind = r));
+        this.promises.boot = new Promise(r => (this.resolves.boot = r));
     }
 
     public setFlag(flag: typeof DefferBound | typeof DefferBooted) {
@@ -37,7 +36,7 @@ export default class Deffer implements BindDeffer, BootDeffer {
     private processState(): void {
         if (this.isBound()) {
             this.resolves.bind(this);
-            console.log(this.promises.bind)
+            console.log(this.promises.bind);
             if (this.isBooted()) {
                 this.resolves.boot();
             }
@@ -45,7 +44,7 @@ export default class Deffer implements BindDeffer, BootDeffer {
     }
 
     async awaitBind(): Promise<BootDeffer> {
-        console.log(this.promises.bind)
+        console.log(this.promises.bind);
         return await this.promises.bind;
     }
 
@@ -65,6 +64,6 @@ export default class Deffer implements BindDeffer, BootDeffer {
         if (this.isBound()) {
             return this.factory();
         }
-        throw new PluginBindIncompleteError('Not all services have been sound yet');
+        throw new PluginBindIncompleteError("Not all services have been sound yet");
     }
 }
