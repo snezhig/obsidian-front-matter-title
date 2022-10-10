@@ -1,4 +1,4 @@
-import { Api as ApiInterface } from "front-matter-plugin-api-provider";
+import { ApiInterface } from "front-matter-plugin-api-provider";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";

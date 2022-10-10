@@ -1,33 +1,32 @@
-import { Api, BindDeffer, BootDeffer, PluginBindIncompleteError} from 'front-matter-plugin-api-provider';
-import {inject, injectable} from "inversify";
+import { ApiInterface, DefferInterface, PluginIsNotReadyError } from "front-matter-plugin-api-provider";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 
-
-export const DefferBound = 2;
-export const DefferBooted = 4;
+export const DefferPluginReady = 2;
+export const DefferManagersReady = 4;
 @injectable()
-export default class Deffer implements BindDeffer, BootDeffer {
+export default class Deffer implements DefferInterface {
     private state = 0;
 
     private promises = {
-        bind: null as Promise<Deffer>,
-        boot: null as Promise<void>
+        plugin: null as Promise<void>,
+        managers: null as Promise<void>,
     };
 
     private resolves = {
-        bind: null as (v?: unknown) => void,
-        boot: null as (v?: unknown) => void
+        plugin: null as (v?: unknown) => void,
+        managers: null as (v?: unknown) => void,
     };
 
     constructor(
         @inject(SI["factory:api"])
-        private factory: () => Api
+        private factory: () => ApiInterface
     ) {
-        this.promises.bind = new Promise(r => this.resolves.bind = r);
-        this.promises.boot = new Promise(r => this.resolves.boot = r);
+        this.promises.plugin = new Promise(r => (this.resolves.plugin = r));
+        this.promises.managers = new Promise(r => (this.resolves.managers = r));
     }
 
-    public setFlag(flag: typeof DefferBound | typeof DefferBooted) {
+    public setFlag(flag: typeof DefferPluginReady | typeof DefferManagersReady) {
         if (!(this.state & flag)) {
             this.state = this.state | flag;
             this.processState();
@@ -35,36 +34,34 @@ export default class Deffer implements BindDeffer, BootDeffer {
     }
 
     private processState(): void {
-        if (this.isBound()) {
-            this.resolves.bind(this);
-            console.log(this.promises.bind)
-            if (this.isBooted()) {
-                this.resolves.boot();
+        if (this.isPluginReady()) {
+            this.resolves.plugin();
+            if (this.isManagersReady()) {
+                this.resolves.managers();
             }
         }
     }
 
-    async awaitBind(): Promise<BootDeffer> {
-        console.log(this.promises.bind)
-        return await this.promises.bind;
+    async awaitPlugin(): Promise<void> {
+        return await this.promises.plugin;
     }
 
-    async awaitBoot(): Promise<void> {
-        return this.promises.boot;
+    async awaitManagers(): Promise<void> {
+        return this.promises.managers;
     }
 
-    isBound(): boolean {
-        return (this.state & DefferBound) !== 0;
+    isPluginReady(): boolean {
+        return (this.state & DefferPluginReady) !== 0;
     }
 
-    isBooted(): boolean {
-        return (this.state & DefferBooted) !== 0;
+    isManagersReady(): boolean {
+        return (this.state & DefferManagersReady) !== 0;
     }
 
-    getApi(): Api {
-        if (this.isBound()) {
+    getApi(): ApiInterface {
+        if (this.isPluginReady()) {
             return this.factory();
         }
-        throw new PluginBindIncompleteError('Not all services have been sound yet');
+        throw new PluginIsNotReadyError("Not all services have been sound yet");
     }
 }

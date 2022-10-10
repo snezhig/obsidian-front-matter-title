@@ -20,10 +20,10 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import {Feature, Manager} from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import ObjectHelper from "@src/Utils/ObjectHelper";
-import {BindDeffer, getDeffer, Plugin as ApiPlugin} from "front-matter-plugin-api-provider";
-import Deffer, {DefferBooted, DefferBound} from "@src/Api/Deffer";
+import Deffer, {DefferManagersReady, DefferPluginReady} from "@src/Api/Deffer";
+import {DefferInterface, PluginInterface} from "front-matter-plugin-api-provider";
 
-export default class MetaTitlePlugin extends Plugin implements ApiPlugin {
+export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private composer: Composer = null;
     private container: interfaces.Container = Container;
@@ -32,7 +32,7 @@ export default class MetaTitlePlugin extends Plugin implements ApiPlugin {
     private c: MComposer;
     private featureToggle: FeatureToggle;
 
-    public getDeffer(): BindDeffer {
+    public getDeffer(): DefferInterface {
         return this.container.get(SI.deffer);
     }
 
@@ -60,32 +60,14 @@ export default class MetaTitlePlugin extends Plugin implements ApiPlugin {
     }
 
     public async onload() {
-
-        const deffer = getDeffer(this.app);
-        const path = 'path/to/file.md';
-        if (!deffer.isBound()) {
-            //After this API object will be available by deffer.getApi();
-            const bootDeffer = await deffer.awaitBind();
-            //This is optional. Do this if you want to wait until plugin run all its managers.
-            await bootDeffer.awaitBoot();
-        }
-        const api = deffer.getApi();
-
-        //Resolve title asynchronously
-        const title = await api.resolve(path);
-        console.log(title);
-
-        //Resolve title synchronously
-        const titleSync = api.resolveSync(path);
-        console.log(titleSync);
-
         this.bindServices();
         this.dispatcher = this.container.get(SI.dispatcher);
         this.logger = this.container.getNamed(SI.logger, "main");
         new App();
         await this.loadSettings();
-        this.container.get<Deffer>(SI.deffer).setFlag(DefferBound);
-
+        this.app.workspace.onLayoutReady(() => {
+            this.container.get<Deffer>(SI.deffer).setFlag(DefferPluginReady);
+        });
         const delay = this.storage.get("boot").get("delay").value();
         this.logger.log(`Plugin manual delay ${delay}`);
         await new Promise(r => setTimeout(r, delay));
@@ -101,18 +83,15 @@ export default class MetaTitlePlugin extends Plugin implements ApiPlugin {
     }
 
     private bindServices(): void {
-        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<{ [k: string]: any },
-            [string]>(
-            () =>
-                (path: string): any =>
-                    this.app.vault.getAbstractFileByPath(path)
-        );
-        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:meta"]).toFactory<{ [k: string]: any },
-            [string, string]>(
-            () =>
-                (path: string, type: string): any =>
-                    this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]
-        );
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"])
+            .toFactory<{ [k: string]: any },
+                [string]>(
+                () => (path: string): any => this.app.vault.getAbstractFileByPath(path)
+            );
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:meta"])
+            .toFactory<{ [k: string]: any }, [string, string]>(
+                () => (path: string, type: string): any => this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]
+            );
         Container.bind<ObsidianFacade>(SI["facade:obsidian"]).toConstantValue(
             new ObsidianFacade(this.app.vault, this.app.metadataCache, this.app.workspace)
         );
@@ -154,12 +133,11 @@ export default class MetaTitlePlugin extends Plugin implements ApiPlugin {
                 ManagerType.QuickSwitcher
             );
             await this.processFeatures(this.storage.get("features").value());
-            await Promise.all(
-                [
-                    this.processManagers().catch(console.error),
-                    this.runManagersUpdate().catch(console.error),
-                ]);
-            this.container.get<Deffer>(SI.deffer).setFlag(DefferBooted);
+            await Promise.all([
+                this.processManagers().catch(console.error),
+                this.runManagersUpdate().catch(console.error),
+            ]);
+            this.container.get<Deffer>(SI.deffer).setFlag(DefferManagersReady);
         });
 
         this.dispatcher.addListener(
