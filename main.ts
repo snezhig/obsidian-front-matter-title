@@ -1,27 +1,27 @@
-import {CachedMetadata, Plugin, TAbstractFile} from "obsidian";
-import Composer, {ManagerType} from "./src/Title/Manager/Composer";
+import { CachedMetadata, Plugin, TAbstractFile } from "obsidian";
+import Composer, { ManagerType } from "./src/Title/Manager/Composer";
 import MComposer from "./src/Managers/Composer";
-import {SettingsEvent, SettingsFeatures, SettingsType} from "@src/Settings/SettingsType";
+import { SettingsEvent, SettingsFeatures, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
-import {interfaces} from "inversify";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import { interfaces } from "inversify";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import App from "@src/App";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {AppEvents} from "@src/Types";
-import {ResolverEvents} from "@src/Resolver/ResolverType";
+import { AppEvents } from "@src/Types";
+import { ResolverEvents } from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import {Feature, Manager} from "@src/enum";
+import { Feature, Manager } from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import ObjectHelper from "@src/Utils/ObjectHelper";
-import Deffer, {DefferManagersReady, DefferPluginReady} from "@src/Api/Deffer";
-import {DefferInterface, PluginInterface} from "front-matter-plugin-api-provider";
+import Deffer, { DefferManagersReady, DefferPluginReady } from "@src/Api/Deffer";
+import { DefferInterface, PluginInterface } from "front-matter-plugin-api-provider";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
@@ -41,7 +41,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             ...PluginHelper.createDefaultSettings(),
             ...{
                 templates: ["title"],
-                boot: {delay: 1000},
+                boot: { delay: 1000 },
             },
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
@@ -83,15 +83,22 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     private bindServices(): void {
-        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"])
-            .toFactory<{ [k: string]: any },
-                [string]>(
-                () => (path: string): any => this.app.vault.getAbstractFileByPath(path)
-            );
-        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:meta"])
-            .toFactory<{ [k: string]: any }, [string, string]>(
-                () => (path: string, type: string): any => this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]
-            );
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<
+            { [k: string]: any },
+            [string]
+        >(
+            () =>
+                (path: string): any =>
+                    this.app.vault.getAbstractFileByPath(path)
+        );
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:meta"]).toFactory<
+            { [k: string]: any },
+            [string, string]
+        >(
+            () =>
+                (path: string, type: string): any =>
+                    this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]
+        );
         Container.bind<ObsidianFacade>(SI["facade:obsidian"]).toConstantValue(
             new ObsidianFacade(this.app.vault, this.app.metadataCache, this.app.workspace)
         );
@@ -107,13 +114,13 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private bind() {
         this.registerEvent(
             this.app.metadataCache.on("changed", file => {
-                this.dispatcher.dispatch("resolver.clear", new Event({path: file.path}));
+                this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }));
             })
         );
         this.app.workspace.onLayoutReady(() =>
             this.registerEvent(
                 this.app.vault.on("rename", (e, o) => {
-                    this.dispatcher.dispatch("resolver.clear", new Event({path: o}));
+                    this.dispatcher.dispatch("resolver.clear", new Event({ path: o }));
                 })
             )
         );
@@ -156,7 +163,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     private async processFeatures(options: SettingsFeatures<Feature>): Promise<void> {
-        for (const [id, {enabled}] of Object.entries(options)) {
+        for (const [id, { enabled }] of Object.entries(options)) {
             await this.featureToggle.toggle(id as Feature, enabled).catch(console.error);
         }
     }
