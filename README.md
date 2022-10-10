@@ -4,6 +4,9 @@ __Also known as `Meta Title Filename`__
 
 This is a plugin for [Obsidian](https://obsidian.md).
 
+# Api
+Look for integration? Try [API provider](https://github.com/Snezhig/front-matter-plguin-api-provider).
+
 # Introduction
 
 Plugin **does not rename files**,
