@@ -1,13 +1,13 @@
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import {SearchPluginView, SearchViewDOM} from "obsidian";
-import {Manager} from "@src/enum";
+import { SearchPluginView, SearchViewDOM } from "obsidian";
+import { Manager } from "@src/enum";
 import AbstractManager from "@src/Managers/AbstractManager";
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
-type Replacer = FunctionReplacer<SearchViewDOM, 'addResult', SearchManager>;
+type Replacer = FunctionReplacer<SearchViewDOM, "addResult", SearchManager>;
 
 @injectable()
 export default class SearchManager extends AbstractManager {
@@ -18,14 +18,15 @@ export default class SearchManager extends AbstractManager {
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.logger) @named('manager:starred')
+        @inject(SI.logger)
+        @named("manager:starred")
         private logger: LoggerInterface
     ) {
         super();
     }
 
     private getView(): SearchPluginView | null {
-        return this.facade.getViewsOfType<SearchPluginView>('search')?.[0] ?? null;
+        return this.facade.getViewsOfType<SearchPluginView>("search")?.[0] ?? null;
     }
 
     private getSearchDom(): SearchViewDOM | null {
@@ -39,15 +40,15 @@ export default class SearchManager extends AbstractManager {
         if (!this.replacer && this.getSearchDom()) {
             this.replacer = new FunctionReplacer(
                 this.getSearchDom(),
-                'addResult',
+                "addResult",
                 this,
                 (self, defaultArgs, vanilla) => {
-                    if (defaultArgs[0]?.extension === 'md') {
+                    if (defaultArgs[0]?.extension === "md") {
                         defaultArgs[0].basename = Math.random().toString();
                     }
                     return vanilla(...defaultArgs);
                 }
-            )
+            );
         }
         return this.replacer;
     }
@@ -85,6 +86,4 @@ export default class SearchManager extends AbstractManager {
         }
         return run;
     }
-
-
 }

@@ -1,6 +1,4 @@
-
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T] & string;
-
 
 export default class FunctionReplacer<Target, Method extends FunctionPropertyNames<Required<Target>>, O> {
     private vanilla: Target[Method] = null;
@@ -49,4 +47,3 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
         return this.vanilla !== null;
     }
 }
-
