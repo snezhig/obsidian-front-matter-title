@@ -6,6 +6,7 @@ import { inject, injectable, named } from "inversify";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 
 type Replacer = FunctionReplacer<SearchViewDOM, "addResult", SearchManager>;
 
@@ -18,6 +19,9 @@ export default class SearchManager extends AbstractManager {
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
+        @inject(SI.resolver)
+        @named(Resolving.Sync)
+        private resolver: ResolverInterface,
         @inject(SI.logger)
         @named("manager:starred")
         private logger: LoggerInterface
@@ -38,17 +42,21 @@ export default class SearchManager extends AbstractManager {
 
     private initReplacer(): Replacer | null {
         if (!this.replacer && this.getSearchDom()) {
-            this.replacer = new FunctionReplacer(
-                this.getSearchDom(),
-                "addResult",
-                this,
-                (self, defaultArgs, vanilla) => {
-                    if (defaultArgs[0]?.extension === "md") {
-                        defaultArgs[0].basename = Math.random().toString();
+            this.replacer = new FunctionReplacer(this.getSearchDom(), "addResult", this, function (
+                self,
+                defaultArgs,
+                vanilla
+            ) {
+                const c = vanilla.call(this, ...defaultArgs);
+                const file = defaultArgs[0];
+                if (file?.extension === "md") {
+                    const title = self.resolver.resolve(file.path);
+                    if (title) {
+                        c.containerEl.find(".tree-item-inner").setText(title);
                     }
-                    return vanilla(...defaultArgs);
                 }
-            );
+                return c;
+            });
         }
         return this.replacer;
     }
@@ -61,10 +69,11 @@ export default class SearchManager extends AbstractManager {
     async doEnable(): Promise<void> {
         this.initReplacer().enable();
         this.enabled = !!this.replacer;
+        this.getView().startSearch();
     }
 
     getId(): Manager {
-        return undefined;
+        return Manager.Search;
     }
 
     isEnabled(): boolean {

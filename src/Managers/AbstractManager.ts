@@ -1,6 +1,8 @@
 import ManagerInterface from "@src/Interfaces/ManagerInterface";
 import { Manager } from "@src/enum";
+import { injectable } from "inversify";
 
+@injectable()
 export default abstract class AbstractManager implements ManagerInterface {
     async disable(): Promise<void> {
         if (this.isEnabled()) {
