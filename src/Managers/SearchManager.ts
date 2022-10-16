@@ -64,6 +64,7 @@ export default class SearchManager extends AbstractManager {
     async doDisable(): Promise<void> {
         this.initReplacer().disable();
         this.enabled = false;
+        this.getView().startSearch();
     }
 
     async doEnable(): Promise<void> {
