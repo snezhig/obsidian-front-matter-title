@@ -53,11 +53,6 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
         args: O,
         implementation: Implementation<Target, Method, O>
     ) {
-        return new FunctionReplacer(
-            target,
-            method,
-            args,
-            implementation
-        );
+        return new FunctionReplacer(target, method, args, implementation);
     }
 }

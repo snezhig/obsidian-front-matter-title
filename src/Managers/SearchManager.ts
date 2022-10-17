@@ -42,21 +42,22 @@ export default class SearchManager extends AbstractManager {
 
     private initReplacer(): Replacer | null {
         if (!this.replacer && this.getSearchDom()) {
-            this.replacer = FunctionReplacer.create(this.getSearchDom(), "addResult", this, function (
-                self,
-                defaultArgs,
-                vanilla
-            ) {
-                const c = vanilla.call(this, ...defaultArgs);
-                const file = defaultArgs[0];
-                if (file?.extension === "md") {
-                    const title = self.resolver.resolve(file.path);
-                    if (title) {
-                        c.containerEl.find(".tree-item-inner").setText(title);
+            this.replacer = FunctionReplacer.create(
+                this.getSearchDom(),
+                "addResult",
+                this,
+                function (self, defaultArgs, vanilla) {
+                    const c = vanilla.call(this, ...defaultArgs);
+                    const file = defaultArgs[0];
+                    if (file?.extension === "md") {
+                        const title = self.resolver.resolve(file.path);
+                        if (title) {
+                            c.containerEl.find(".tree-item-inner").setText(title);
+                        }
                     }
+                    return c;
                 }
-                return c;
-            });
+            );
         }
         return this.replacer;
     }
@@ -67,10 +68,10 @@ export default class SearchManager extends AbstractManager {
         this.getView()?.startSearch();
     }
 
-    protected async  doEnable(): Promise<void> {
+    protected async doEnable(): Promise<void> {
         this.initReplacer()?.enable();
         this.enabled = !!this.replacer;
-        if(this.enabled) {
+        if (this.enabled) {
             this.getView().startSearch();
         }
     }
@@ -84,7 +85,7 @@ export default class SearchManager extends AbstractManager {
     }
 
     protected async doUpdate(path?: string | null): Promise<boolean> {
-        let run = (!(path ?? false));
+        let run = !(path ?? false);
         if (path) {
             for (const file of this.getSearchDom().resultDomLookup.keys()) {
                 if (file.path === path) {
