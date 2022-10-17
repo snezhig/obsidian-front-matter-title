@@ -1,5 +1,9 @@
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T] & string;
-
+type Implementation<Target, Method extends FunctionPropertyNames<Required<Target>>, O> = (
+    args: O,
+    defaultArgs: Target[Method] extends (...arg: any) => any ? Parameters<Target[Method]> : unknown[],
+    vanilla: Target[Method]
+) => any;
 export default class FunctionReplacer<Target, Method extends FunctionPropertyNames<Required<Target>>, O> {
     private vanilla: Target[Method] | null = null;
 
@@ -7,11 +11,7 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
         private target: Target,
         private method: Method,
         private args: O,
-        private implementation: (
-            args: O,
-            defaultArgs: Target[Method] extends (...arg: any) => any ? Parameters<Target[Method]> : unknown[],
-            vanilla: Target[Method]
-        ) => any
+        private implementation: Implementation<Target, Method, O>
     ) {
         this.valid();
     }
@@ -45,5 +45,19 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
 
     public isEnabled(): boolean {
         return this.vanilla !== null;
+    }
+
+    public static create<Target, Method extends FunctionPropertyNames<Required<Target>>, O>(
+        target: Target,
+        method: Method,
+        args: O,
+        implementation: Implementation<Target, Method, O>
+    ) {
+        return new FunctionReplacer(
+            target,
+            method,
+            args,
+            implementation
+        );
     }
 }

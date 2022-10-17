@@ -42,7 +42,7 @@ export default class SearchManager extends AbstractManager {
 
     private initReplacer(): Replacer | null {
         if (!this.replacer && this.getSearchDom()) {
-            this.replacer = new FunctionReplacer(this.getSearchDom(), "addResult", this, function (
+            this.replacer = FunctionReplacer.create(this.getSearchDom(), "addResult", this, function (
                 self,
                 defaultArgs,
                 vanilla
@@ -61,16 +61,18 @@ export default class SearchManager extends AbstractManager {
         return this.replacer;
     }
 
-    async doDisable(): Promise<void> {
+    protected async doDisable(): Promise<void> {
         this.initReplacer().disable();
         this.enabled = false;
-        this.getView().startSearch();
+        this.getView()?.startSearch();
     }
 
-    async doEnable(): Promise<void> {
-        this.initReplacer().enable();
+    protected async  doEnable(): Promise<void> {
+        this.initReplacer()?.enable();
         this.enabled = !!this.replacer;
-        this.getView().startSearch();
+        if(this.enabled) {
+            this.getView().startSearch();
+        }
     }
 
     getId(): Manager {
@@ -82,7 +84,7 @@ export default class SearchManager extends AbstractManager {
     }
 
     protected async doUpdate(path?: string | null): Promise<boolean> {
-        let run = !!path;
+        let run = (!(path ?? false));
         if (path) {
             for (const file of this.getSearchDom().resultDomLookup.keys()) {
                 if (file.path === path) {
