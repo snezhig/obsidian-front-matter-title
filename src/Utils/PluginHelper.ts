@@ -12,6 +12,7 @@ export default class PluginHelper {
                 quick_switcher: false,
                 file_note_link: false,
                 starred: false,
+                search: false,
             },
             rules: {
                 paths: {
