@@ -7,10 +7,16 @@ import { Manager } from "@src/enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { SearchPluginView, SearchViewDOM, TFile } from "obsidian";
 
-const mockDom = mock<SearchViewDOM>(undefined, { deep: true });
+const addResult = jest.fn();
+const mockDom = mock<SearchViewDOM>({ addResult }, { deep: true });
 const mockView = mock<SearchPluginView>({ dom: mockDom });
 const mockReplacer = mock<FunctionReplacer<SearchViewDOM, "addResult", SearchManager>>();
-const spyCreate = jest.spyOn(FunctionReplacer, "create").mockImplementation(() => mockReplacer);
+let implementation: (manager: SearchManager, args: unknown[], v: () => any) => any = null;
+const spyCreate = jest.spyOn(FunctionReplacer, "create").mockImplementation((t, m, a, i) => {
+    //@ts-ignore
+    implementation = i;
+    return mockReplacer;
+});
 const mockFacade = mock<ObsidianFacade>();
 const mockResolver = mock<ResolverInterface>();
 const manager = new SearchManager(mockFacade, mockResolver, mock<LoggerInterface>());
@@ -77,6 +83,46 @@ describe("Test enabled state", () => {
         mockDom.resultDomLookup = new Map([[mock<TFile>({ path }), undefined]]);
         await manager.update(path);
         expect(mockView.startSearch).toHaveBeenCalledTimes(1);
+    });
+
+    describe("Test replacing of addResult", () => {
+        const mockContainer = mock<Element>();
+        const mockResult = { containerEl: mockContainer };
+        const path = "path/to/file.md";
+        beforeAll(() => {
+            addResult.mockReturnValue(mockResult);
+        });
+        beforeEach(() => {
+            addResult.mockClear();
+            mockResolver.resolve.mockClear();
+        });
+        test("Should not call resolver becase the extension is not md", () => {
+            implementation(manager, [mock<TFile>()], addResult);
+            expect(mockResolver.resolve).not.toHaveBeenCalled();
+            expect(mockContainer.find).not.toHaveBeenCalled();
+        });
+        test("Should call resolver, not find the inner item because title is null", () => {
+            implementation(manager, [mock<TFile>({ extension: "md", path })], addResult);
+            expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
+            expect(mockResolver.resolve).toHaveBeenCalledWith(path);
+            expect(mockContainer.find).not.toHaveBeenCalled();
+        });
+        test("Should call resolver, find the inner item and call setText", () => {
+            const mockInner = mock<Element>();
+            const title = "new_title";
+            mockContainer.find.mockReturnValueOnce(mockInner);
+            mockResolver.resolve.mockReturnValueOnce(title);
+            implementation(manager, [mock<TFile>({ extension: "md", path })], addResult);
+
+            expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
+            expect(mockResolver.resolve).toHaveBeenCalledWith(path);
+
+            expect(mockContainer.find).toHaveBeenCalledTimes(1);
+            expect(mockContainer.find).toHaveBeenCalledWith(".tree-item-inner");
+
+            expect(mockInner.setText).toHaveBeenCalledTimes(1);
+            expect(mockInner.setText).toHaveBeenCalledWith(title);
+        });
     });
 });
 
