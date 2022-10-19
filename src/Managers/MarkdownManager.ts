@@ -1,20 +1,21 @@
 import AbstractManager from "@src/Managers/AbstractManager";
-import {Manager} from "@src/enum";
+import { Manager } from "@src/enum";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import {inject, named} from "inversify";
+import { inject, named } from "inversify";
 import SI from "@config/inversify.types";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import {View, WorkspaceLeafExt} from "obsidian";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import { View, WorkspaceLeafExt } from "obsidian";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 
 export class MarkdownManager extends AbstractManager {
     private enabled = false;
-    private replacer: FunctionReplacer<View, 'getDisplayText', MarkdownManager> = null;
+    private replacer: FunctionReplacer<View, "getDisplayText", MarkdownManager> = null;
 
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver) @named(Resolving.Sync)
+        @inject(SI.resolver)
+        @named(Resolving.Sync)
         private resolver: ResolverInterface
     ) {
         super();
@@ -28,21 +29,21 @@ export class MarkdownManager extends AbstractManager {
         if (this.replacer !== null) {
             return;
         }
-        const view = app.workspace.getLeaf().view
+        const view = app.workspace.getLeaf().view;
         this.replacer = FunctionReplacer.create(
             Object.getPrototypeOf(view),
-            'getDisplayText',
+            "getDisplayText",
             this,
             function (self, defaultArgs, vanilla) {
-                let title = !this.file || this.getViewType() !== 'markdown' ? vanilla.call(this, defaultArgs) : null;
-                title = title ?? (self.resolver.resolve(this.file.path) ?? vanilla.call(this, defaultArgs));
+                let title = !this.file || this.getViewType() !== "markdown" ? vanilla.call(this, defaultArgs) : null;
+                title = title ?? self.resolver.resolve(this.file.path) ?? vanilla.call(this, defaultArgs);
                 return title;
             }
-        )
+        );
     }
 
     private updateHeader(): void {
-        this.facade.getLeavesOfType<WorkspaceLeafExt>('markdown').forEach(e => e.updateHeader());
+        this.facade.getLeavesOfType<WorkspaceLeafExt>("markdown").forEach(e => e.updateHeader());
     }
 
     protected doEnable(): Promise<void> {

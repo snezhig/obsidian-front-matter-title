@@ -1,5 +1,5 @@
 import "obsidian";
-import {MarkdownView, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf} from "obsidian";
+import { MarkdownView, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
 
 declare module "obsidian" {
     export interface TFileExplorerItem {
@@ -12,8 +12,8 @@ declare module "obsidian" {
         };
     }
 
-    export abstract class WorkspaceLeafExt extends WorkspaceLeaf{
-        updateHeader: () => any
+    export abstract class WorkspaceLeafExt extends WorkspaceLeaf {
+        updateHeader: () => any;
     }
 
     export abstract class StarredPluginView extends ViewPluginEventable {
