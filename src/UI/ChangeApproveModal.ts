@@ -1,8 +1,6 @@
 import { App, Modal, Setting } from "obsidian";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import { AppEvents } from "@src/Types";
 
 @injectable()
 export default class ChangeApproveModal {
@@ -16,9 +14,7 @@ export default class ChangeApproveModal {
     > = new Map();
     constructor(
         @inject(SI["obsidian:app"])
-        private app: App,
-        @inject(SI.dispatcher)
-        dispatcher: DispatcherInterface<AppEvents>
+        private app: App
     ) {}
     create(path: string, changes: [string, string][], approve: (approved: boolean) => void): Modal {
         const modal = new Modal(this.app);

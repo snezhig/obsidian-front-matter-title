@@ -71,4 +71,14 @@ declare module "obsidian" {
         type: "alias" | "file";
         alias?: string;
     }
+
+    export interface SearchViewDOM {
+        addResult(f: TFile, ...other: unknown[]): unknown;
+        resultDomLookup: Map<TFile, unknown>;
+    }
+
+    export abstract class SearchPluginView extends View {
+        dom: SearchViewDOM;
+        startSearch: () => any;
+    }
 }

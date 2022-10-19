@@ -7,5 +7,7 @@ export default class Event<T> implements EventInterface<T> {
         return this.data;
     }
 
-    stop(): void {}
+    stop(): void {
+        return;
+    }
 }

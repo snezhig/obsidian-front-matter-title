@@ -7,7 +7,7 @@
     "pack.beta": "node utils/pack-release.mjs beta",
     "pack.release": "node utils/pack-release.mjs release",
     "dev": "node utils/esbuild.config.mjs",
-    "build": " node utils/esbuild.config.mjs production",
+    "build": "tsc -noEmit -skipLibCheck -p ./tsconfig.build.json && node utils/esbuild.config.mjs production",
     "version": "node utils/version-bump.mjs && git add manifest.json versions.json",
     "test": "jest",
     "eslint": "eslint src",
