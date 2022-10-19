@@ -13,6 +13,7 @@ export enum Manager {
     FileNoteLink = "file_note_link",
     Starred = "starred",
     Search = "search",
+    Markdown = "markdown",
 }
 
 export enum Feature {

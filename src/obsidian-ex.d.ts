@@ -1,5 +1,5 @@
 import "obsidian";
-import { MarkdownView, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
+import {MarkdownView, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf} from "obsidian";
 
 declare module "obsidian" {
     export interface TFileExplorerItem {
@@ -11,6 +11,11 @@ declare module "obsidian" {
             setChildren(items: any[]): void;
         };
     }
+
+    export abstract class WorkspaceLeafExt extends WorkspaceLeaf{
+        updateHeader: () => any
+    }
+
     export abstract class StarredPluginView extends ViewPluginEventable {
         itemLookup: WeakMap<Element, { type: string | "file"; title: string; path: string }>;
         listEl: Element;
@@ -25,9 +30,11 @@ declare module "obsidian" {
             [K: string]: TFileExplorerItem;
         };
         sortOrder: string;
+
         getDisplayText(): string;
 
         getViewType(): string;
+
         requestSort: () => void;
     }
 
@@ -74,6 +81,7 @@ declare module "obsidian" {
 
     export interface SearchViewDOM {
         addResult(f: TFile, ...other: unknown[]): unknown;
+
         resultDomLookup: Map<TFile, unknown>;
     }
 
