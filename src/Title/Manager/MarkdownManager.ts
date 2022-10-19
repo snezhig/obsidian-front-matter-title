@@ -86,7 +86,7 @@ export default class MarkdownManager implements Manager {
             el.dataset["ofmt"] = "true";
             el.innerText = title;
             el.hidden = true;
-            el.onclick = e => {
+            el.onclick = () => {
                 el.hidden = true;
                 view.titleEl.hidden = false;
                 view.titleEl.focus();

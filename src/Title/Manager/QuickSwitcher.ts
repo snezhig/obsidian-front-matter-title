@@ -69,6 +69,7 @@ export default class QuickSwitcher implements Manager {
         return this.state;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public update(abstract?: TAbstractFile | null): Promise<boolean> {
         return Promise.resolve(true);
     }
