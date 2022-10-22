@@ -29,7 +29,9 @@ export default class Composer {
         await this.do(e => e.isEnabled() && e.update(path), id);
         this.logger.log(`Update for [${path}] and [${id}]`);
         for (const manager of this.determineItems(id)) {
-            this.dispatcher.dispatch(`manager:update`, new Event({ id: manager.getId() }));
+            if (manager.isEnabled()) {
+                this.dispatcher.dispatch(`manager:update`, new Event({ id: manager.getId() }));
+            }
         }
     }
 

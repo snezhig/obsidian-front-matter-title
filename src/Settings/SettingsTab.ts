@@ -246,6 +246,11 @@ export default class SettingsTab extends PluginSettingTab {
                 name: "Search",
                 desc: "Replace shown titles in search leaf",
             },
+            {
+                manager: Manager.Tab,
+                name: "Tabs",
+                desc: "Replace shown titles in tabs",
+            },
         ];
         for (const item of data) {
             new Setting(this.containerEl)

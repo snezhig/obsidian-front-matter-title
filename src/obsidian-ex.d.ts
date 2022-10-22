@@ -12,9 +12,7 @@ declare module "obsidian" {
         };
     }
 
-    export abstract class WorkspaceLeafExt extends WorkspaceLeaf {
-        updateHeader: () => any;
-    }
+
 
     export abstract class StarredPluginView extends ViewPluginEventable {
         itemLookup: WeakMap<Element, { type: string | "file"; title: string; path: string }>;
@@ -88,5 +86,10 @@ declare module "obsidian" {
     export abstract class SearchPluginView extends View {
         dom: SearchViewDOM;
         startSearch: () => any;
+    }
+
+    export abstract class MarkdownLeaf extends WorkspaceLeaf{
+        tabHeaderInnerTitleEl: Element;
+        view: MarkdownView;
     }
 }
