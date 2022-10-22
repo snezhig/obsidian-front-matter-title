@@ -12,8 +12,6 @@ declare module "obsidian" {
         };
     }
 
-
-
     export abstract class StarredPluginView extends ViewPluginEventable {
         itemLookup: WeakMap<Element, { type: string | "file"; title: string; path: string }>;
         listEl: Element;
@@ -88,7 +86,7 @@ declare module "obsidian" {
         startSearch: () => any;
     }
 
-    export abstract class MarkdownLeaf extends WorkspaceLeaf{
+    export abstract class MarkdownLeaf extends WorkspaceLeaf {
         tabHeaderInnerTitleEl: Element;
         view: MarkdownView;
     }
