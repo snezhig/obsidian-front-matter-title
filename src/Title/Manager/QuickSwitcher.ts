@@ -43,12 +43,6 @@ export default class QuickSwitcher implements Manager {
         };
     }
 
-    private static hasValidItem(items: SuggestModalChooserFileItem[]): boolean {
-        const first = items?.[0];
-        const allowedType = [/*'alias',*/ "file"];
-        return first && allowedType.includes(first?.type) && first.file instanceof TFile;
-    }
-
     public disable(): Promise<void> | void {
         this.replacers.modal.disable();
         this.replacers?.chooser?.disable();
@@ -101,10 +95,10 @@ export default class QuickSwitcher implements Manager {
     }
 
     private replaceAliases(items: SuggestModalChooserFileItem[]): SuggestModalChooserFileItem[] {
-        if (!QuickSwitcher.hasValidItem(items)) {
-            return items;
-        }
         for (const item of items) {
+            if (!item.type || !["alias", "file"].includes(item.type) || !item.file) {
+                continue;
+            }
             const alias = this.resolver.resolve(item.file.path);
             if (alias) {
                 item.alias = alias;
