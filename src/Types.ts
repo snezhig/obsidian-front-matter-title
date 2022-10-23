@@ -3,7 +3,7 @@ import { NoteLink } from "./Utils/FileNoteLinkService";
 
 export type AppEvents = {
     "templates:changed": { old: string[]; new: string[] };
-    "manager:update": { id: Manager };
+    "manager:update": { id: Manager; result: boolean };
     "feature:state:changed": { id: Feature; enabled: boolean };
     "note:link:change:approve": {
         path: string;

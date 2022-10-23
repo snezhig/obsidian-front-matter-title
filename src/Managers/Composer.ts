@@ -26,12 +26,12 @@ export default class Composer {
     }
 
     public async update(path: string | null = null, id: Manager = null): Promise<void> {
-        await this.do(e => e.isEnabled() && e.update(path), id);
+        const results: [Manager, boolean][] = [];
+        await this.do(e => e.isEnabled() && e.update(path).then(r => results.push([e.getId(), r])), id);
         this.logger.log(`Update for [${path}] and [${id}]`);
-        for (const manager of this.determineItems(id)) {
-            if (manager.isEnabled()) {
-                this.dispatcher.dispatch(`manager:update`, new Event({ id: manager.getId() }));
-            }
+        for (const [id, result] of results) {
+            console.log(id, result);
+            this.dispatcher.dispatch(`manager:update`, new Event({ id, result }));
         }
     }
 
