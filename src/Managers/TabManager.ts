@@ -3,8 +3,7 @@ import { Manager } from "@src/enum";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import { inject, named } from "inversify";
 import SI from "@config/inversify.types";
-import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import { MarkdownLeaf, TFile, View } from "obsidian";
+import { MarkdownLeaf } from "obsidian";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 
 export class TabManager extends AbstractManager {

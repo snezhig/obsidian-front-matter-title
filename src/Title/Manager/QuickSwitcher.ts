@@ -5,7 +5,6 @@ import {
     SuggestModalChooserFileItem,
     SuggestModalExt,
     TAbstractFile,
-    TFile,
 } from "obsidian";
 import FunctionReplacer from "../../Utils/FunctionReplacer";
 import Manager from "./Manager";
