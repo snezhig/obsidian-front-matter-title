@@ -77,17 +77,19 @@ export default class ExplorerManager implements ManagerInterface {
 
         const promises = items.map(e => this.setTitle(e));
 
-        return Promise.all(promises).then(() => true);
+        return Promise.all(promises).then(r => r.includes(true));
     }
 
-    private async setTitle(item: TFileExplorerItem): Promise<void> {
+    private async setTitle(item: TFileExplorerItem): Promise<boolean> {
         const title = await this.resolver.resolve(item.file.path).catch(() => null);
         if (this.isTitleEmpty(title)) {
             return this.restore(item);
         } else if (item.titleInnerEl.innerText !== title) {
             this.keepOrigin(item);
             item.titleInnerEl.innerText = title;
+            return true;
         }
+        return false;
     }
 
     private isTitleEmpty = (title: string): boolean => title === null || title === "" || title === undefined;
@@ -102,10 +104,12 @@ export default class ExplorerManager implements ManagerInterface {
         Object.values(this.explorerView.fileItems).map(this.restore.bind(this));
     }
 
-    private restore(item: TFileExplorerItem): void {
+    private restore(item: TFileExplorerItem): boolean {
         if (this.originTitles.has(item.file.path)) {
             item.titleInnerEl.innerText = this.originTitles.get(item.file.path);
             this.originTitles.delete(item.file.path);
+            return true;
         }
+        return false;
     }
 }

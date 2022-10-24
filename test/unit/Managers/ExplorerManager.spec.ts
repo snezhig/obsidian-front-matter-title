@@ -71,7 +71,7 @@ describe("Test flow", () => {
     test("Should call resolver, but update nothing", async () => {
         for (const value of [null, undefined, ""]) {
             resolverMock.resolve.mockResolvedValue(value as any);
-            expect(await manager.update()).toBeTruthy();
+            expect(await manager.update()).toBeFalsy();
         }
         expect(resolverMock.resolve).toHaveBeenCalledTimes(6);
 
