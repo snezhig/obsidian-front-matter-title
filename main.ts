@@ -53,16 +53,20 @@ export default class MetaTitlePlugin extends Plugin {
         await this.runManagersUpdate();
     }
 
+    private async delay(): Promise<void>{
+        const delay = this.storage.get("boot").get("delay").value();
+        this.logger.log(`Plugin manual delay ${delay}`);
+        await new Promise(r => setTimeout(r, delay));
+    }
+
     public async onload() {
         this.bindServices();
         this.dispatcher = this.container.get(SI.dispatcher);
         this.logger = this.container.getNamed(SI.logger, "main");
-        new App();
-        await this.loadSettings();
 
-        const delay = this.storage.get("boot").get("delay").value();
-        this.logger.log(`Plugin manual delay ${delay}`);
-        await new Promise(r => setTimeout(r, delay));
+        new App();//replace with static
+        await this.loadSettings();
+        await this.delay();
 
         this.composer = new Composer(
             this.app.workspace,
@@ -71,6 +75,7 @@ export default class MetaTitlePlugin extends Plugin {
         );
         this.c = Container.get(SI.composer);
         this.featureToggle = Container.get(SI.feature_toggle);
+
         this.bind();
     }
 
