@@ -53,7 +53,7 @@ export default class MetaTitlePlugin extends Plugin {
         await this.runManagersUpdate();
     }
 
-    private async delay(): Promise<void>{
+    private async delay(): Promise<void> {
         const delay = this.storage.get("boot").get("delay").value();
         this.logger.log(`Plugin manual delay ${delay}`);
         await new Promise(r => setTimeout(r, delay));
@@ -64,7 +64,7 @@ export default class MetaTitlePlugin extends Plugin {
         this.dispatcher = this.container.get(SI.dispatcher);
         this.logger = this.container.getNamed(SI.logger, "main");
 
-        new App();//replace with static
+        new App(); //replace with static
         await this.loadSettings();
         await this.delay();
 
