@@ -1,7 +1,7 @@
 export default interface FeatureInterface<T> {
-    enable(): Promise<void>;
+    enable(): Promise<void>|void;
 
-    disable(): Promise<void>;
+    disable(): Promise<void>|void;
 
     getId(): T;
 

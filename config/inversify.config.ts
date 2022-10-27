@@ -37,6 +37,11 @@ import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilter
 import StarredManager from "@src/Managers/StarredManager";
 import SearchManager from "@src/Managers/SearchManager";
 import { TabManager } from "@src/Managers/TabManager";
+import AliasModifierStrategyInterface from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierStrategyInterface";
+import {AliasModifier} from "@src/Components/MetadataCacheAlias/AliasModifier";
+import EnsureStrategy from "@src/Components/MetadataCacheAlias/Strategy/EnsureStrategy";
+import AdjustStrategy from "@src/Components/MetadataCacheAlias/Strategy/AdjustStrategy";
+import ReplaceStrategy from "@src/Components/MetadataCacheAlias/Strategy/ReplaceStrategy";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -85,6 +90,12 @@ Container.bind<Composer>(SI.composer).to(Composer);
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
 Container.bind(SI["modal:change:approve"]).to(ChangeApproveModal).inSingletonScope();
+
+Container.bind(SI['alias:modifier']).to(AliasModifier);
+Container.bind(SI['alias:modifier:strategy']).to(EnsureStrategy).whenTargetNamed('ensure');
+Container.bind(SI['alias:modifier:strategy']).to(AdjustStrategy).whenTargetNamed('adjust');
+Container.bind(SI['alias:modifier:strategy']).to(ReplaceStrategy).whenTargetNamed('replace');
+Container.bind(SI["factory:alias:modifier:strategy"]).toAutoNamedFactory<AliasModifierStrategyInterface>(SI['alias:modifier:strategy']);
 //START CREATOR
 bindCreator(Container);
 //END CREATOR
