@@ -30,7 +30,6 @@ export default class Composer {
         await this.do(e => e.isEnabled() && e.update(path).then(r => results.push([e.getId(), r])), id);
         this.logger.log(`Update for [${path}] and [${id}]`);
         for (const [id, result] of results) {
-            console.log(id, result);
             this.dispatcher.dispatch(`manager:update`, new Event({ id, result }));
         }
     }
