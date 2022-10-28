@@ -35,7 +35,10 @@ export default class Composer {
     }
 
     public async setState(state: boolean, id: Manager = null): Promise<void> {
-        await this.do(e => e[state ? "enable" : "disable"](), id);
+        await this.do(e => {
+            e[state ? "enable" : "disable"]();
+            return Promise.resolve(true);
+        }, id);
     }
 
     private async do(e: (manager: ManagerInterface) => Promise<any>, id: Manager = null): Promise<void> {

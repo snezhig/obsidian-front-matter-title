@@ -1,25 +1,31 @@
-import { CachedMetadata, Plugin, TAbstractFile } from "obsidian";
-import Composer, { ManagerType } from "./src/Title/Manager/Composer";
+import {CachedMetadata, Plugin, TAbstractFile} from "obsidian";
+import Composer, {ManagerType} from "./src/Title/Manager/Composer";
 import MComposer from "./src/Managers/Composer";
-import { SettingsEvent, SettingsFeatures, SettingsType } from "@src/Settings/SettingsType";
+import {SettingsEvent, SettingsFeatures, SettingsType} from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
-import { interfaces } from "inversify";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
+import {interfaces} from "inversify";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import App from "@src/App";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import { AppEvents } from "@src/Types";
-import { ResolverEvents } from "@src/Resolver/ResolverType";
+import {AppEvents} from "@src/Types";
+import {ResolverEvents} from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { Feature, Manager } from "@src/enum";
+import {Feature, Manager} from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import ObjectHelper from "@src/Utils/ObjectHelper";
+import {AliasModifier} from "@src/Components/MetadataCacheAlias/AliasModifier";
+import AliasModifierStrategyInterface
+    from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierStrategyInterface";
+import AliasModifierInterfaceInterface
+    from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierInterfaceInterface";
+import FeatureComposer from "@src/Feature/FeatureComposer";
 
 export default class MetaTitlePlugin extends Plugin {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
@@ -29,13 +35,14 @@ export default class MetaTitlePlugin extends Plugin {
     private logger: LoggerInterface;
     private c: MComposer;
     private featureToggle: FeatureToggle;
+    private fc: FeatureComposer;
 
     private async loadSettings(): Promise<void> {
         let data: SettingsType = {
             ...PluginHelper.createDefaultSettings(),
             ...{
                 templates: ["title"],
-                boot: { delay: 1000 },
+                boot: {delay: 1000},
             },
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
@@ -53,7 +60,7 @@ export default class MetaTitlePlugin extends Plugin {
         await this.runManagersUpdate();
     }
 
-    private async delay(): Promise<void>{
+    private async delay(): Promise<void> {
         const delay = this.storage.get("boot").get("delay").value();
         this.logger.log(`Plugin manual delay ${delay}`);
         await new Promise(r => setTimeout(r, delay));
@@ -64,7 +71,7 @@ export default class MetaTitlePlugin extends Plugin {
         this.dispatcher = this.container.get(SI.dispatcher);
         this.logger = this.container.getNamed(SI.logger, "main");
 
-        new App();//replace with static
+        new App(); //replace with static
         await this.loadSettings();
         await this.delay();
 
@@ -74,24 +81,21 @@ export default class MetaTitlePlugin extends Plugin {
             this.container.getNamed<ResolverInterface<Resolving.Async>>(SI.resolver, Resolving.Async)
         );
         this.c = Container.get(SI.composer);
+        this.fc = Container.get(SI["feature:composer"]);
         this.featureToggle = Container.get(SI.feature_toggle);
 
         this.bind();
     }
 
     private bindServices(): void {
-        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<
-            { [k: string]: any },
-            [string]
-        >(
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<{ [k: string]: any },
+            [string]>(
             () =>
                 (path: string): any =>
                     this.app.vault.getAbstractFileByPath(path)
         );
-        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:meta"]).toFactory<
-            { [k: string]: any },
-            [string, string]
-        >(
+        Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:meta"]).toFactory<{ [k: string]: any },
+            [string, string]>(
             () =>
                 (path: string, type: string): any =>
                     this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]
@@ -110,14 +114,15 @@ export default class MetaTitlePlugin extends Plugin {
 
     private bind() {
         this.registerEvent(
-            this.app.metadataCache.on("changed", file => {
-                this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }));
+            this.app.metadataCache.on("changed", (file, data, cache) => {
+                this.dispatcher.dispatch("metadata:cache:changed", new Event({file, data, cache}));
+                this.dispatcher.dispatch("resolver.clear", new Event({path: file.path}));
             })
         );
         this.app.workspace.onLayoutReady(() =>
             this.registerEvent(
                 this.app.vault.on("rename", (e, o) => {
-                    this.dispatcher.dispatch("resolver.clear", new Event({ path: o }));
+                    this.dispatcher.dispatch("resolver.clear", new Event({path: o}));
                 })
             )
         );
@@ -130,6 +135,8 @@ export default class MetaTitlePlugin extends Plugin {
         );
 
         this.app.workspace.onLayoutReady(async () => {
+            window.t = this.fc;
+
             this.composer.setState(this.storage.get("managers").get(Manager.Graph).value(), ManagerType.Graph);
             this.composer.setState(this.storage.get("managers").get(Manager.Header).value(), ManagerType.Markdown);
             this.composer.setState(
@@ -139,6 +146,7 @@ export default class MetaTitlePlugin extends Plugin {
             await this.processFeatures(this.storage.get("features").value());
             this.processManagers().catch(console.error);
             this.runManagersUpdate().catch(console.error);
+            this.toggleFeatures().catch(console.error);
         });
 
         this.dispatcher.addListener(
@@ -157,7 +165,7 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private async processFeatures(options: SettingsFeatures<Feature>): Promise<void> {
-        for (const [id, { enabled }] of Object.entries(options)) {
+        for (const [id, {enabled}] of Object.entries(options)) {
             await this.featureToggle.toggle(id as Feature, enabled).catch(console.error);
         }
     }
@@ -166,5 +174,20 @@ export default class MetaTitlePlugin extends Plugin {
         this.logger.log("runManagersUpdate");
         await this.composer.update(file);
         await this.c.update(file?.path ?? null);
+    }
+
+    private async toggleFeatures(): Promise<void> {
+        const states: { [k: string]: boolean } = {};
+        for (const [k, v] of Object.entries(this.storage.get('managers').value())) {
+            console.log(k, v)
+            states[k] = v;
+        }
+        for (const [k, v] of Object.entries(this.storage.get('features').value())) {
+            states[k] = v.enabled;
+        }
+        console.log(states);
+        for (const [id, state] of Object.entries(states)) {
+            this.fc.toggle(id, state)
+        }
     }
 }

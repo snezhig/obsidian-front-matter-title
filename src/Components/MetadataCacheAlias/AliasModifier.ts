@@ -12,9 +12,10 @@ import AliasModifierInterfaceInterface
     from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierInterfaceInterface";
 import Alias from "@src/Components/MetadataCacheAlias/Alias";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import AbstractFeature from "@src/Feature/AbstractFeature";
 
 @injectable()
-export class AliasModifier implements FeatureInterface<string>, AliasModifierInterfaceInterface {
+export class AliasModifier  extends AbstractFeature<string> implements AliasModifierInterfaceInterface {
 
     private enabled = false;
     private callback: CallbackInterface<AppEvents['metadata:cache:changed']> = null;
@@ -28,6 +29,7 @@ export class AliasModifier implements FeatureInterface<string>, AliasModifierInt
         @inject(SI.logger) @named("alias:modifier")
         private logger: LoggerInterface
     ) {
+        super();
         this.init();
     }
 
@@ -54,8 +56,12 @@ export class AliasModifier implements FeatureInterface<string>, AliasModifierInt
         }
     }
 
-    getId(): string {
+    static getId(): string{
         return 'alias-modify';
+    }
+
+    getId(): string {
+        return AliasModifier.getId();
     }
 
     isEnabled(): boolean {
