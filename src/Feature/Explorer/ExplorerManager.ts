@@ -8,7 +8,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import AbstractManager from "@src/Feature/AbstractManager";
 
 @injectable()
-export default class ExplorerManager extends AbstractManager<Manager> {
+export default class ExplorerManager extends AbstractManager {
     private explorerView: TFileExplorerView = null;
     private originTitles = new Map<string, string>();
     private enabled = false;

@@ -1,14 +1,14 @@
-import { Manager } from "@src/enum";
-import ManagerInterface from "@src/Interfaces/ManagerInterface";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
-import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { EventRef, StarredPluginView } from "obsidian";
-import { inject, injectable, named } from "inversify";
+import {EventRef, StarredPluginView} from "obsidian";
+import {inject, injectable, named} from "inversify";
 import SI from "@config/inversify.types";
+import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import {Manager} from "@src/enum";
+import AbstractManager from "@src/Feature/AbstractManager";
 
 @injectable()
-export default class StarredManager implements ManagerInterface {
+export default class StarredManager extends AbstractManager {
     private enabled = false;
     private view: StarredPluginView = null;
     private ref: EventRef = null;
@@ -22,14 +22,20 @@ export default class StarredManager implements ManagerInterface {
         @inject(SI.logger)
         @named("manager:starred")
         private logger: LoggerInterface
-    ) {}
+    ) {
+        super();
+    }
 
-    async update(path?: string): Promise<boolean> {
+    async doUpdate(path?: string): Promise<boolean> {
         if (!this.isEnabled()) {
             this.logger.log("Update skipped because of disabled");
             return false;
         }
-        this.onChanged(path);
+        return this.onChanged(path)[path] === true;
+    }
+
+    async doRefresh(): Promise<{ [k: string]: boolean }> {
+        return this.onChanged();
     }
 
     private initView(): boolean {
@@ -60,16 +66,20 @@ export default class StarredManager implements ManagerInterface {
         this.view.plugin.trigger("changed");
     }
 
-    private onChanged(path: string = null): void {
+    private onChanged(path: string = null): { [k: string]: boolean } {
         const listEl = this.view.listEl.findAll(".nav-file");
         const items = this.view.itemLookup;
+        const result: { [k: string]: boolean } = {};
         for (const div of Array.from(listEl)) {
             const item = items.get(div);
             const content = div.find(".nav-file-title-content");
+            result[item.path] = false;
             if (content && item.type === "file" && (!path || item.path == path)) {
                 this.process(content, item.path, item.title).catch(console.error);
+                result[item.path] = true;
             }
         }
+        return result;
     }
 
     private async process(div: Element, path: string, original: string): Promise<void> {
@@ -79,13 +89,13 @@ export default class StarredManager implements ManagerInterface {
         }
     }
 
-    async enable(): Promise<void> {
+    doEnable(): void {
         if (!this.isEnabled() && this.initView() && this.subscribe()) {
             this.enabled = true;
         }
     }
 
-    async disable(): Promise<void> {
+    doDisable(): void {
         if (this.isEnabled()) {
             this.unsubscribe();
             this.view = null;

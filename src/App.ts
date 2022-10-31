@@ -9,13 +9,11 @@ import BlackWhiteListInterface from "@src/Components/BlackWhiteList/BlackWhiteLi
 import Event from "@src/Components/EventDispatcher/Event";
 import { AppEvents } from "@src/Types";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
-import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import { injectable } from "inversify";
 
 @injectable()
 export default class App {
     private container = Container;
-    private featureToggle: FeatureToggle;
     constructor() {
         this.bind();
     }
@@ -39,7 +37,6 @@ export default class App {
             .get<BlackWhiteListInterface>(SI["component:black_white_list"])
             .setList(settings.rules.paths.values);
         this.container.get<LoggerComposer>(SI["logger:composer"])[settings.debug ? "enable" : "disable"]();
-        this.featureToggle = this.container.get<FeatureToggle>(SI.feature_toggle);
     }
 
     private onSettingsChanged({ old, actual }: SettingsEvent["settings.changed"]): void {

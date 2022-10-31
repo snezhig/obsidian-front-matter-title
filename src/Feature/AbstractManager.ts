@@ -1,9 +1,10 @@
 import {injectable} from "inversify";
 import AbstractFeature from "@src/Feature/AbstractFeature";
 import ManagerFeatureInterface from "@src/Interfaces/ManagerFeatureInterface";
+import {Manager} from "@src/enum";
 
 @injectable()
-export default abstract class AbstractManager<T> extends AbstractFeature<T> implements ManagerFeatureInterface {
+export default abstract class AbstractManager extends AbstractFeature<Manager> implements ManagerFeatureInterface {
     disable(): void {
         this.isEnabled() && this.doDisable();
     }

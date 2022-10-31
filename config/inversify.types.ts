@@ -24,21 +24,23 @@ const SI = {
     "factory:obsidian:file_modifiable": "",
     "factory:obsidian:file": "",
     "factory:obsidian:meta": "",
-    "factory:feature": "",
     delimiter: "",
     "getter:delimiter": "",
     "getter:obsidian:leaves": "",
     "facade:obsidian": "",
-    feature: "",
+    "feature": "",
     feature_toggle: "",
     manager: "",
     composer: "",
+    "manager:composer": "",
+    "feature:composer": "",
     "obsidian:app": "",
     "service:note:link": "",
     "modal:change:approve": "",
     "alias:modifier": "",
     "alias:modifier:strategy": "",
     "factory:alias:modifier:strategy": "",
+    "factory:feature": ""
 };
 
 for (const key of Object.keys(SI)) {

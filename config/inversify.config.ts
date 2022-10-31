@@ -1,8 +1,9 @@
 import "reflect-metadata";
-import { Container as _Container, interfaces } from "inversify";
+import {Container as _Container} from "inversify";
 import SI from "./inversify.types";
 import bindCreator from "./services/creator.config";
-import ResolverInterface, { Resolving } from "../src/Interfaces/ResolverInterface";
+import bindFeature from "./services/feature.config";
+import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
 import ResolverSync from "../src/Resolver/ResolverSync";
 import FilterInterface from "../src/Interfaces/FilterInterface";
 import ExtensionFilter from "../src/Filters/ExtensionFilter";
@@ -22,26 +23,11 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
-import ExplorerManager from "@src/Managers/ExplorerManager";
-import ExplorerSortFeature from "@src/Managers/Features/ExplorerSortFeature";
 import ManagerInterface from "@src/Interfaces/ManagerInterface";
-import Composer from "@src/Managers/Composer";
-import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import { Feature } from "@src/enum";
-import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import LinkNoteManager from "@src/Managers/FileNoteLinkManager";
 import ChangeApproveModal from "@src/UI/ChangeApproveModal";
-import LinkNoteApproveFeature from "@src/Managers/Features/FileNoteLinkApproveFeature";
-import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilterFeature";
-import StarredManager from "@src/Managers/StarredManager";
 import SearchManager from "@src/Managers/SearchManager";
-import { TabManager } from "@src/Managers/TabManager";
-import AliasModifierStrategyInterface from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierStrategyInterface";
-import {AliasModifier} from "@src/Components/MetadataCacheAlias/AliasModifier";
-import EnsureStrategy from "@src/Components/MetadataCacheAlias/Strategy/EnsureStrategy";
-import AdjustStrategy from "@src/Components/MetadataCacheAlias/Strategy/AdjustStrategy";
-import ReplaceStrategy from "@src/Components/MetadataCacheAlias/Strategy/ReplaceStrategy";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -69,35 +55,15 @@ Container.bind<LoggerInterface>(SI.logger)
     })
     .when(() => true);
 
-Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
 Container.bind<ManagerInterface>(SI["manager"]).to(LinkNoteManager);
-Container.bind<ManagerInterface>(SI["manager"]).to(StarredManager);
 Container.bind<ManagerInterface>(SI["manager"]).to(SearchManager);
-Container.bind<ManagerInterface>(SI["manager"]).to(TabManager);
-Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).whenTargetNamed(ExplorerSortFeature.id());
-Container.bind<FeatureInterface<Feature>>(SI.feature)
-    .to(LinkNoteApproveFeature)
-    .whenTargetNamed(LinkNoteApproveFeature.id());
-Container.bind<FeatureInterface<Feature>>(SI.feature)
-    .to(FileNoteLinkFilterFeature)
-    .whenTargetNamed(FileNoteLinkFilterFeature.id());
-Container.bind<interfaces.Factory<FeatureInterface<Feature>>>(SI["factory:feature"]).toFactory<
-    FeatureInterface<Feature>,
-    [Feature]
->(context => (id: Feature) => context.container.getNamed<FeatureInterface<Feature>>(SI.feature, id));
-Container.bind<FeatureToggle>(SI.feature_toggle).to(FeatureToggle).inSingletonScope();
-Container.bind<Composer>(SI.composer).to(Composer);
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
 Container.bind(SI["modal:change:approve"]).to(ChangeApproveModal).inSingletonScope();
 
-Container.bind(SI['alias:modifier']).to(AliasModifier);
-Container.bind(SI['alias:modifier:strategy']).to(EnsureStrategy).whenTargetNamed('ensure');
-Container.bind(SI['alias:modifier:strategy']).to(AdjustStrategy).whenTargetNamed('adjust');
-Container.bind(SI['alias:modifier:strategy']).to(ReplaceStrategy).whenTargetNamed('replace');
-Container.bind(SI["factory:alias:modifier:strategy"]).toAutoNamedFactory<AliasModifierStrategyInterface>(SI['alias:modifier:strategy']);
 //START CREATOR
 bindCreator(Container);
+bindFeature(Container);
 //END CREATOR
 
 export default Container;

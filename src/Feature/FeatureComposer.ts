@@ -7,9 +7,13 @@ export default class FeatureComposer {
     private features: { [k: string]: FeatureInterface<any> } = {};
 
     constructor(
-        @inject(SI["factory:f"])
+        @inject(SI["factory:feature"])
         private factory: (name: string) => FeatureInterface<any>,
     ) {
+    }
+    public get<K extends FeatureInterface<any>>(id: any): K|null{
+        console.log(this.features, id)
+        return (this.features[id] as K) ?? null;
     }
 
     toggle(id: any, state: boolean): void {
@@ -22,7 +26,7 @@ export default class FeatureComposer {
             this.features[id] = this.factory(id);
             return this.toggle(id, state);
         }
-
+console.log(this.features)
         feature[state ? "enable" : "disable"]();
         if (!state) {
             delete this.features[id];
