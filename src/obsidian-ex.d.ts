@@ -1,5 +1,5 @@
 import "obsidian";
-import { MarkdownView, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
+import {MarkdownView, MetadataCache, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf} from "obsidian";
 
 declare module "obsidian" {
     export interface TFileExplorerItem {
@@ -89,5 +89,9 @@ declare module "obsidian" {
     export abstract class MarkdownLeaf extends WorkspaceLeaf {
         tabHeaderInnerTitleEl: Element;
         view: MarkdownView;
+    }
+
+    export abstract class MetadataCacheExt extends MetadataCache{
+        getCachedFiles(): string[]
     }
 }

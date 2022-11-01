@@ -94,23 +94,7 @@ export default class SettingsTab extends PluginSettingTab {
                     id: Feature.ExplorerSort,
                     default: false,
                 },
-            ],
-            [Manager.FileNoteLink]: [
-                {
-                    name: "File Note Link Approval",
-                    desc: "If File Note Link manager find link is oppened file",
-                    toggle: null,
-                    id: Feature.FileNoteLinkApproval,
-                    default: true,
-                },
-                {
-                    name: "Replace only links without names",
-                    desc: "If it is on File Note Link will replace only [[link-to-file]] link, otherwise [[link-to-file]] and [[link-to-file|with-alias]] links",
-                    default: true,
-                    id: Feature.FileNoteLinkFilter,
-                    toggle: null,
-                },
-            ],
+            ]
         };
         for (const [manager, items] of Object.entries(features)) {
             for (const item of items) {
@@ -230,11 +214,6 @@ export default class SettingsTab extends PluginSettingTab {
                 manager: Manager.QuickSwitcher,
                 name: "Quick switches title",
                 desc: "Replace shown titles in the quick switcher modal",
-            },
-            {
-                manager: Manager.FileNoteLink,
-                name: "File Note Link",
-                desc: "Change display name of links to note in file",
             },
             {
                 manager: Manager.Starred,

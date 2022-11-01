@@ -6,11 +6,11 @@ export default class PluginHelper {
         return {
             templates: [],
             managers: {
+                alias: false,
                 explorer: false,
                 graph: false,
                 header: false,
                 quick_switcher: false,
-                file_note_link: false,
                 starred: false,
                 search: false,
                 [Manager.Tab]: false,
@@ -31,8 +31,6 @@ export default class PluginHelper {
             },
             features: {
                 [Feature.ExplorerSort]: { enabled: false },
-                [Feature.FileNoteLinkApproval]: { enabled: false },
-                [Feature.FileNoteLinkFilter]: { enabled: false },
             },
         };
     }

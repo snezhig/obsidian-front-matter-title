@@ -1,5 +1,5 @@
-import Alias from "@src/Components/MetadataCacheAlias/Alias";
-import ReplaceStrategy from "@src/Components/MetadataCacheAlias/Strategy/ReplaceStrategy";
+import ReplaceStrategy from "@src/Feature/Alias/Strategy/ReplaceStrategy";
+import Alias from "@src/Feature/Alias/Alias";
 
 export default class EnsureStrategy extends ReplaceStrategy {
     process(alias: Alias, path: string): void {

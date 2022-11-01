@@ -1,9 +1,9 @@
 import { mock } from "jest-mock-extended";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
-import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import { TFileExplorerItem, TFileExplorerView } from "obsidian";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ExplorerManager from "@src/Feature/Explorer/ExplorerManager";
+import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 
 const path = "path/to/file.md";
 const resolverMock = mock<ResolverInterface<Resolving.Async>>();

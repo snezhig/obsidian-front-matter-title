@@ -3,9 +3,9 @@ import { Leaves, Manager } from "@src/enum";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
-import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import AbstractManager from "@src/Feature/AbstractManager";
+import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 
 @injectable()
 export default class ExplorerManager extends AbstractManager {

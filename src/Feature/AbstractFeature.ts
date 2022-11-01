@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 @injectable()
 export default abstract class AbstractFeature<T> implements FeatureInterface<T> {
     static getId(): any {
-        throw new Error("Static function 'id()' is not implemented");
+        throw new Error("Static function 'getId()' is not implemented");
     }
 
     abstract disable(): void;

@@ -1,5 +1,6 @@
 export default class Alias {
     private key: string | null;
+    private changed = false;
 
     constructor(private cache: { [k: string]: any }) {
         this.parse();
@@ -28,6 +29,10 @@ export default class Alias {
 
     public setValue(alias: string | string[]): void {
         const key = this.key ?? this.getPossibleKeys()[0];
+        this.changed = true;
         this.cache[key] = alias;
+    }
+    public isChanged(): boolean{
+        return this.changed;
     }
 }

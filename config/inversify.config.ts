@@ -23,11 +23,7 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
-import ManagerInterface from "@src/Interfaces/ManagerInterface";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
-import LinkNoteManager from "@src/Managers/FileNoteLinkManager";
-import ChangeApproveModal from "@src/UI/ChangeApproveModal";
-import SearchManager from "@src/Managers/SearchManager";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -55,11 +51,8 @@ Container.bind<LoggerInterface>(SI.logger)
     })
     .when(() => true);
 
-Container.bind<ManagerInterface>(SI["manager"]).to(LinkNoteManager);
-Container.bind<ManagerInterface>(SI["manager"]).to(SearchManager);
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
-Container.bind(SI["modal:change:approve"]).to(ChangeApproveModal).inSingletonScope();
 
 //START CREATOR
 bindCreator(Container);

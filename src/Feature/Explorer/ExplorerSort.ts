@@ -1,6 +1,6 @@
 import FunctionReplacer from "../../Utils/FunctionReplacer";
 import CallbackInterface from "../../Components/EventDispatcher/Interfaces/CallbackInterface";
-import { AppEvents } from "../../Types";
+import { AppEvents } from "@src/Types";
 import { inject, injectable, named } from "inversify";
 import SI from "../../../config/inversify.types";
 import ResolverInterface, { Resolving } from "../../Interfaces/ResolverInterface";
@@ -9,9 +9,9 @@ import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import DispatcherInterface from "../../Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
 import CallbackVoid from "../../Components/EventDispatcher/CallbackVoid";
-import { Feature, Leaves, Manager } from "../../enum";
-import ExplorerViewUndefined from "../../Managers/Exceptions/ExplorerViewUndefined";
+import { Feature, Leaves, Manager } from "@src/enum";
 import AbstractFeature from "../AbstractFeature";
+import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 
 @injectable()
 export default class ExplorerSort extends AbstractFeature<Feature> {

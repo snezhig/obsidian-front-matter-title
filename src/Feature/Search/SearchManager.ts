@@ -75,8 +75,11 @@ export default class SearchManager extends AbstractManager {
         }
     }
 
-    getId(): Manager {
+    static getId(): Manager {
         return Manager.Search;
+    }
+    getId(): Manager{
+        return SearchManager.getId();
     }
 
     isEnabled(): boolean {

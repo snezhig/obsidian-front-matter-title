@@ -56,8 +56,11 @@ export default class TabManager extends AbstractManager {
         return result[path] === true;
     }
 
-    getId(): Manager {
+    static getId(): Manager {
         return Manager.Tab;
+    }
+    getId(): Manager {
+        return TabManager.getId();
     }
 
     isEnabled(): boolean {

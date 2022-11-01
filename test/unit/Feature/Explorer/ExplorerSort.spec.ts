@@ -1,6 +1,5 @@
 import { mock } from "jest-mock-extended";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
-import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import { TFileExplorerView, WorkspaceLeaf } from "obsidian";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
@@ -9,6 +8,7 @@ import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/Callba
 import Event from "@src/Components/EventDispatcher/Event";
 import { Manager } from "@src/enum";
 import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
+import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 
 jest.useFakeTimers();
 jest.spyOn(global, "setTimeout");
