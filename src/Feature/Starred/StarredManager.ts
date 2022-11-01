@@ -27,10 +27,6 @@ export default class StarredManager extends AbstractManager {
     }
 
     async doUpdate(path?: string): Promise<boolean> {
-        if (!this.isEnabled()) {
-            this.logger.log("Update skipped because of disabled");
-            return false;
-        }
         return this.onChanged(path)[path] === true;
     }
 

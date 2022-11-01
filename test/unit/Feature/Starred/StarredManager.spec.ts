@@ -1,10 +1,10 @@
-import StarredManager from "@src/Managers/StarredManager";
 import { mock } from "jest-mock-extended";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { EventRef, Events, Plugin, StarredPluginView } from "obsidian";
 import { Manager } from "@src/enum";
+import StarredManager from "@src/Feature/Starred/StarredManager";
 
 const mockFacade = mock<ObsidianFacade>();
 const mockResolver = mock<ResolverInterface<Resolving.Sync>>();
@@ -26,16 +26,16 @@ test("Should not work because disabled", async () => {
 
 describe("Test enable when the dependencies are not exist", () => {
     afterEach(() => mockFacade.getViewsOfType.mockClear());
-    test("Should not be enabled because there is no the leaf", async () => {
-        await manager.enable();
+    test("Should not be enabled because there is no the leaf", () => {
+        manager.enable();
         expect(manager.isEnabled()).toBeFalsy();
         expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(1);
         expect(mockFacade.getViewsOfType).toHaveBeenCalledWith("starred");
     });
 
-    test("Should not be enabled because there is not the plugin in the view of the leaf", async () => {
+    test("Should not be enabled because there is not the plugin in the view of the leaf", () => {
         mockFacade.getViewsOfType.mockReturnValueOnce([mock<StarredPluginView>({ plugin: null })]);
-        await manager.enable();
+        manager.enable();
 
         expect(manager.isEnabled()).toBeFalsy();
         expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(1);
@@ -46,14 +46,14 @@ describe("Test enable when the dependencies are not exist", () => {
 describe("Test enabled state", () => {
     const view = mock<StarredPluginView>({ plugin });
 
-    test("Should be enabled", async () => {
+    test("Should be enabled", () => {
         mockFacade.getViewsOfType.mockReturnValueOnce([view]);
-        await manager.enable();
+        manager.enable();
         expect(manager.isEnabled()).toBeTruthy();
     });
 
-    test("Should not call anything because it is already enabled", async () => {
-        await manager.enable();
+    test("Should not call anything because it is already enabled", () => {
+        manager.enable();
         expect(manager.isEnabled()).toBeTruthy();
         expect(plugin.on).toHaveBeenCalledWith("changed", expect.anything());
         expect(plugin.on).toHaveBeenCalledTimes(1);
@@ -116,7 +116,7 @@ describe("Test enabled state", () => {
                 }
             });
 
-            await manager.update();
+            await manager.refresh();
 
             expect(contentBlocks.fileFoo.setText).toHaveBeenCalledTimes(1);
             expect(contentBlocks.fileFoo.setText).toHaveBeenCalledWith("foo-resolved");
@@ -131,8 +131,8 @@ describe("Test enabled state", () => {
 });
 
 describe("Test disabled state", () => {
-    test("Should be disabled", async () => {
-        await manager.disable();
+    test("Should be disabled", () => {
+        manager.disable();
         expect(manager.isEnabled()).toBeFalsy();
     });
     test("Should unsubscribe ref and trigger event to restore default", () => {
