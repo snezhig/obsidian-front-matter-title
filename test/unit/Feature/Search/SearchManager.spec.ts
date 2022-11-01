@@ -1,4 +1,3 @@
-import SearchManager from "@src/Managers/SearchManager";
 import { mock } from "jest-mock-extended";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface from "@src/Interfaces/ResolverInterface";
@@ -6,6 +5,7 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Manager } from "@src/enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { SearchPluginView, SearchViewDOM, TFile } from "obsidian";
+import SearchManager from "@src/Feature/Search/SearchManager";
 
 const addResult = jest.fn();
 const mockDom = mock<SearchViewDOM>({ addResult }, { deep: true });
@@ -25,16 +25,16 @@ test(`Should return ${Manager.Search}`, () => expect(manager.getId()).toEqual(Ma
 
 describe("Test unsuccessful attempts to enable manager", () => {
     beforeEach(() => mockFacade.getViewsOfType.mockClear());
-    test("Should be disabled, because view does not found", async () => {
-        await manager.enable();
+    test("Should be disabled, because view does not found",  () => {
+         manager.enable();
         expect(manager.isEnabled()).toBeFalsy();
         expect(spyCreate).not.toHaveBeenCalled();
         expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(1);
     });
 
-    test("Should be disabled, because view does not have dom", async () => {
+    test("Should be disabled, because view does not have dom",  () => {
         mockFacade.getViewsOfType.mockReturnValueOnce([mock<SearchPluginView>({ dom: null })]);
-        await manager.enable();
+        manager.enable();
         expect(manager.isEnabled()).toBeFalsy();
         expect(spyCreate).not.toHaveBeenCalled();
         expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(1);
@@ -43,7 +43,7 @@ describe("Test unsuccessful attempts to enable manager", () => {
 
 test("Should not call anything because it`s disabled", async () => {
     mockFacade.getViewsOfType.mockClear();
-    await manager.update();
+    await manager.refresh();
     expect(manager.isEnabled()).toBeFalsy();
     expect(mockFacade.getViewsOfType).not.toHaveBeenCalled();
 });
@@ -57,10 +57,10 @@ describe("Test enabled state", () => {
         mockView.startSearch.mockClear();
     });
 
-    test("Should be enabled", async () => {
+    test("Should be enabled", () => {
         //Call twice, but second call should not call dependencies twice
-        await manager.enable();
-        await manager.enable();
+        manager.enable();
+        manager.enable();
         expect(manager.isEnabled()).toBeTruthy();
         expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(2);
         expect(spyCreate).toHaveBeenCalledTimes(1);
@@ -69,7 +69,7 @@ describe("Test enabled state", () => {
     });
 
     test("Should call startSearch because update all", async () => {
-        await manager.update();
+        await manager.refresh();
         expect(mockView.startSearch).toHaveBeenCalledTimes(1);
     });
     test("Should not call startSearch because does not have passed path", async () => {

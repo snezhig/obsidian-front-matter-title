@@ -1,16 +1,15 @@
-import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import { SearchPluginView, SearchViewDOM } from "obsidian";
-import { Manager } from "@src/enum";
-import AbstractManager from "@src/Managers/AbstractManager";
-import { inject, injectable, named } from "inversify";
-import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
+import AbstractManager from "@src/Feature/AbstractManager";
+import {inject, named} from "inversify";
 import SI from "@config/inversify.types";
+import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
+import FunctionReplacer from "@src/Utils/FunctionReplacer";
+import {Manager} from "@src/enum";
+import {SearchPluginView, SearchViewDOM} from "obsidian";
 
 type Replacer = FunctionReplacer<SearchViewDOM, "addResult", SearchManager>;
 
-@injectable()
 export default class SearchManager extends AbstractManager {
     private enabled = false;
     private replacer: Replacer = null;
@@ -84,7 +83,7 @@ export default class SearchManager extends AbstractManager {
         return this.enabled;
     }
 
-    protected async doUpdate(path?: string | null): Promise<boolean> {
+    private async updateInternal(path: string = null): Promise<boolean> {
         let run = !(path ?? false);
         if (path) {
             for (const file of this.getSearchDom().resultDomLookup.keys()) {
@@ -98,5 +97,14 @@ export default class SearchManager extends AbstractManager {
             this.getView().startSearch();
         }
         return run;
+    }
+
+    protected async doUpdate(path: string): Promise<boolean> {
+        return await this.updateInternal(path);
+    }
+
+    protected async doRefresh(): Promise<{ [k: string]: boolean }> {
+        await this.updateInternal();
+        return {};
     }
 }
