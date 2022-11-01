@@ -1,5 +1,5 @@
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import {inject, injectable} from "inversify";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 
 @injectable()
@@ -8,11 +8,10 @@ export default class FeatureComposer {
 
     constructor(
         @inject(SI["factory:feature"])
-        private factory: (name: string) => FeatureInterface<any>,
-    ) {
-    }
-    public get<K extends FeatureInterface<any>>(id: any): K|null{
-        console.log(this.features, id)
+        private factory: (name: string) => FeatureInterface<any>
+    ) {}
+    public get<K extends FeatureInterface<any>>(id: any): K | null {
+        console.log(this.features, id);
         return (this.features[id] as K) ?? null;
     }
 
@@ -26,7 +25,7 @@ export default class FeatureComposer {
             this.features[id] = this.factory(id);
             return this.toggle(id, state);
         }
-console.log(this.features)
+        console.log(this.features);
         feature[state ? "enable" : "disable"]();
         if (!state) {
             delete this.features[id];

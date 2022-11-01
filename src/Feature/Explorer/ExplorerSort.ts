@@ -1,15 +1,15 @@
 import FunctionReplacer from "../../Utils/FunctionReplacer";
 import CallbackInterface from "../../Components/EventDispatcher/Interfaces/CallbackInterface";
-import {AppEvents} from "../../Types";
-import {inject, injectable, named} from "inversify";
+import { AppEvents } from "../../Types";
+import { inject, injectable, named } from "inversify";
 import SI from "../../../config/inversify.types";
-import ResolverInterface, {Resolving} from "../../Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving } from "../../Interfaces/ResolverInterface";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import DispatcherInterface from "../../Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {debounce, TFileExplorerItem, TFileExplorerView, TFolder} from "obsidian";
+import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
 import CallbackVoid from "../../Components/EventDispatcher/CallbackVoid";
-import {Feature, Leaves, Manager} from "../../enum";
+import { Feature, Leaves, Manager } from "../../enum";
 import ExplorerViewUndefined from "../../Managers/Exceptions/ExplorerViewUndefined";
 import AbstractFeature from "../AbstractFeature";
 

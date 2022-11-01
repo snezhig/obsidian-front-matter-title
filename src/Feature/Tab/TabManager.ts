@@ -1,10 +1,10 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
-import {Manager} from "@src/enum";
-import {MarkdownLeaf} from "obsidian";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
+import { Manager } from "@src/enum";
+import { MarkdownLeaf } from "obsidian";
 
 @injectable()
 export default class TabManager extends AbstractManager {

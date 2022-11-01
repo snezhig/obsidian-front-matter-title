@@ -1,24 +1,21 @@
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {AppEvents} from "@src/Types";
+import { AppEvents } from "@src/Types";
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
-import {SettingsEvent} from "@src/Settings/SettingsType";
-import AliasModifierStrategyInterface
-    from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierStrategyInterface";
-import AliasModifierInterfaceInterface
-    from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierInterfaceInterface";
+import { SettingsEvent } from "@src/Settings/SettingsType";
+import AliasModifierStrategyInterface from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierStrategyInterface";
+import AliasModifierInterfaceInterface from "@src/Components/MetadataCacheAlias/Interfaces/AliasModifierInterfaceInterface";
 import Alias from "@src/Components/MetadataCacheAlias/Alias";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import AbstractFeature from "@src/Feature/AbstractFeature";
 
 @injectable()
-export class AliasModifier  extends AbstractFeature<string> implements AliasModifierInterfaceInterface {
-
+export class AliasModifier extends AbstractFeature<string> implements AliasModifierInterfaceInterface {
     private enabled = false;
-    private callback: CallbackInterface<AppEvents['metadata:cache:changed']> = null;
+    private callback: CallbackInterface<AppEvents["metadata:cache:changed"]> = null;
     private strategy: AliasModifierStrategyInterface = null;
 
     constructor(
@@ -26,7 +23,8 @@ export class AliasModifier  extends AbstractFeature<string> implements AliasModi
         private dispatcher: DispatcherInterface<AppEvents & SettingsEvent>,
         @inject(SI["factory:alias:modifier:strategy"])
         private strategyFactory: (name: string) => AliasModifierStrategyInterface,
-        @inject(SI.logger) @named("alias:modifier")
+        @inject(SI.logger)
+        @named("alias:modifier")
         private logger: LoggerInterface
     ) {
         super();
@@ -35,9 +33,12 @@ export class AliasModifier  extends AbstractFeature<string> implements AliasModi
 
     private init() {
         this.callback = new CallbackVoid(e => {
-            const {file: {path}, cache} = e.get();
+            const {
+                file: { path },
+                cache,
+            } = e.get();
             this.strategy.process(new Alias(cache.frontmatter ?? {}), path);
-        })
+        });
     }
 
     setStrategy(name: string) {
@@ -45,19 +46,19 @@ export class AliasModifier  extends AbstractFeature<string> implements AliasModi
     }
 
     disable(): void {
-        this.dispatcher.removeListener('metadata:cache:changed', this.callback);
+        this.dispatcher.removeListener("metadata:cache:changed", this.callback);
         this.enabled = false;
     }
 
     enable(): void {
         if (!this.enabled) {
-            this.dispatcher.addListener('metadata:cache:changed', this.callback);
+            this.dispatcher.addListener("metadata:cache:changed", this.callback);
             this.enabled = true;
         }
     }
 
-    static getId(): string{
-        return 'alias-modify';
+    static getId(): string {
+        return "alias-modify";
     }
 
     getId(): string {

@@ -1,8 +1,8 @@
-import {TFileExplorerItem, TFileExplorerView} from "obsidian";
-import {Leaves, Manager} from "@src/enum";
-import {inject, injectable, named} from "inversify";
+import { TFileExplorerItem, TFileExplorerView } from "obsidian";
+import { Leaves, Manager } from "@src/enum";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import AbstractManager from "@src/Feature/AbstractManager";
@@ -66,7 +66,7 @@ export default class ExplorerManager extends AbstractManager {
         }
 
         const result: { [k: string]: boolean } = {};
-        const promises = items.map(e => this.setTitle(e).then(r => result[e.file.path] = r));
+        const promises = items.map(e => this.setTitle(e).then(r => (result[e.file.path] = r)));
 
         await Promise.all(promises);
         return result;

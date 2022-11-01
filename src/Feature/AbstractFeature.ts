@@ -1,5 +1,5 @@
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import {injectable} from "inversify";
+import { injectable } from "inversify";
 
 @injectable()
 export default abstract class AbstractFeature<T> implements FeatureInterface<T> {

@@ -1,9 +1,7 @@
 export default class Alias {
     private key: string | null;
 
-    constructor(
-        private cache: { [k: string]: any }
-    ) {
+    constructor(private cache: { [k: string]: any }) {
         this.parse();
     }
 
@@ -17,7 +15,7 @@ export default class Alias {
     }
 
     private getPossibleKeys(): string[] {
-        return ['alias', 'aliases'];
+        return ["alias", "aliases"];
     }
 
     public getKey(): string | null {
