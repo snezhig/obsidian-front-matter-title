@@ -1,5 +1,5 @@
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import {inject, injectable} from "inversify";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 
 @injectable()
@@ -9,8 +9,7 @@ export default class FeatureComposer {
     constructor(
         @inject(SI["factory:feature"])
         private factory: (name: string) => FeatureInterface<any>
-    ) {
-    }
+    ) {}
 
     public get<K extends FeatureInterface<any>>(id: any): K | null {
         return (this.features[id] as K) ?? null;

@@ -1,12 +1,12 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import {inject, named} from "inversify";
+import { inject, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import {Manager} from "@src/enum";
-import {SearchPluginView, SearchViewDOM} from "obsidian";
+import { Manager } from "@src/enum";
+import { SearchPluginView, SearchViewDOM } from "obsidian";
 
 type Replacer = FunctionReplacer<SearchViewDOM, "addResult", SearchManager>;
 
@@ -78,7 +78,7 @@ export default class SearchManager extends AbstractManager {
     static getId(): Manager {
         return Manager.Search;
     }
-    getId(): Manager{
+    getId(): Manager {
         return SearchManager.getId();
     }
 

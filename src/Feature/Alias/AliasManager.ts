@@ -1,13 +1,13 @@
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import AbstractManager from "@src/Feature/AbstractManager";
-import {Manager} from "@src/enum";
+import { Manager } from "@src/enum";
 import AliasManagerInterface from "@src/Feature/Alias/Interfaces/AliasManagerInterface";
 import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import Alias from "@src/Feature/Alias/Alias";
-import {MetadataCacheExt} from "obsidian";
-import {MetadataCacheFactory} from "@config/inversify.factory.types";
+import { MetadataCacheExt } from "obsidian";
+import { MetadataCacheFactory } from "@config/inversify.factory.types";
 
 @injectable()
 export class AliasManager extends AbstractManager implements AliasManagerInterface {
@@ -55,7 +55,7 @@ export class AliasManager extends AbstractManager implements AliasManagerInterfa
         const res: { [k: string]: boolean } = {};
         const promises = [];
         for (const path of cache.getCachedFiles()) {
-            promises.push(this.doUpdate(path).then(r => res[path] = r));
+            promises.push(this.doUpdate(path).then(r => (res[path] = r)));
         }
         await Promise.all(promises);
         return res;

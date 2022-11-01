@@ -13,7 +13,7 @@ export enum Manager {
     Starred = "starred",
     Search = "search",
     Tab = "tab",
-    Alias = "alias"
+    Alias = "alias",
 }
 
 export enum Feature {

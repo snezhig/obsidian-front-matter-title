@@ -1,10 +1,10 @@
-import {EventRef, StarredPluginView} from "obsidian";
-import {inject, injectable, named} from "inversify";
+import { EventRef, StarredPluginView } from "obsidian";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import {Manager} from "@src/enum";
+import { Manager } from "@src/enum";
 import AbstractManager from "@src/Feature/AbstractManager";
 
 @injectable()

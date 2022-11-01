@@ -94,7 +94,7 @@ export default class SettingsTab extends PluginSettingTab {
                     id: Feature.ExplorerSort,
                     default: false,
                 },
-            ]
+            ],
         };
         for (const [manager, items] of Object.entries(features)) {
             for (const item of items) {

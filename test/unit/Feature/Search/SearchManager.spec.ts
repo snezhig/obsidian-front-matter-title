@@ -25,14 +25,14 @@ test(`Should return ${Manager.Search}`, () => expect(manager.getId()).toEqual(Ma
 
 describe("Test unsuccessful attempts to enable manager", () => {
     beforeEach(() => mockFacade.getViewsOfType.mockClear());
-    test("Should be disabled, because view does not found",  () => {
-         manager.enable();
+    test("Should be disabled, because view does not found", () => {
+        manager.enable();
         expect(manager.isEnabled()).toBeFalsy();
         expect(spyCreate).not.toHaveBeenCalled();
         expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(1);
     });
 
-    test("Should be disabled, because view does not have dom",  () => {
+    test("Should be disabled, because view does not have dom", () => {
         mockFacade.getViewsOfType.mockReturnValueOnce([mock<SearchPluginView>({ dom: null })]);
         manager.enable();
         expect(manager.isEnabled()).toBeFalsy();

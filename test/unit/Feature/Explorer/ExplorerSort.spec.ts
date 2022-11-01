@@ -18,12 +18,7 @@ let callback: CallbackInterface<any>;
 const dispatcher = mock<DispatcherInterface<any>>();
 dispatcher.addListener.mockImplementation((name, cb) => (callback = cb));
 
-const sort = new ExplorerSort(
-    mock<ResolverInterface<Resolving.Sync>>(),
-    mock<LoggerInterface>(),
-    facade,
-    dispatcher
-);
+const sort = new ExplorerSort(mock<ResolverInterface<Resolving.Sync>>(), mock<LoggerInterface>(), facade, dispatcher);
 
 const view = mock<TFileExplorerView>();
 // @ts-ignore

@@ -32,7 +32,7 @@ export default class Alias {
         this.changed = true;
         this.cache[key] = alias;
     }
-    public isChanged(): boolean{
+    public isChanged(): boolean {
         return this.changed;
     }
 }
