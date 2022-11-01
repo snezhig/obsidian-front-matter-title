@@ -1,4 +1,3 @@
-import ExplorerSortFeature from "@src/Managers/Features/ExplorerSortFeature";
 import { mock } from "jest-mock-extended";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import ExplorerViewUndefined from "@src/Managers/Exceptions/ExplorerViewUndefined";
@@ -9,6 +8,7 @@ import DispatcherInterface from "../../../../src/Components/EventDispatcher/Inte
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 import { Manager } from "@src/enum";
+import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 
 jest.useFakeTimers();
 jest.spyOn(global, "setTimeout");
@@ -18,7 +18,7 @@ let callback: CallbackInterface<any>;
 const dispatcher = mock<DispatcherInterface<any>>();
 dispatcher.addListener.mockImplementation((name, cb) => (callback = cb));
 
-const sort = new ExplorerSortFeature(
+const sort = new ExplorerSort(
     mock<ResolverInterface<Resolving.Sync>>(),
     mock<LoggerInterface>(),
     facade,
