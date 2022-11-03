@@ -2,7 +2,7 @@ import { mock } from "jest-mock-extended";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import { Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { SearchPluginView, SearchViewDOM, TFile } from "obsidian";
 import SearchManager from "@src/Feature/Search/SearchManager";
@@ -21,7 +21,7 @@ const mockFacade = mock<ObsidianFacade>();
 const mockResolver = mock<ResolverInterface>();
 const manager = new SearchManager(mockFacade, mockResolver, mock<LoggerInterface>());
 
-test(`Should return ${Manager.Search}`, () => expect(manager.getId()).toEqual(Manager.Search));
+test(`Should return ${Feature.Search}`, () => expect(manager.getId()).toEqual(Feature.Search));
 
 describe("Test unsuccessful attempts to enable manager", () => {
     beforeEach(() => mockFacade.getViewsOfType.mockClear());

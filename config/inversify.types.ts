@@ -34,6 +34,8 @@ const SI = {
     "placeholder:meta": "",
     "resolver": "",
     "service:note:link": "",
+    "settings:feature:builder": "",
+    "factory:settings:feature:builder": "",
     "storage": "",
     "template:pattern": "",
     "templates": ""

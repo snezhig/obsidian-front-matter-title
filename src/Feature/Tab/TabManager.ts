@@ -3,7 +3,7 @@ import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
-import { Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import { MarkdownLeaf } from "obsidian";
 
 @injectable()
@@ -56,10 +56,10 @@ export default class TabManager extends AbstractManager {
         return result[path] === true;
     }
 
-    static getId(): Manager {
-        return Manager.Tab;
+    static getId(): Feature {
+        return Feature.Tab;
     }
-    getId(): Manager {
+    getId(): Feature {
         return TabManager.getId();
     }
 

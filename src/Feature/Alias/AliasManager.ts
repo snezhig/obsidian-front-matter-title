@@ -2,7 +2,7 @@ import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import AliasManagerInterface from "@src/Feature/Alias/Interfaces/AliasManagerInterface";
 import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import Alias from "@src/Feature/Alias/Alias";
@@ -61,11 +61,11 @@ export class AliasManager extends AbstractManager implements AliasManagerInterfa
         return res;
     }
 
-    static getId(): Manager {
-        return Manager.Alias;
+    static getId(): Feature {
+        return Feature.Alias;
     }
 
-    getId(): Manager {
+    getId(): Feature {
         return AliasManager.getId();
     }
 

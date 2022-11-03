@@ -1,5 +1,5 @@
 import { TFileExplorerItem, TFileExplorerView } from "obsidian";
-import { Leaves, Manager } from "@src/enum";
+import { Leaves, Feature } from "@src/enum";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
@@ -23,8 +23,8 @@ export default class ExplorerManager extends AbstractManager {
         super();
     }
 
-    getId(): Manager {
-        return Manager.Explorer;
+    getId(): Feature {
+        return Feature.Explorer;
     }
 
     isEnabled(): boolean {
@@ -115,7 +115,7 @@ export default class ExplorerManager extends AbstractManager {
         return result[path] === true;
     }
 
-    static getId(): Manager {
-        return Manager.Explorer;
+    static getId(): Feature {
+        return Feature.Explorer;
     }
 }

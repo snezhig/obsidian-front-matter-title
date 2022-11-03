@@ -5,8 +5,9 @@ export enum Leaves {
     MD = "markdown",
 }
 
-export enum Manager {
+export enum Feature {
     Explorer = "explorer",
+    ExplorerSort = "explorer:sort",
     Graph = "graph",
     Header = "header",
     QuickSwitcher = "quick_switcher",
@@ -16,6 +17,6 @@ export enum Manager {
     Alias = "alias",
 }
 
-export enum Feature {
+export enum DeprecatedFeature {
     ExplorerSort = "explorer:sort",
 }

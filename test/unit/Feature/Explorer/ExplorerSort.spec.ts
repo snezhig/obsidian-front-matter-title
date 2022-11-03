@@ -6,7 +6,7 @@ import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
 import DispatcherInterface from "../../../../src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import Event from "@src/Components/EventDispatcher/Event";
-import { Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 
@@ -46,7 +46,7 @@ test("Should init timer to find item", () => {
 });
 
 test("Should call requestSort", () => {
-    callback.execute(new Event({ id: Manager.Explorer, result: true }));
+    callback.execute(new Event({ id: Feature.Explorer, result: true }));
     expect(view.requestSort).toHaveBeenCalledTimes(1);
     view.requestSort.mockClear();
 });
@@ -55,7 +55,7 @@ test("Should switch off, requestSort and do not call requestSort by event", asyn
     await sort.disable();
     expect(sort.isEnabled()).toBeFalsy();
     expect(view.requestSort).toHaveBeenCalledTimes(1);
-    callback.execute(new Event({ id: Manager.Explorer }));
+    callback.execute(new Event({ id: Feature.Explorer }));
     expect(view.requestSort).toHaveBeenCalledTimes(1);
 });
 

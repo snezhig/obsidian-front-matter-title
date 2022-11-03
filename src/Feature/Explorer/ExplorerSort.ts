@@ -9,12 +9,12 @@ import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import DispatcherInterface from "../../Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
 import CallbackVoid from "../../Components/EventDispatcher/CallbackVoid";
-import { Feature, Leaves, Manager } from "@src/enum";
+import { DeprecatedFeature, Leaves, Feature } from "@src/enum";
 import AbstractFeature from "../AbstractFeature";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 
 @injectable()
-export default class ExplorerSort extends AbstractFeature<Feature> {
+export default class ExplorerSort extends AbstractFeature<DeprecatedFeature> {
     private view: TFileExplorerView;
     private enabled = false;
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
@@ -35,7 +35,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         super();
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
         this.cb = new CallbackVoid(e => {
-            if (e.get().id === Manager.Explorer && e.get().result) {
+            if (e.get().id === Feature.Explorer && e.get().result) {
                 trigger();
             }
         });
@@ -50,8 +50,8 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         this.view.requestSort();
     }
 
-    static getId(): Feature {
-        return Feature.ExplorerSort;
+    static getId(): DeprecatedFeature {
+        return DeprecatedFeature.ExplorerSort;
     }
 
     private initView(): void {
@@ -172,7 +172,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         return this.enabled;
     }
 
-    getId(): Feature {
-        return Feature.ExplorerSort;
+    getId(): DeprecatedFeature {
+        return DeprecatedFeature.ExplorerSort;
     }
 }

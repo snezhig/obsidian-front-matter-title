@@ -3,7 +3,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { EventRef, Events, Plugin, StarredPluginView } from "obsidian";
-import { Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import StarredManager from "@src/Feature/Starred/StarredManager";
 
 const mockFacade = mock<ObsidianFacade>();
@@ -15,7 +15,7 @@ const plugin = mock<Plugin & Events>({ on: jest.fn(() => ref) });
 const ref = mock<EventRef>();
 
 test("Should return correct id", () => {
-    expect(manager.getId()).toEqual(Manager.Starred);
+    expect(manager.getId()).toEqual(Feature.Starred);
 });
 
 test("Should not work because disabled", async () => {

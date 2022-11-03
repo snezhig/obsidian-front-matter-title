@@ -4,7 +4,7 @@ import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import { Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import AbstractManager from "@src/Feature/AbstractManager";
 
 @injectable()
@@ -99,11 +99,11 @@ export default class StarredManager extends AbstractManager {
         }
     }
 
-    static getId(): Manager {
-        return Manager.Starred;
+    static getId(): Feature {
+        return Feature.Starred;
     }
 
-    getId(): Manager {
+    getId(): Feature {
         return StarredManager.getId();
     }
 

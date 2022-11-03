@@ -1,11 +1,11 @@
-import { App, PluginSettingTab, Setting, TextComponent, ToggleComponent } from "obsidian";
+import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../../main";
-import Storage, { PrimitiveItemInterface } from "@src/Settings/Storage";
-import { SettingsEvent, SettingsManagersType, SettingsType } from "@src/Settings/SettingsType";
+import Storage, {PrimitiveItemInterface} from "@src/Settings/Storage";
+import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import { Feature, Manager } from "@src/enum";
-import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import {Feature} from "@src/enum";
+import {SettingsFeatureBuildFactory} from "@config/inversify.factory.types";
 
 export default class SettingsTab extends PluginSettingTab {
     private changed = false;
@@ -15,18 +15,19 @@ export default class SettingsTab extends PluginSettingTab {
         app: App,
         plugin: MetaTitlePlugin,
         private storage: Storage<SettingsType>,
-        private dispatcher: DispatcherInterface<SettingsEvent>
+        private dispatcher: DispatcherInterface<SettingsEvent>,
+        private builderFactory: SettingsFeatureBuildFactory
     ) {
         super(app, plugin);
         this.updatePrevious();
-        dispatcher.dispatch("settings.loaded", new Event({ settings: this.storage.collect() }));
+        dispatcher.dispatch("settings.loaded", new Event({settings: this.storage.collect()}));
     }
 
     display(): any {
-        const { containerEl } = this;
+        const {containerEl} = this;
 
         containerEl.empty();
-        containerEl.createEl("h2", { text: "Settings for plugin." });
+        containerEl.createEl("h2", {text: "Settings for plugin."});
 
         new Setting(containerEl)
             .setName("Template")
@@ -58,9 +59,8 @@ export default class SettingsTab extends PluginSettingTab {
                     })
             );
         this.buildRules();
-        this.buildManagers();
         this.buildFeatures();
-        containerEl.createEl("h4", { text: "Util" });
+        containerEl.createEl("h4", {text: "Util"});
         new Setting(containerEl)
             .setName("Debug info")
             .setDesc("Show debug info and caught errors in console")
@@ -81,56 +81,12 @@ export default class SettingsTab extends PluginSettingTab {
         this.buildDonation();
     }
 
-    private buildFeatures(): void {
-        this.containerEl.createEl("h4", { text: "Features" });
-        const settings = this.storage.get("features");
-        type item = { name: string; desc: string; toggle: ToggleComponent | null; id: Feature; default: boolean };
-        const features: { [K in Manager]?: item[] } = {
-            [Manager.Explorer]: [
-                {
-                    name: "Explorer sort",
-                    desc: "Enable alphabetical sort by custom titles",
-                    toggle: null,
-                    id: Feature.ExplorerSort,
-                    default: false,
-                },
-            ],
-        };
-        for (const [manager, items] of Object.entries(features)) {
-            for (const item of items) {
-                new Setting(this.containerEl)
-                    .setName(item.name)
-                    .setDesc(item.desc)
-                    .addToggle(
-                        t =>
-                            (item.toggle = t
-                                .setValue(settings.get(item.id).get("enabled").value())
-                                .onChange(v => this.change(settings.get(item.id).get("enabled"), v))
-                                .setDisabled(
-                                    !this.storage
-                                        .get("managers")
-                                        .get(manager as Manager)
-                                        .value()
-                                ))
-                    );
-            }
-        }
-        this.dispatcher.addListener(
-            "settings:tab:manager:changed",
-            new CallbackVoid(e => {
-                const items = features[e.get().id] ?? [];
-                for (const feature of items) {
-                    const value = e.get().value ? feature.default : false;
-                    feature.toggle.setDisabled(!e.get().value).setValue(value);
-                    const s = settings.get(feature.id)?.get("enabled");
-                    s && this.change(s, value);
-                }
-            })
-        );
+    public getSettings(): SettingsType{
+        return this.storage.collect();
     }
 
     private buildRules(): void {
-        this.containerEl.createEl("h4", { text: "Rules" });
+        this.containerEl.createEl("h4", {text: "Rules"});
         this.buildRulePaths();
         this.buildRuleDelimiter();
     }
@@ -148,7 +104,7 @@ export default class SettingsTab extends PluginSettingTab {
             .addDropdown(
                 e =>
                     (e
-                        .addOptions({ white: "White list mode", black: "Black list mode" })
+                        .addOptions({white: "White list mode", black: "Black list mode"})
                         .setValue(getActual().value())
                         .onChange(e => {
                             this.change(getActual(), e as "black" | "white");
@@ -185,7 +141,7 @@ export default class SettingsTab extends PluginSettingTab {
             .addDropdown(
                 e =>
                     (e
-                        .addOptions({ N: "Use first value", Y: "Join all by delimiter" })
+                        .addOptions({N: "Use first value", Y: "Join all by delimiter"})
                         .setValue(delimiter.get("enabled").value() ? "Y" : "N")
                         .onChange(e => onDropdownChange(e === "Y")).selectEl.style["marginRight"] = "10px")
             )
@@ -200,51 +156,48 @@ export default class SettingsTab extends PluginSettingTab {
         text.inputEl.hidden = !isEnabled();
     }
 
-    private buildManagers(): void {
-        this.containerEl.createEl("h4", { text: "Managers" });
-        const data: { manager: SettingsManagersType; name: string; desc: string }[] = [
+    private buildFeatures(): void {
+        this.containerEl.createEl("h4", {text: "Features"});
+        const data: { feature: Feature, name: string; desc: string }[] = [
             {
-                manager: Manager.Header,
+                feature: Feature.Header,
                 name: "Header title",
                 desc: "Replace titles in header of leaves and update them",
             },
-            { manager: Manager.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer" },
-            { manager: Manager.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph" },
+            {feature: Feature.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer"},
+            {feature: Feature.ExplorerSort, name: "Explorer Sort", desc: ""},
+            {feature: Feature.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph"},
             {
-                manager: Manager.QuickSwitcher,
+                feature: Feature.QuickSwitcher,
                 name: "Quick switches title",
                 desc: "Replace shown titles in the quick switcher modal",
             },
             {
-                manager: Manager.Starred,
+                feature: Feature.Starred,
                 name: "Starred",
                 desc: "Replace shown titles in starred plugin",
             },
             {
-                manager: Manager.Search,
+                feature: Feature.Search,
                 name: "Search",
                 desc: "Replace shown titles in search leaf",
             },
             {
-                manager: Manager.Tab,
+                feature: Feature.Tab,
                 name: "Tabs",
                 desc: "Replace shown titles in tabs",
             },
         ];
         for (const item of data) {
-            new Setting(this.containerEl)
-                .setName(item.name)
-                .setDesc(item.desc)
-                .addToggle(e =>
-                    e.setValue(this.storage.get("managers").get(item.manager).value()).onChange(v => {
-                        this.change(this.storage.get("managers").get(item.manager), v);
-                        this.dispatcher.dispatch(
-                            "settings:tab:manager:changed",
-                            new Event({ id: item.manager, value: v })
-                        );
-                    })
-                );
+            const builder = this.builderFactory(item.feature) ?? this.builderFactory('default');
+            const settings =  this.storage.get('features').get(item.feature).value();
+            builder.setContext(this);
+            builder.build({id: item.feature, desc: item.desc, name: item.name, settings})
         }
+    }
+
+    public getDispatcher(): DispatcherInterface<SettingsEvent> {
+        return this.dispatcher;
     }
 
     private buildDonation(): void {

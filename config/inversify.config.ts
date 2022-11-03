@@ -3,6 +3,7 @@ import {Container as _Container} from "inversify";
 import SI from "./inversify.types";
 import bindCreator from "./services/creator.config";
 import bindFeature from "./services/feature.config";
+import bindSettings from "./services/settings.config";
 import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
 import ResolverSync from "../src/Resolver/ResolverSync";
 import FilterInterface from "../src/Interfaces/FilterInterface";
@@ -57,6 +58,7 @@ Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope
 //START CREATOR
 bindCreator(Container);
 bindFeature(Container);
+bindSettings(Container);
 //END CREATOR
 
 export default Container;

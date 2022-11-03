@@ -1,20 +1,10 @@
-import { SettingsType } from "@src/Settings/SettingsType";
-import { Feature, Manager } from "@src/enum";
+import {SettingsType} from "@src/Settings/SettingsType";
+import {DeprecatedFeature, Feature} from "@src/enum";
 
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
         return {
             templates: [],
-            managers: {
-                alias: false,
-                explorer: false,
-                graph: false,
-                header: false,
-                quick_switcher: false,
-                starred: false,
-                search: false,
-                [Manager.Tab]: false,
-            },
             rules: {
                 paths: {
                     mode: "black",
@@ -29,9 +19,20 @@ export default class PluginHelper {
             boot: {
                 delay: 0,
             },
-            features: {
-                [Feature.ExplorerSort]: { enabled: false },
+            deprecated_features: {
+                [DeprecatedFeature.ExplorerSort]: {enabled: false},
             },
+            features: {
+                [Feature.Alias]: {enabled: false, strategy: ''},
+                [Feature.Explorer]: {enabled: false},
+                [Feature.ExplorerSort]: {enabled: false},
+                [Feature.Tab]: {enabled: false},
+                [Feature.Header]: {enabled: false},
+                [Feature.Graph]: {enabled: false},
+                [Feature.QuickSwitcher]: {enabled: false},
+                [Feature.Starred]: {enabled: false},
+                [Feature.Search]: {enabled: false},
+            }
         };
     }
 }

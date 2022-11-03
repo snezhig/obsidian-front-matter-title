@@ -5,7 +5,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import { Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import { SearchPluginView, SearchViewDOM } from "obsidian";
 
 type Replacer = FunctionReplacer<SearchViewDOM, "addResult", SearchManager>;
@@ -75,10 +75,10 @@ export default class SearchManager extends AbstractManager {
         }
     }
 
-    static getId(): Manager {
-        return Manager.Search;
+    static getId(): Feature {
+        return Feature.Search;
     }
-    getId(): Manager {
+    getId(): Feature {
         return SearchManager.getId();
     }
 
