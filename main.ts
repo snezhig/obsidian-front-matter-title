@@ -1,6 +1,6 @@
 import { CachedMetadata, Plugin, TAbstractFile } from "obsidian";
 import Composer, { ManagerType } from "./src/Title/Manager/Composer";
-import { SettingsEvent , SettingsType } from "@src/Settings/SettingsType";
+import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
@@ -41,7 +41,15 @@ export default class MetaTitlePlugin extends Plugin {
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
         this.storage = new Storage<SettingsType>(data);
-        this.addSettingTab(new SettingsTab(this.app, this, this.storage, this.dispatcher, this.container.get(SI["factory:settings:feature:builder"])));
+        this.addSettingTab(
+            new SettingsTab(
+                this.app,
+                this,
+                this.storage,
+                this.dispatcher,
+                this.container.get(SI["factory:settings:feature:builder"])
+            )
+        );
     }
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
@@ -131,10 +139,16 @@ export default class MetaTitlePlugin extends Plugin {
         this.app.workspace.onLayoutReady(async () => {
             window.t = this.fc;
 
-            this.composer.setState(this.storage.get("features").get(Feature.Graph).get('enabled').value(), ManagerType.Graph);
-            this.composer.setState(this.storage.get("features").get(Feature.Header).get('enabled').value(), ManagerType.Markdown);
             this.composer.setState(
-                this.storage.get("features").get(Feature.QuickSwitcher).get('enabled').value(),
+                this.storage.get("features").get(Feature.Graph).get("enabled").value(),
+                ManagerType.Graph
+            );
+            this.composer.setState(
+                this.storage.get("features").get(Feature.Header).get("enabled").value(),
+                ManagerType.Markdown
+            );
+            this.composer.setState(
+                this.storage.get("features").get(Feature.QuickSwitcher).get("enabled").value(),
                 ManagerType.QuickSwitcher
             );
             this.runManagersUpdate().catch(console.error);
