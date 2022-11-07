@@ -6,6 +6,8 @@ import Event from "@src/Components/EventDispatcher/Event";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import {Feature} from "@src/enum";
 import {SettingsFeatureBuildFactory} from "@config/inversify.factory.types";
+import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 
 export default class SettingsTab extends PluginSettingTab {
     private changed = false;
@@ -21,6 +23,7 @@ export default class SettingsTab extends PluginSettingTab {
         super(app, plugin);
         this.updatePrevious();
         dispatcher.dispatch("settings.loaded", new Event({settings: this.storage.collect()}));
+        dispatcher.addListener('settings:tab:feature:changed', new CallbackVoid(this.onFeatureChange.bind(this)))
     }
 
     display(): any {
@@ -81,7 +84,7 @@ export default class SettingsTab extends PluginSettingTab {
         this.buildDonation();
     }
 
-    public getSettings(): SettingsType{
+    public getSettings(): SettingsType {
         return this.storage.collect();
     }
 
@@ -160,13 +163,18 @@ export default class SettingsTab extends PluginSettingTab {
         this.containerEl.createEl("h4", {text: "Features"});
         const data: { feature: Feature, name: string; desc: string }[] = [
             {
-                feature: Feature.Header,
-                name: "Header title",
-                desc: "Replace titles in header of leaves and update them",
+                feature: Feature.Alias,
+                name: 'Alias title',
+                desc: "Modify alias in metadata cache. The real alias will not be affected.",
             },
             {feature: Feature.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer"},
             {feature: Feature.ExplorerSort, name: "Explorer Sort", desc: ""},
             {feature: Feature.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph"},
+            {
+                feature: Feature.Header,
+                name: "Header title",
+                desc: "Replace titles in header of leaves and update them",
+            },
             {
                 feature: Feature.QuickSwitcher,
                 name: "Quick switches title",
@@ -190,7 +198,7 @@ export default class SettingsTab extends PluginSettingTab {
         ];
         for (const item of data) {
             const builder = this.builderFactory(item.feature) ?? this.builderFactory('default');
-            const settings =  this.storage.get('features').get(item.feature).value();
+            const settings = this.storage.get('features').get(item.feature).value();
             builder.setContext(this);
             builder.build({id: item.feature, desc: item.desc, name: item.name, settings})
         }
@@ -198,6 +206,11 @@ export default class SettingsTab extends PluginSettingTab {
 
     public getDispatcher(): DispatcherInterface<SettingsEvent> {
         return this.dispatcher;
+    }
+
+    private onFeatureChange(e: EventInterface<SettingsEvent['settings:tab:feature:changed']>): void {
+        this.storage.get('features').get(e.get().id).set(e.get().value);
+        this.changed = true;
     }
 
     private buildDonation(): void {
