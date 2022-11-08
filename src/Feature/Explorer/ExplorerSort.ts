@@ -9,12 +9,12 @@ import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import DispatcherInterface from "../../Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
 import CallbackVoid from "../../Components/EventDispatcher/CallbackVoid";
-import { DeprecatedFeature, Leaves, Feature } from "@src/enum";
+import { Leaves, Feature } from "@src/enum";
 import AbstractFeature from "../AbstractFeature";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 
 @injectable()
-export default class ExplorerSort extends AbstractFeature<DeprecatedFeature> {
+export default class ExplorerSort extends AbstractFeature<Feature> {
     private view: TFileExplorerView;
     private enabled = false;
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
@@ -50,8 +50,8 @@ export default class ExplorerSort extends AbstractFeature<DeprecatedFeature> {
         this.view.requestSort();
     }
 
-    static getId(): DeprecatedFeature {
-        return DeprecatedFeature.ExplorerSort;
+    static getId(): Feature {
+        return Feature.ExplorerSort;
     }
 
     private initView(): void {
@@ -172,7 +172,7 @@ export default class ExplorerSort extends AbstractFeature<DeprecatedFeature> {
         return this.enabled;
     }
 
-    getId(): DeprecatedFeature {
-        return DeprecatedFeature.ExplorerSort;
+    getId(): Feature {
+        return Feature.ExplorerSort;
     }
 }

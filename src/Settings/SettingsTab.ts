@@ -1,11 +1,11 @@
-import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
+import { App, PluginSettingTab, Setting, TextComponent } from "obsidian";
 import MetaTitlePlugin from "../../main";
-import Storage, {PrimitiveItemInterface} from "@src/Settings/Storage";
-import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
+import Storage, { PrimitiveItemInterface } from "@src/Settings/Storage";
+import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {Feature} from "@src/enum";
-import {SettingsFeatureBuildFactory} from "@config/inversify.factory.types";
+import { Feature } from "@src/enum";
+import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 
@@ -22,15 +22,15 @@ export default class SettingsTab extends PluginSettingTab {
     ) {
         super(app, plugin);
         this.updatePrevious();
-        dispatcher.dispatch("settings.loaded", new Event({settings: this.storage.collect()}));
-        dispatcher.addListener('settings:tab:feature:changed', new CallbackVoid(this.onFeatureChange.bind(this)))
+        dispatcher.dispatch("settings.loaded", new Event({ settings: this.storage.collect() }));
+        dispatcher.addListener("settings:tab:feature:changed", new CallbackVoid(this.onFeatureChange.bind(this)));
     }
 
     display(): any {
-        const {containerEl} = this;
+        const { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl("h2", {text: "Settings for plugin."});
+        containerEl.createEl("h2", { text: "Settings for plugin." });
 
         new Setting(containerEl)
             .setName("Template")
@@ -63,7 +63,7 @@ export default class SettingsTab extends PluginSettingTab {
             );
         this.buildRules();
         this.buildFeatures();
-        containerEl.createEl("h4", {text: "Util"});
+        containerEl.createEl("h4", { text: "Util" });
         new Setting(containerEl)
             .setName("Debug info")
             .setDesc("Show debug info and caught errors in console")
@@ -89,7 +89,7 @@ export default class SettingsTab extends PluginSettingTab {
     }
 
     private buildRules(): void {
-        this.containerEl.createEl("h4", {text: "Rules"});
+        this.containerEl.createEl("h4", { text: "Rules" });
         this.buildRulePaths();
         this.buildRuleDelimiter();
     }
@@ -107,7 +107,7 @@ export default class SettingsTab extends PluginSettingTab {
             .addDropdown(
                 e =>
                     (e
-                        .addOptions({white: "White list mode", black: "Black list mode"})
+                        .addOptions({ white: "White list mode", black: "Black list mode" })
                         .setValue(getActual().value())
                         .onChange(e => {
                             this.change(getActual(), e as "black" | "white");
@@ -144,7 +144,7 @@ export default class SettingsTab extends PluginSettingTab {
             .addDropdown(
                 e =>
                     (e
-                        .addOptions({N: "Use first value", Y: "Join all by delimiter"})
+                        .addOptions({ N: "Use first value", Y: "Join all by delimiter" })
                         .setValue(delimiter.get("enabled").value() ? "Y" : "N")
                         .onChange(e => onDropdownChange(e === "Y")).selectEl.style["marginRight"] = "10px")
             )
@@ -160,16 +160,16 @@ export default class SettingsTab extends PluginSettingTab {
     }
 
     private buildFeatures(): void {
-        this.containerEl.createEl("h4", {text: "Features"});
-        const data: { feature: Feature, name: string; desc: string }[] = [
+        this.containerEl.createEl("h4", { text: "Features" });
+        const data: { feature: Feature; name: string; desc: string }[] = [
             {
                 feature: Feature.Alias,
-                name: 'Alias title',
+                name: "Alias title",
                 desc: "Modify alias in metadata cache. The real alias will not be affected.",
             },
-            {feature: Feature.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer"},
-            {feature: Feature.ExplorerSort, name: "Explorer Sort", desc: ""},
-            {feature: Feature.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph"},
+            { feature: Feature.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer" },
+            { feature: Feature.ExplorerSort, name: "Explorer Sort", desc: "" },
+            { feature: Feature.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph" },
             {
                 feature: Feature.Header,
                 name: "Header title",
@@ -197,10 +197,10 @@ export default class SettingsTab extends PluginSettingTab {
             },
         ];
         for (const item of data) {
-            const builder = this.builderFactory(item.feature) ?? this.builderFactory('default');
-            const settings = this.storage.get('features').get(item.feature).value();
+            const builder = this.builderFactory(item.feature) ?? this.builderFactory("default");
+            const settings = this.storage.get("features").get(item.feature).value();
             builder.setContext(this);
-            builder.build({id: item.feature, desc: item.desc, name: item.name, settings})
+            builder.build({ id: item.feature, desc: item.desc, name: item.name, settings });
         }
     }
 
@@ -208,8 +208,8 @@ export default class SettingsTab extends PluginSettingTab {
         return this.dispatcher;
     }
 
-    private onFeatureChange(e: EventInterface<SettingsEvent['settings:tab:feature:changed']>): void {
-        this.storage.get('features').get(e.get().id).set(e.get().value);
+    private onFeatureChange(e: EventInterface<SettingsEvent["settings:tab:feature:changed"]>): void {
+        this.storage.get("features").get(e.get().id).set(e.get().value);
         this.changed = true;
     }
 

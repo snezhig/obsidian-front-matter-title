@@ -1,7 +1,7 @@
 import FeatureComposer from "@src/Feature/FeatureComposer";
 import { Feature } from "@src/enum";
 import AbstractManager from "@src/Feature/AbstractManager";
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
@@ -11,7 +11,8 @@ export default class ManagerComposer {
     constructor(
         @inject(SI["feature:composer"])
         private features: FeatureComposer,
-        @inject(SI.logger) @named('composer:manager')
+        @inject(SI.logger)
+        @named("composer:manager")
         private logger: LoggerInterface
     ) {}
 
@@ -21,7 +22,7 @@ export default class ManagerComposer {
         for (const i of ids) {
             const manager = this.features.get<AbstractManager>(i);
             if (manager) {
-                this.logger.log(`Run update for [${path}] on [${manager.getId()}]`)
+                this.logger.log(`Run update for [${path}] on [${manager.getId()}]`);
                 result[i] = await manager.update(path);
             }
         }
@@ -29,7 +30,7 @@ export default class ManagerComposer {
     }
 
     public async refresh(id: Feature = null): Promise<{ [K in Feature]?: { [k: string]: boolean } }> {
-        this.logger.log('refresh');
+        this.logger.log("refresh");
         const ids = id ? [id] : this.ids;
         const result: { [K in Feature]?: { [k: string]: boolean } } = {};
         for (const i of ids) {

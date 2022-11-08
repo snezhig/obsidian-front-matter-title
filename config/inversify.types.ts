@@ -25,6 +25,7 @@ const SI = {
     "feature:composer": "",
     "filter": "",
     "getter:delimiter": "",
+    "listener": "",
     "logger": "",
     "logger:composer": "",
     "manager:composer": "",

@@ -66,6 +66,9 @@ export default class App {
         if (changed.debug) {
             this.container.get<LoggerComposer>(SI["logger:composer"])[actual.debug ? "enable" : "disable"]();
         }
+        if (changed?.features?.alias?.strategy) {
+            queue["alias:strategy:changed"] = actual.features.alias.strategy;
+        }
 
         const dispatcher = this.container.get<DispatcherInterface<events>>(SI.dispatcher);
         for (const event of Object.keys(queue) as (keyof events)[]) {

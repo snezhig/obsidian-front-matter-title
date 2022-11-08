@@ -21,6 +21,7 @@ import ObjectHelper from "@src/Utils/ObjectHelper";
 import FeatureComposer from "@src/Feature/FeatureComposer";
 import ManagerComposer from "@src/Feature/ManagerComposer";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
+import ListenerInterface from "@src/Interfaces/ListenerInterface";
 
 export default class MetaTitlePlugin extends Plugin {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
@@ -58,6 +59,7 @@ export default class MetaTitlePlugin extends Plugin {
         this.composer.setState(settings.features.header.enabled, ManagerType.Markdown);
         this.composer.setState(settings.features.quick_switcher.enabled, ManagerType.QuickSwitcher);
         await this.runManagersUpdate();
+        await this.mc.refresh();
     }
 
     private async delay(): Promise<void> {
@@ -82,11 +84,11 @@ export default class MetaTitlePlugin extends Plugin {
         );
         this.fc = Container.get(SI["feature:composer"]);
         this.mc = Container.get(SI["manager:composer"]);
-
         this.bind();
     }
 
     private bindServices(): void {
+        Container.bind<Storage<SettingsType>>(SI.storage).toDynamicValue(() => this.storage);
         Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<
             { [k: string]: any },
             [string]
@@ -115,9 +117,9 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private bind() {
+        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
         this.registerEvent(
             this.app.metadataCache.on("changed", (file, data, cache) => {
-                this.dispatcher.dispatch("metadata:cache:changed", new Event({ file, data, cache }));
                 this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }));
             })
         );
@@ -137,8 +139,6 @@ export default class MetaTitlePlugin extends Plugin {
         );
 
         this.app.workspace.onLayoutReady(async () => {
-            window.t = this.fc;
-
             this.composer.setState(
                 this.storage.get("features").get(Feature.Graph).get("enabled").value(),
                 ManagerType.Graph
@@ -173,9 +173,6 @@ export default class MetaTitlePlugin extends Plugin {
     private async toggleFeatures(): Promise<void> {
         const states: { [k: string]: boolean } = {};
         for (const [k, v] of Object.entries(this.storage.get("features").value())) {
-            states[k] = v.enabled;
-        }
-        for (const [k, v] of Object.entries(this.storage.get("deprecated_features").value())) {
             states[k] = v.enabled;
         }
         for (const [id, state] of Object.entries(states)) {

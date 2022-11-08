@@ -1,5 +1,5 @@
 import { SettingsType } from "@src/Settings/SettingsType";
-import { DeprecatedFeature, Feature } from "@src/enum";
+import { Feature } from "@src/enum";
 
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
@@ -18,9 +18,6 @@ export default class PluginHelper {
             debug: false,
             boot: {
                 delay: 0,
-            },
-            deprecated_features: {
-                [DeprecatedFeature.ExplorerSort]: { enabled: false },
             },
             features: {
                 [Feature.Alias]: { enabled: false, strategy: "" },

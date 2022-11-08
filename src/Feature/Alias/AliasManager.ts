@@ -1,21 +1,17 @@
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import AbstractManager from "@src/Feature/AbstractManager";
-import {Feature} from "@src/enum";
+import { Feature } from "@src/enum";
 import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import Alias from "@src/Feature/Alias/Alias";
-import {MetadataCacheExt} from "obsidian";
-import {MetadataCacheFactory} from "@config/inversify.factory.types";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {AppEvents} from "@src/Types";
-import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import { MetadataCacheExt } from "obsidian";
+import { MetadataCacheFactory } from "@config/inversify.factory.types";
 
 @injectable()
 export class AliasManager extends AbstractManager {
     private enabled = false;
     private strategy: AliasManagerStrategyInterface = null;
-    private readonly callback: CallbackVoid<AppEvents['alias:strategy:changed']> = null;
     private items: { [k: string]: Alias } = {};
 
     constructor(
@@ -25,27 +21,23 @@ export class AliasManager extends AbstractManager {
         @named("alias:modifier")
         private logger: LoggerInterface,
         @inject(SI["factory:metadata:cache"])
-        private factory: MetadataCacheFactory<MetadataCacheExt>,
-        @inject(SI.dispatcher)
-        private dispatcher: DispatcherInterface<AppEvents>
+        private factory: MetadataCacheFactory<MetadataCacheExt>
     ) {
         super();
-        this.callback = new CallbackVoid(e => this.setStrategy(e.get()));
     }
 
-    public setStrategy(name: string) {
+    public setStrategy(name: string): void {
         this.strategy = this.strategyFactory(name);
         this.reset();
         this.logger.log(`Set strategy [${name}]. Status: ${this.strategy !== null}`);
     }
 
     doDisable(): void {
-        this.dispatcher.removeListener('alias:strategy:changed', this.callback);
+        this.reset();
         this.enabled = false;
     }
 
     doEnable(): void {
-        this.dispatcher.addListener('alias:strategy:changed', this.callback);
         this.enabled = true;
     }
 

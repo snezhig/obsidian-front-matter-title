@@ -1,6 +1,5 @@
-import { DeprecatedFeature, Feature } from "@src/enum";
+import { Feature } from "@src/enum";
 
-export type SettingsFeatures<F extends DeprecatedFeature> = { [K in F]: { enabled: boolean } };
 export type SFExt = {
     [Feature.Alias]: { strategy: string };
 };
@@ -17,7 +16,6 @@ export type SettingsType = {
     boot: {
         delay: number;
     };
-    deprecated_features: SettingsFeatures<DeprecatedFeature>;
     features: SF;
 };
 

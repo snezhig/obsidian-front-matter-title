@@ -25,6 +25,8 @@ import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
+import ListenerInterface from "@src/Interfaces/ListenerInterface";
+import Listener from "@src/Feature/Alias/Listener";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -54,6 +56,7 @@ Container.bind<LoggerInterface>(SI.logger)
 
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
+Container.bind<ListenerInterface>(SI.listener).to(Listener);
 
 //START CREATOR
 bindCreator(Container);

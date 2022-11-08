@@ -16,7 +16,3 @@ export enum Feature {
     Tab = "tab",
     Alias = "alias",
 }
-
-export enum DeprecatedFeature {
-    ExplorerSort = "explorer:sort",
-}

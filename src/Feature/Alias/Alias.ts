@@ -29,10 +29,10 @@ export default class Alias {
     }
 
     public setValue(alias: string | string[]): void {
-        this.original = this.getValue();
-        const key = this.key ?? this.getPossibleKeys()[0];
+        const value = this.getValue();
+        this.original = Array.isArray(value) ? [...value] : value;
+        this.modify(alias);
         this.changed = true;
-        this.cache[key] = alias;
     }
 
     public isChanged(): boolean {
@@ -40,6 +40,12 @@ export default class Alias {
     }
 
     public restore(): void {
-        this.setValue(this.original ?? []);
+        this.modify(this.original ?? []);
+        this.changed = false;
+    }
+
+    private modify(alias: string | string[]): void {
+        const key = this.key ?? this.getPossibleKeys()[0];
+        this.cache[key] = alias;
     }
 }
