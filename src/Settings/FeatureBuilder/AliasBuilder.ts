@@ -39,15 +39,13 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     }
 
     private onChange(): void {
-        this.context
-            .getDispatcher()
-            .dispatch(
-                "settings:tab:feature:changed",
-                new Event({
-                    id: this.id,
-                    value: { enabled: this.toggle.getValue(), strategy: this.dropdown.getValue() },
-                })
-            );
+        this.context.getDispatcher().dispatch(
+            "settings:tab:feature:changed",
+            new Event({
+                id: this.id,
+                value: { enabled: this.toggle.getValue(), strategy: this.dropdown.getValue() },
+            })
+        );
         this.actualizeDesc();
     }
 
