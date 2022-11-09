@@ -61,7 +61,7 @@ export class AliasManager extends AbstractManager {
     protected async doUpdate(path: string): Promise<boolean> {
         const cache = this.factory();
         const metadata = cache.getCache(path);
-        return this.process(metadata?.frontmatter ?? {}, path);
+        return metadata.frontmatter ? this.process(metadata.frontmatter, path) : false;
     }
 
     protected async doRefresh(): Promise<{ [p: string]: boolean }> {
