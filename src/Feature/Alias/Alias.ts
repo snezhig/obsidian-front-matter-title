@@ -1,19 +1,12 @@
 export default class Alias {
-    private key: string | null;
     private changed = false;
-    private original: string | string[] | null = null;
+    private original: {
+        key: string | null,
+        value: string | string[] | null
+    } = undefined;
 
     constructor(private cache: { [k: string]: any }) {
-        this.parse();
-    }
 
-    private parse(): void {
-        this.key = null;
-        for (const key of Object.keys(this.cache)) {
-            if (this.getPossibleKeys().includes(key)) {
-                this.key = key;
-            }
-        }
     }
 
     private getPossibleKeys(): string[] {
@@ -21,16 +14,26 @@ export default class Alias {
     }
 
     public getKey(): string | null {
-        return this.key;
+        for (const key of Object.keys(this.cache)) {
+            if (this.getPossibleKeys().includes(key)) {
+                return key;
+            }
+        }
+        return null;
     }
 
     public getValue(): string | string[] | null {
-        return this.key ? this.cache[this.key] ?? null : null;
+        return this.cache[this.getKey()] ?? null;
     }
 
     public setValue(alias: string | string[]): void {
-        const value = this.getValue();
-        this.original = Array.isArray(value) ? [...value] : value;
+        if (this.original === undefined) {
+            const value = this.getValue();
+            this.original = {
+                value: Array.isArray(value) ? [...value] : value,
+                key: this.getKey()
+            }
+        }
         this.modify(alias);
         this.changed = true;
     }
@@ -40,12 +43,17 @@ export default class Alias {
     }
 
     public restore(): void {
-        this.modify(this.original ?? []);
+        const key = this.getKey();
+        if (this.original.key === null && key) {
+            delete this.cache[key];
+        } else if (this.original.key) {
+            this.modify(this.original.value);
+        }
         this.changed = false;
     }
 
     private modify(alias: string | string[]): void {
-        const key = this.key ?? this.getPossibleKeys()[0];
+        const key = this.getKey() ?? this.getPossibleKeys()[0];
         this.cache[key] = alias;
     }
 }
