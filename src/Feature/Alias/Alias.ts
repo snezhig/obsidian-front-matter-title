@@ -1,13 +1,11 @@
 export default class Alias {
     private changed = false;
     private original: {
-        key: string | null,
-        value: string | string[] | null
+        key: string | null;
+        value: string | string[] | null;
     } = undefined;
 
-    constructor(private cache: { [k: string]: any }) {
-
-    }
+    constructor(private cache: { [k: string]: any }) {}
 
     private getPossibleKeys(): string[] {
         return ["alias", "aliases"];
@@ -31,8 +29,8 @@ export default class Alias {
             const value = this.getValue();
             this.original = {
                 value: Array.isArray(value) ? [...value] : value,
-                key: this.getKey()
-            }
+                key: this.getKey(),
+            };
         }
         this.modify(alias);
         this.changed = true;
