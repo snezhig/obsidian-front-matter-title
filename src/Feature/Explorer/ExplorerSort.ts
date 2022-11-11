@@ -18,7 +18,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
     private view: TFileExplorerView;
     private enabled = false;
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
-    private readonly cb: CallbackInterface<AppEvents["manager:update"]>;
+    private readonly cb: CallbackInterface<AppEvents["manager:update"] & AppEvents["manager:refresh"]>;
 
     constructor(
         @inject(SI.resolver)
@@ -35,7 +35,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         super();
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
         this.cb = new CallbackVoid(e => {
-            if (e.get().id === Feature.Explorer && e.get().result) {
+            if (e.get().id === Feature.Explorer && (e.get().result == true || e.get().result === undefined)) {
                 trigger();
             }
         });
@@ -155,6 +155,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
             throw new ExplorerViewUndefined();
         }
         this.dispatcher.addListener("manager:update", this.cb);
+        this.dispatcher.addListener("manager:refresh", this.cb);
         this.enabled = true;
         this.tryToReplaceOriginalSort();
         this.logger.log("enabled");
@@ -163,6 +164,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
     public async disable(): Promise<void> {
         this.enabled = false;
         this.dispatcher.removeListener("manager:update", this.cb);
+        this.dispatcher.removeListener("manager:refresh", this.cb);
         this.replacer?.disable();
         this.view?.requestSort();
         this.logger.log("disabled");

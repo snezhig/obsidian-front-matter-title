@@ -36,7 +36,8 @@ test("Should add listener after enabled", async () => {
     await sort.enable();
     expect(sort.isEnabled()).toBeTruthy();
     expect(dispatcher.addListener).toHaveBeenCalledWith("manager:update", expect.anything());
-    expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
+    expect(dispatcher.addListener).toHaveBeenCalledWith("manager:refresh", expect.anything());
+    expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
 });
 
 test("Should init timer to find item", () => {
@@ -55,6 +56,9 @@ test("Should switch off, requestSort and do not call requestSort by event", asyn
     await sort.disable();
     expect(sort.isEnabled()).toBeFalsy();
     expect(view.requestSort).toHaveBeenCalledTimes(1);
+    expect(dispatcher.removeListener).toHaveBeenCalledTimes(2);
+    expect(dispatcher.removeListener).toHaveBeenCalledWith("manager:update", callback);
+    expect(dispatcher.removeListener).toHaveBeenCalledWith("manager:refresh", callback);
     callback.execute(new Event({ id: Feature.Explorer }));
     expect(view.requestSort).toHaveBeenCalledTimes(1);
 });

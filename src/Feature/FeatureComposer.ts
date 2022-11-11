@@ -22,17 +22,20 @@ export default class FeatureComposer {
 
     toggle(id: any, state: boolean): void {
         const feature = this.features[id];
-        if (!state && !feature) {
+        if ((!state && !feature) || (state && feature?.isEnabled())) {
             return;
         }
+
         if (!feature) {
             this.features[id] = this.factory(id);
             return this.toggle(id, state);
         }
+
         feature[state ? "enable" : "disable"]();
         if (!state) {
             delete this.features[id];
         }
+        
         this.dispatcher.dispatch("feature:state:changed", new Event({ enabled: state, id }));
     }
 
