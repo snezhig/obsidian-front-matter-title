@@ -5,7 +5,7 @@ export type AppEvents = {
     "alias:strategy:changed": string;
     "templates:changed": { old: string[]; new: string[] };
     "manager:update": { id: Feature; result: boolean };
-    "manager:refresh": {id: Feature}
+    "manager:refresh": { id: Feature };
     "feature:state:changed": { id: Feature; enabled: boolean };
     "note:link:change:approve": {
         path: string;

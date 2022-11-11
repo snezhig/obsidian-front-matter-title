@@ -172,14 +172,14 @@ export default class MetaTitlePlugin extends Plugin {
     }
 
     private async toggleFeatures(): Promise<void> {
-        const f = this.storage.get('features');
+        const f = this.storage.get("features");
         const states = [
-            [Feature.Alias, f.get(Feature.Alias).get('enabled').value()],
-            [Feature.Tab, f.get(Feature.Tab).get('enabled').value()],
-            [Feature.Search, f.get(Feature.Search).get('enabled').value()],
-            [Feature.Explorer, f.get(Feature.Explorer).get('enabled').value()],
-            [Feature.ExplorerSort, f.get(Feature.ExplorerSort).get('enabled').value()],
-            [Feature.Starred, f.get(Feature.Starred).get('enabled').value()],
+            [Feature.Alias, f.get(Feature.Alias).get("enabled").value()],
+            [Feature.Tab, f.get(Feature.Tab).get("enabled").value()],
+            [Feature.Search, f.get(Feature.Search).get("enabled").value()],
+            [Feature.Explorer, f.get(Feature.Explorer).get("enabled").value()],
+            [Feature.ExplorerSort, f.get(Feature.ExplorerSort).get("enabled").value()],
+            [Feature.Starred, f.get(Feature.Starred).get("enabled").value()],
         ];
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);

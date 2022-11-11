@@ -35,7 +35,7 @@ export default class FeatureComposer {
         if (!state) {
             delete this.features[id];
         }
-        
+
         this.dispatcher.dispatch("feature:state:changed", new Event({ enabled: state, id }));
     }
 
