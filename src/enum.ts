@@ -10,9 +10,9 @@ export enum Feature {
     ExplorerSort = "explorer:sort",
     Graph = "graph",
     Header = "header",
-    QuickSwitcher = "quick_switcher",
     Starred = "starred",
     Search = "search",
     Tab = "tab",
     Alias = "alias",
+    Suggest = "suggest",
 }

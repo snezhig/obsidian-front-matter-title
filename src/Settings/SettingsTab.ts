@@ -1,11 +1,11 @@
-import { App, PluginSettingTab, Setting, TextComponent } from "obsidian";
+import {App, PluginSettingTab, Setting, TextComponent} from "obsidian";
 import MetaTitlePlugin from "../../main";
-import Storage, { PrimitiveItemInterface } from "@src/Settings/Storage";
-import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
+import Storage, {PrimitiveItemInterface} from "@src/Settings/Storage";
+import {SettingsEvent, SettingsType} from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import { Feature } from "@src/enum";
-import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
+import {Feature} from "@src/enum";
+import {SettingsFeatureBuildFactory} from "@config/inversify.factory.types";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 
@@ -176,11 +176,6 @@ export default class SettingsTab extends PluginSettingTab {
                 desc: "Replace titles in header of leaves and update them",
             },
             {
-                feature: Feature.QuickSwitcher,
-                name: "Quick switches title",
-                desc: "Replace shown titles in the quick switcher modal",
-            },
-            {
                 feature: Feature.Starred,
                 name: "Starred",
                 desc: "Replace shown titles in starred plugin",
@@ -189,6 +184,11 @@ export default class SettingsTab extends PluginSettingTab {
                 feature: Feature.Search,
                 name: "Search",
                 desc: "Replace shown titles in search leaf",
+            },
+            {
+                feature: Feature.Suggest,
+                name: "Suggest",
+                desc: "Replace shown titles in suggest modals"
             },
             {
                 feature: Feature.Tab,

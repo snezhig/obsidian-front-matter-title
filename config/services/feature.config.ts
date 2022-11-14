@@ -13,6 +13,7 @@ import EnsureStrategy from "@src/Feature/Alias/Strategy/EnsureStrategy";
 import AdjustStrategy from "@src/Feature/Alias/Strategy/AdjustStrategy";
 import ReplaceStrategy from "@src/Feature/Alias/Strategy/ReplaceStrategy";
 import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
+import SuggestFeature from "@src/Feature/Suggest/SuggestFeature";
 
 export default (container: Container) => {
     container.bind(SI["feature:composer"]).to(FeatureComposer).inSingletonScope();
@@ -24,6 +25,7 @@ export default (container: Container) => {
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerSort).whenTargetNamed(ExplorerSort.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SearchManager).whenTargetNamed(SearchManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
 
     container.bind(SI["factory:alias:modifier:strategy"]).toAutoNamedFactory<AliasManagerStrategyInterface>(SI['alias:modifier:strategy']);
     container.bind(SI['alias:modifier:strategy']).to(EnsureStrategy).whenTargetNamed('ensure');

@@ -1,19 +1,25 @@
-import { Feature } from "@src/enum";
-import ResolverInterface from "@src/Interfaces/ResolverInterface";
+import {Feature} from "@src/enum";
+import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import { SuggestModal, SuggestModalChooser, SuggestModalChooserFileItem, SuggestModalExt } from "obsidian";
+import {SuggestModal, SuggestModalChooser, SuggestModalChooserFileItem, SuggestModalExt} from "obsidian";
 import AbstractFeature from "../AbstractFeature";
+import {inject, injectable, named} from "inversify";
+import SI from "@config/inversify.types";
 
 type Replacers = {
     modal?: FunctionReplacer<SuggestModalExt<any>, "open", SuggestFeature>;
     chooser?: FunctionReplacer<SuggestModalChooser<any>, "setSuggestions", SuggestFeature>;
 };
 
+@injectable()
 export default class SuggestFeature extends AbstractFeature<Feature> {
     private repalcers: Replacers = {};
     private state: boolean;
 
-    constructor(private resolver: ResolverInterface) {
+    constructor(
+        @inject(SI.resolver) @named(Resolving.Sync)
+        private resolver: ResolverInterface
+    ) {
         super();
         this.createModalReplacer();
     }
@@ -41,7 +47,7 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
     }
 
     static getId(): Feature {
-        return undefined;
+        return Feature.Suggest;
     }
 
     private createModalReplacer(): void {
@@ -77,7 +83,7 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
     }
     private modifySuggestions(items: SuggestModalChooserFileItem[]): SuggestModalChooserFileItem[] {
         for (const item of items) {
-            if (!item.type || item.type !== "file" || !item.file) {
+            if (!item || !item.type || item.type !== "file" || !item.file) {
                 continue;
             }
             const alias = this.resolver.resolve(item.file.path);
