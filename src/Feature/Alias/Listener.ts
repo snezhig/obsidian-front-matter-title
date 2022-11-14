@@ -32,16 +32,24 @@ export default class Listener implements ListenerInterface {
 
     private onStateChange(event: EventInterface<AppEvents["feature:state:changed"]>): void {
         const { id, enabled } = event.get();
-        if (id === Feature.Alias && enabled) {
+        if (id !== Feature.Alias) {
+            return;
+        }
+        if (enabled) {
             const strategy = this.storage.get("features").get(Feature.Alias).get("strategy").value();
             this.setStrategy(strategy);
+        } else {
+            this.lastStrategy = null;
         }
     }
 
     private setStrategy(strategy: string): void {
         if (this.lastStrategy !== strategy) {
-            (this.composer.get(Feature.Alias) as AliasManager)?.setStrategy(strategy);
-            this.lastStrategy = strategy;
+            const alias = this.composer.get(Feature.Alias) as AliasManager;
+            if (alias) {
+                alias.setStrategy(strategy);
+                this.lastStrategy = strategy;
+            }
         }
     }
 
