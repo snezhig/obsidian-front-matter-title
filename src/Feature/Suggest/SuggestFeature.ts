@@ -1,9 +1,9 @@
-import {Feature} from "@src/enum";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import { Feature } from "@src/enum";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import {SuggestModal, SuggestModalChooser, SuggestModalChooserFileItem, SuggestModalExt} from "obsidian";
+import { SuggestModal, SuggestModalChooser, SuggestModalChooserFileItem, SuggestModalExt } from "obsidian";
 import AbstractFeature from "../AbstractFeature";
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 
 type Replacers = {
@@ -17,7 +17,8 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
     private state: boolean;
 
     constructor(
-        @inject(SI.resolver) @named(Resolving.Sync)
+        @inject(SI.resolver)
+        @named(Resolving.Sync)
         private resolver: ResolverInterface
     ) {
         super();

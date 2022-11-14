@@ -28,7 +28,7 @@ export default class PluginHelper {
                 [Feature.Graph]: { enabled: false },
                 [Feature.Starred]: { enabled: false },
                 [Feature.Search]: { enabled: false },
-                [Feature.Suggest]: {enabled: false}
+                [Feature.Suggest]: { enabled: false },
             },
         };
     }

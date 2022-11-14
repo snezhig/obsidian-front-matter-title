@@ -57,7 +57,6 @@ export default class MetaTitlePlugin extends Plugin {
         await this.saveData(settings);
         this.composer.setState(settings.features.graph.enabled, ManagerType.Graph);
         this.composer.setState(settings.features.header.enabled, ManagerType.Markdown);
-        this.composer.setState(settings.features.quick_switcher.enabled, ManagerType.QuickSwitcher);
         await this.runManagersUpdate();
         await this.toggleFeatures();
         await this.mc.refresh();
@@ -148,10 +147,6 @@ export default class MetaTitlePlugin extends Plugin {
                 this.storage.get("features").get(Feature.Header).get("enabled").value(),
                 ManagerType.Markdown
             );
-            this.composer.setState(
-                this.storage.get("features").get(Feature.QuickSwitcher).get("enabled").value(),
-                ManagerType.QuickSwitcher
-            );
             this.runManagersUpdate().catch(console.error);
             await this.toggleFeatures().catch(console.error);
             await this.mc.refresh();
@@ -180,6 +175,7 @@ export default class MetaTitlePlugin extends Plugin {
             [Feature.Explorer, f.get(Feature.Explorer).get("enabled").value()],
             [Feature.ExplorerSort, f.get(Feature.ExplorerSort).get("enabled").value()],
             [Feature.Starred, f.get(Feature.Starred).get("enabled").value()],
+            [Feature.Suggest, f.get(Feature.Suggest).get("enabled").value()],
         ];
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);

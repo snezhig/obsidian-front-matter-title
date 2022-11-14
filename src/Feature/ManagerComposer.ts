@@ -1,11 +1,11 @@
 import FeatureComposer from "@src/Feature/FeatureComposer";
-import {Feature} from "@src/enum";
+import { Feature } from "@src/enum";
 import AbstractManager from "@src/Feature/AbstractManager";
-import {inject, injectable, named} from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import {AppEvents} from "@src/Types";
+import { AppEvents } from "@src/Types";
 import Event from "@src/Components/EventDispatcher/Event";
 
 @injectable()
