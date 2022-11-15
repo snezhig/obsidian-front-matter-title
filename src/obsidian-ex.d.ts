@@ -4,11 +4,9 @@ import {
     MarkdownView,
     MetadataCache,
     Plugin,
-    SuggestModal,
     TFile,
     TFolder,
     View,
-    Workspace,
     WorkspaceLeaf,
 } from "obsidian";
 

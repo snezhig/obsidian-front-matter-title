@@ -73,6 +73,8 @@ export default class MetaTitlePlugin extends Plugin {
         this.dispatcher = this.container.get(SI.dispatcher);
         this.logger = this.container.getNamed(SI.logger, "main");
 
+        this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", new Event(undefined)));
+
         new App(); //replace with static
         await this.loadSettings();
         await this.delay();
@@ -110,10 +112,11 @@ export default class MetaTitlePlugin extends Plugin {
         );
         Container.bind<ObsidianMetaFactory>(SI["factory:metadata:cache"]).toFunction(() => this.app.metadataCache);
         Container.bind(SI["obsidian:app"]).toConstantValue(this.app);
-        //@ts-ignore
         Container.bind(SI["newable:obsidian:chooser"]).toConstructor(
+            //@ts-ignore
             Object.getPrototypeOf(this.app.workspace.editorSuggest.suggests[0].suggestions).constructor
         );
+        Container.bind(SI["factory:obsidian:active:file"]).toFunction(() => this.app.workspace.getActiveFile());
     }
 
     public onunload() {

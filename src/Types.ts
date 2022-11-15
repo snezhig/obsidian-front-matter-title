@@ -15,4 +15,5 @@ export type AppEvents = {
     "note:link:filter": {
         links: NoteLink[];
     };
+    "layout:change": undefined;
 };

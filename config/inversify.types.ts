@@ -14,6 +14,7 @@ const SI = {
     "factory:alias:modifier:strategy": "",
     "factory:feature": "",
     "factory:metadata:cache": "",
+    "factory:obsidian:active:file": "",
     "factory:obsidian:file": "",
     "factory:obsidian:file_modifiable": "",
     "factory:obsidian:meta": "",
