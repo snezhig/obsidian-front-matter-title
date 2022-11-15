@@ -14,6 +14,7 @@ import AdjustStrategy from "@src/Feature/Alias/Strategy/AdjustStrategy";
 import ReplaceStrategy from "@src/Feature/Alias/Strategy/ReplaceStrategy";
 import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import SuggestFeature from "@src/Feature/Suggest/SuggestFeature";
+import StarredManager from "@src/Feature/Starred/StarredManager";
 
 export default (container: Container) => {
     container.bind(SI["feature:composer"]).to(FeatureComposer).inSingletonScope();
@@ -24,6 +25,7 @@ export default (container: Container) => {
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerManager).whenTargetNamed(ExplorerManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerSort).whenTargetNamed(ExplorerSort.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SearchManager).whenTargetNamed(SearchManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
 

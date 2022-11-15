@@ -21,6 +21,7 @@ const SI = {
     "factory:placeholder:resolver": "",
     "factory:template": "",
     "factory:template:resolver": "",
+    "newable:obsidian:chooser": "",
     "feature": "",
     "feature:composer": "",
     "filter": "",

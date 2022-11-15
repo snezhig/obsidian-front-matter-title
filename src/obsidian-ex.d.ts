@@ -1,5 +1,16 @@
 import "obsidian";
-import { MarkdownView, MetadataCache, Plugin, SuggestModal, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
+import {
+    Events,
+    MarkdownView,
+    MetadataCache,
+    Plugin,
+    SuggestModal,
+    TFile,
+    TFolder,
+    View,
+    Workspace,
+    WorkspaceLeaf,
+} from "obsidian";
 
 declare module "obsidian" {
     export interface TFileExplorerItem {
@@ -60,12 +71,8 @@ declare module "obsidian" {
         titleContainerEl: HTMLDivElement;
     }
 
-    export abstract class SuggestModalExt<T> extends SuggestModal<T> {
-        chooser?: SuggestModalChooser<any> | any;
-    }
-
-    export abstract class SuggestModalChooser<T> {
-        setSuggestions(e: T): any;
+    export abstract class Chooser {
+        setSuggestions(e: any): any;
     }
 
     export interface SuggestModalChooserFileItem {

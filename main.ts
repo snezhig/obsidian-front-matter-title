@@ -110,6 +110,10 @@ export default class MetaTitlePlugin extends Plugin {
         );
         Container.bind<ObsidianMetaFactory>(SI["factory:metadata:cache"]).toFunction(() => this.app.metadataCache);
         Container.bind(SI["obsidian:app"]).toConstantValue(this.app);
+        //@ts-ignore
+        Container.bind(SI["newable:obsidian:chooser"]).toConstructor(
+            Object.getPrototypeOf(this.app.workspace.editorSuggest.suggests[0].suggestions).constructor
+        );
     }
 
     public onunload() {
