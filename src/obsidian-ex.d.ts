@@ -1,14 +1,5 @@
 import "obsidian";
-import {
-    Events,
-    MarkdownView,
-    MetadataCache,
-    Plugin,
-    TFile,
-    TFolder,
-    View,
-    WorkspaceLeaf,
-} from "obsidian";
+import { Events, MarkdownView, MetadataCache, Plugin, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
 
 declare module "obsidian" {
     export interface TFileExplorerItem {
