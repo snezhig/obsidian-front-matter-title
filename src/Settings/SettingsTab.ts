@@ -1,11 +1,13 @@
-import { App, PluginSettingTab, Setting, TextComponent, ToggleComponent } from "obsidian";
+import { App, PluginSettingTab, Setting, TextComponent } from "obsidian";
 import MetaTitlePlugin from "../../main";
 import Storage, { PrimitiveItemInterface } from "@src/Settings/Storage";
-import { SettingsEvent, SettingsManagersType, SettingsType } from "@src/Settings/SettingsType";
+import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
 import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import { Feature, Manager } from "@src/enum";
+import { Feature } from "@src/enum";
+import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
 import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 
 export default class SettingsTab extends PluginSettingTab {
     private changed = false;
@@ -15,11 +17,13 @@ export default class SettingsTab extends PluginSettingTab {
         app: App,
         plugin: MetaTitlePlugin,
         private storage: Storage<SettingsType>,
-        private dispatcher: DispatcherInterface<SettingsEvent>
+        private dispatcher: DispatcherInterface<SettingsEvent>,
+        private builderFactory: SettingsFeatureBuildFactory
     ) {
         super(app, plugin);
         this.updatePrevious();
         dispatcher.dispatch("settings.loaded", new Event({ settings: this.storage.collect() }));
+        dispatcher.addListener("settings:tab:feature:changed", new CallbackVoid(this.onFeatureChange.bind(this)));
     }
 
     display(): any {
@@ -58,7 +62,6 @@ export default class SettingsTab extends PluginSettingTab {
                     })
             );
         this.buildRules();
-        this.buildManagers();
         this.buildFeatures();
         containerEl.createEl("h4", { text: "Util" });
         new Setting(containerEl)
@@ -81,68 +84,8 @@ export default class SettingsTab extends PluginSettingTab {
         this.buildDonation();
     }
 
-    private buildFeatures(): void {
-        this.containerEl.createEl("h4", { text: "Features" });
-        const settings = this.storage.get("features");
-        type item = { name: string; desc: string; toggle: ToggleComponent | null; id: Feature; default: boolean };
-        const features: { [K in Manager]?: item[] } = {
-            [Manager.Explorer]: [
-                {
-                    name: "Explorer sort",
-                    desc: "Enable alphabetical sort by custom titles",
-                    toggle: null,
-                    id: Feature.ExplorerSort,
-                    default: false,
-                },
-            ],
-            [Manager.FileNoteLink]: [
-                {
-                    name: "File Note Link Approval",
-                    desc: "If File Note Link manager find link is oppened file",
-                    toggle: null,
-                    id: Feature.FileNoteLinkApproval,
-                    default: true,
-                },
-                {
-                    name: "Replace only links without names",
-                    desc: "If it is on File Note Link will replace only [[link-to-file]] link, otherwise [[link-to-file]] and [[link-to-file|with-alias]] links",
-                    default: true,
-                    id: Feature.FileNoteLinkFilter,
-                    toggle: null,
-                },
-            ],
-        };
-        for (const [manager, items] of Object.entries(features)) {
-            for (const item of items) {
-                new Setting(this.containerEl)
-                    .setName(item.name)
-                    .setDesc(item.desc)
-                    .addToggle(
-                        t =>
-                            (item.toggle = t
-                                .setValue(settings.get(item.id).get("enabled").value())
-                                .onChange(v => this.change(settings.get(item.id).get("enabled"), v))
-                                .setDisabled(
-                                    !this.storage
-                                        .get("managers")
-                                        .get(manager as Manager)
-                                        .value()
-                                ))
-                    );
-            }
-        }
-        this.dispatcher.addListener(
-            "settings:tab:manager:changed",
-            new CallbackVoid(e => {
-                const items = features[e.get().id] ?? [];
-                for (const feature of items) {
-                    const value = e.get().value ? feature.default : false;
-                    feature.toggle.setDisabled(!e.get().value).setValue(value);
-                    const s = settings.get(feature.id)?.get("enabled");
-                    s && this.change(s, value);
-                }
-            })
-        );
+    public getSettings(): SettingsType {
+        return this.storage.collect();
     }
 
     private buildRules(): void {
@@ -216,56 +159,58 @@ export default class SettingsTab extends PluginSettingTab {
         text.inputEl.hidden = !isEnabled();
     }
 
-    private buildManagers(): void {
-        this.containerEl.createEl("h4", { text: "Managers" });
-        const data: { manager: SettingsManagersType; name: string; desc: string }[] = [
+    private buildFeatures(): void {
+        this.containerEl.createEl("h4", { text: "Features" });
+        const data: { feature: Feature; name: string; desc: string }[] = [
             {
-                manager: Manager.Header,
+                feature: Feature.Alias,
+                name: "Alias title",
+                desc: "Modify alias in metadata cache. The real alias will not be affected.",
+            },
+            { feature: Feature.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer" },
+            { feature: Feature.ExplorerSort, name: "Explorer Sort", desc: "" },
+            { feature: Feature.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph" },
+            {
+                feature: Feature.Header,
                 name: "Header title",
                 desc: "Replace titles in header of leaves and update them",
             },
-            { manager: Manager.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer" },
-            { manager: Manager.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph" },
             {
-                manager: Manager.QuickSwitcher,
-                name: "Quick switches title",
-                desc: "Replace shown titles in the quick switcher modal",
-            },
-            {
-                manager: Manager.FileNoteLink,
-                name: "File Note Link",
-                desc: "Change display name of links to note in file",
-            },
-            {
-                manager: Manager.Starred,
+                feature: Feature.Starred,
                 name: "Starred",
                 desc: "Replace shown titles in starred plugin",
             },
             {
-                manager: Manager.Search,
+                feature: Feature.Search,
                 name: "Search",
                 desc: "Replace shown titles in search leaf",
             },
             {
-                manager: Manager.Tab,
+                feature: Feature.Suggest,
+                name: "Suggest",
+                desc: "Replace shown titles in suggest modals",
+            },
+            {
+                feature: Feature.Tab,
                 name: "Tabs",
                 desc: "Replace shown titles in tabs",
             },
         ];
         for (const item of data) {
-            new Setting(this.containerEl)
-                .setName(item.name)
-                .setDesc(item.desc)
-                .addToggle(e =>
-                    e.setValue(this.storage.get("managers").get(item.manager).value()).onChange(v => {
-                        this.change(this.storage.get("managers").get(item.manager), v);
-                        this.dispatcher.dispatch(
-                            "settings:tab:manager:changed",
-                            new Event({ id: item.manager, value: v })
-                        );
-                    })
-                );
+            const builder = this.builderFactory(item.feature) ?? this.builderFactory("default");
+            const settings = this.storage.get("features").get(item.feature).value();
+            builder.setContext(this);
+            builder.build({ id: item.feature, desc: item.desc, name: item.name, settings });
         }
+    }
+
+    public getDispatcher(): DispatcherInterface<SettingsEvent> {
+        return this.dispatcher;
+    }
+
+    private onFeatureChange(e: EventInterface<SettingsEvent["settings:tab:feature:changed"]>): void {
+        this.storage.get("features").get(e.get().id).set(e.get().value);
+        this.changed = true;
     }
 
     private buildDonation(): void {
