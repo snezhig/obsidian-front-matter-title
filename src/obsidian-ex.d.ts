@@ -11,6 +11,7 @@ declare module "obsidian" {
             setChildren(items: any[]): void;
         };
     }
+
     export abstract class StarredPluginView extends ViewPluginEventable {
         itemLookup: WeakMap<Element, { type: string | "file"; title: string; path: string }>;
         listEl: Element;
@@ -25,9 +26,11 @@ declare module "obsidian" {
             [K: string]: TFileExplorerItem;
         };
         sortOrder: string;
+
         getDisplayText(): string;
 
         getViewType(): string;
+
         requestSort: () => void;
     }
 
@@ -70,5 +73,21 @@ declare module "obsidian" {
         file: TFile;
         type: "alias" | "file";
         alias?: string;
+    }
+
+    export interface SearchViewDOM {
+        addResult(f: TFile, ...other: unknown[]): unknown;
+
+        resultDomLookup: Map<TFile, unknown>;
+    }
+
+    export abstract class SearchPluginView extends View {
+        dom: SearchViewDOM;
+        startSearch: () => any;
+    }
+
+    export abstract class MarkdownLeaf extends WorkspaceLeaf {
+        tabHeaderInnerTitleEl: Element;
+        view: MarkdownView;
     }
 }

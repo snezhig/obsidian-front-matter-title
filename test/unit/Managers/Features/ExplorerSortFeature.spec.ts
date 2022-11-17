@@ -51,7 +51,7 @@ test("Should init timer to find item", () => {
 });
 
 test("Should call requestSort", () => {
-    callback.execute(new Event({ id: Manager.Explorer }));
+    callback.execute(new Event({ id: Manager.Explorer, result: true }));
     expect(view.requestSort).toHaveBeenCalledTimes(1);
     view.requestSort.mockClear();
 });

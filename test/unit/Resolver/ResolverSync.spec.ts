@@ -90,6 +90,7 @@ describe("Resolver Sync Test", () => {
         });
         test("Should not save item to cache", () => {
             creator.create.mockImplementation(() => {
+                throw new Error();
                 throw error;
             });
             expect(resolver.resolve("/path/to/file_exception.md")).toBeNull();

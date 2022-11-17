@@ -35,6 +35,8 @@ import ChangeApproveModal from "@src/UI/ChangeApproveModal";
 import LinkNoteApproveFeature from "@src/Managers/Features/FileNoteLinkApproveFeature";
 import FileNoteLinkFilterFeature from "@src/Managers/Features/FileNoteLinkFilterFeature";
 import StarredManager from "@src/Managers/StarredManager";
+import SearchManager from "@src/Managers/SearchManager";
+import { TabManager } from "@src/Managers/TabManager";
 import Api from "@src/Api/Api";
 import Deffer from "@src/Api/Deffer";
 
@@ -42,7 +44,10 @@ const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
 Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{(\\w|\\s)+?}})");
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("sync");
-Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver).to(ResolverAsync).inSingletonScope().whenTargetNamed("async");
+Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver)
+    .to(ResolverAsync)
+    .inSingletonScope()
+    .whenTargetNamed("async");
 Container.bind<FilterInterface>(SI.filter).to(ExtensionFilter);
 Container.bind<FilterInterface>(SI.filter).to(PathListFilter);
 Container.bind<BlackWhiteListInterface>(SI["component:black_white_list"]).to(BlackWhiteList).inSingletonScope();
@@ -54,19 +59,29 @@ Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(NullStr
 
 Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
 Container.bind<LoggerInterface>(SI.logger)
-  .toDynamicValue((context) => {
-    return context.container.get<LoggerComposer>(SI["logger:composer"]).create(context.currentRequest.target.getNamedTag().value);
-  })
-  .when(() => true);
+    .toDynamicValue(context => {
+        return context.container
+            .get<LoggerComposer>(SI["logger:composer"])
+            .create(context.currentRequest.target.getNamedTag().value);
+    })
+    .when(() => true);
 
 Container.bind<ManagerInterface>(SI["manager"]).to(ExplorerManager);
 Container.bind<ManagerInterface>(SI["manager"]).to(LinkNoteManager);
 Container.bind<ManagerInterface>(SI["manager"]).to(StarredManager);
+Container.bind<ManagerInterface>(SI["manager"]).to(SearchManager);
+Container.bind<ManagerInterface>(SI["manager"]).to(TabManager);
 Container.bind<FeatureInterface<Feature>>(SI.feature).to(ExplorerSortFeature).whenTargetNamed(ExplorerSortFeature.id());
-Container.bind<FeatureInterface<Feature>>(SI.feature).to(LinkNoteApproveFeature).whenTargetNamed(LinkNoteApproveFeature.id());
-Container.bind<FeatureInterface<Feature>>(SI.feature).to(FileNoteLinkFilterFeature).whenTargetNamed(FileNoteLinkFilterFeature.id());
-Container.bind<interfaces.Factory<FeatureInterface<Feature>>>(SI["factory:feature"])
-    .toFactory<FeatureInterface<Feature>, [Feature]>((context) => (id: Feature) => context.container.getNamed<FeatureInterface<Feature>>(SI.feature, id))
+Container.bind<FeatureInterface<Feature>>(SI.feature)
+    .to(LinkNoteApproveFeature)
+    .whenTargetNamed(LinkNoteApproveFeature.id());
+Container.bind<FeatureInterface<Feature>>(SI.feature)
+    .to(FileNoteLinkFilterFeature)
+    .whenTargetNamed(FileNoteLinkFilterFeature.id());
+Container.bind<interfaces.Factory<FeatureInterface<Feature>>>(SI["factory:feature"]).toFactory<
+    FeatureInterface<Feature>,
+    [Feature]
+>(context => (id: Feature) => context.container.getNamed<FeatureInterface<Feature>>(SI.feature, id));
 Container.bind<FeatureToggle>(SI.feature_toggle).to(FeatureToggle).inSingletonScope();
 Container.bind<Composer>(SI.composer).to(Composer);
 

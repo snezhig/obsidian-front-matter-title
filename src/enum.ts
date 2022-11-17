@@ -12,6 +12,8 @@ export enum Manager {
     QuickSwitcher = "quick_switcher",
     FileNoteLink = "file_note_link",
     Starred = "starred",
+    Search = "search",
+    Tab = "tab",
 }
 
 export enum Feature {

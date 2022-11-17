@@ -135,6 +135,16 @@ Some info
 |:--------------------------------------------:|:-------------------------------------------:|
 | ![](./github/images/File%20header%20off.png) | ![](./github/images/File%20header%20on.png) |
 
+
+## Search
+
+> Display titles in the search window
+
+|                   Disabled                   |                   Enabled                   |
+|:--------------------------------------------:|:-------------------------------------------:|
+| ![](./github/images/SearchOff.png) | ![](./github/images/SearchOn.png) |
+
+
 ## Thank you
 
 If you like this plugin and would like to buy me a coffee, you can!
