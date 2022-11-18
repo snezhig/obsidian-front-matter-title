@@ -20,7 +20,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import { Feature, Manager } from "@src/enum";
 import FeatureToggle from "@src/Managers/Features/FeatureToggle";
 import ObjectHelper from "@src/Utils/ObjectHelper";
-import Deffer, { DefferManagersReady, DefferPluginReady } from "@src/Api/Deffer";
+import Deffer, { DefferFeaturesReady, DefferPluginReady } from "@src/Api/Deffer";
 import { DefferInterface, PluginInterface } from "front-matter-plugin-api-provider";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
@@ -150,7 +150,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 this.processManagers().catch(console.error),
                 this.runManagersUpdate().catch(console.error),
             ]);
-            this.container.get<Deffer>(SI.deffer).setFlag(DefferManagersReady);
+            this.container.get<Deffer>(SI.deffer).setFlag(DefferFeaturesReady);
         });
 
         this.dispatcher.addListener(

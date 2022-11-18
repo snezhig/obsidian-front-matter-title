@@ -1,6 +1,6 @@
 import { ApiInterface, PluginIsNotReadyError } from "front-matter-plugin-api-provider";
 import { mock } from "jest-mock-extended";
-import Deffer, { DefferManagersReady, DefferPluginReady } from "@src/Api/Deffer";
+import Deffer, { DefferFeaturesReady, DefferPluginReady } from "@src/Api/Deffer";
 import { expect } from "@jest/globals";
 
 const mockFactory = jest.fn(() => mock<ApiInterface>());
@@ -26,7 +26,7 @@ test("Should call factory to create Api", async () => {
 });
 
 test("Should be booted and bound", async () => {
-    deffer.setFlag(DefferManagersReady);
+    deffer.setFlag(DefferFeaturesReady);
     await deffer.awaitManagers();
     expect(deffer.isPluginReady()).toBeTruthy();
     expect(deffer.isPluginReady()).toBeTruthy();

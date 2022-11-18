@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 
 export const DefferPluginReady = 2;
-export const DefferManagersReady = 4;
+export const DefferFeaturesReady = 4;
 @injectable()
 export default class Deffer implements DefferInterface {
     private state = 0;
@@ -26,7 +26,7 @@ export default class Deffer implements DefferInterface {
         this.promises.managers = new Promise(r => (this.resolves.managers = r));
     }
 
-    public setFlag(flag: typeof DefferPluginReady | typeof DefferManagersReady) {
+    public setFlag(flag: typeof DefferPluginReady | typeof DefferFeaturesReady) {
         if (!(this.state & flag)) {
             this.state = this.state | flag;
             this.processState();
@@ -36,7 +36,7 @@ export default class Deffer implements DefferInterface {
     private processState(): void {
         if (this.isPluginReady()) {
             this.resolves.plugin();
-            if (this.isManagersReady()) {
+            if (this.isFeaturesReady()) {
                 this.resolves.managers();
             }
         }
@@ -46,7 +46,7 @@ export default class Deffer implements DefferInterface {
         return await this.promises.plugin;
     }
 
-    async awaitManagers(): Promise<void> {
+    async awaitFeatures(): Promise<void> {
         return this.promises.managers;
     }
 
@@ -54,8 +54,8 @@ export default class Deffer implements DefferInterface {
         return (this.state & DefferPluginReady) !== 0;
     }
 
-    isManagersReady(): boolean {
-        return (this.state & DefferManagersReady) !== 0;
+    isFeaturesReady(): boolean {
+        return (this.state & DefferFeaturesReady) !== 0;
     }
 
     getApi(): ApiInterface {
