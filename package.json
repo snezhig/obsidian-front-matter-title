@@ -1,6 +1,6 @@
 {
   "name": "obsidian-sample-plugin",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
   "main": "main.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "eslint": "^8.14.0",
     "jest": "^27.5.1",
     "jest-mock-extended": "^2.0.6",
-    "obsidian": "^0.15.4",
+    "obsidian": "^0.16.3",
     "prettier": "^2.7.1",
     "ts-debounce": "^4.0.0",
     "ts-jest": "^27.1.4",
