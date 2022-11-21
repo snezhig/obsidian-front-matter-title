@@ -1,9 +1,11 @@
-import { Feature, Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 import { NoteLink } from "./Utils/FileNoteLinkService";
 
 export type AppEvents = {
+    "alias:strategy:changed": string;
     "templates:changed": { old: string[]; new: string[] };
-    "manager:update": { id: Manager; result: boolean };
+    "manager:update": { id: Feature; result: boolean };
+    "manager:refresh": { id: Feature };
     "feature:state:changed": { id: Feature; enabled: boolean };
     "note:link:change:approve": {
         path: string;
@@ -13,4 +15,5 @@ export type AppEvents = {
     "note:link:filter": {
         links: NoteLink[];
     };
+    "layout:change": undefined;
 };

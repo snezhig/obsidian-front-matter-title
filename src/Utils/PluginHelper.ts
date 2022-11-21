@@ -1,20 +1,10 @@
 import { SettingsType } from "@src/Settings/SettingsType";
-import { Feature, Manager } from "@src/enum";
+import { Feature } from "@src/enum";
 
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
         return {
             templates: [],
-            managers: {
-                explorer: false,
-                graph: false,
-                header: false,
-                quick_switcher: false,
-                file_note_link: false,
-                starred: false,
-                search: false,
-                [Manager.Tab]: false,
-            },
             rules: {
                 paths: {
                     mode: "black",
@@ -30,9 +20,15 @@ export default class PluginHelper {
                 delay: 0,
             },
             features: {
+                [Feature.Alias]: { enabled: false, strategy: "" },
+                [Feature.Explorer]: { enabled: false },
                 [Feature.ExplorerSort]: { enabled: false },
-                [Feature.FileNoteLinkApproval]: { enabled: false },
-                [Feature.FileNoteLinkFilter]: { enabled: false },
+                [Feature.Tab]: { enabled: false },
+                [Feature.Header]: { enabled: false },
+                [Feature.Graph]: { enabled: false },
+                [Feature.Starred]: { enabled: false },
+                [Feature.Search]: { enabled: false },
+                [Feature.Suggest]: { enabled: false },
             },
         };
     }

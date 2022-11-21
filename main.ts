@@ -1,7 +1,6 @@
 import { CachedMetadata, Plugin, TAbstractFile } from "obsidian";
 import Composer, { ManagerType } from "./src/Title/Manager/Composer";
-import MComposer from "./src/Managers/Composer";
-import { SettingsEvent, SettingsFeatures, SettingsType } from "@src/Settings/SettingsType";
+import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
@@ -17,9 +16,12 @@ import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { Feature, Manager } from "@src/enum";
-import FeatureToggle from "@src/Managers/Features/FeatureToggle";
+import { Feature } from "@src/enum";
 import ObjectHelper from "@src/Utils/ObjectHelper";
+import FeatureComposer from "@src/Feature/FeatureComposer";
+import ManagerComposer from "@src/Feature/ManagerComposer";
+import { ObsidianMetaFactory } from "@config/inversify.factory.types";
+import ListenerInterface from "@src/Interfaces/ListenerInterface";
 
 export default class MetaTitlePlugin extends Plugin {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
@@ -27,8 +29,8 @@ export default class MetaTitlePlugin extends Plugin {
     private container: interfaces.Container = Container;
     private storage: Storage<SettingsType>;
     private logger: LoggerInterface;
-    private c: MComposer;
-    private featureToggle: FeatureToggle;
+    private fc: FeatureComposer;
+    private mc: ManagerComposer;
 
     private async loadSettings(): Promise<void> {
         let data: SettingsType = {
@@ -40,17 +42,24 @@ export default class MetaTitlePlugin extends Plugin {
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
         this.storage = new Storage<SettingsType>(data);
-        this.addSettingTab(new SettingsTab(this.app, this, this.storage, this.dispatcher));
+        this.addSettingTab(
+            new SettingsTab(
+                this.app,
+                this,
+                this.storage,
+                this.dispatcher,
+                this.container.get(SI["factory:settings:feature:builder"])
+            )
+        );
     }
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
         await this.saveData(settings);
-        this.composer.setState(settings.managers.header, ManagerType.Graph);
-        this.composer.setState(settings.managers.header, ManagerType.Markdown);
-        this.composer.setState(settings.managers.quick_switcher, ManagerType.QuickSwitcher);
-        await this.processFeatures(settings.features);
-        await this.processManagers();
+        this.composer.setState(settings.features.graph.enabled, ManagerType.Graph);
+        this.composer.setState(settings.features.header.enabled, ManagerType.Markdown);
         await this.runManagersUpdate();
+        await this.toggleFeatures();
+        await this.mc.refresh();
     }
 
     private async delay(): Promise<void> {
@@ -64,6 +73,8 @@ export default class MetaTitlePlugin extends Plugin {
         this.dispatcher = this.container.get(SI.dispatcher);
         this.logger = this.container.getNamed(SI.logger, "main");
 
+        this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", new Event(undefined)));
+
         new App(); //replace with static
         await this.loadSettings();
         await this.delay();
@@ -73,13 +84,13 @@ export default class MetaTitlePlugin extends Plugin {
             this.container.getNamed<ResolverInterface>(SI.resolver, Resolving.Sync),
             this.container.getNamed<ResolverInterface<Resolving.Async>>(SI.resolver, Resolving.Async)
         );
-        this.c = Container.get(SI.composer);
-        this.featureToggle = Container.get(SI.feature_toggle);
-
+        this.fc = Container.get(SI["feature:composer"]);
+        this.mc = Container.get(SI["manager:composer"]);
         this.bind();
     }
 
     private bindServices(): void {
+        Container.bind<Storage<SettingsType>>(SI.storage).toDynamicValue(() => this.storage);
         Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<
             { [k: string]: any },
             [string]
@@ -99,18 +110,23 @@ export default class MetaTitlePlugin extends Plugin {
         Container.bind<ObsidianFacade>(SI["facade:obsidian"]).toConstantValue(
             new ObsidianFacade(this.app.vault, this.app.metadataCache, this.app.workspace)
         );
+        Container.bind<ObsidianMetaFactory>(SI["factory:metadata:cache"]).toFunction(() => this.app.metadataCache);
         Container.bind(SI["obsidian:app"]).toConstantValue(this.app);
+        Container.bind(SI["newable:obsidian:chooser"]).toConstructor(
+            //@ts-ignore
+            Object.getPrototypeOf(this.app.workspace.editorSuggest.suggests[0].suggestions).constructor
+        );
+        Container.bind(SI["factory:obsidian:active:file"]).toFunction(() => this.app.workspace.getActiveFile());
     }
 
     public onunload() {
         this.composer.setState(false);
-        this.c.setState(false).catch(console.error);
-        this.featureToggle.disableAll().catch(console.error);
     }
 
     private bind() {
+        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
         this.registerEvent(
-            this.app.metadataCache.on("changed", file => {
+            this.app.metadataCache.on("changed", (file, data, cache) => {
                 this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }));
             })
         );
@@ -130,15 +146,17 @@ export default class MetaTitlePlugin extends Plugin {
         );
 
         this.app.workspace.onLayoutReady(async () => {
-            this.composer.setState(this.storage.get("managers").get(Manager.Graph).value(), ManagerType.Graph);
-            this.composer.setState(this.storage.get("managers").get(Manager.Header).value(), ManagerType.Markdown);
             this.composer.setState(
-                this.storage.get("managers").get(Manager.QuickSwitcher).value(),
-                ManagerType.QuickSwitcher
+                this.storage.get("features").get(Feature.Graph).get("enabled").value(),
+                ManagerType.Graph
             );
-            await this.processFeatures(this.storage.get("features").value());
-            this.processManagers().catch(console.error);
+            this.composer.setState(
+                this.storage.get("features").get(Feature.Header).get("enabled").value(),
+                ManagerType.Markdown
+            );
             this.runManagersUpdate().catch(console.error);
+            await this.toggleFeatures().catch(console.error);
+            await this.mc.refresh();
         });
 
         this.dispatcher.addListener(
@@ -147,24 +165,27 @@ export default class MetaTitlePlugin extends Plugin {
         );
     }
 
-    private async processManagers(): Promise<void> {
-        this.logger.log("processManagers");
-        const promises = [];
-        for (const [id, state] of Object.entries(this.storage.get("managers").value())) {
-            promises.push(this.c.setState(state, id as Manager));
-        }
-        await Promise.all(promises);
-    }
-
-    private async processFeatures(options: SettingsFeatures<Feature>): Promise<void> {
-        for (const [id, { enabled }] of Object.entries(options)) {
-            await this.featureToggle.toggle(id as Feature, enabled).catch(console.error);
-        }
-    }
-
     private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
         this.logger.log("runManagersUpdate");
         await this.composer.update(file);
-        await this.c.update(file?.path ?? null);
+        if (file) {
+            await this.mc.update(file.path);
+        }
+    }
+
+    private async toggleFeatures(): Promise<void> {
+        const f = this.storage.get("features");
+        const states = [
+            [Feature.Alias, f.get(Feature.Alias).get("enabled").value()],
+            [Feature.Tab, f.get(Feature.Tab).get("enabled").value()],
+            [Feature.Search, f.get(Feature.Search).get("enabled").value()],
+            [Feature.Explorer, f.get(Feature.Explorer).get("enabled").value()],
+            [Feature.ExplorerSort, f.get(Feature.ExplorerSort).get("enabled").value()],
+            [Feature.Starred, f.get(Feature.Starred).get("enabled").value()],
+            [Feature.Suggest, f.get(Feature.Suggest).get("enabled").value()],
+        ];
+        for (const [id, state] of states) {
+            this.fc.toggle(id, state as boolean);
+        }
     }
 }

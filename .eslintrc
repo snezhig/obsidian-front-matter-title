@@ -1,23 +1,32 @@
 {
-	"root": true,
-	"parser": "@typescript-eslint/parser",
-	"env": {
-		"node": true
-	},
-	"plugins": [
-		"@typescript-eslint"
-	],
-	"extends": [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/eslint-recommended",
-		"plugin:@typescript-eslint/recommended"
-	],
-	"parserOptions": {
-		"sourceType": "module"
-	},
-	"rules": {
-		"@typescript-eslint/ban-ts-comment": "off",
-		"@typescript-eslint/no-explicit-any": "off",
-		"@typescript-eslint/no-this-alias": "off"
-	}
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "node": true
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "error",
+          "debug"
+        ]
+      }
+    ]
+  }
 }
