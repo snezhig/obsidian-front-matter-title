@@ -10,7 +10,6 @@ import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import PluginHelper from "../../src/Utils/PluginHelper";
 import { mock } from "jest-mock-extended";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import { Feature } from "@src/enum";
 
 const spy = {
     addListener: jest.spyOn<DispatcherInterface<any>, "addListener">(Container.get(SI.dispatcher), "addListener"),
@@ -23,7 +22,6 @@ const spy = {
 };
 
 const dispatcher = Container.get<DispatcherInterface<SettingsEvent>>(SI.dispatcher);
-Container.rebind(SI.feature).toDynamicValue(() => mock<FeatureInterface<Feature>>());
 const createDefaultSettings = (): SettingsType => PluginHelper.createDefaultSettings();
 describe("Test App", () => {
     new App();

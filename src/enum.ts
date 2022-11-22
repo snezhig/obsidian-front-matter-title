@@ -5,19 +5,14 @@ export enum Leaves {
     MD = "markdown",
 }
 
-export enum Manager {
+export enum Feature {
     Explorer = "explorer",
+    ExplorerSort = "explorer:sort",
     Graph = "graph",
     Header = "header",
-    QuickSwitcher = "quick_switcher",
-    FileNoteLink = "file_note_link",
     Starred = "starred",
     Search = "search",
     Tab = "tab",
-}
-
-export enum Feature {
-    ExplorerSort = "explorer:sort",
-    FileNoteLinkApproval = "file:note:link:approval",
-    FileNoteLinkFilter = "file:note:link:filter",
+    Alias = "alias",
+    Suggest = "suggest",
 }

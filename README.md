@@ -101,49 +101,80 @@ Some info
 
 > **If you use the only one value, use `short` instead of `{{short}}` to have a better performance**
 
-# Managers
+# Features
+
+## Alias
+
+> Modify frontmatter cache to add or replace alias or just ensure that the one exists
+
+|                Disabled                 |               Enabled               |
+|:---------------------------------------:|:-----------------------------------:|
+| ![](./resources/img/Alias%20Off.png) | ![](./resources/img/Alias%20On.png) |
 
 ## Explorer
 
 > Display titles in app`s file explorer
 
-|                 Disabled                 |                      Enabled                       |
-|:----------------------------------------:|:--------------------------------------------------:|
-| ![](./github/images/Common%20Folder.png) | ![](./github/images/Structure%20with%20plugin.png) |
+|                Disabled                 |                Enabled                 |
+|:---------------------------------------:|:--------------------------------------:|
+| ![](./resources/img/Explorer%20Off.png) | ![](./resources/img/Explorer%20On.png) |
+
+## Explorer Sort
+
+> Sort files by custom titles. Available only if Explorer is enabled
+
+|                Disabled                |                  Enabled                   |
+|:--------------------------------------:|:------------------------------------------:|
+| ![](./resources/img/Explorer%20On.png) | ![](./resources/img/ExplorerSort%20On.png) |
 
 ## Graph
 
 > Display titles in app's graph and local-graph
 
-|                Disabled                 |                    Enabled                     |
-|:---------------------------------------:|:----------------------------------------------:|
-| ![](./github/images/Common%20graph.png) | ![](./github/images/Graph%20with%20plugin.png) |
+|               Disabled               |               Enabled               |
+|:------------------------------------:|:-----------------------------------:|
+| ![](./resources/img/Graph%20Off.png) | ![](./resources/img/Graph%20On.png) |
 
-## Quick switcher
-
-> Display titles in app's quick switcher modal
-
-|                    Disabled                     |                    Enabled                     |
-|:-----------------------------------------------:|:----------------------------------------------:|
-| ![](./github/images/Quick%20Switcher%20off.png) | ![](./github/images/Quick%20Switcher%20on.png) |
-
-## File header
+## Header
 
 > Display title in opened file's header
 
-|                   Disabled                   |                   Enabled                   |
-|:--------------------------------------------:|:-------------------------------------------:|
-| ![](./github/images/File%20header%20off.png) | ![](./github/images/File%20header%20on.png) |
+|                Disabled                |                Enabled                |
+|:--------------------------------------:|:-------------------------------------:|
+| ![](./resources/img/Heading%20Off.png) | ![](./resources/img/Heading%20On.png) |
 
+## Starred
+
+> Display title in starred window
+
+|                Disabled                |                Enabled                |
+|:--------------------------------------:|:-------------------------------------:|
+| ![](./resources/img/Starred%20Off.png) | ![](./resources/img/Starred%20on.png) |
 
 ## Search
 
 > Display titles in the search window
 
-|                   Disabled                   |                   Enabled                   |
-|:--------------------------------------------:|:-------------------------------------------:|
-| ![](./github/images/SearchOff.png) | ![](./github/images/SearchOn.png) |
+|               Disabled                |               Enabled                |
+|:-------------------------------------:|:------------------------------------:|
+| ![](./resources/img/Search%20Off.png) | ![](./resources/img/Search%20On.png) |
 
+## Suggest
+
+> Display titles in suggest modal\windows.
+
+|                  Disabled                  |                  Enabled                  |
+|:------------------------------------------:|:-----------------------------------------:|
+| ![](./resources/img/Suggest%20Off%201.png) | ![](./resources/img/Suggest%20On%201.png) |
+| ![](./resources/img/Suggest%20Off%202.png) | ![](./resources/img/Suggest%20On%202.png) |
+
+## Tab
+
+> Display titles in leaf's tab
+
+|              Disabled              |              Enabled              |
+|:----------------------------------:|:---------------------------------:|
+| ![](./resources/img/Tab%20Off.png) | ![](./resources/img/Tab%20On.png) |
 
 ## Thank you
 
