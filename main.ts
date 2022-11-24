@@ -22,6 +22,8 @@ import FeatureComposer from "@src/Feature/FeatureComposer";
 import ManagerComposer from "@src/Feature/ManagerComposer";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
+import { DefferInterface, PluginInterface } from "front-matter-plugin-api-provider";
+import Deffer, { DefferPluginReady } from "@src/Api/Deffer";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
@@ -161,9 +163,9 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 this.storage.get("features").get(Feature.Header).get("enabled").value(),
                 ManagerType.Markdown
             );
-            this.runManagersUpdate().catch(console.error);
-            await this.toggleFeatures().catch(console.error);
-            await this.mc.refresh();
+
+            this.toggleFeatures();
+            Promise.all([this.runManagersUpdate().catch(console.error), this.mc.refresh()]).catch(console.error);
         });
 
         this.dispatcher.addListener(
@@ -180,7 +182,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         }
     }
 
-    private async toggleFeatures(): Promise<void> {
+    private toggleFeatures(): void {
         const f = this.storage.get("features");
         const states = [
             [Feature.Alias, f.get(Feature.Alias).get("enabled").value()],

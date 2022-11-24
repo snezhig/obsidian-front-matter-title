@@ -1,4 +1,4 @@
-import { ApiInterface, DefferInterface, PluginIsNotReadyError } from "front-matter-plugin-api-provider";
+import { ApiInterface, DefferInterface } from "front-matter-plugin-api-provider";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 
@@ -58,10 +58,7 @@ export default class Deffer implements DefferInterface {
         return (this.state & DefferFeaturesReady) !== 0;
     }
 
-    getApi(): ApiInterface {
-        if (this.isPluginReady()) {
-            return this.factory();
-        }
-        throw new PluginIsNotReadyError("Not all services have been sound yet");
+    getApi(): ApiInterface | null {
+        return this.isPluginReady() ? this.factory() : null;
     }
 }
