@@ -1,11 +1,11 @@
-import { ApiInterface, DefferInterface } from "front-matter-plugin-api-provider";
+import { ApiInterface, DeferInterface } from "front-matter-plugin-api-provider";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 
-export const DefferPluginReady = 2;
-export const DefferFeaturesReady = 4;
+export const DeferPluginReady = 2;
+export const DeferFeaturesReady = 4;
 @injectable()
-export default class Deffer implements DefferInterface {
+export default class Defer implements DeferInterface {
     private state = 0;
 
     private promises = {
@@ -26,7 +26,7 @@ export default class Deffer implements DefferInterface {
         this.promises.managers = new Promise(r => (this.resolves.managers = r));
     }
 
-    public setFlag(flag: typeof DefferPluginReady | typeof DefferFeaturesReady) {
+    public setFlag(flag: typeof DeferPluginReady | typeof DeferFeaturesReady) {
         if (!(this.state & flag)) {
             this.state = this.state | flag;
             this.processState();
@@ -51,11 +51,11 @@ export default class Deffer implements DefferInterface {
     }
 
     isPluginReady(): boolean {
-        return (this.state & DefferPluginReady) !== 0;
+        return (this.state & DeferPluginReady) !== 0;
     }
 
     isFeaturesReady(): boolean {
-        return (this.state & DefferFeaturesReady) !== 0;
+        return (this.state & DeferFeaturesReady) !== 0;
     }
 
     getApi(): ApiInterface | null {

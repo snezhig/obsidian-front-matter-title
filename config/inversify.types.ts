@@ -43,7 +43,7 @@ const SI = {
     "template:pattern": "",
     "templates": "",
     api: "",
-    deffer: "",
+    defer: "",
     "factory:api": "",
 };
 

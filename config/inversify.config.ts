@@ -28,7 +28,7 @@ import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
 import Listener from "@src/Feature/Alias/Listener";
 import Api from "@src/Api/Api";
-import Deffer from "@src/Api/Deffer";
+import Defer from "@src/Api/Defer";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
@@ -68,6 +68,6 @@ bindSettings(Container);
 
 Container.bind(SI.api).to(Api);
 Container.bind(SI["factory:api"]).toFactory(c => () => c.container.get(SI.api));
-Container.bind(SI.deffer).to(Deffer).inSingletonScope()
+Container.bind(SI.defer).to(Defer).inSingletonScope()
 
 export default Container;
