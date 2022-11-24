@@ -22,8 +22,8 @@ import FeatureComposer from "@src/Feature/FeatureComposer";
 import ManagerComposer from "@src/Feature/ManagerComposer";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
-import { DefferInterface, PluginInterface } from "front-matter-plugin-api-provider";
-import Deffer, { DefferPluginReady } from "@src/Api/Deffer";
+import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
+import Defer, { DeferPluginReady } from "@src/Api/Defer";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
@@ -34,8 +34,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private fc: FeatureComposer;
     private mc: ManagerComposer;
 
-    public getDeffer(): DefferInterface {
-        return this.container.get(SI.deffer);
+    public getDefer(): DeferInterface {
+        return this.container.get(SI.defer);
     }
 
     private async loadSettings(): Promise<void> {
@@ -84,7 +84,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         new App(); //replace with static
         await this.loadSettings();
         this.app.workspace.onLayoutReady(() => {
-            this.container.get<Deffer>(SI.deffer).setFlag(DefferPluginReady);
+            this.container.get<Defer>(SI.defer).setFlag(DeferPluginReady);
         });
         await this.delay();
 

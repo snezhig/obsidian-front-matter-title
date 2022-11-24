@@ -41,7 +41,7 @@
     "yaml": "^2.0.1"
   },
   "dependencies": {
-    "front-matter-plugin-api-provider": "^0.0.7-alpha",
+    "front-matter-plugin-api-provider": "^0.0.9-alpha",
     "inversify": "^6.0.1",
     "reflect-metadata": "^0.1.13"
   }
