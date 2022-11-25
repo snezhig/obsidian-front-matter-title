@@ -21,7 +21,7 @@ export class EventDispatcher<E> implements EventDispatcherInterface<E> {
         return ref;
     }
 
-    dispatch<T extends keyof E>(name: T, e: E[T] extends (undefined | null) ? undefined : EventInterface<E[T]>) {
+    dispatch<T extends keyof E>(name: T, e: E[T] extends undefined | null ? undefined : EventInterface<E[T]>) {
         for (const [i, item] of this.events.get(name).entries()) {
             item.cb(e);
             if (item.once) {
@@ -29,7 +29,6 @@ export class EventDispatcher<E> implements EventDispatcherInterface<E> {
             }
         }
     }
-
 
     removeListener<T extends keyof E>(ref: ListenerRef<T>): void {
         for (const [i, item] of this.events.get(ref.getName()).entries()) {
