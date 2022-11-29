@@ -5,16 +5,16 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import { Feature } from "@src/enum";
 import { MarkdownLeaf } from "obsidian";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { AppEvents } from "@src/Types";
 import { ObsidianActiveFile } from "@config/inversify.factory.types";
-import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
-import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 
 @injectable()
 export default class TabManager extends AbstractManager {
     private enabled = false;
-    private readonly callback: CallbackInterface<AppEvents["layout:change"]> = null;
+    private readonly callback: () => void = null;
+    private ref: ListenerRef<"layout:change">;
 
     constructor(
         @inject(SI["facade:obsidian"])
@@ -22,27 +22,28 @@ export default class TabManager extends AbstractManager {
         @inject(SI.resolver)
         @named(Resolving.Sync)
         private resolver: ResolverInterface,
-        @inject(SI.dispatcher)
-        private dispatcher: DispatcherInterface<AppEvents>,
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["factory:obsidian:active:file"])
         factory: ObsidianActiveFile
     ) {
         super();
-        this.callback = new CallbackVoid(() => {
+        this.callback = () => {
             const file = factory();
             file && this.update(file.path);
-        });
+        };
     }
 
     protected async doDisable(): Promise<void> {
-        this.dispatcher.removeListener("layout:change", this.callback);
+        this.dispatcher.removeListener(this.ref);
+        this.ref = null;
         this.reset();
         this.enabled = false;
     }
 
     protected async doEnable(): Promise<void> {
         this.enabled = true;
-        this.dispatcher.addListener("layout:change", this.callback);
+        this.ref = this.dispatcher.addListener({ name: "layout:change", cb: this.callback });
         return;
     }
     private reset() {

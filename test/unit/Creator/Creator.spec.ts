@@ -2,12 +2,13 @@ import { mock } from "jest-mock-extended";
 import TemplateInterface from "../../../src/Interfaces/TemplateInterface";
 import TemplatePlaceholderInterface from "../../../src/Interfaces/TemplatePlaceholderInterface";
 import Creator from "../../../src/Creator/Creator";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { AppEvents } from "@src/Types";
-import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
+import EventDispatcherInterface, {
+    Callback,
+} from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 describe("Test Creator", () => {
     const path = "/path/to/file.md";
@@ -15,12 +16,12 @@ describe("Test Creator", () => {
     const expected = "static_(static)_static";
     const template = mock<TemplateInterface>();
     const placeholder = mock<TemplatePlaceholderInterface>();
-    const dispatcher = mock<DispatcherInterface<AppEvents>>();
-    const events: { [K in keyof AppEvents]?: CallbackInterface<AppEvents[K]> } = {};
+    const dispatcher = mock<EventDispatcherInterface<AppEvents>>();
+    const events: { [K in keyof AppEvents]?: Callback<AppEvents[K]> } = {};
     const templateCallback = jest.fn(() => [template]);
     const logger = mock<LoggerInterface>();
     // @ts-ignore
-    dispatcher.addListener.mockImplementation((name, cb) => (events[name] = cb));
+    dispatcher.addListener.mockImplementation(({ name, cb }) => (events[name] = cb));
     template.getPlaceholders.mockReturnValue([placeholder]);
     template.getTemplate.mockReturnValue(templateStr);
 
@@ -64,13 +65,13 @@ describe("Test Creator", () => {
         });
         test("Should add listener", () => {
             expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
-            expect(dispatcher.addListener).toHaveBeenCalledWith("templates:changed", expect.anything());
+            expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "settings:changed", cb: expect.anything() });
         });
 
         test("Should update template after template:changed event", () => {
             templateCallback.mockClear();
-            expect(events["templates:changed"]).not.toBeUndefined();
-            events["templates:changed"].execute(new Event<AppEvents["templates:changed"]>({ old: [], new: [] }));
+            expect(events["settings:changed"]).not.toBeUndefined();
+            events["settings:changed"](new Event<AppEvents["settings:changed"]>(mock()));
             expect(templateCallback).toHaveBeenCalledTimes(1);
         });
     });

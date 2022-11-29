@@ -7,9 +7,7 @@ import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
 import { interfaces } from "inversify";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
-import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import App from "@src/App";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { AppEvents } from "@src/Types";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
@@ -24,9 +22,10 @@ import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
 import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
 import Defer, { DeferPluginReady } from "@src/Api/Defer";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
-    private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
+    private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private composer: Composer = null;
     private container: interfaces.Container = Container;
     private storage: Storage<SettingsType>;
@@ -53,7 +52,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 this.app,
                 this,
                 this.storage,
-                this.dispatcher,
+                this.container.get(SI["event:dispatcher"]),
                 this.container.get(SI["factory:settings:feature:builder"])
             )
         );
@@ -64,7 +63,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         this.composer.setState(settings.features.graph.enabled, ManagerType.Graph);
         this.composer.setState(settings.features.header.enabled, ManagerType.Markdown);
         await this.runManagersUpdate();
-        await this.toggleFeatures();
+        this.reloadFeatures();
         await this.mc.refresh();
     }
 
@@ -76,12 +75,12 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     public async onload() {
         this.bindServices();
-        this.dispatcher = this.container.get(SI.dispatcher);
+        this.dispatcher = this.container.get(SI["event:dispatcher"]);
         this.logger = this.container.getNamed(SI.logger, "main");
 
-        this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", new Event(undefined)));
-
+        this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", null));
         new App(); //replace with static
+        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
         await this.loadSettings();
         this.app.workspace.onLayoutReady(() => {
             this.container.get<Defer>(SI.defer).setFlag(DeferPluginReady);
@@ -133,9 +132,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     private bind() {
-        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
         this.registerEvent(
-            this.app.metadataCache.on("changed", (file, data, cache) => {
+            this.app.metadataCache.on("changed", file => {
                 this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }));
             })
         );
@@ -146,13 +144,13 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 })
             )
         );
-        this.dispatcher.addListener(
-            "resolver.unresolved",
-            new CallbackVoid<ResolverEvents["resolver.unresolved"]>(e => {
+        this.dispatcher.addListener({
+            name: "resolver.unresolved",
+            cb: e => {
                 const file = e.get().path ? this.app.vault.getAbstractFileByPath(e.get().path) : null;
                 this.runManagersUpdate(file).catch(console.error);
-            })
-        );
+            },
+        });
 
         this.app.workspace.onLayoutReady(async () => {
             this.composer.setState(
@@ -164,14 +162,11 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 ManagerType.Markdown
             );
 
-            this.toggleFeatures();
+            this.reloadFeatures();
             Promise.all([this.runManagersUpdate().catch(console.error), this.mc.refresh()]).catch(console.error);
         });
 
-        this.dispatcher.addListener(
-            "settings.changed",
-            new CallbackVoid<SettingsEvent["settings.changed"]>(e => this.onSettingsChange(e.get().actual))
-        );
+        this.dispatcher.addListener({ name: "settings:changed", cb: e => this.onSettingsChange(e.get().actual) });
     }
 
     private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
@@ -182,7 +177,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         }
     }
 
-    private toggleFeatures(): void {
+    private reloadFeatures(): void {
+        this.fc.disableAll();
         const f = this.storage.get("features");
         const states = [
             [Feature.Alias, f.get(Feature.Alias).get("enabled").value()],

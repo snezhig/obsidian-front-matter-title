@@ -1,4 +1,6 @@
 const SI = {
+    "factory:creator:templates": "",
+    "event:dispatcher": "",
     "alias:modifier": "",
     "alias:modifier:strategy": "",
     "cache": "",
@@ -9,7 +11,6 @@ const SI = {
     "creator:fallback": "",
     "creator:template": "",
     "delimiter": "",
-    "dispatcher": "",
     "facade:obsidian": "",
     "factory:alias:modifier:strategy": "",
     "factory:feature": "",

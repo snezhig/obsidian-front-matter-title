@@ -4,10 +4,10 @@ import ResolverInterface, { Resolving, Return } from "../Interfaces/ResolverInte
 import CreatorInterface from "../Interfaces/CreatorInterface";
 import { inject, injectable, multiInject } from "inversify";
 import SI from "../../config/inversify.types";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 import Event from "@src/Components/EventDispatcher/Event";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 @injectable()
 export default class ResolverSync implements ResolverInterface {
@@ -18,13 +18,10 @@ export default class ResolverSync implements ResolverInterface {
         private cache: CacheInterface,
         @inject(SI.creator)
         private creator: CreatorInterface,
-        @inject(SI.dispatcher)
-        private dispatcher: DispatcherInterface<ResolverEvents>
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<ResolverEvents>
     ) {
-        const exec = this.handleClear.bind(this);
-        dispatcher.addListener("resolver.clear", {
-            execute: exec,
-        });
+        dispatcher.addListener({ name: "resolver.clear", cb: this.handleClear.bind(this) });
     }
 
     private handleClear(

@@ -7,8 +7,10 @@ import CacheItemInterface from "../../../src/Components/Cache/CacheItemInterface
 import { expect } from "@jest/globals";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
-import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
+import EventDispatcherInterface, {
+    Callback,
+} from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 
 describe("Resolver Sync Test", () => {
     const path = "/test/path/file.md";
@@ -22,9 +24,14 @@ describe("Resolver Sync Test", () => {
     cacheItem.isHit.mockReturnValue(false);
     const cache = mock<CacheInterface>(undefined, { deep: true });
     cache.getItem.mockReturnValue(cacheItem);
-    const dispatcher = mock<DispatcherInterface<ResolverEvents>>();
-    let eventCallback: CallbackInterface<ResolverEvents["resolver.clear"]> = null;
-    dispatcher.addListener.mockImplementation((name: string, cb) => (eventCallback = cb));
+    const dispatcher = mock<EventDispatcherInterface<ResolverEvents>>();
+    let eventCallback: Callback<ResolverEvents["resolver.clear"]> = null;
+    let ref: ListenerRef<any> = null;
+    dispatcher.addListener.mockImplementation(({ name, cb }) => {
+        eventCallback = cb;
+        ref = { getName: () => name };
+        return ref;
+    });
     const resolver = new ResolverSync([filter], cache, creator, dispatcher);
 
     afterEach(() => {
@@ -116,11 +123,11 @@ describe("Resolver Sync Test", () => {
         });
         test("Should add listener", () => {
             expect(dispatcher.addListener).toHaveBeenCalledTimes(1);
-            expect(dispatcher.addListener).toHaveBeenCalledWith("resolver.clear", expect.anything());
+            expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "resolver.clear", cb: expect.anything() });
         });
         test('Should delete one item from cache and dispatch "resolver.unresolved" with path', () => {
             const path = "/path/to/file.md";
-            eventCallback.execute(new Event({ path }));
+            eventCallback(new Event({ path }));
             expect(cache.delete).toHaveBeenCalledTimes(1);
             expect(cache.delete).toHaveBeenCalledWith(path);
             expect(cache.clear).not.toHaveBeenCalled();
@@ -129,7 +136,7 @@ describe("Resolver Sync Test", () => {
         });
 
         test('Should clear cache and dispatch "resolver.unresolved" with all', () => {
-            eventCallback.execute(new Event({ all: true }));
+            eventCallback(new Event({ all: true }));
             expect(cache.clear).toHaveBeenCalledTimes(1);
             expect(dispatcher.dispatch).toHaveBeenCalledTimes(1);
             expect(dispatcher.dispatch).toHaveBeenCalledWith("resolver.unresolved", new Event({ all: true }));

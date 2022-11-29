@@ -1,5 +1,7 @@
 import { EventDispatcher } from "@src/Components/EventDispatcher/EventDispatcher";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { mock } from "jest-mock-extended";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 type Events = {
     foo: null;
@@ -7,7 +9,7 @@ type Events = {
     fred: { spam: number };
 };
 
-const dispatcher: EventDispatcherInterface<Events> = new EventDispatcher();
+const dispatcher: EventDispatcherInterface<Events> = new EventDispatcher(mock<LoggerInterface>());
 
 describe("Test add listener, call and remove by ref", () => {
     let actual = "";

@@ -4,8 +4,17 @@ import EventDispatcherInterface, {
     Callback,
     Listener,
 } from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { inject, injectable, named } from "inversify";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import SI from "@config/inversify.types";
 
+@injectable()
 export class EventDispatcher<E> implements EventDispatcherInterface<E> {
+    constructor(
+        @inject(SI.logger)
+        @named("event:dispatcher")
+        private logger: LoggerInterface
+    ) {}
     private readonly events: Map<
         keyof E,
         { cb: Callback<E[keyof E]>; sort: number; once: boolean; ref: ListenerRef<keyof E> }[]
@@ -18,11 +27,13 @@ export class EventDispatcher<E> implements EventDispatcherInterface<E> {
         events.push({ cb, sort, ref, once });
         events.sort((a, b) => a.sort - b.sort);
         this.events.set(name, events);
+
         return ref;
     }
 
     dispatch<T extends keyof E>(name: T, e: E[T] extends undefined | null ? undefined : EventInterface<E[T]>) {
-        for (const [i, item] of this.events.get(name).entries()) {
+        this.logger.log(name);
+        for (const [i, item] of [...(this.events.get(name)?.entries() ?? [])]) {
             item.cb(e);
             if (item.once) {
                 this.events.get(name).splice(i, 1);

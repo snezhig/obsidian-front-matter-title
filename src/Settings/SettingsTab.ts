@@ -3,11 +3,11 @@ import MetaTitlePlugin from "../../main";
 import Storage, { PrimitiveItemInterface } from "@src/Settings/Storage";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { Feature } from "@src/enum";
 import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
-import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
+import ObjectHelper from "@src/Utils/ObjectHelper";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 export default class SettingsTab extends PluginSettingTab {
     private changed = false;
@@ -17,13 +17,13 @@ export default class SettingsTab extends PluginSettingTab {
         app: App,
         plugin: MetaTitlePlugin,
         private storage: Storage<SettingsType>,
-        private dispatcher: DispatcherInterface<SettingsEvent>,
+        private dispatcher: EventDispatcherInterface<SettingsEvent>,
         private builderFactory: SettingsFeatureBuildFactory
     ) {
         super(app, plugin);
         this.updatePrevious();
         dispatcher.dispatch("settings.loaded", new Event({ settings: this.storage.collect() }));
-        dispatcher.addListener("settings:tab:feature:changed", new CallbackVoid(this.onFeatureChange.bind(this)));
+        dispatcher.addListener({ name: "settings:tab:feature:changed", cb: this.onFeatureChange.bind(this) });
     }
 
     display(): any {
@@ -204,7 +204,7 @@ export default class SettingsTab extends PluginSettingTab {
         }
     }
 
-    public getDispatcher(): DispatcherInterface<SettingsEvent> {
+    public getDispatcher(): EventDispatcherInterface<SettingsEvent> {
         return this.dispatcher;
     }
 
@@ -250,11 +250,17 @@ export default class SettingsTab extends PluginSettingTab {
         }
 
         this.changed = false;
+        this.dispatcher.dispatch("settings:tab:close", null);
+        const changed = ObjectHelper.compare(this.previous, this.storage.collect());
+        if (Object.keys(changed).length === 0) {
+            return;
+        }
         this.dispatcher.dispatch(
-            "settings.changed",
+            "settings:changed",
             new Event({
                 old: this.previous,
                 actual: this.storage.collect(),
+                changed: ObjectHelper.compare(this.previous, this.storage.collect()),
             })
         );
         this.updatePrevious();

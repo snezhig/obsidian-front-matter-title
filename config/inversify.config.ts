@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {Container as _Container} from "inversify";
 import SI from "./inversify.types";
-import bindCreator from "./services/creator.config";
+import CreatorModule from "./services/creator.config";
 import bindFeature from "./services/feature.config";
 import bindSettings from "./services/settings.config";
 import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
@@ -22,17 +22,19 @@ import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
 import NullStrategy from "@src/Components/Extractor/NullStrategy";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import Dispatcher from "@src/Components/EventDispatcher/Dispatcher";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
-import Listener from "@src/Feature/Alias/Listener";
+import AliasListener from "@src/Feature/Alias/Listener";
 import Api from "@src/Api/Api";
 import Defer from "@src/Api/Defer";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import {EventDispatcher} from "@src/Components/EventDispatcher/EventDispatcher";
+import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteListListener";
 
 const Container = new _Container();
-Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
+Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
 Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{(\\w|\\s)+?}})");
+
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("sync");
 Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver)
     .to(ResolverAsync)
@@ -46,7 +48,6 @@ Container.bind<ExtractorInterface>(SI["component:extractor"]).to(Extractor);
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(LiteralStrategy);
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(ArrayStrategy);
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(NullStrategy);
-
 Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
 Container.bind<LoggerInterface>(SI.logger)
     .toDynamicValue(context => {
@@ -58,10 +59,11 @@ Container.bind<LoggerInterface>(SI.logger)
 
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
-Container.bind<ListenerInterface>(SI.listener).to(Listener);
+Container.bind<ListenerInterface>(SI.listener).to(AliasListener);
+Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener);
 
 //START CREATOR
-bindCreator(Container);
+Container.load(CreatorModule);
 bindFeature(Container);
 bindSettings(Container);
 //END CREATOR

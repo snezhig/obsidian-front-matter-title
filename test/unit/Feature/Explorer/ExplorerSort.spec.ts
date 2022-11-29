@@ -3,20 +3,28 @@ import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface"
 import { TFileExplorerView, WorkspaceLeaf } from "obsidian";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
-import DispatcherInterface from "../../../../src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import CallbackInterface from "@src/Components/EventDispatcher/Interfaces/CallbackInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 import { Feature } from "@src/enum";
 import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
+import EventDispatcherInterface, {
+    Callback,
+} from "../../../../src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { AppEvents } from "../../../../src/Types";
 
 jest.useFakeTimers();
 jest.spyOn(global, "setTimeout");
 
 const facade = mock<ObsidianFacade>();
-let callback: CallbackInterface<any>;
-const dispatcher = mock<DispatcherInterface<any>>();
-dispatcher.addListener.mockImplementation((name, cb) => (callback = cb));
+let callback: Callback<AppEvents[keyof AppEvents]>;
+const dispatcher = mock<EventDispatcherInterface<any>>();
+const refs: [any?, any?] = [];
+dispatcher.addListener.mockImplementation(({ name, cb }) => {
+    callback = cb;
+    const ref = { getName: () => name };
+    refs.push(ref);
+    return ref;
+});
 
 const sort = new ExplorerSort(mock<ResolverInterface<Resolving.Sync>>(), mock<LoggerInterface>(), facade, dispatcher);
 
@@ -35,8 +43,8 @@ test("Should add listener after enabled", async () => {
     facade.getLeavesOfType.mockReturnValueOnce([leaf]);
     await sort.enable();
     expect(sort.isEnabled()).toBeTruthy();
-    expect(dispatcher.addListener).toHaveBeenCalledWith("manager:update", expect.anything());
-    expect(dispatcher.addListener).toHaveBeenCalledWith("manager:refresh", expect.anything());
+    expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:update", cb: expect.anything() });
+    expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:refresh", cb: expect.anything() });
     expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
 });
 
@@ -47,7 +55,7 @@ test("Should init timer to find item", () => {
 });
 
 test("Should call requestSort", () => {
-    callback.execute(new Event({ id: Feature.Explorer, result: true }));
+    callback(new Event({ id: Feature.Explorer, result: true }));
     expect(view.requestSort).toHaveBeenCalledTimes(1);
     view.requestSort.mockClear();
 });
@@ -57,9 +65,9 @@ test("Should switch off, requestSort and do not call requestSort by event", asyn
     expect(sort.isEnabled()).toBeFalsy();
     expect(view.requestSort).toHaveBeenCalledTimes(1);
     expect(dispatcher.removeListener).toHaveBeenCalledTimes(2);
-    expect(dispatcher.removeListener).toHaveBeenCalledWith("manager:update", callback);
-    expect(dispatcher.removeListener).toHaveBeenCalledWith("manager:refresh", callback);
-    callback.execute(new Event({ id: Feature.Explorer }));
+    expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[0]);
+    expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[1]);
+    callback(new Event({ id: Feature.Explorer }));
     expect(view.requestSort).toHaveBeenCalledTimes(1);
 });
 
