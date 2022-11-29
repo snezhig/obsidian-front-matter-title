@@ -41,7 +41,10 @@ const SI = {
     "factory:settings:feature:builder": "",
     "storage": "",
     "template:pattern": "",
-    "templates": ""
+    "templates": "",
+    api: "",
+    defer: "",
+    "factory:api": "",
 };
 
 for (const key of Object.keys(SI)) {
