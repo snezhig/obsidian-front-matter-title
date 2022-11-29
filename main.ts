@@ -22,8 +22,10 @@ import FeatureComposer from "@src/Feature/FeatureComposer";
 import ManagerComposer from "@src/Feature/ManagerComposer";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
+import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
+import Defer, { DeferPluginReady } from "@src/Api/Defer";
 
-export default class MetaTitlePlugin extends Plugin {
+export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private composer: Composer = null;
     private container: interfaces.Container = Container;
@@ -31,6 +33,10 @@ export default class MetaTitlePlugin extends Plugin {
     private logger: LoggerInterface;
     private fc: FeatureComposer;
     private mc: ManagerComposer;
+
+    public getDefer(): DeferInterface {
+        return this.container.get(SI.defer);
+    }
 
     private async loadSettings(): Promise<void> {
         let data: SettingsType = {
@@ -77,6 +83,9 @@ export default class MetaTitlePlugin extends Plugin {
 
         new App(); //replace with static
         await this.loadSettings();
+        this.app.workspace.onLayoutReady(() => {
+            this.container.get<Defer>(SI.defer).setFlag(DeferPluginReady);
+        });
         await this.delay();
 
         this.composer = new Composer(
@@ -154,9 +163,9 @@ export default class MetaTitlePlugin extends Plugin {
                 this.storage.get("features").get(Feature.Header).get("enabled").value(),
                 ManagerType.Markdown
             );
-            this.runManagersUpdate().catch(console.error);
-            await this.toggleFeatures().catch(console.error);
-            await this.mc.refresh();
+
+            this.toggleFeatures();
+            Promise.all([this.runManagersUpdate().catch(console.error), this.mc.refresh()]).catch(console.error);
         });
 
         this.dispatcher.addListener(
@@ -173,7 +182,7 @@ export default class MetaTitlePlugin extends Plugin {
         }
     }
 
-    private async toggleFeatures(): Promise<void> {
+    private toggleFeatures(): void {
         const f = this.storage.get("features");
         const states = [
             [Feature.Alias, f.get(Feature.Alias).get("enabled").value()],
