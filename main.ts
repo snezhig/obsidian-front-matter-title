@@ -60,7 +60,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
         await this.saveData(settings);
-        this.composer.setState(settings.features.graph.enabled, ManagerType.Graph);
         this.composer.setState(settings.features.header.enabled, ManagerType.Markdown);
         await this.runManagersUpdate();
         this.reloadFeatures();
@@ -154,10 +153,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
         this.app.workspace.onLayoutReady(async () => {
             this.composer.setState(
-                this.storage.get("features").get(Feature.Graph).get("enabled").value(),
-                ManagerType.Graph
-            );
-            this.composer.setState(
                 this.storage.get("features").get(Feature.Header).get("enabled").value(),
                 ManagerType.Markdown
             );
@@ -188,6 +183,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             [Feature.ExplorerSort, f.get(Feature.ExplorerSort).get("enabled").value()],
             [Feature.Starred, f.get(Feature.Starred).get("enabled").value()],
             [Feature.Suggest, f.get(Feature.Suggest).get("enabled").value()],
+            [Feature.Graph, f.get(Feature.Graph).get("enabled").value()],
         ];
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);

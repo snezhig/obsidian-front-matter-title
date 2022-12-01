@@ -1,4 +1,5 @@
 const SI = {
+    "factory:replacer": "",
     "factory:creator:templates": "",
     "event:dispatcher": "",
     "alias:modifier": "",

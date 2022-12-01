@@ -30,6 +30,7 @@ import Defer from "@src/Api/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import {EventDispatcher} from "@src/Components/EventDispatcher/EventDispatcher";
 import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteListListener";
+import FunctionReplacer from "@src/Utils/FunctionReplacer";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
@@ -62,14 +63,14 @@ Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope
 Container.bind<ListenerInterface>(SI.listener).to(AliasListener);
 Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener);
 
-//START CREATOR
 Container.load(CreatorModule);
 bindFeature(Container);
 bindSettings(Container);
-//END CREATOR
 
 Container.bind(SI.api).to(Api);
 Container.bind(SI["factory:api"]).toFactory(c => () => c.container.get(SI.api));
 Container.bind(SI.defer).to(Defer).inSingletonScope()
+
+Container.bind(SI["factory:replacer"]).toFunction((t: any, m: any, a: unknown, i: any) => FunctionReplacer.create(t, m, a, i))
 
 export default Container;

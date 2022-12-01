@@ -1,12 +1,9 @@
 import { TAbstractFile, Workspace } from "obsidian";
 import Manager from "./Manager";
 import MarkdownManager from "./MarkdownManager";
-import GraphManager from "./GraphManager";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 
 export enum ManagerType {
-    Graph = "g",
-    Explorer = "e",
     Markdown = "m",
 }
 
@@ -14,9 +11,7 @@ export default class Composer {
     private managers = new Map<ManagerType, Manager>();
 
     constructor(ws: Workspace, rss: ResolverInterface, rsa: ResolverInterface<Resolving.Async>) {
-        this.managers
-            .set(ManagerType.Markdown, new MarkdownManager(ws, rsa))
-            .set(ManagerType.Graph, new GraphManager(ws, rsa));
+        this.managers.set(ManagerType.Markdown, new MarkdownManager(ws, rsa));
     }
 
     public update(file?: TAbstractFile, type?: ManagerType): Promise<{ manager: ManagerType; result: boolean }[]> {
