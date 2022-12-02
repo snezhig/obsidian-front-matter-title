@@ -1,4 +1,4 @@
-import { CachedMetadata, Plugin, TAbstractFile } from "obsidian";
+import { CachedMetadata, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
@@ -57,7 +57,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
         await this.saveData(settings);
-        await this.runManagersUpdate();
         this.reloadFeatures();
         await this.mc.refresh();
     }
@@ -118,43 +117,33 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     public onunload() {
-        return;
+        this.fc.disableAll();
     }
 
     private bind() {
         this.registerEvent(
-            this.app.metadataCache.on("changed", file => {
-                this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }));
-            })
-        );
-        this.app.workspace.onLayoutReady(() =>
-            this.registerEvent(
-                this.app.vault.on("rename", (e, o) => {
-                    this.dispatcher.dispatch("resolver.clear", new Event({ path: o }));
-                })
+            this.app.metadataCache.on("changed", file =>
+                this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }))
             )
         );
+        this.app.workspace.onLayoutReady(async () => {
+            this.registerEvent(
+                this.app.vault.on("rename", (e, o) =>
+                    this.dispatcher.dispatch("resolver.clear", new Event({ path: o }))
+                )
+            );
+            this.reloadFeatures();
+            await this.mc.refresh();
+        });
         this.dispatcher.addListener({
             name: "resolver.unresolved",
             cb: e => {
                 const file = e.get().path ? this.app.vault.getAbstractFileByPath(e.get().path) : null;
-                this.runManagersUpdate(file).catch(console.error);
+                this.mc.update(file.path).catch(console.error);
             },
         });
 
-        this.app.workspace.onLayoutReady(async () => {
-            this.reloadFeatures();
-            Promise.all([this.runManagersUpdate().catch(console.error), this.mc.refresh()]).catch(console.error);
-        });
-
         this.dispatcher.addListener({ name: "settings:changed", cb: e => this.onSettingsChange(e.get().actual) });
-    }
-
-    private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
-        this.logger.log("runManagersUpdate");
-        if (file) {
-            await this.mc.update(file.path);
-        }
     }
 
     private reloadFeatures(): void {
