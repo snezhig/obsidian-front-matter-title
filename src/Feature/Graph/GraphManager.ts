@@ -58,12 +58,6 @@ export default class GraphManager extends AbstractManager {
     }
 
     private initReplacement(): boolean {
-        if (this.replacement) {
-            this.unbind();
-            this.replacement.enable();
-            return true;
-        }
-
         const node = this.getFirstNode();
         if (node) {
             this.replacement = this.factory(
@@ -94,7 +88,7 @@ export default class GraphManager extends AbstractManager {
 
     private getFirstNode(): GraphNode | null {
         for (const view of this.getViews()) {
-            const node = (view?.renderer?.nodes ?? []).first() ?? null;
+            const node = (view.renderer?.nodes ?? []).first() ?? null;
             if (node) {
                 return node;
             }
@@ -121,7 +115,7 @@ export default class GraphManager extends AbstractManager {
 
     protected doRefresh(): Promise<{ [p: string]: boolean }> {
         for (const view of this.getViews()) {
-            view?.renderer?.onIframeLoad();
+            view.renderer?.onIframeLoad();
         }
         return Promise.resolve({});
     }
