@@ -1,12 +1,10 @@
 import { CachedMetadata, Plugin, TAbstractFile } from "obsidian";
-import Composer, { ManagerType } from "./src/Title/Manager/Composer";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Settings/Storage";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
 import { interfaces } from "inversify";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import App from "@src/App";
 import { AppEvents } from "@src/Types";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
@@ -26,7 +24,6 @@ import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
-    private composer: Composer = null;
     private container: interfaces.Container = Container;
     private storage: Storage<SettingsType>;
     private logger: LoggerInterface;
@@ -60,7 +57,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
         await this.saveData(settings);
-        this.composer.setState(settings.features.header.enabled, ManagerType.Markdown);
         await this.runManagersUpdate();
         this.reloadFeatures();
         await this.mc.refresh();
@@ -86,11 +82,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         });
         await this.delay();
 
-        this.composer = new Composer(
-            this.app.workspace,
-            this.container.getNamed<ResolverInterface>(SI.resolver, Resolving.Sync),
-            this.container.getNamed<ResolverInterface<Resolving.Async>>(SI.resolver, Resolving.Async)
-        );
         this.fc = Container.get(SI["feature:composer"]);
         this.mc = Container.get(SI["manager:composer"]);
         this.bind();
@@ -127,7 +118,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     public onunload() {
-        this.composer.setState(false);
+        return;
     }
 
     private bind() {
@@ -152,10 +143,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         });
 
         this.app.workspace.onLayoutReady(async () => {
-            this.composer.setState(
-                this.storage.get("features").get(Feature.Header).get("enabled").value(),
-                ManagerType.Markdown
-            );
+
 
             this.reloadFeatures();
             Promise.all([this.runManagersUpdate().catch(console.error), this.mc.refresh()]).catch(console.error);
@@ -166,7 +154,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
         this.logger.log("runManagersUpdate");
-        await this.composer.update(file);
         if (file) {
             await this.mc.update(file.path);
         }
@@ -184,6 +171,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             [Feature.Starred, f.get(Feature.Starred).get("enabled").value()],
             [Feature.Suggest, f.get(Feature.Suggest).get("enabled").value()],
             [Feature.Graph, f.get(Feature.Graph).get("enabled").value()],
+            [Feature.Header, f.get(Feature.Header).get("enabled").value()],
         ];
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);
