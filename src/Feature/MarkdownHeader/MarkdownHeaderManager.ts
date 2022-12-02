@@ -1,13 +1,13 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import {Feature} from "@src/enum";
-import {inject, injectable, named} from "inversify";
+import { Feature } from "@src/enum";
+import { inject, injectable, named } from "inversify";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import {AppEvents} from "@src/Types";
+import { AppEvents } from "@src/Types";
 import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import {MarkdownViewExt} from "obsidian";
-import ResolverInterface, {Resolving} from "@src/Interfaces/ResolverInterface";
+import { MarkdownViewExt } from "obsidian";
+import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 @injectable()
@@ -20,9 +20,11 @@ export class MarkdownHeaderManager extends AbstractManager {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver) @named(Resolving.Async)
+        @inject(SI.resolver)
+        @named(Resolving.Async)
         private resolver: ResolverInterface<Resolving.Async>,
-        @inject(SI.logger) @named(`manager:${MarkdownHeaderManager.getId()}`)
+        @inject(SI.logger)
+        @named(`manager:${MarkdownHeaderManager.getId()}`)
         private logger: LoggerInterface
     ) {
         super();
@@ -38,7 +40,10 @@ export class MarkdownHeaderManager extends AbstractManager {
     }
 
     protected doEnable(): void {
-        this.ref = this.dispatcher.addListener({name: "layout:change", cb: () => this.refresh().catch(console.error)});
+        this.ref = this.dispatcher.addListener({
+            name: "layout:change",
+            cb: () => this.refresh().catch(console.error),
+        });
         this.enabled = true;
     }
 
@@ -52,11 +57,11 @@ export class MarkdownHeaderManager extends AbstractManager {
     }
 
     private async innerUpdate(path: string = null): Promise<boolean> {
-        const views = this.facade.getViewsOfType<MarkdownViewExt>('markdown');
+        const views = this.facade.getViewsOfType<MarkdownViewExt>("markdown");
         const promises = [];
         for (const view of views) {
             if (!path || view.file.path === path) {
-                promises.push(this.resolver.resolve(view.file.path).then(r => this.setTitle(view, r)))
+                promises.push(this.resolver.resolve(view.file.path).then(r => this.setTitle(view, r)));
             }
         }
         await Promise.all(promises);
@@ -64,7 +69,7 @@ export class MarkdownHeaderManager extends AbstractManager {
     }
 
     private setTitle(view: MarkdownViewExt, title: string | null): void {
-        this.logger.log(`Set title "${title ?? ' '}" for ${view.file.path}`)
+        this.logger.log(`Set title "${title ?? " "}" for ${view.file.path}`);
         const container = view.titleContainerEl as HTMLDivElement;
         let el: HTMLDivElement = null;
         for (const i of Array.from(container.children)) {

@@ -143,8 +143,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         });
 
         this.app.workspace.onLayoutReady(async () => {
-
-
             this.reloadFeatures();
             Promise.all([this.runManagersUpdate().catch(console.error), this.mc.refresh()]).catch(console.error);
         });
