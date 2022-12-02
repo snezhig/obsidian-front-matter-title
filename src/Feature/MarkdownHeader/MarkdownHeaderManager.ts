@@ -86,6 +86,7 @@ export class MarkdownHeaderManager extends AbstractManager {
             return;
         }
         if (title && el && el.innerText === title && !el.hidden) {
+            this.logger.log(`Set title for ${view.file.path} is skipped`);
             return;
         }
         if (el === null) {

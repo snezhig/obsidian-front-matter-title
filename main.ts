@@ -160,17 +160,12 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private reloadFeatures(): void {
         this.fc.disableAll();
         const f = this.storage.get("features");
-        const states = [
-            [Feature.Alias, f.get(Feature.Alias).get("enabled").value()],
-            [Feature.Tab, f.get(Feature.Tab).get("enabled").value()],
-            [Feature.Search, f.get(Feature.Search).get("enabled").value()],
-            [Feature.Explorer, f.get(Feature.Explorer).get("enabled").value()],
-            [Feature.ExplorerSort, f.get(Feature.ExplorerSort).get("enabled").value()],
-            [Feature.Starred, f.get(Feature.Starred).get("enabled").value()],
-            [Feature.Suggest, f.get(Feature.Suggest).get("enabled").value()],
-            [Feature.Graph, f.get(Feature.Graph).get("enabled").value()],
-            [Feature.Header, f.get(Feature.Header).get("enabled").value()],
-        ];
+        const states = [];
+
+        for (const feature of Object.values(Feature)) {
+            states.push([feature, f.get(feature).get("enabled").value()]);
+        }
+
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);
         }

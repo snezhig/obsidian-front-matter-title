@@ -10,15 +10,7 @@ import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces
 
 @injectable()
 export default class ManagerComposer {
-    private ids: Feature[] = [
-        Feature.Tab,
-        Feature.Explorer,
-        Feature.Starred,
-        Feature.Search,
-        Feature.Alias,
-        Feature.Graph,
-        Feature.Header,
-    ];
+    private ids: Feature[] = Object.values(Feature).filter(e => ![Feature.ExplorerSort, Feature.Suggest].includes(e));
 
     constructor(
         @inject(SI["feature:composer"])
