@@ -64,7 +64,7 @@ describe("Test App", () => {
             dispatcher.dispatch("settings:changed", new Event({ old, actual, changed }));
 
             expect(Container.get<string>(SI.templates)).toEqual(["actual_title"]);
-            expect(spy.dispatch).toHaveBeenCalledWith("resolver.clear", new Event({ all: true }));
+            expect(spy.dispatch).toHaveBeenCalledWith("resolver:clear", null);
             expect(spy.dispatch).toHaveBeenCalledTimes(2);
         });
 
@@ -78,7 +78,7 @@ describe("Test App", () => {
             dispatcher.dispatch("settings:changed", new Event({ old, actual, changed }));
             expect(Container.get(SI.delimiter)).toEqual({ value, enabled: true });
             expect(spy.dispatch).toHaveBeenCalledTimes(2);
-            expect(spy.dispatch).toHaveBeenCalledWith("resolver.clear", new Event({ all: true }));
+            expect(spy.dispatch).toHaveBeenCalledWith("resolver:clear", null);
         });
     });
 });

@@ -37,8 +37,6 @@ export default class App {
 
     private onSettingsChanged({ actual, changed }: SettingsEvent["settings:changed"]): void {
         type events = ResolverEvents & AppEvents;
-        const queue: { [K in keyof events]?: events[K] } = {};
-        queue["resolver.clear"] = { all: true };
 
         if (changed.templates) {
             this.container.rebind(SI.templates).toConstantValue(actual.templates);
@@ -53,8 +51,6 @@ export default class App {
         }
 
         const dispatcher = this.container.get<EventDispatcherInterface<events>>(SI["event:dispatcher"]);
-        for (const event of Object.keys(queue) as (keyof events)[]) {
-            dispatcher.dispatch(event, new Event(queue[event]));
-        }
+        dispatcher.dispatch("resolver:clear", null);
     }
 }

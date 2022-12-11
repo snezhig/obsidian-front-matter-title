@@ -21,20 +21,21 @@ export default class ResolverSync implements ResolverInterface {
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<ResolverEvents>
     ) {
-        dispatcher.addListener({ name: "resolver.clear", cb: this.handleClear.bind(this) });
+        dispatcher.addListener({ name: "resolver:clear", cb: () => this.cache.clear() });
+        dispatcher.addListener({ name: "resolver:delete", cb: this.handleDelete.bind(this) });
     }
 
-    private handleClear(
-        e: EventInterface<ResolverEvents["resolver.clear"]>
-    ): EventInterface<ResolverEvents["resolver.clear"]> {
-        const { all = false, path } = e.get();
-        if (all) {
-            this.cache.clear();
-        } else {
-            this.cache.delete(path);
+    private handleDelete(e: EventInterface<ResolverEvents["resolver:delete"]>): void {
+        const path = e.get().path;
+        const old = this.cache.getItem(path);
+        if (!old.isHit()) {
+            return;
         }
-        this.dispatcher.dispatch("resolver.unresolved", new Event(e.get()));
-        return e;
+        this.cache.delete(path);
+        const actual = this.resolve(path);
+        if (old.get() !== actual) {
+            this.dispatcher.dispatch("resolver:unresolved", new Event({ path }));
+        }
     }
 
     resolve(path: string): Return<Resolving.Sync> {
