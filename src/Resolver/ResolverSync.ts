@@ -47,7 +47,7 @@ export default class ResolverSync implements ResolverInterface {
         const item = this.cache.getItem<string | null>(path);
         try {
             if (item.isHit() === false) {
-                title = this.creator.create(path);
+                title = this.dispatch(this.creator.create(path));
                 this.cache.save(item.set(title));
             } else {
                 title = item.get();
@@ -57,6 +57,17 @@ export default class ResolverSync implements ResolverInterface {
         }
 
         return title ?? null;
+    }
+
+    private dispatch(title: string): string {
+        const event = new Event<ResolverEvents["resolver:resolved"]>({
+            value: title,
+            modify: function (v: string) {
+                this.title = v;
+            },
+        });
+        this.dispatcher.dispatch("resolver:resolved", event);
+        return event.get().value;
     }
 
     private valid(path: string): boolean {
