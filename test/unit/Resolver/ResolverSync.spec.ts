@@ -129,9 +129,14 @@ describe("Resolver Sync Test", () => {
     });
 
     describe("Test events", () => {
+        const path = "/path/to/file.md";
         beforeEach(() => {
+            cacheItem.get.mockReturnValue("foo");
+            cacheItem.isHit.mockReturnValue(false);
+            cacheItem.set.mockReturnThis();
             cache.clear.mockClear();
             cache.delete.mockClear();
+            cache.save.mockClear();
             dispatcher.dispatch.mockClear();
         });
         test("Should add listener", () => {
@@ -139,16 +144,44 @@ describe("Resolver Sync Test", () => {
             expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "resolver:clear", cb: expect.anything() });
             expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "resolver:delete", cb: expect.anything() });
         });
-        test('Should delete one item from cache and dispatch "resolver.unresolved" with path', () => {
-            const path = "/path/to/file.md";
-            //UPDATE TEST
-            cacheItem.get.mockReturnValueOnce(true);
+        test("Should not do anything, because item is not hit", () => {
+            eventDeleteCallback(new Event({ path }));
+            expect(cache.delete).not.toHaveBeenCalled();
+            expect(cache.save).not.toHaveBeenCalled();
+            expect(creator.create).not.toHaveBeenCalled();
+            expect(cache.clear).not.toHaveBeenCalled();
+            expect(dispatcher.dispatch).not.toHaveBeenCalled();
+        });
+
+        test("Should update title, but does not dispatch any event bause of equal", () => {
+            creator.create.mockReturnValueOnce("foo");
+            cacheItem.isHit.mockReturnValueOnce(true);
             eventDeleteCallback(new Event({ path }));
             expect(cache.delete).toHaveBeenCalledTimes(1);
             expect(cache.delete).toHaveBeenCalledWith(path);
             expect(cache.clear).not.toHaveBeenCalled();
+            expect(creator.create).toHaveBeenCalledTimes(1);
+            expect(creator.create).toHaveBeenCalledWith(path);
+            expect(cacheItem.set).toHaveBeenCalledWith("foo");
+            expect(cache.save).toHaveBeenCalledTimes(1);
+            expect(cache.save).toHaveBeenCalledWith(cacheItem);
+            expect(dispatcher.dispatch).not.toHaveBeenCalled();
+        });
+
+        test("Should update title and dispatch new event", () => {
+            creator.create.mockReturnValueOnce("foo-bar");
+            cacheItem.isHit.mockReturnValueOnce(true);
+            eventDeleteCallback(new Event({ path }));
+            expect(cache.delete).toHaveBeenCalledTimes(1);
+            expect(cache.delete).toHaveBeenCalledWith(path);
+            expect(cache.clear).not.toHaveBeenCalled();
+            expect(creator.create).toHaveBeenCalledTimes(1);
+            expect(creator.create).toHaveBeenCalledWith(path);
+            expect(cacheItem.set).toHaveBeenCalledWith("foo-bar");
+            expect(cache.save).toHaveBeenCalledTimes(1);
+            expect(cache.save).toHaveBeenCalledWith(cacheItem);
             expect(dispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(dispatcher.dispatch).toHaveBeenCalledWith("resolver.unresolved", new Event({ path }));
+            expect(dispatcher.dispatch).toHaveBeenCalledWith("resolver:unresolved", new Event({ path }));
         });
 
         test("Should clear cache", () => {
