@@ -123,24 +123,21 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private bind() {
         this.registerEvent(
             this.app.metadataCache.on("changed", file =>
-                this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }))
+                this.dispatcher.dispatch("resolver:delete", new Event({ path: file.path }))
             )
         );
         this.app.workspace.onLayoutReady(async () => {
             this.registerEvent(
                 this.app.vault.on("rename", (e, o) =>
-                    this.dispatcher.dispatch("resolver.clear", new Event({ path: o }))
+                    this.dispatcher.dispatch("resolver:delete", new Event({ path: o }))
                 )
             );
             this.reloadFeatures();
             await this.mc.refresh();
         });
         this.dispatcher.addListener({
-            name: "resolver.unresolved",
-            cb: e => {
-                const file = e.get().path ? this.app.vault.getAbstractFileByPath(e.get().path) : null;
-                this.mc.update(file.path).catch(console.error);
-            },
+            name: "resolver:unresolved",
+            cb: e => this.mc.update(e.get().path).catch(console.error),
         });
 
         this.dispatcher.addListener({ name: "settings:changed", cb: e => this.onSettingsChange(e.get().actual) });
