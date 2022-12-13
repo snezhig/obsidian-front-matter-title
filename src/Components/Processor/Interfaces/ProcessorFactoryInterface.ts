@@ -1,5 +1,3 @@
-import ProcessorTypes from "../ProcessorUtils";
-import ProcessorInterface from "./ProcessorInterface";
-export default interface ProcessorFactoryInterface {
-    create(type: ProcessorTypes): ProcessorInterface;
+export default interface ProcessorInterface {
+    process(value: string): string;
 }

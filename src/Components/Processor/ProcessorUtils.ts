@@ -1,8 +1,8 @@
-import ProcessorFactoryInterface from "./Interfaces/ProcessorFactoryInterface";
+import ProcessorInterface from "./Interfaces/ProcessorFactoryInterface";
 
 export enum ProcessorTypes {
     Function = "function",
     Replace = "replace",
 }
 
-export type ProcessorFactory = (type: ProcessorTypes) => ProcessorFactoryInterface;
+export type ProcessorFactory = (type: ProcessorTypes) => ProcessorInterface;
