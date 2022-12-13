@@ -2,7 +2,6 @@ import Container from "@config/inversify.config";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SI from "@config/inversify.types";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
-import Event from "@src/Components/EventDispatcher/Event";
 import { AppEvents } from "@src/Types";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import { injectable } from "inversify";

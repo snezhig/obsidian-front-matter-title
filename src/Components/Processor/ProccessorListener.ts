@@ -8,7 +8,7 @@ export default class ProcessorListener implements ListenerInterface {
     private ref: ListenerRef<"settings:changed"> = null;
     constructor(private dispatcher: EventDispatcherInterface<AppEvents>, private factory: ProcessorFactory) {}
     bind(): void {
-        this.ref = this.dispatcher.addListener({ name: "settings:changed", cb: () => {} });
+        this.ref = this.dispatcher.addListener({ name: "settings:changed", cb: () => null });
     }
     unbind(): void {
         this.dispatcher.removeListener(this.ref);
