@@ -5,12 +5,15 @@ import Event from "@src/Components/EventDispatcher/Event";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 import ResolverInterface from "@src/Interfaces/ResolverInterface";
-import { inject } from "inversify";
+import { inject, injectable, named } from "inversify";
 import { ResolverEvents } from "./ResolverType";
-
+@injectable()
 export default class ResolverCachedProxy implements ResolverInterface {
     constructor(
+        @inject(SI.resolver)
+        @named("original")
         private resolver: ResolverInterface,
+        @inject(SI.cache)
         private cache: CacheInterface,
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<ResolverEvents>

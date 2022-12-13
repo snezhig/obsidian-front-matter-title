@@ -1,10 +1,10 @@
 import "reflect-metadata";
-import {Container as _Container} from "inversify";
+import { Container as _Container } from "inversify";
 import SI from "./inversify.types";
 import CreatorModule from "./services/creator.config";
 import bindFeature from "./services/feature.config";
 import bindSettings from "./services/settings.config";
-import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving } from "../src/Interfaces/ResolverInterface";
 import ResolverSync from "../src/Resolver/ResolverSync";
 import FilterInterface from "../src/Interfaces/FilterInterface";
 import ExtensionFilter from "../src/Filters/ExtensionFilter";
@@ -28,15 +28,17 @@ import AliasListener from "@src/Feature/Alias/Listener";
 import Api from "@src/Api/Api";
 import Defer from "@src/Api/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import {EventDispatcher} from "@src/Components/EventDispatcher/EventDispatcher";
+import { EventDispatcher } from "@src/Components/EventDispatcher/EventDispatcher";
 import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteListListener";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
+import ResolverCachedProxy from "@src/Resolver/ResolverCachedProxy";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
 Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{(\\w|\\s)+?}})");
 
-Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("sync");
+Container.bind<ResolverInterface>(SI.resolver).to(ResolverCachedProxy).inSingletonScope().whenTargetNamed("sync");
+Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("original");
 Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver)
     .to(ResolverAsync)
     .inSingletonScope()
@@ -58,7 +60,6 @@ Container.bind<LoggerInterface>(SI.logger)
     })
     .when(() => true);
 
-
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
 Container.bind<ListenerInterface>(SI.listener).to(AliasListener);
 Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener);
@@ -69,8 +70,10 @@ bindSettings(Container);
 
 Container.bind(SI.api).to(Api);
 Container.bind(SI["factory:api"]).toFactory(c => () => c.container.get(SI.api));
-Container.bind(SI.defer).to(Defer).inSingletonScope()
+Container.bind(SI.defer).to(Defer).inSingletonScope();
 
-Container.bind(SI["factory:replacer"]).toFunction((t: any, m: any, a: unknown, i: any) => FunctionReplacer.create(t, m, a, i))
+Container.bind(SI["factory:replacer"]).toFunction((t: any, m: any, a: unknown, i: any) =>
+    FunctionReplacer.create(t, m, a, i)
+);
 
 export default Container;
