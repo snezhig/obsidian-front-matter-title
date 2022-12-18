@@ -56,12 +56,17 @@ describe("Test add listener, call and remove by ref", () => {
 
 test("Should call listener only once", () => {
     const listener = jest.fn();
-    const once = jest.fn();
+    const onceFoo = jest.fn();
+    const onceBar = jest.fn();
+
+    dispatcher.addListener({ name: "baz", cb: onceFoo, once: true });
     dispatcher.addListener({ name: "baz", cb: listener });
-    dispatcher.addListener({ name: "baz", cb: once, once: true });
+    dispatcher.addListener({ name: "baz", cb: onceBar, once: true });
+
     dispatcher.dispatch("baz", null);
     dispatcher.dispatch("baz", null);
 
     expect(listener).toHaveBeenCalledTimes(2);
-    expect(once).toHaveBeenCalledTimes(1);
+    expect(onceFoo).toHaveBeenCalledTimes(1);
+    expect(onceBar).toHaveBeenCalledTimes(1);
 });

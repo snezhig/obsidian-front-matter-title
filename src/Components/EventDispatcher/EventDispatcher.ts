@@ -33,10 +33,11 @@ export class EventDispatcher<E> implements EventDispatcherInterface<E> {
 
     dispatch<T extends keyof E>(name: T, e: E[T] extends undefined | null ? undefined : EventInterface<E[T]>) {
         this.logger.log(name);
+        let shift = 0;
         for (const [i, item] of [...(this.events.get(name)?.entries() ?? [])]) {
             item.cb(e);
             if (item.once) {
-                this.events.get(name).splice(i, 1);
+                this.events.get(name).splice(i - shift++, 1);
             }
         }
     }
