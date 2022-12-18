@@ -5,4 +5,4 @@ export enum ProcessorTypes {
     Replace = "replace",
 }
 
-export type ProcessorFactory = (type: ProcessorTypes) => ProcessorInterface;
+export type ProcessorFactory = (type: ProcessorTypes, args: string[]) => ProcessorInterface;
