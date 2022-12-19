@@ -1,7 +1,9 @@
+import "reflect-metadata";
+
 import { CachedMetadata, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
-import Storage from "@src/Settings/Storage";
+import Storage from "@src/Storage/Storage";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
 import { interfaces } from "inversify";
@@ -44,15 +46,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
         this.storage = new Storage<SettingsType>(data);
-        this.addSettingTab(
-            new SettingsTab(
-                this.app,
-                this,
-                this.storage,
-                this.container.get(SI["event:dispatcher"]),
-                this.container.get(SI["factory:settings:feature:builder"])
-            )
-        );
+        this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
+        this.addSettingTab(this.container.resolve(SettingsTab).getTab());
     }
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
@@ -87,7 +82,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     private bindServices(): void {
-        Container.bind<Storage<SettingsType>>(SI.storage).toDynamicValue(() => this.storage);
         Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<
             { [k: string]: any },
             [string]
@@ -109,6 +103,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         );
         Container.bind<ObsidianMetaFactory>(SI["factory:metadata:cache"]).toFunction(() => this.app.metadataCache);
         Container.bind(SI["obsidian:app"]).toConstantValue(this.app);
+        Container.bind(SI["obsidian:plugin"]).toConstantValue(this);
         Container.bind(SI["newable:obsidian:chooser"]).toConstructor(
             //@ts-ignore
             Object.getPrototypeOf(this.app.workspace.editorSuggest.suggests[0].suggestions).constructor

@@ -6,7 +6,7 @@ import AbstractBuilder from "./AbstractBuilder";
 
 export default class DefaultBuilder extends AbstractBuilder {
     build({ id, name, desc, settings }: BuildParams<SFC>) {
-        new Setting(this.context.containerEl)
+        new Setting(this.context.getContainer())
             .setName(name)
             .setDesc(desc)
             .addToggle(e =>

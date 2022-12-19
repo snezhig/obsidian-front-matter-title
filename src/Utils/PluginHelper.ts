@@ -30,6 +30,10 @@ export default class PluginHelper {
                 [Feature.Search]: { enabled: false },
                 [Feature.Suggest]: { enabled: false },
             },
+            processor: {
+                args: [],
+                type: null,
+            },
         };
     }
 }
