@@ -28,6 +28,11 @@ describe("Composite Test", () => {
         const data = [
             { template: "{foo}} {{ bar}}", placeholders: ["{{ bar}}"] },
             { template: "{{{foo}} {{ bar _ }}", placeholders: ["{{foo}}", "{{ bar _ }}"] },
+            { template: "{{{fo{o}} {{ bar _ }}", placeholders: ["{{ bar _ }}"] },
+            {
+                template: "{{#heading}} {{ #heading }} {{bar}}",
+                placeholders: ["{{#heading}}", "{{ #heading }}", "{{bar}}"],
+            },
         ];
 
         for (const item of data) {

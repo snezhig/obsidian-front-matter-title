@@ -53,7 +53,7 @@ export default class Creator implements CreatorInterface {
                 }
                 template = template.replace(placeholder.getPlaceholder(), value);
             }
-            if (template?.length) {
+            if (template?.trim()?.length) {
                 return template;
             }
         }

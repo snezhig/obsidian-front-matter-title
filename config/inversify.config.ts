@@ -1,10 +1,10 @@
 import "reflect-metadata";
-import {Container as _Container} from "inversify";
+import { Container as _Container } from "inversify";
 import SI from "./inversify.types";
 import bindCreator from "./services/creator.config";
 import bindFeature from "./services/feature.config";
 import bindSettings from "./services/settings.config";
-import ResolverInterface, {Resolving} from "../src/Interfaces/ResolverInterface";
+import ResolverInterface, { Resolving } from "../src/Interfaces/ResolverInterface";
 import ResolverSync from "../src/Resolver/ResolverSync";
 import FilterInterface from "../src/Interfaces/FilterInterface";
 import ExtensionFilter from "../src/Filters/ExtensionFilter";
@@ -32,7 +32,7 @@ import Defer from "@src/Api/Defer";
 
 const Container = new _Container();
 Container.bind<DispatcherInterface<any>>(SI.dispatcher).to(Dispatcher).inSingletonScope();
-Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{(\\w|\\s)+?}})");
+Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{[^{}]+?}})");
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("sync");
 Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver)
     .to(ResolverAsync)
