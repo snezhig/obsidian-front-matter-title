@@ -70,7 +70,7 @@ export default class StarredManager extends AbstractManager {
             const item = items.get(div);
             const content = div.find(".nav-file-title-content");
             result[item.path] = false;
-            if (content && item.type === "file" && (!path || item.path == path)) {
+            if (content && item.type === "file" && (!path || item.path === path)) {
                 this.process(content, item.path, item.title).catch(console.error);
                 result[item.path] = true;
             }

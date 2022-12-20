@@ -4,28 +4,31 @@
   "env": {
     "node": true
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "./node_modules/gts"
   ],
   "parserOptions": {
     "sourceType": "module"
   },
   "rules": {
+    "node/no-unpublished-import": [
+      "off",
+      {
+        "allowModules": ["obsidian"]
+      }
+    ],
+    "quotes": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-this-alias": "off",
     "no-console": [
       "error",
       {
-        "allow": [
-          "error",
-          "debug"
-        ]
+        "allow": ["error", "debug"]
       }
     ]
   }

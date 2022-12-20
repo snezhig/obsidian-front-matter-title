@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { SettingsType } from "../../SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
-import SettingBuilderInterface from "@src/Settings/Interface/SettingBuilderInterface";
 import SI from "@config/inversify.types";
 import { SettingsBuilderFactory } from "../../../../config/inversify.factory.types";
 

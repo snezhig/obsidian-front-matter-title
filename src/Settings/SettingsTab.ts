@@ -4,8 +4,7 @@ import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import SettingBuilderInterface from "./Interface/SettingBuilderInterface";
-import { inject, injectable, multiInject } from "inversify";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import { KeyStorageInterface } from "@src/Storage/Interfaces";
 import { SettingsBuilderFactory } from "@config/inversify.factory.types";
@@ -99,7 +98,6 @@ export default class SettingsTab {
     private dispatch(): void {
         this.dispatcher.dispatch("settings:tab:close", null);
         const changed = ObjectHelper.compare(this.previous, this.storage.collect());
-        console.log(changed, Object.keys(changed));
         if (Object.keys(changed).length === 0) {
             return;
         }

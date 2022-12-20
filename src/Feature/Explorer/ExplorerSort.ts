@@ -35,7 +35,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         super();
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
         this.cb = e => {
-            if (e.id === Feature.Explorer && (e.result == true || e.result === undefined)) {
+            if (e.id === Feature.Explorer && (e.result === true || e.result === undefined)) {
                 trigger();
             }
         };
