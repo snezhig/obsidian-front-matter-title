@@ -28,7 +28,7 @@ export default class Storage<T extends ObjectItem> implements KeyStorageInterfac
 }
 
 const create = <T>(value: T): DynamicItem<T> => {
-    if (typeof value === "object" && !Array.isArray(value)) {
+    if (typeof value === "object" && !Array.isArray(value) && value !== null) {
         return new StorageObjectItem(value);
     } else {
         return new StoragePrimitiveItem(value) as unknown as DynamicItem<T>;

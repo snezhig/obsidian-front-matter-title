@@ -1,4 +1,4 @@
-import { DynamicItem } from "../../Storage/Storage";
+import { DynamicItem } from "@src/Storage/Interfaces";
 
 export type BuildParams<T extends object, K extends keyof T> = {
     name: K;

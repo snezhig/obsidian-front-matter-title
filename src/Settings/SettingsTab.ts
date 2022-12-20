@@ -8,6 +8,7 @@ import SettingBuilderInterface from "./Interface/SettingBuilderInterface";
 import { inject, injectable, multiInject } from "inversify";
 import SI from "@config/inversify.types";
 import { KeyStorageInterface } from "@src/Storage/Interfaces";
+import { SettingsBuilderFactory } from "@config/inversify.factory.types";
 
 @injectable()
 export default class SettingsTab {
@@ -23,9 +24,10 @@ export default class SettingsTab {
         private storage: KeyStorageInterface<SettingsType>,
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<SettingsEvent>,
-        @multiInject(SI["settings:builder"])
-        private builders: SettingBuilderInterface<SettingsType, keyof SettingsType>[]
+        @inject(SI["factory:settings:builder"])
+        private factory: SettingsBuilderFactory
     ) {
+        window.y = this.dispatcher;
         const self = this;
         this.tab = new (class extends PluginSettingTab {
             display = () => self.display();
@@ -49,8 +51,9 @@ export default class SettingsTab {
         containerEl.empty();
         containerEl.createEl("h2", { text: "Settings for plugin." });
 
+        const builders = this.factory<SettingsType>("main");
         for (const k of this.orderedKeys) {
-            for (const builder of this.builders) {
+            for (const builder of builders) {
                 if (builder.support(k)) {
                     builder.build({
                         name: k,
@@ -96,6 +99,7 @@ export default class SettingsTab {
     private dispatch(): void {
         this.dispatcher.dispatch("settings:tab:close", null);
         const changed = ObjectHelper.compare(this.previous, this.storage.collect());
+        console.log(changed, Object.keys(changed));
         if (Object.keys(changed).length === 0) {
             return;
         }

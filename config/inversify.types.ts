@@ -43,6 +43,7 @@ const SI = {
     "settings:feature:builder": "",
     "settings:builder": "",
     "factory:settings:feature:builder": "",
+    "factory:settings:builder": "",
     "settings:storage": "",
     "template:pattern": "",
     "templates": "",

@@ -1,14 +1,14 @@
 import { DropdownComponent, Setting, TextComponent } from "obsidian";
 import AbstractBuilder from "../AbstractBuilder";
 import { injectable } from "inversify";
-import { SettingsTypeRules } from "@src/Settings/SettingsType";
+import { SettingsType } from "@src/Settings/SettingsType";
 
 @injectable()
-export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsTypeRules, "delimiter"> {
+export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsType["rules"], "delimiter"> {
     private setting: Setting = null;
     private text: TextComponent = null;
     support(k: "delimiter" | "paths"): boolean {
-        throw new Error("Method not implemented.");
+        return k === "delimiter";
     }
     doBuild(): void {
         this.setting = new Setting(this.container);
@@ -20,21 +20,22 @@ export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsTypeR
         const enabled = this.item.get("enabled");
         new DropdownComponent(this.setting.controlEl)
             .addOptions({ N: "Use first value", Y: "Join all by delimiter" })
-            .setValue(enabled.value ? "Y" : "N")
+            .setValue(enabled.value() ? "Y" : "N")
             .onChange(e => {
-                enabled.set(true);
+                enabled.set(e === "Y");
                 this.text
                     .setValue("")
                     .setPlaceholder(this.getPlaceholder())
                     .setDisabled(e === "N")
                     .onChanged();
-                this.text.inputEl.hidden = !this.isEnabled();
             });
     }
 
     private buildText(): void {
         const v = this.item.get("value");
-        new TextComponent(this.setting.controlEl).setValue(v.value()).setDisabled!(this.isEnabled())
+        this.text = new TextComponent(this.setting.controlEl)
+            .setValue(v.value())
+            .setDisabled(!this.isEnabled())
             .setPlaceholder(this.getPlaceholder())
             .onChange(e => v.set(e));
     }

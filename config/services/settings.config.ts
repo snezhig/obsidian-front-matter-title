@@ -4,7 +4,7 @@ import SI from "@config/inversify.types";
 import DefaultBuilder from "@src/Settings/FeatureBuilder/DefaultBuilder";
 import AliasBuilder from "@src/Settings/FeatureBuilder/AliasBuilder";
 import { Feature } from "@src/enum";
-import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
+import { SettingsBuilderFactory, SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
 import ExplorerSortBuilder from "@src/Settings/FeatureBuilder/ExplorerSortBuilder";
 import TemplatesBuilder from "@src/Settings/SettingBuilders/Templates/TemplatesBuilder";
 import RulesBuiler from "@src/Settings/SettingBuilders/Rules/RulesBuilder";
@@ -27,10 +27,15 @@ export default (c: Container) => {
         c.isBoundNamed(SI["settings:feature:builder"], name) ? c.getNamed(SI["settings:feature:builder"], name) : null
     );
 
-    c.bind(SI["settings:builder"]).to(TemplatesBuilder);
-    c.bind(SI["settings:builder"]).to(FeaturesBuilder);
-    c.bind(SI["settings:builder"]).to(UtilBuilder);
-    c.bind(SI["settings:builder"]).to(RulesBuiler);
+    c.bind(SI["settings:builder"]).to(TemplatesBuilder).whenTargetNamed("main");
+    c.bind(SI["settings:builder"]).to(FeaturesBuilder).whenTargetNamed("main");
+    c.bind(SI["settings:builder"]).to(UtilBuilder).whenTargetNamed("main");
+    c.bind(SI["settings:builder"]).to(RulesBuiler).whenTargetNamed("main");
+
     c.bind(SI["settings:builder"]).to(RulesDelimiterBuilder).whenTargetNamed("rules");
     c.bind(SI["settings:builder"]).to(RulesPathsBuilder).whenTargetNamed("rules");
+
+    c.bind<SettingsBuilderFactory>(SI["factory:settings:builder"]).toFunction(name =>
+        c.getAllNamed(SI["settings:builder"], name)
+    );
 };
