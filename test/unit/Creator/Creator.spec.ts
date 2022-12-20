@@ -48,6 +48,22 @@ describe("Test Creator", () => {
         expect(actual).toBeNull();
     });
 
+    test("Should return value for composite template because there are only spaces", () => {
+        const fooPlaceholder = mock<TemplatePlaceholderInterface>({
+            makeValue: jest.fn(() => ""),
+            getPlaceholder: jest.fn(() => "{{ foo }}"),
+        });
+        const barPlaceholder = mock<TemplatePlaceholderInterface>({
+            makeValue: jest.fn(() => ""),
+            getPlaceholder: jest.fn(() => "{{bar}}"),
+        });
+        template.getPlaceholders.mockReturnValueOnce([fooPlaceholder, barPlaceholder]);
+        template.getTemplate.mockReturnValueOnce(" {{ foo }} {{bar}} ");
+        const creator = new Creator(dispatcher, templateCallback, logger);
+        const actual = creator.create(path);
+        expect(actual).toBeNull();
+    });
+
     test("Should return null because of exception in makeValue", () => {
         placeholder.makeValue.mockImplementation(() => {
             throw new PathNotFoundException();

@@ -35,7 +35,7 @@ import ResolverCachedProxy from "@src/Resolver/ResolverCachedProxy";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
-Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{(\\w|\\s)+?}})");
+Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{[^{}]+?}})");
 
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverCachedProxy).inSingletonScope().whenTargetNamed("sync");
 Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("original");
