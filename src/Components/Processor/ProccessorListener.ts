@@ -5,8 +5,8 @@ import { AppEvents } from "@src/Types";
 import EventDispatcherInterface from "../EventDispatcher/Interfaces/EventDispatcherInterface";
 import EventInterface from "../EventDispatcher/Interfaces/EventInterface";
 import ListenerRef from "../EventDispatcher/Interfaces/ListenerRef";
-import ProcessorInterface from "./Interfaces/ProcessorFactoryInterface";
 import { ProcessorFactory, ProcessorTypes } from "./ProcessorUtils";
+import ProcessorInterface from "./Interfaces";
 
 export default class ProcessorListener implements ListenerInterface {
     private changedRef: ListenerRef<"settings:changed"> = null;

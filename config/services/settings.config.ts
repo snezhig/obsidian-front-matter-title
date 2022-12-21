@@ -12,6 +12,7 @@ import FeaturesBuilder from "@src/Settings/SettingBuilders/Features/FeaturesBuil
 import UtilBuilder from "@src/Settings/SettingBuilders/Util/UtilBuilder";
 import RulesDelimiterBuilder from "@src/Settings/SettingBuilders/Rules/RulesDelimiterBuilder";
 import RulesPathsBuilder from "@src/Settings/SettingBuilders/Rules/RulesPathsBuilder";
+import ProcessorBuilder from "../../src/Settings/SettingBuilders/Processor/ProcessorBuilder";
 
 export default (c: Container) => {
     c.bind(SI["settings:feature:builder"])
@@ -31,6 +32,7 @@ export default (c: Container) => {
     c.bind(SI["settings:builder"]).to(FeaturesBuilder).whenTargetNamed("main");
     c.bind(SI["settings:builder"]).to(UtilBuilder).whenTargetNamed("main");
     c.bind(SI["settings:builder"]).to(RulesBuiler).whenTargetNamed("main");
+    c.bind(SI["settings:builder"]).to(ProcessorBuilder).whenTargetNamed("main");
 
     c.bind(SI["settings:builder"]).to(RulesDelimiterBuilder).whenTargetNamed("rules");
     c.bind(SI["settings:builder"]).to(RulesPathsBuilder).whenTargetNamed("rules");

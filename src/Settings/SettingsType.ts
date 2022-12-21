@@ -11,7 +11,7 @@ export type SF = { [K in Feature]: SFC & { [P in keyof SFExt]: P extends K ? SFE
 export type SettingsType = {
     templates: string[];
     processor: {
-        type: ProcessorTypes | null;
+        type: ProcessorTypes;
         args: string[];
     };
     rules: {

@@ -67,7 +67,7 @@ export default class SettingsTab {
     }
 
     private get orderedKeys(): (keyof SettingsType)[] {
-        return ["templates", "rules", "features", "debug", "boot"];
+        return ["templates", "processor", "rules", "features", "debug", "boot"];
     }
 
     private buildDonation(): void {

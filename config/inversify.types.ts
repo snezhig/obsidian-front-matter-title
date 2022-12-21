@@ -50,6 +50,9 @@ const SI = {
     api: "",
     defer: "",
     "factory:api": "",
+    "factory:processor": "",
+    "processor": "",
+    "processor:args": ""
 };
 
 for (const key of Object.keys(SI)) {
