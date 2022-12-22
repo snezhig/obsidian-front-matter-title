@@ -4,6 +4,7 @@ import SI from "./inversify.types";
 import CreatorModule from "./services/creator.config";
 import bindFeature from "./services/feature.config";
 import bindSettings from "./services/settings.config";
+import processorModule from "./services/processors.config";
 import ResolverInterface, { Resolving } from "../src/Interfaces/ResolverInterface";
 import ResolverSync from "../src/Resolver/ResolverSync";
 import FilterInterface from "../src/Interfaces/FilterInterface";
@@ -32,6 +33,7 @@ import { EventDispatcher } from "@src/Components/EventDispatcher/EventDispatcher
 import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteListListener";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import ResolverCachedProxy from "@src/Resolver/ResolverCachedProxy";
+import ProcessorListener from "../src/Components/Processor/ProccessorListener";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
@@ -63,10 +65,13 @@ Container.bind<LoggerInterface>(SI.logger)
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
 Container.bind<ListenerInterface>(SI.listener).to(AliasListener);
 Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener);
+Container.bind<ListenerInterface>(SI.listener).to(ProcessorListener);
 
 Container.load(CreatorModule);
 bindFeature(Container);
 bindSettings(Container);
+Container.load(processorModule);
+
 
 Container.bind(SI.api).to(Api);
 Container.bind(SI["factory:api"]).toFactory(c => () => c.container.get(SI.api));

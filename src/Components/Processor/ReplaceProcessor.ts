@@ -10,8 +10,12 @@ export default class ReplaceProcessor implements ProcessorInterface {
         @inject(SI["processor:args"])
         args: string[]
     ) {
-        this.pattern = new RegExp(args?.[0] ?? null);
-        this.replacement = args?.[1] ?? null;
+        try {
+            this.pattern = new RegExp(args?.[0] ?? null);
+            this.replacement = args?.[1] ?? null;
+        } catch (e) {
+            console.error(e);
+        }
     }
     process(value: string): string {
         return value.replace(this.pattern, this.replacement);

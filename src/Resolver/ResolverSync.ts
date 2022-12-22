@@ -35,7 +35,7 @@ export default class ResolverSync implements ResolverInterface {
     private dispatch(title: string | null): string | null {
         const event = new Event<ResolverEvents["resolver:resolved"]>({
             value: title,
-            modify: function (v: string) {
+            modify(v: string) {
                 this.value = v;
             },
         });

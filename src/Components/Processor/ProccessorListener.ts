@@ -7,19 +7,23 @@ import EventInterface from "../EventDispatcher/Interfaces/EventInterface";
 import ListenerRef from "../EventDispatcher/Interfaces/ListenerRef";
 import { ProcessorFactory, ProcessorTypes } from "./ProcessorUtils";
 import ProcessorInterface from "./Interfaces";
-
+import { inject, injectable } from "inversify";
+import SI from "../../../config/inversify.types";
+@injectable()
 export default class ProcessorListener implements ListenerInterface {
     private changedRef: ListenerRef<"settings:changed"> = null;
     private resolvedRef: ListenerRef<"resolver:resolved"> = null;
 
     private processor: ProcessorInterface = null;
     constructor(
+        @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents>,
+        @inject(SI["factory:processor"])
         private factory: ProcessorFactory
     ) {}
     bind(): void {
         this.changedRef = this.dispatcher.addListener({ name: "settings:changed", cb: e => this.make(e.get().actual) });
-        this.dispatcher.addListener({ name: "settings.loaded", cb: e => this.make(e.get().settings) });
+        this.dispatcher.addListener({ name: "settings.loaded", cb: e => this.make(e.get().settings), once: true });
     }
 
     unbind(): void {
@@ -29,8 +33,11 @@ export default class ProcessorListener implements ListenerInterface {
     }
 
     private make(actual: SettingsType): void {
+        this.disable();
         const options = actual.processor;
-        options.type ? this.enable(options.type, options.args) : this.disable();
+        if (options.type !== ProcessorTypes.None) {
+            this.enable(options.type, options.args);
+        }
     }
 
     private disable(): void {
@@ -51,8 +58,8 @@ export default class ProcessorListener implements ListenerInterface {
 
     private handleResolved(event: EventInterface<ResolverEvents["resolver:resolved"]>): void {
         if (this.processor) {
-            const { modify, value } = event.get();
-            modify(this.processor.process(value));
+            const obj = event.get();
+            obj.modify(obj.value ? this.processor.process(obj.value) : obj.value);
         }
     }
 }

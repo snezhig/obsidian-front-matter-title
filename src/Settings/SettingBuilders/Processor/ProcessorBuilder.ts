@@ -5,27 +5,62 @@ import { ProcessorTypes } from "../../../Components/Processor/ProcessorUtils";
 
 export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "processor"> {
     private setting: Setting;
+    private lastArgs: { [K in ProcessorTypes]?: string[] } = {};
     support(k: keyof SettingsType): boolean {
         return k === "processor";
     }
 
     doBuild(): void {
-        this.setting = new Setting(this.container).setName("Processor").setDesc("Modifies resolved title, if enabled");
+        this.setting = new Setting(this.container).setName("Processor");
         this.buildDynamic();
     }
 
+    private updateDesc(): void {
+        const fragment = createFragment();
+        fragment.appendText("Modifies resolved title.");
+        let additional: (string | HTMLElement)[] = [];
+        switch (this.item.get("type").value()) {
+            case ProcessorTypes.Replace:
+                additional = [
+                    "",
+                    "What will be executed:",
+                    "title.replace(",
+                    createSpan("", e => (e.innerHTML = "&emsp;new RegExp(#pattern#)")),
+                    createSpan("", e => (e.innerHTML = "&emsp;#replacement#")),
+                    ")",
+                ];
+
+                break;
+            case ProcessorTypes.Function:
+                additional = [
+                    "",
+                    "How it will work:",
+                    "const value = new Function('title', #Your value of text area#)",
+                ];
+                break;
+        }
+        additional.forEach(e => {
+            fragment.appendChild(createEl("br"));
+            typeof e === "string" ? fragment.appendText(e) : fragment.appendChild(e);
+        });
+        this.setting.setDesc(fragment);
+    }
+
     private buildDynamic(): void {
+        this.updateDesc();
         this.setting.addDropdown(c =>
             c
                 .addOptions({
-                    [ProcessorTypes.None]: "None",
+                    [ProcessorTypes.None]: "Disabled",
                     [ProcessorTypes.Replace]: "Replace",
                     [ProcessorTypes.Function]: "Function",
                 })
                 .setValue(this.item.get("type").value())
                 .onChange((v: ProcessorTypes) => {
+                    const type = this.item.get("type").value();
+                    this.lastArgs[type] = [...this.item.get("args").value()];
                     this.item.get("type").set(v);
-                    this.item.get("args").set([]);
+                    this.item.get("args").set([...(this.lastArgs?.[v] ?? [])]);
                     this.setting.controlEl.innerHTML = "";
                     this.buildDynamic();
                 })
@@ -34,6 +69,7 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
 
         switch (this.item.get("type").value()) {
             case ProcessorTypes.Function:
+                this.setAlignItemsMode("start");
                 return this.buildFunction();
             case ProcessorTypes.Replace:
                 this.setAlignItemsMode("start");
@@ -82,7 +118,7 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
             );
             container.appendChild(c);
         }
-        this.setting.controlEl.appendChild(container);
+        this.setting.controlEl.prepend(container);
     }
 
     private buildFunction(): void {
