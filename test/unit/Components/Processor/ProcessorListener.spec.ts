@@ -9,6 +9,6 @@ const mockFactory = mock<ProcessorFactory>();
 
 const listener = new ProcessorListener(mockDispatcher, mockFactory);
 
-test('Stub', () => {
+test("Stub", () => {
     expect(1).toEqual(1);
-})
+});
