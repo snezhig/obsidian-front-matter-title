@@ -33,10 +33,11 @@ export default class ProcessorListener implements ListenerInterface {
     }
 
     private make(actual: SettingsType): void {
-        this.disable();
-        const options = actual.processor;
-        if (options.type !== ProcessorTypes.None) {
-            this.enable(options.type, options.args);
+        const { type, args } = actual.processor;
+        if (Object.values(ProcessorTypes).includes(type)) {
+            this.enable(type, args);
+        }else{
+            this.disable();
         }
     }
 
@@ -49,17 +50,20 @@ export default class ProcessorListener implements ListenerInterface {
     }
 
     private enable(type: ProcessorTypes, args: string[]): void {
-        this.resolvedRef = this.dispatcher.addListener({
-            name: "resolver:resolved",
-            cb: this.handleResolved.bind(this),
-        });
         this.processor = this.factory(type, args);
+        if (this.resolvedRef === null) {
+            this.resolvedRef = this.dispatcher.addListener({
+                name: "resolver:resolved",
+                cb: this.handleResolved.bind(this),
+            });
+        }
     }
 
     private handleResolved(event: EventInterface<ResolverEvents["resolver:resolved"]>): void {
-        if (this.processor) {
-            const obj = event.get();
-            obj.modify(obj.value ? this.processor.process(obj.value) : obj.value);
+        const obj = event.get();
+        const value = this.processor?.process(obj.value) ?? null;
+        if(value){
+            obj.modify(value);
         }
     }
 }
