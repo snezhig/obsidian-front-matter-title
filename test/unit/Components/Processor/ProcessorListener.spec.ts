@@ -8,7 +8,6 @@ import Event from "../../../../src/Components/EventDispatcher/Event";
 import { mock } from "jest-mock-extended";
 import ProcessorInterface from "../../../../src/Components/Processor/Interfaces";
 import { ResolverEvents } from "../../../../src/Resolver/ResolverType";
-import { type } from "os";
 
 type Events = AppEvents & ResolverEvents;
 const events: Map<ListenerRef<keyof Events>, Callback<Events[keyof Events]>> = new Map();
@@ -67,41 +66,44 @@ test("Should create new processor without binding new event", () => {
 });
 
 test("Should unbinb 'resolver:resolved' ref, because processor is null", () => {
-    const ref = Array.from(events.keys()).find(e => e.getName() === 'resolver:resolved');
-    mockDispatcher.dispatch(
-        "settings:changed",
-        new Event({ actual: { processor: { type: null } } })
-    );
+    const ref = Array.from(events.keys()).find(e => e.getName() === "resolver:resolved");
+    mockDispatcher.dispatch("settings:changed", new Event({ actual: { processor: { type: null } } }));
     expect(ref).not.toBeNull();
     expect(mockFactory).not.toHaveBeenCalled();
     expect(mockDispatcher.addListener).not.toHaveBeenCalled();
     expect(mockDispatcher.removeListener).toHaveBeenCalledWith(ref);
-})
+});
 
+describe("Test 'resolver:resolved' listener", () => {
+    const mockProcessor = mock<ProcessorInterface>();
+    beforeEach(() => mockProcessor.process.mockClear());
+    beforeAll(() => {
+        mockProcessor.process.mockReturnValue(null);
+        mockFactory.mockReturnValueOnce(mockProcessor);
+        mockDispatcher.dispatch(
+            "settings:changed",
+            new Event({ actual: { processor: { type: ProcessorTypes.Function } } })
+        );
+    });
+    const value = "foo";
+    const modify = jest.fn();
+    const obj: ResolverEvents["resolver:resolved"] = { value, modify };
+    const dispatch = () => mockDispatcher.dispatch("resolver:resolved", new Event(obj));
 
-// describe("Test 'resolver:resolved' listener", () => {
-//     const mockProcessor = mock<ProcessorInterface>();
-//     beforeEach(() => mockProcessor.process.mockClear());
-//     beforeAll(() => mockProcessor.process.mockReturnValue(null))
-//     const value = 'foo';
-//     const modify = jest.fn();
-//     const obj:ResolverEvents['resolver:resolved'] = {value, modify};
-//     const dispatch  = () =>         mockDispatcher.dispatch("resolver:resolved",new Event(obj));
+    test("Should call processor, but withour modify value", () => {
+        dispatch();
+        expect(mockProcessor.process).toHaveBeenCalledWith(value);
+        expect(mockProcessor.process).toHaveBeenCalledTimes(1);
+        expect(modify).not.toHaveBeenCalled();
+    });
 
-//     test('Should call processor, but withour modify value', () => {
-//         dispatch();
-//         expect(mockProcessor.process).toHaveBeenCalledWith(value);
-//         expect(mockProcessor.process).toHaveBeenCalledTimes(1);
-//         expect(modify).not.toHaveBeenCalled();
-//     })
-
-//     test('Should call processor and modify the value', () => {
-//         const changed = 'bar';
-//         mockProcessor.process.mockReturnValueOnce(changed);
-//         dispatch();
-//         expect(mockProcessor.process).toHaveBeenCalledWith(value);
-//         expect(mockProcessor.process).toHaveBeenCalledTimes(1);
-//         expect(modify).toHaveBeenCalledTimes(1);
-//         expect(modify).toHaveBeenCalledWith(changed);
-//     })
-// })
+    test("Should call processor and modify the value", () => {
+        const changed = "bar";
+        mockProcessor.process.mockReturnValueOnce(changed);
+        dispatch();
+        expect(mockProcessor.process).toHaveBeenCalledWith(value);
+        expect(mockProcessor.process).toHaveBeenCalledTimes(1);
+        expect(modify).toHaveBeenCalledTimes(1);
+        expect(modify).toHaveBeenCalledWith(changed);
+    });
+});

@@ -36,7 +36,7 @@ export default class ProcessorListener implements ListenerInterface {
         const { type, args } = actual.processor;
         if (Object.values(ProcessorTypes).includes(type)) {
             this.enable(type, args);
-        }else{
+        } else {
             this.disable();
         }
     }
@@ -62,7 +62,7 @@ export default class ProcessorListener implements ListenerInterface {
     private handleResolved(event: EventInterface<ResolverEvents["resolver:resolved"]>): void {
         const obj = event.get();
         const value = this.processor?.process(obj.value) ?? null;
-        if(value){
+        if (value) {
             obj.modify(value);
         }
     }

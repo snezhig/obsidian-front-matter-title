@@ -39,7 +39,7 @@ export default class ObjectHelper {
                 continue;
             }
             const type = typeof v;
-            if (type === "object" && !Array.isArray(fv)) {
+            if (type === "object" && !Array.isArray(fv) && v !== null) {
                 if (fv !== null) {
                     ObjectHelper.fillFrom(v, fv);
                 }

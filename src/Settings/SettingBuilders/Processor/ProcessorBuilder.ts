@@ -51,16 +51,17 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
         this.setting.addDropdown(c =>
             c
                 .addOptions({
-                    [ProcessorTypes.None]: "Disabled",
+                    "": "Disabled",
                     [ProcessorTypes.Replace]: "Replace",
                     [ProcessorTypes.Function]: "Function",
                 })
-                .setValue(this.item.get("type").value())
-                .onChange((v: ProcessorTypes) => {
+                .setValue(this.item.get("type").value() ?? "")
+                .onChange((v: ProcessorTypes | "") => {
+                    const value: ProcessorTypes | null = v === "" ? null : v;
                     const type = this.item.get("type").value();
                     this.lastArgs[type] = [...this.item.get("args").value()];
-                    this.item.get("type").set(v);
-                    this.item.get("args").set([...(this.lastArgs?.[v] ?? [])]);
+                    this.item.get("type").set(value);
+                    this.item.get("args").set([...(this.lastArgs?.[value] ?? [])]);
                     this.setting.controlEl.innerHTML = "";
                     this.buildDynamic();
                 })
@@ -107,7 +108,10 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
                         e.appendChild(
                             createDiv({ attr: { style: "margin-right: 10px" } }, e => e.appendText(`${item.name}:`))
                         );
-                        new TextComponent(e).setValue(value?.[i] ?? null).onChange(e => value.splice(i, 1, e));
+                        new TextComponent(e)
+                            .setValue(value?.[i] ?? "")
+                            .onChange(e => value.splice(i, 1, e))
+                            .onChanged();
                     }
                 )
             );

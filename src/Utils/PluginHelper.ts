@@ -33,7 +33,7 @@ export default class PluginHelper {
             },
             processor: {
                 args: [],
-                type: ProcessorTypes.None,
+                type: null,
             },
         };
     }

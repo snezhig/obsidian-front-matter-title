@@ -86,6 +86,11 @@ describe("Test fillFrom", () => {
         expect(ObjectHelper.fillFrom(def(), { foo: { bar: null } })).toHaveProperty("foo.bar", null);
     });
 
+    test("Should change thud null to nubmer", () => {
+        const value: dynamic<obj> = { ...def(), thud: null };
+        expect(ObjectHelper.fillFrom(value, { thud: 10 })).toHaveProperty("thud", 10);
+    });
+
     test("Should change qux", () => {
         const value = [1, "two"];
         expect(ObjectHelper.fillFrom(def(), { qux: value })).toHaveProperty("qux", value);
