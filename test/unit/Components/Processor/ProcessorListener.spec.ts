@@ -85,14 +85,14 @@ describe("Test 'resolver:resolved' listener", () => {
             new Event({ actual: { processor: { type: ProcessorTypes.Function } } })
         );
     });
-    const value = "foo";
     const modify = jest.fn();
-    const obj: ResolverEvents["resolver:resolved"] = { value, modify };
-    const dispatch = () => mockDispatcher.dispatch("resolver:resolved", new Event(obj));
+    const dispatch = (value: any) => {
+        mockDispatcher.dispatch("resolver:resolved", new Event({ modify, value }));
+    };
 
     test("Should call processor, but withour modify value", () => {
-        dispatch();
-        expect(mockProcessor.process).toHaveBeenCalledWith(value);
+        dispatch("foo");
+        expect(mockProcessor.process).toHaveBeenCalledWith("foo");
         expect(mockProcessor.process).toHaveBeenCalledTimes(1);
         expect(modify).not.toHaveBeenCalled();
     });
@@ -100,10 +100,18 @@ describe("Test 'resolver:resolved' listener", () => {
     test("Should call processor and modify the value", () => {
         const changed = "bar";
         mockProcessor.process.mockReturnValueOnce(changed);
-        dispatch();
-        expect(mockProcessor.process).toHaveBeenCalledWith(value);
+        dispatch("foo");
+        expect(mockProcessor.process).toHaveBeenCalledWith("foo");
         expect(mockProcessor.process).toHaveBeenCalledTimes(1);
         expect(modify).toHaveBeenCalledTimes(1);
         expect(modify).toHaveBeenCalledWith(changed);
+    });
+
+    test("Should not call processir, becuase value is not a string", () => {
+        dispatch({});
+        dispatch(null);
+        dispatch(false);
+        dispatch(10);
+        expect(mockProcessor.process).not.toHaveBeenCalled();
     });
 });

@@ -61,6 +61,9 @@ export default class ProcessorListener implements ListenerInterface {
 
     private handleResolved(event: EventInterface<ResolverEvents["resolver:resolved"]>): void {
         const obj = event.get();
+        if (typeof obj.value !== "string") {
+            return;
+        }
         const value = this.processor?.process(obj.value) ?? null;
         if (value) {
             obj.modify(value);

@@ -1,6 +1,5 @@
 import { SettingsType } from "@src/Settings/SettingsType";
 import { Feature } from "@src/enum";
-import { ProcessorTypes } from "../Components/Processor/ProcessorUtils";
 
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
