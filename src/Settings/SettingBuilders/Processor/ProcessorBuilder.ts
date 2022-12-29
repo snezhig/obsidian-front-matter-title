@@ -25,7 +25,12 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
                     "",
                     "What will be executed:",
                     "title.replace(",
-                    createSpan("", e => (e.innerHTML = "&emsp;new RegExp(#pattern#)")),
+                    createSpan(
+                        "",
+                        e =>
+                            (e.innerHTML =
+                                "&emsp;new RegExp(<br>&emsp;&emsp;#pattern#, <br>&emsp;&emsp;#flags#<br>&emsp;),")
+                    ),
                     createSpan("", e => (e.innerHTML = "&emsp;#replacement#")),
                     ")",
                 ];
@@ -87,8 +92,9 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
         const items = [
             {
                 name: "Pattern",
-                desc: "Will be used as an argument of RegExp first, and then as a first argument of replace()",
+                desc: "Will be used as a first argument of RegExp first, and then as a first argument of replace()",
             },
+            { name: "Flags", desc: "Will be used as a second argument of new RegExp" },
             { name: "Replacement", desc: "Will be used as a second argument of replace()" },
         ];
         const container = createDiv({ attr: { style: "margin-left: 20px" } });

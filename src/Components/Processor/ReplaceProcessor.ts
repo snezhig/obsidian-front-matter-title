@@ -11,8 +11,8 @@ export default class ReplaceProcessor implements ProcessorInterface {
         args: string[]
     ) {
         try {
-            this.pattern = new RegExp(args?.[0] ?? null);
-            this.replacement = args?.[1] ?? null;
+            this.pattern = new RegExp(args?.[0] ?? null, args?.[1]);
+            this.replacement = args?.[2] ?? null;
         } catch (e) {
             console.error(e);
         }
