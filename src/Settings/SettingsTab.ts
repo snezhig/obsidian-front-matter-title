@@ -26,7 +26,6 @@ export default class SettingsTab {
         @inject(SI["factory:settings:builder"])
         private factory: SettingsBuilderFactory
     ) {
-        window.y = this.dispatcher;
         const self = this;
         this.tab = new (class extends PluginSettingTab {
             display = () => self.display();
