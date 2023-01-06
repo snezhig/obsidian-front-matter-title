@@ -1,4 +1,7 @@
 const SI = {
+    "factory:replacer": "",
+    "factory:creator:templates": "",
+    "event:dispatcher": "",
     "alias:modifier": "",
     "alias:modifier:strategy": "",
     "cache": "",
@@ -9,7 +12,6 @@ const SI = {
     "creator:fallback": "",
     "creator:template": "",
     "delimiter": "",
-    "dispatcher": "",
     "facade:obsidian": "",
     "factory:alias:modifier:strategy": "",
     "factory:feature": "",
@@ -32,19 +34,25 @@ const SI = {
     "logger:composer": "",
     "manager:composer": "",
     "obsidian:app": "",
+    "obsidian:plugin": "",
     "placeholder": "",
     "placeholder:brackets": "",
     "placeholder:meta": "",
     "resolver": "",
     "service:note:link": "",
     "settings:feature:builder": "",
+    "settings:builder": "",
     "factory:settings:feature:builder": "",
-    "storage": "",
+    "factory:settings:builder": "",
+    "settings:storage": "",
     "template:pattern": "",
     "templates": "",
     api: "",
     defer: "",
     "factory:api": "",
+    "factory:processor": "",
+    "processor": "",
+    "processor:args": ""
 };
 
 for (const key of Object.keys(SI)) {

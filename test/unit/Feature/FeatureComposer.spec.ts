@@ -1,16 +1,17 @@
 import { mock } from "jest-mock-extended";
 import { AppEvents } from "@src/Types";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import FeatureComposer from "@src/Feature/FeatureComposer";
 import Event from "@src/Components/EventDispatcher/Event";
+import EventDispatcherInterface from "../../../src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import LoggerInterface from "../../../src/Components/Debug/LoggerInterface";
 
-const mockDispatcher = mock<DispatcherInterface<AppEvents>>();
+const mockDispatcher = mock<EventDispatcherInterface<AppEvents>>();
 const mockFeatureFoo = mock<FeatureInterface<any>>();
 const mockFeatureBar = mock<FeatureInterface<any>>();
 const mockFactory = jest.fn(() => null);
 
-const composer = new FeatureComposer(mockFactory, mockDispatcher);
+const composer = new FeatureComposer(mockFactory, mockDispatcher, mock<LoggerInterface>());
 
 test("Should return null, because does not have a feature", () => {
     expect(composer.get("foo")).toBeNull();
@@ -39,27 +40,14 @@ describe("Test toggle one feature", () => {
         expect(mockFactory).toHaveBeenCalledWith("foo");
         expect(mockFeatureFoo.enable).toHaveBeenCalledTimes(1);
         expect(mockDispatcher.dispatch).toHaveBeenCalledTimes(1);
-        expect(mockDispatcher.dispatch).toHaveBeenCalledWith(
-            "feature:state:changed",
-            new Event({
-                enabled: true,
-                id: "foo",
-            })
-        );
+        expect(mockDispatcher.dispatch).toHaveBeenCalledWith("feature:enable", new Event({ feature: mockFeatureFoo }));
     });
 
     test("Should disable feature", () => {
         composer.toggle("foo", false);
         expect(mockFactory).not.toHaveBeenCalled();
         expect(mockFeatureFoo.disable).toHaveBeenCalledTimes(1);
-        expect(mockDispatcher.dispatch).toHaveBeenCalledTimes(1);
-        expect(mockDispatcher.dispatch).toHaveBeenCalledWith(
-            "feature:state:changed",
-            new Event({
-                enabled: false,
-                id: "foo",
-            })
-        );
+        expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
     });
 });
 

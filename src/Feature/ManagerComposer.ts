@@ -4,13 +4,13 @@ import AbstractManager from "@src/Feature/AbstractManager";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { AppEvents } from "@src/Types";
 import Event from "@src/Components/EventDispatcher/Event";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 @injectable()
 export default class ManagerComposer {
-    private ids: Feature[] = [Feature.Tab, Feature.Explorer, Feature.Starred, Feature.Search, Feature.Alias];
+    private ids: Feature[] = Object.values(Feature).filter(e => ![Feature.ExplorerSort, Feature.Suggest].includes(e));
 
     constructor(
         @inject(SI["feature:composer"])
@@ -18,8 +18,8 @@ export default class ManagerComposer {
         @inject(SI.logger)
         @named("composer:manager")
         private logger: LoggerInterface,
-        @inject(SI.dispatcher)
-        private dispatcher: DispatcherInterface<AppEvents>
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<AppEvents>
     ) {}
 
     public async update(path: string, id: Feature = null): Promise<{ [K in Feature]?: boolean }> {

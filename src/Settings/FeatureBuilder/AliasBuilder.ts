@@ -14,7 +14,7 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     build({ id, name, desc, settings }: BuildParams<Feature.Alias>): void {
         this.id = id;
         this.desc = desc;
-        this.setting = new Setting(this.context.containerEl).setName(name).setDesc(desc);
+        this.setting = new Setting(this.context.getContainer()).setName(name).setDesc(desc);
         this.buildDropdown(settings.strategy);
         this.buildToggle(settings.enabled);
         this.actualizeDesc();

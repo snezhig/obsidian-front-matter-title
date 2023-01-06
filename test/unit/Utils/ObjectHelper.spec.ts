@@ -1,7 +1,7 @@
 import ObjectHelper, { Changed } from "@src/Utils/ObjectHelper";
 
 describe("Test compare", () => {
-    type d = {
+    type DataType = {
         number?: number;
         string?: string;
         boolean?: boolean;
@@ -13,8 +13,9 @@ describe("Test compare", () => {
                 item?: string;
             };
         };
+        null?: null;
     };
-    const data: d = {
+    const data: DataType = Object.freeze({
         number: 2,
         string: "foobar",
         boolean: false,
@@ -26,7 +27,8 @@ describe("Test compare", () => {
                 item: "value",
             },
         },
-    };
+        null: null,
+    });
 
     test("Should return empty object", () => {
         const changed = ObjectHelper.compare(data, { ...data });
@@ -34,7 +36,7 @@ describe("Test compare", () => {
     });
 
     test("Should return diff for nested", () => {
-        const changed: Changed<d> = {
+        const changed: Changed<DataType> = {
             object: { nested: { item: true } },
         };
         const actual = JSON.parse(JSON.stringify(data));
@@ -82,6 +84,11 @@ describe("Test fillFrom", () => {
 
     test("Should change bar to null", () => {
         expect(ObjectHelper.fillFrom(def(), { foo: { bar: null } })).toHaveProperty("foo.bar", null);
+    });
+
+    test("Should change thud null to nubmer", () => {
+        const value: dynamic<obj> = { ...def(), thud: null };
+        expect(ObjectHelper.fillFrom(value, { thud: 10 })).toHaveProperty("thud", 10);
     });
 
     test("Should change qux", () => {

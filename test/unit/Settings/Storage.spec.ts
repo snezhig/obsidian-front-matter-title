@@ -1,4 +1,4 @@
-import Storage from "@src/Settings/Storage";
+import Storage from "@src/Storage/Storage";
 
 describe("Storage Test", () => {
     type d = {

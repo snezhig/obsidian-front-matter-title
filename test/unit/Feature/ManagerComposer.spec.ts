@@ -4,12 +4,12 @@ import ManagerComposer from "@src/Feature/ManagerComposer";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ManagerFeatureInterface from "@src/Interfaces/ManagerFeatureInterface";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
-import DispatcherInterface from "../../../src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { AppEvents } from "../../../src/Types";
 import { Feature } from "@src/enum";
+import EventDispatcherInterface from "../../../src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 const mockComposer = mock<FeatureComposer>();
-const mockDispatcher = mock<DispatcherInterface<AppEvents>>();
+const mockDispatcher = mock<EventDispatcherInterface<AppEvents>>();
 const composer = new ManagerComposer(mockComposer, mock<LoggerInterface>(), mockDispatcher);
 const path = "path/to/file.md";
 

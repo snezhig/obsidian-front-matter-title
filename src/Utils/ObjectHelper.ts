@@ -9,7 +9,8 @@ export default class ObjectHelper {
             const first = old[k];
             const second = actual[k];
             const type = typeof (first !== undefined ? first : second);
-            if (type === "object") {
+            const thereIsNull = first === null || second === null;
+            if (type === "object" && !thereIsNull) {
                 if (Array.isArray(first)) {
                     const hasDiff = first.some(x => !second.includes(x));
                     const isChanged = hasDiff ? true : second.some((x: string | number) => !first.includes(x));
@@ -38,7 +39,7 @@ export default class ObjectHelper {
                 continue;
             }
             const type = typeof v;
-            if (type === "object" && !Array.isArray(fv)) {
+            if (type === "object" && !Array.isArray(fv) && v !== null) {
                 if (fv !== null) {
                     ObjectHelper.fillFrom(v, fv);
                 }
@@ -48,5 +49,9 @@ export default class ObjectHelper {
             to[k] = fv;
         }
         return to;
+    }
+
+    public static entries<T extends object>(object: T): [keyof T, T[keyof T]][] {
+        return Object.entries(object) as [keyof T, T[keyof T]][];
     }
 }

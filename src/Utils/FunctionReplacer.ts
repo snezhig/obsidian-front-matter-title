@@ -1,5 +1,6 @@
-type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T] & string;
-type Implementation<Target, Method extends FunctionPropertyNames<Required<Target>>, O> = (
+export type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T] &
+    string;
+export type Implementation<Target, Method extends FunctionPropertyNames<Required<Target>>, O> = (
     args: O,
     defaultArgs: Target[Method] extends (...arg: any) => any ? Parameters<Target[Method]> : unknown[],
     vanilla: Target[Method]

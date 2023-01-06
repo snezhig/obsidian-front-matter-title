@@ -1,29 +1,46 @@
-import { App, PluginSettingTab, Setting, TextComponent } from "obsidian";
+import { App, PluginSettingTab } from "obsidian";
 import MetaTitlePlugin from "../../main";
-import Storage, { PrimitiveItemInterface } from "@src/Settings/Storage";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import Event from "@src/Components/EventDispatcher/Event";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
-import { Feature } from "@src/enum";
-import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
-import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
-import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
+import ObjectHelper from "@src/Utils/ObjectHelper";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { inject, injectable } from "inversify";
+import SI from "@config/inversify.types";
+import { KeyStorageInterface } from "@src/Storage/Interfaces";
+import { SettingsBuilderFactory } from "@config/inversify.factory.types";
 
-export default class SettingsTab extends PluginSettingTab {
-    private changed = false;
+@injectable()
+export default class SettingsTab {
     private previous: SettingsType;
+    private tab: PluginSettingTab;
 
     constructor(
+        @inject(SI["obsidian:app"])
         app: App,
+        @inject(SI["obsidian:plugin"])
         plugin: MetaTitlePlugin,
-        private storage: Storage<SettingsType>,
-        private dispatcher: DispatcherInterface<SettingsEvent>,
-        private builderFactory: SettingsFeatureBuildFactory
+        @inject(SI["settings:storage"])
+        private storage: KeyStorageInterface<SettingsType>,
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<SettingsEvent>,
+        @inject(SI["factory:settings:builder"])
+        private factory: SettingsBuilderFactory
     ) {
-        super(app, plugin);
+        const self = this;
+        this.tab = new (class extends PluginSettingTab {
+            display = () => self.display();
+            hide = () => self.hide();
+        })(app, plugin);
         this.updatePrevious();
         dispatcher.dispatch("settings.loaded", new Event({ settings: this.storage.collect() }));
-        dispatcher.addListener("settings:tab:feature:changed", new CallbackVoid(this.onFeatureChange.bind(this)));
+    }
+
+    get containerEl(): HTMLElement {
+        return this.getTab().containerEl;
+    }
+
+    public getTab(): PluginSettingTab {
+        return this.tab;
     }
 
     display(): any {
@@ -32,185 +49,24 @@ export default class SettingsTab extends PluginSettingTab {
         containerEl.empty();
         containerEl.createEl("h2", { text: "Settings for plugin." });
 
-        new Setting(containerEl)
-            .setName("Template")
-            .setDesc(
-                `Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}".
-        Also you can use #heading to use first Heading from a file or _basename and another reserved words. 
-        See Readme to find out more`
-            )
-            .addText(text =>
-                text
-                    .setPlaceholder("Type a template")
-                    .setValue(this.storage.get("templates").value()?.[0] ?? "")
-                    .onChange(async value => {
-                        this.storage.get("templates").value().splice(0, 1, value);
-                        this.changed = true;
-                    })
-            );
-
-        new Setting(containerEl)
-            .setName("Template fallback")
-            .setDesc("This template will be used as a fallback option if the main template is not resolved")
-            .addText(text =>
-                text
-                    .setPlaceholder("Type a template")
-                    .setValue(this.storage.get("templates").value()?.[1] ?? "")
-                    .onChange(v => {
-                        this.storage.get("templates").value().splice(1, 1, v);
-                        this.changed = true;
-                    })
-            );
-        this.buildRules();
-        this.buildFeatures();
-        containerEl.createEl("h4", { text: "Util" });
-        new Setting(containerEl)
-            .setName("Debug info")
-            .setDesc("Show debug info and caught errors in console")
-            .addToggle(e =>
-                e.setValue(this.storage.get("debug").value()).onChange(e => this.change(this.storage.get("debug"), e))
-            );
-        new Setting(containerEl)
-            .setName("Boot delay")
-            .setDesc("Plugin will be loaded with specified delay in ms")
-            .addText(e =>
-                e.setValue(this.storage.get("boot").get("delay").value().toString()).onChange(s => {
-                    const v = !isNaN(parseInt(s)) ? parseInt(s) : 0;
-                    e.setValue(v.toString());
-                    this.change(this.storage.get("boot").get("delay"), v);
-                })
-            );
+        const builders = this.factory<SettingsType>("main");
+        for (const k of this.orderedKeys) {
+            for (const builder of builders) {
+                if (builder.support(k)) {
+                    builder.build({
+                        name: k,
+                        item: this.storage.get(k),
+                        container: this.containerEl,
+                    });
+                }
+            }
+        }
 
         this.buildDonation();
     }
 
-    public getSettings(): SettingsType {
-        return this.storage.collect();
-    }
-
-    private buildRules(): void {
-        this.containerEl.createEl("h4", { text: "Rules" });
-        this.buildRulePaths();
-        this.buildRuleDelimiter();
-    }
-
-    private buildRulePaths(): void {
-        const descriptions = {
-            white: "Files that are located by paths will be processed by plugin. Each path must be written with new line.",
-            black: "Files that are located by paths will be ignored by plugin. Each path must be written with new line.",
-        };
-        const setting = new Setting(this.containerEl).setName("File path rule");
-        const getActual = () => this.storage.get("rules").get("paths").get("mode");
-        const updateDesc = () => setting.setDesc(descriptions[getActual().value()]);
-        updateDesc();
-        setting
-            .addDropdown(
-                e =>
-                    (e
-                        .addOptions({ white: "White list mode", black: "Black list mode" })
-                        .setValue(getActual().value())
-                        .onChange(e => {
-                            this.change(getActual(), e as "black" | "white");
-                            updateDesc();
-                        }).selectEl.style["marginRight"] = "10px")
-            )
-            .addTextArea(e =>
-                e.setValue(this.storage.get("rules").get("paths").get("values").value().join("\n")).onChange(v => {
-                    this.changed = true;
-                    this.storage
-                        .get("rules")
-                        .get("paths")
-                        .get("values")
-                        .set(v.split("\n").filter(e => e));
-                })
-            );
-    }
-
-    private buildRuleDelimiter(): void {
-        const setting = new Setting(this.containerEl)
-            .setName("List values")
-            .setDesc("Set the rule about how to process list values");
-        let text: TextComponent = null;
-        const delimiter = this.storage.get("rules").get("delimiter");
-        const isEnabled = () => delimiter.get("enabled").value();
-        const getPlaceholder = () => (isEnabled() ? "Type a delimiter" : "First value will be used");
-
-        const onDropdownChange = (e: boolean) => {
-            this.change(delimiter.get("enabled"), e);
-            text.setValue("").setPlaceholder(getPlaceholder()).setDisabled(!e).onChanged();
-            text.inputEl.hidden = !isEnabled();
-        };
-        setting
-            .addDropdown(
-                e =>
-                    (e
-                        .addOptions({ N: "Use first value", Y: "Join all by delimiter" })
-                        .setValue(delimiter.get("enabled").value() ? "Y" : "N")
-                        .onChange(e => onDropdownChange(e === "Y")).selectEl.style["marginRight"] = "10px")
-            )
-            .addText(
-                e =>
-                    (text = e
-                        .onChange(e => this.change(delimiter.get("value"), e))
-                        .setValue(delimiter.get("value").value())
-                        .setDisabled(!isEnabled())
-                        .setPlaceholder(getPlaceholder()))
-            );
-        text.inputEl.hidden = !isEnabled();
-    }
-
-    private buildFeatures(): void {
-        this.containerEl.createEl("h4", { text: "Features" });
-        const data: { feature: Feature; name: string; desc: string }[] = [
-            {
-                feature: Feature.Alias,
-                name: "Alias title",
-                desc: "Modify alias in metadata cache. The real alias will not be affected.",
-            },
-            { feature: Feature.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer" },
-            { feature: Feature.ExplorerSort, name: "Explorer Sort", desc: "" },
-            { feature: Feature.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph" },
-            {
-                feature: Feature.Header,
-                name: "Header title",
-                desc: "Replace titles in header of leaves and update them",
-            },
-            {
-                feature: Feature.Starred,
-                name: "Starred",
-                desc: "Replace shown titles in starred plugin",
-            },
-            {
-                feature: Feature.Search,
-                name: "Search",
-                desc: "Replace shown titles in search leaf",
-            },
-            {
-                feature: Feature.Suggest,
-                name: "Suggest",
-                desc: "Replace shown titles in suggest modals",
-            },
-            {
-                feature: Feature.Tab,
-                name: "Tabs",
-                desc: "Replace shown titles in tabs",
-            },
-        ];
-        for (const item of data) {
-            const builder = this.builderFactory(item.feature) ?? this.builderFactory("default");
-            const settings = this.storage.get("features").get(item.feature).value();
-            builder.setContext(this);
-            builder.build({ id: item.feature, desc: item.desc, name: item.name, settings });
-        }
-    }
-
-    public getDispatcher(): DispatcherInterface<SettingsEvent> {
-        return this.dispatcher;
-    }
-
-    private onFeatureChange(e: EventInterface<SettingsEvent["settings:tab:feature:changed"]>): void {
-        this.storage.get("features").get(e.get().id).set(e.get().value);
-        this.changed = true;
+    private get orderedKeys(): (keyof SettingsType)[] {
+        return ["templates", "processor", "rules", "features", "debug", "boot"];
     }
 
     private buildDonation(): void {
@@ -234,27 +90,22 @@ export default class SettingsTab extends PluginSettingTab {
         this.previous = JSON.parse(JSON.stringify(this.storage.collect()));
     }
 
-    private change<T>(o: PrimitiveItemInterface<T>, v: T) {
-        o.set(v);
-        this.changed = true;
-    }
-
     hide(): any {
-        super.hide();
         this.dispatch();
     }
 
     private dispatch(): void {
-        if (!this.changed) {
+        this.dispatcher.dispatch("settings:tab:close", null);
+        const changed = ObjectHelper.compare(this.previous, this.storage.collect());
+        if (Object.keys(changed).length === 0) {
             return;
         }
-
-        this.changed = false;
         this.dispatcher.dispatch(
-            "settings.changed",
+            "settings:changed",
             new Event({
                 old: this.previous,
                 actual: this.storage.collect(),
+                changed: ObjectHelper.compare(this.previous, this.storage.collect()),
             })
         );
         this.updatePrevious();

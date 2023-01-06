@@ -1,15 +1,13 @@
-import { CachedMetadata, Plugin, TAbstractFile } from "obsidian";
-import Composer, { ManagerType } from "./src/Title/Manager/Composer";
+import "reflect-metadata";
+
+import { CachedMetadata, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
-import Storage from "@src/Settings/Storage";
+import Storage from "@src/Storage/Storage";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
 import { interfaces } from "inversify";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
-import CallbackVoid from "@src/Components/EventDispatcher/CallbackVoid";
 import App from "@src/App";
-import DispatcherInterface from "@src/Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { AppEvents } from "@src/Types";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
@@ -24,10 +22,10 @@ import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
 import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
 import Defer, { DeferPluginReady } from "@src/Api/Defer";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
-    private dispatcher: DispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
-    private composer: Composer = null;
+    private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private container: interfaces.Container = Container;
     private storage: Storage<SettingsType>;
     private logger: LoggerInterface;
@@ -48,23 +46,13 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
         this.storage = new Storage<SettingsType>(data);
-        this.addSettingTab(
-            new SettingsTab(
-                this.app,
-                this,
-                this.storage,
-                this.dispatcher,
-                this.container.get(SI["factory:settings:feature:builder"])
-            )
-        );
+        this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
+        this.addSettingTab(this.container.resolve(SettingsTab).getTab());
     }
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
         await this.saveData(settings);
-        this.composer.setState(settings.features.graph.enabled, ManagerType.Graph);
-        this.composer.setState(settings.features.header.enabled, ManagerType.Markdown);
-        await this.runManagersUpdate();
-        await this.toggleFeatures();
+        this.reloadFeatures();
         await this.mc.refresh();
     }
 
@@ -76,30 +64,24 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     public async onload() {
         this.bindServices();
-        this.dispatcher = this.container.get(SI.dispatcher);
+        this.dispatcher = this.container.get(SI["event:dispatcher"]);
         this.logger = this.container.getNamed(SI.logger, "main");
 
-        this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", new Event(undefined)));
-
+        this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", null));
         new App(); //replace with static
+        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
         await this.loadSettings();
         this.app.workspace.onLayoutReady(() => {
             this.container.get<Defer>(SI.defer).setFlag(DeferPluginReady);
         });
         await this.delay();
 
-        this.composer = new Composer(
-            this.app.workspace,
-            this.container.getNamed<ResolverInterface>(SI.resolver, Resolving.Sync),
-            this.container.getNamed<ResolverInterface<Resolving.Async>>(SI.resolver, Resolving.Async)
-        );
         this.fc = Container.get(SI["feature:composer"]);
         this.mc = Container.get(SI["manager:composer"]);
         this.bind();
     }
 
     private bindServices(): void {
-        Container.bind<Storage<SettingsType>>(SI.storage).toDynamicValue(() => this.storage);
         Container.bind<interfaces.Factory<{ [k: string]: any }>>(SI["factory:obsidian:file"]).toFactory<
             { [k: string]: any },
             [string]
@@ -121,6 +103,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         );
         Container.bind<ObsidianMetaFactory>(SI["factory:metadata:cache"]).toFunction(() => this.app.metadataCache);
         Container.bind(SI["obsidian:app"]).toConstantValue(this.app);
+        Container.bind(SI["obsidian:plugin"]).toConstantValue(this);
         Container.bind(SI["newable:obsidian:chooser"]).toConstructor(
             //@ts-ignore
             Object.getPrototypeOf(this.app.workspace.editorSuggest.suggests[0].suggestions).constructor
@@ -129,70 +112,41 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     public onunload() {
-        this.composer.setState(false);
+        this.fc.disableAll();
     }
 
     private bind() {
-        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
         this.registerEvent(
-            this.app.metadataCache.on("changed", (file, data, cache) => {
-                this.dispatcher.dispatch("resolver.clear", new Event({ path: file.path }));
-            })
-        );
-        this.app.workspace.onLayoutReady(() =>
-            this.registerEvent(
-                this.app.vault.on("rename", (e, o) => {
-                    this.dispatcher.dispatch("resolver.clear", new Event({ path: o }));
-                })
+            this.app.metadataCache.on("changed", file =>
+                this.dispatcher.dispatch("resolver:delete", new Event({ path: file.path }))
             )
         );
-        this.dispatcher.addListener(
-            "resolver.unresolved",
-            new CallbackVoid<ResolverEvents["resolver.unresolved"]>(e => {
-                const file = e.get().path ? this.app.vault.getAbstractFileByPath(e.get().path) : null;
-                this.runManagersUpdate(file).catch(console.error);
-            })
-        );
-
         this.app.workspace.onLayoutReady(async () => {
-            this.composer.setState(
-                this.storage.get("features").get(Feature.Graph).get("enabled").value(),
-                ManagerType.Graph
+            this.registerEvent(
+                this.app.vault.on("rename", (e, o) =>
+                    this.dispatcher.dispatch("resolver:delete", new Event({ path: o }))
+                )
             );
-            this.composer.setState(
-                this.storage.get("features").get(Feature.Header).get("enabled").value(),
-                ManagerType.Markdown
-            );
-
-            this.toggleFeatures();
-            Promise.all([this.runManagersUpdate().catch(console.error), this.mc.refresh()]).catch(console.error);
+            this.reloadFeatures();
+            await this.mc.refresh();
+        });
+        this.dispatcher.addListener({
+            name: "resolver:unresolved",
+            cb: e => this.mc.update(e.get().path).catch(console.error),
         });
 
-        this.dispatcher.addListener(
-            "settings.changed",
-            new CallbackVoid<SettingsEvent["settings.changed"]>(e => this.onSettingsChange(e.get().actual))
-        );
+        this.dispatcher.addListener({ name: "settings:changed", cb: e => this.onSettingsChange(e.get().actual) });
     }
 
-    private async runManagersUpdate(file: TAbstractFile = null): Promise<void> {
-        this.logger.log("runManagersUpdate");
-        await this.composer.update(file);
-        if (file) {
-            await this.mc.update(file.path);
-        }
-    }
-
-    private toggleFeatures(): void {
+    private reloadFeatures(): void {
+        this.fc.disableAll();
         const f = this.storage.get("features");
-        const states = [
-            [Feature.Alias, f.get(Feature.Alias).get("enabled").value()],
-            [Feature.Tab, f.get(Feature.Tab).get("enabled").value()],
-            [Feature.Search, f.get(Feature.Search).get("enabled").value()],
-            [Feature.Explorer, f.get(Feature.Explorer).get("enabled").value()],
-            [Feature.ExplorerSort, f.get(Feature.ExplorerSort).get("enabled").value()],
-            [Feature.Starred, f.get(Feature.Starred).get("enabled").value()],
-            [Feature.Suggest, f.get(Feature.Suggest).get("enabled").value()],
-        ];
+        const states = [];
+
+        for (const feature of Object.values(Feature)) {
+            states.push([feature, f.get(feature).get("enabled").value()]);
+        }
+
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);
         }

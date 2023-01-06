@@ -15,6 +15,8 @@ import ReplaceStrategy from "@src/Feature/Alias/Strategy/ReplaceStrategy";
 import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import SuggestFeature from "@src/Feature/Suggest/SuggestFeature";
 import StarredManager from "@src/Feature/Starred/StarredManager";
+import GraphManager from "@src/Feature/Graph/GraphManager";
+import {MarkdownHeaderManager} from "@src/Feature/MarkdownHeader/MarkdownHeaderManager";
 
 export default (container: Container) => {
     container.bind(SI["feature:composer"]).to(FeatureComposer).inSingletonScope();
@@ -28,6 +30,8 @@ export default (container: Container) => {
     container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
 
     container.bind(SI["factory:alias:modifier:strategy"]).toAutoNamedFactory<AliasManagerStrategyInterface>(SI['alias:modifier:strategy']);
     container.bind(SI['alias:modifier:strategy']).to(EnsureStrategy).whenTargetNamed('ensure');

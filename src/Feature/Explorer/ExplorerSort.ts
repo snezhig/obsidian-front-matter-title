@@ -1,24 +1,24 @@
 import FunctionReplacer from "../../Utils/FunctionReplacer";
-import CallbackInterface from "../../Components/EventDispatcher/Interfaces/CallbackInterface";
 import { AppEvents } from "@src/Types";
 import { inject, injectable, named } from "inversify";
 import SI from "../../../config/inversify.types";
 import ResolverInterface, { Resolving } from "../../Interfaces/ResolverInterface";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
-import DispatcherInterface from "../../Components/EventDispatcher/Interfaces/DispatcherInterface";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
-import CallbackVoid from "../../Components/EventDispatcher/CallbackVoid";
 import { Leaves, Feature } from "@src/enum";
 import AbstractFeature from "../AbstractFeature";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 
 @injectable()
 export default class ExplorerSort extends AbstractFeature<Feature> {
     private view: TFileExplorerView;
     private enabled = false;
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
-    private readonly cb: CallbackInterface<AppEvents["manager:update"] & AppEvents["manager:refresh"]>;
+    private readonly cb: (e: { id: Feature; result?: boolean }) => void;
+    private refs: [ListenerRef<"manager:refresh">?, ListenerRef<"manager:update">?] = [];
 
     constructor(
         @inject(SI.resolver)
@@ -29,16 +29,16 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         private logger: LoggerInterface,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.dispatcher)
-        private dispatcher: DispatcherInterface<AppEvents>
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<AppEvents>
     ) {
         super();
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
-        this.cb = new CallbackVoid(e => {
-            if (e.get().id === Feature.Explorer && (e.get().result == true || e.get().result === undefined)) {
+        this.cb = e => {
+            if (e.id === Feature.Explorer && (e.result === true || e.result === undefined)) {
                 trigger();
             }
-        });
+        };
     }
 
     private onManagerUpdate(): void {
@@ -154,8 +154,14 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         if (!this.view && (this.initView(), !this.view)) {
             throw new ExplorerViewUndefined();
         }
-        this.dispatcher.addListener("manager:update", this.cb);
-        this.dispatcher.addListener("manager:refresh", this.cb);
+
+        this.refs.push(this.dispatcher.addListener({ name: "manager:refresh", cb: e => this.cb({ id: e.get().id }) }));
+        this.refs.push(
+            this.dispatcher.addListener({
+                name: "manager:update",
+                cb: e => this.cb(e.get()),
+            })
+        );
         this.enabled = true;
         this.tryToReplaceOriginalSort();
         this.logger.log("enabled");
@@ -163,8 +169,8 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
 
     public async disable(): Promise<void> {
         this.enabled = false;
-        this.dispatcher.removeListener("manager:update", this.cb);
-        this.dispatcher.removeListener("manager:refresh", this.cb);
+        this.refs.forEach(e => this.dispatcher.removeListener(e));
+        this.refs = [];
         this.replacer?.disable();
         this.view?.requestSort();
         this.logger.log("disabled");
