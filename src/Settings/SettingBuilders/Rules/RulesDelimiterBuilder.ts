@@ -11,7 +11,9 @@ export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsType[
         return k === "delimiter";
     }
     doBuild(): void {
-        this.setting = new Setting(this.container);
+        this.setting = new Setting(this.container)
+            .setName("List values")
+            .setDesc("Set the rule about how to process list values");
         this.buildDropdown();
         this.buildText();
     }
