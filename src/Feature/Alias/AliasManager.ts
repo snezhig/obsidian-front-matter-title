@@ -3,15 +3,17 @@ import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import AbstractManager from "@src/Feature/AbstractManager";
 import { Feature } from "@src/enum";
-import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import Alias from "@src/Feature/Alias/Alias";
 import { MetadataCacheExt } from "obsidian";
 import { MetadataCacheFactory } from "@config/inversify.factory.types";
+import { ValidateStrategyTypes } from "./Types";
+import { AliasManagerStrategyInterface, ValidateStrategyInterface } from "./Interfaces";
 
 @injectable()
 export class AliasManager extends AbstractManager {
     private enabled = false;
     private strategy: AliasManagerStrategyInterface = null;
+    private validateStrategy: ValidateStrategyInterface = null;
     private items: { [k: string]: Alias } = {};
 
     constructor(
@@ -24,6 +26,10 @@ export class AliasManager extends AbstractManager {
         private factory: MetadataCacheFactory<MetadataCacheExt>
     ) {
         super();
+    }
+
+    public setValidateStategy(name: ValidateStrategyTypes): void {
+        //todo: fill the body
     }
 
     public setStrategy(name: string): void {
@@ -61,7 +67,7 @@ export class AliasManager extends AbstractManager {
     protected async doUpdate(path: string): Promise<boolean> {
         const cache = this.factory();
         const metadata = cache.getCache(path);
-        return metadata.frontmatter ? this.process(metadata.frontmatter, path) : false;
+        return this.validateStrategy.validate(metadata) ? this.process(metadata.frontmatter, path) : false;
     }
 
     protected async doRefresh(): Promise<{ [p: string]: boolean }> {
