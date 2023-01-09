@@ -6,19 +6,21 @@ import { Feature } from "@src/enum";
 import Alias from "@src/Feature/Alias/Alias";
 import { MetadataCacheExt } from "obsidian";
 import { MetadataCacheFactory } from "@config/inversify.factory.types";
-import { ValidateStrategyTypes } from "./Types";
-import { AliasManagerStrategyInterface, ValidateStrategyInterface } from "./Interfaces";
+import { StrategyFactory, StrategyType, ValidatorFactory, ValidatorType } from "./Types";
+import { AliasManagerInterface, StrategyInterface, ValidatorInterface } from "./Interfaces";
 
 @injectable()
-export class AliasManager extends AbstractManager {
+export class AliasManager extends AbstractManager implements AliasManagerInterface {
     private enabled = false;
-    private strategy: AliasManagerStrategyInterface = null;
-    private validateStrategy: ValidateStrategyInterface = null;
+    private strategy: StrategyInterface = null;
+    private validator: ValidatorInterface = null;
     private items: { [k: string]: Alias } = {};
 
     constructor(
         @inject(SI["factory:alias:modifier:strategy"])
-        private strategyFactory: (name: string) => AliasManagerStrategyInterface,
+        private strategyFactory: StrategyFactory,
+        @inject(SI["factory:alias:modifier:validator"])
+        private validatorFactory: ValidatorFactory,
         @inject(SI.logger)
         @named("alias:modifier")
         private logger: LoggerInterface,
@@ -28,14 +30,14 @@ export class AliasManager extends AbstractManager {
         super();
     }
 
-    public setValidateStategy(name: ValidateStrategyTypes): void {
-        //todo: fill the body
+    public setValidator(type: ValidatorType): void {
+        this.validator = this.validatorFactory(type);
+        this.logger.log(`Set validator [${type}]. Status: ${this.validator !== null}`);
     }
 
-    public setStrategy(name: string): void {
-        this.strategy = this.strategyFactory(name);
-        this.reset();
-        this.logger.log(`Set strategy [${name}]. Status: ${this.strategy !== null}`);
+    public setStrategy(type: StrategyType): void {
+        this.strategy = this.strategyFactory(type);
+        this.logger.log(`Set strategy [${type}]. Status: ${this.strategy !== null}`);
     }
 
     doDisable(): void {
@@ -67,7 +69,7 @@ export class AliasManager extends AbstractManager {
     protected async doUpdate(path: string): Promise<boolean> {
         const cache = this.factory();
         const metadata = cache.getCache(path);
-        return this.validateStrategy.validate(metadata) ? this.process(metadata.frontmatter, path) : false;
+        return this.validator.validate(metadata) ? this.process(metadata.frontmatter, path) : false;
     }
 
     protected async doRefresh(): Promise<{ [p: string]: boolean }> {

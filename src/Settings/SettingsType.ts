@@ -1,9 +1,10 @@
 import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
 import { Feature } from "@src/enum";
 import { Changed } from "@src/Utils/ObjectHelper";
+import { StrategyType as AliasStrategyType, ValidatorType as AliasValidatorType } from "../Feature/Alias/Types";
 
 export type SFExt = {
-    [Feature.Alias]: { strategy: string };
+    [Feature.Alias]: { strategy: AliasStrategyType; validator: AliasValidatorType };
 };
 export type SFC = { enabled: boolean };
 export type SF = { [K in Feature]: SFC & { [P in keyof SFExt]: P extends K ? SFExt[P] : object }[keyof SFExt] };
