@@ -1,16 +1,19 @@
 import { mock } from "jest-mock-extended";
-import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import { MetadataCacheFactory } from "@config/inversify.factory.types";
 import { CachedMetadata, FrontMatterCache, MetadataCache, MetadataCacheExt, Pos } from "obsidian";
 import { AliasManager } from "@src/Feature/Alias/AliasManager";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/enum";
+import { StrategyInterface, ValidatorInterface } from "../../../../src/Feature/Alias/Interfaces";
+import { StrategyType, ValidatorType } from "../../../../src/Feature/Alias/Types";
 
-const mockStrategy = mock<AliasManagerStrategyInterface>();
+const mockValidator = mock<ValidatorInterface>({ validate: jest.fn(() => true) });
+const mockValidatorFactory = jest.fn(() => mockValidator);
+const mockStrategy = mock<StrategyInterface>();
 const mockStrategyFactory = jest.fn(() => mockStrategy);
 const mockCache = mock<MetadataCacheExt>();
 const mockCacheFactory = jest.fn(() => mockCache);
-const manager = new AliasManager(mockStrategyFactory, mock<LoggerInterface>(), mockCacheFactory);
+const manager = new AliasManager(mockStrategyFactory, mockValidatorFactory, mock<LoggerInterface>(), mockCacheFactory);
 const fooPath = "path/to/foo.md";
 const barPath = "path/to/bar.md";
 const quotePath = "path/to/quote.md";
@@ -30,10 +33,17 @@ describe("Test disabled state", () => {
     });
 });
 test("Set strategy", () => {
-    manager.setStrategy("strategy_name");
+    manager.setStrategy(StrategyType.Adjust);
     expect(mockStrategyFactory).toHaveBeenCalledTimes(1);
-    expect(mockStrategyFactory).toHaveBeenCalledWith("strategy_name");
+    expect(mockStrategyFactory).toHaveBeenCalledWith(StrategyType.Adjust);
     expect(mockStrategyFactory).toHaveReturnedWith(mockStrategy);
+});
+
+test("Set validator", () => {
+    manager.setValidator(ValidatorType.FrontmatterAuto);
+    expect(mockValidatorFactory).toHaveBeenCalledTimes(1);
+    expect(mockValidatorFactory).toHaveBeenCalledWith(ValidatorType.FrontmatterAuto);
+    expect(mockValidatorFactory).toHaveReturnedWith(mockValidator);
 });
 
 describe("Test enabled state", () => {
@@ -42,6 +52,7 @@ describe("Test enabled state", () => {
         mockCache.getCachedFiles.mockClear();
         mockStrategy.process.mockClear();
         mockCacheFactory.mockClear();
+        mockValidator.validate.mockClear();
     });
     test("Should be enabled", () => {
         manager.enable();
@@ -60,16 +71,21 @@ describe("Test enabled state", () => {
         expect(mockCache.getCache).toHaveBeenCalledTimes(1);
         expect(mockCache.getCache).toHaveBeenCalledWith(barPath);
         expect(mockStrategy.process).toHaveBeenCalledTimes(1);
+        expect(mockValidator.validate).toHaveBeenCalledTimes(1);
+        expect(mockValidator.validate).toHaveBeenCalledWith(cache);
     });
-    test("Should not update because cache does not have frontmatter", async () => {
+    test("Should not update because validator returns false", async () => {
         const cache = {};
         mockCache.getCache.mockReturnValueOnce(cache);
+        mockValidator.validate.mockReturnValueOnce(false);
         expect(await manager.update(fooPath)).toBeFalsy();
         expect(cache).toEqual({});
         expect(mockStrategy.process).not.toHaveBeenCalled();
         expect(mockCache.getCache).toHaveBeenCalledTimes(1);
         expect(mockCache.getCache).toHaveBeenCalledWith(fooPath);
         expect(mockCacheFactory).toHaveBeenCalledTimes(1);
+        expect(mockValidator.validate).toHaveBeenCalledTimes(1);
+        expect(mockValidator.validate).toHaveBeenCalledWith(cache);
     });
 
     test("Should set aliases by refresh", async () => {

@@ -1,11 +1,11 @@
 import { inject, injectable, named } from "inversify";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import SI from "@config/inversify.types";
-import AliasManagerStrategyInterface from "@src/Feature/Alias/Interfaces/AliasManagerStrategyInterface";
 import Alias from "@src/Feature/Alias/Alias";
+import { StrategyInterface } from "../Interfaces";
 
 @injectable()
-export default abstract class AbstractStrategy implements AliasManagerStrategyInterface {
+export default abstract class AbstractStrategy implements StrategyInterface {
     constructor(
         @inject(SI.resolver)
         @named(Resolving.Sync)
