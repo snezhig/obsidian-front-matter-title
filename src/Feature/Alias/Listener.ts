@@ -7,11 +7,13 @@ import { AliasManager } from "@src/Feature/Alias/AliasManager";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
+import { StrategyType, ValidatorType } from "./Types";
 
 @injectable()
 export default class Listener implements ListenerInterface {
     private refs: [ListenerRef<"feature:enable">?, ListenerRef<"settings:changed">?] = [];
-    private lastStrategy: string = null;
+    private lastStrategy: StrategyType = null;
+    private lastValidator: ValidatorType = null;
 
     constructor(
         @inject(SI["event:dispatcher"])
@@ -19,13 +21,19 @@ export default class Listener implements ListenerInterface {
     ) {}
 
     private handleEnable(feature: FeatureInterface<any>): void {
-        if (feature instanceof AliasManager && this.lastStrategy) {
-            feature.setStrategy(this.lastStrategy);
+        if (feature instanceof AliasManager) {
+            if (this.lastStrategy) {
+                feature.setStrategy(this.lastStrategy);
+            }
+            if (this.lastValidator) {
+                feature.setValidator(this.lastValidator);
+            }
         }
     }
 
     private handleSettings(settings: SettingsType): void {
         this.lastStrategy = settings.features.alias.strategy;
+        this.lastValidator = settings.features.alias.validator;
     }
 
     bind(): void {
