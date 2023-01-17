@@ -1,6 +1,6 @@
 import FilterInterface from "../Interfaces/FilterInterface";
 import ResolverInterface, { Resolving, Return } from "../Interfaces/ResolverInterface";
-import CreatorInterface from "../Interfaces/CreatorInterface";
+import CreatorInterfaceAdapter from "../Interfaces/CreatorInterfaceAdapter";
 import { inject, injectable, multiInject } from "inversify";
 import SI from "../../config/inversify.types";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
@@ -12,8 +12,8 @@ export default class ResolverSync implements ResolverInterface {
     constructor(
         @multiInject(SI.filter)
         private filters: FilterInterface[],
-        @inject(SI.creator)
-        private creator: CreatorInterface,
+        @inject(SI["creator:creator:adapter"])
+        private creator: CreatorInterfaceAdapter,
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<ResolverEvents>
     ) {}

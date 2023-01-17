@@ -1,8 +1,7 @@
 import { mock, mockClear } from "jest-mock-extended";
 import FilterInterface from "../../../src/Interfaces/FilterInterface";
-import CreatorInterface from "../../../src/Interfaces/CreatorInterface";
+import CreatorInterfaceAdapter from "@src/Interfaces/CreatorInterfaceAdapter";
 import ResolverSync from "../../../src/Resolver/ResolverSync";
-import { expect } from "@jest/globals";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
@@ -12,7 +11,7 @@ describe("Resolver Sync Test", () => {
     const title = "resolved_title";
 
     const filter = mock<FilterInterface>();
-    const creator = mock<CreatorInterface>();
+    const creator = mock<CreatorInterfaceAdapter>();
 
     const dispatcher = mock<EventDispatcherInterface<ResolverEvents>>();
 

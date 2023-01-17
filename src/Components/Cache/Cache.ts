@@ -2,6 +2,7 @@ import CacheInterface from "./CacheInterface";
 import CacheItemInterface from "./CacheItemInterface";
 import CacheItem from "./CacheItem";
 import { injectable } from "inversify";
+import ObjectHelper from "@src/Utils/ObjectHelper";
 
 @injectable()
 export default class Cache implements CacheInterface {
@@ -38,10 +39,23 @@ export default class Cache implements CacheInterface {
         this.pool.delete(key);
         this.serialized.delete(key);
 
-        if (typeof value === "object") {
+        if (this.isObject(value)) {
+            if (!this.canBeSerialized(value as unknown as object)) {
+                throw new Error("Object with functions can not be serialized");
+            }
             this.serialized.set(key, JSON.stringify(value));
         } else {
             this.pool.set(key, value);
         }
+    }
+
+    private isObject(value: unknown): boolean {
+        return typeof value === "object" && ![null, undefined].includes(value);
+    }
+
+    private canBeSerialized(object: object): boolean {
+        return !ObjectHelper.values(object).some(e =>
+            this.isObject(e) ? !this.canBeSerialized(e) : typeof e === "function"
+        );
     }
 }

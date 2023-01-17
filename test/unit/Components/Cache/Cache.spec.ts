@@ -1,7 +1,5 @@
 import Cache from "../../../../src/Components/Cache/Cache";
 import CacheInterface from "../../../../src/Components/Cache/CacheInterface";
-import CacheItemInterface from "../../../../src/Components/Cache/CacheItemInterface";
-import exp from "constants";
 
 describe("Cache Test", () => {
     let cache: CacheInterface = null;
@@ -69,30 +67,58 @@ describe("Cache Test", () => {
     });
 
     describe("Test object values", () => {
-        type O = { value: string };
-        let value: O = null;
-        let copy: O = null;
+        type Value = { value: string; children: number[] };
+        let actual: Value = null;
+        let expected: Value = null;
         const key = "object.value";
         beforeAll(() => {
             recreate();
-            copy = { value: "test_value" };
-            value = { value: "test_value" };
-            cache.save(cache.getItem(key).set(value));
+            expected = { value: "test_value", children: [10, 20] };
+            actual = { value: "test_value", children: [10, 20] };
+            cache.save(cache.getItem(key).set(actual));
         });
         afterAll(recreate);
 
         test("Item isHit and Equal", () => {
             const item = cache.getItem(key);
             expect(item.isHit()).toBeTruthy();
-            expect(item.get()).toEqual(value);
-            expect(item.get()).toEqual(copy);
+            expect(item.get()).toEqual(actual);
+            expect(item.get()).toEqual(expected);
         });
 
         test("Value changing won affect on cache", () => {
-            value.value = "changed_value";
+            actual.value = "changed_value";
+            actual.children = [];
             const item = cache.getItem(key);
-            expect(item.get()).not.toEqual(value);
-            expect(item.get()).toEqual(copy);
+            expect(item.get()).not.toEqual(actual);
+            expect(item.get()).toEqual(expected);
+        });
+    });
+
+    describe("Test object values with functions", () => {
+        test("Should throw error because of internal function", () => {
+            const value = {
+                foo: "foo",
+                bar: () => "bar",
+            };
+            const key = "object-with-function";
+
+            expect(() => cache.save(cache.getItem(key).set(value))).toThrowError(
+                "Object with functions can not be serialized"
+            );
+        });
+        test("Should throw error because of nested function", () => {
+            const value = {
+                foo: "foo",
+                bar: {
+                    baz: () => "baz",
+                },
+            };
+            const key = "object-with-nested-function";
+
+            expect(() => cache.save(cache.getItem(key).set(value))).toThrowError(
+                "Object with functions can not be serialized"
+            );
         });
     });
 });
