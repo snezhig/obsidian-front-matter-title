@@ -67,8 +67,22 @@ export class InlineTitleManager extends AbstractManager {
 
         const canvasViews = this.facade.getViewsOfType<MarkdownViewExt>("canvas");
         for (const view of canvasViews) {
-            for (const node of view.canvas.nodes.values()) {
-                promises.push(this.resolver.resolve(node.filePath).then(r => this.setCanvasTitle(node, r)));
+            const currentPath = view.file.path;
+            if (!path || currentPath === path) {
+                const canvas = view.canvas;
+                if (!canvas.requestFrame._originalFunc){
+                    const originalFunc = canvas.requestFrame;
+                    const manager = this;
+                    canvas.requestFrame = function() {
+                        canvas.requestFrame._originalFunc.apply(this, arguments);
+                        manager.innerUpdate(currentPath);
+                    }
+                    canvas.requestFrame._originalFunc = originalFunc;
+                }
+    
+                for (const node of canvas.nodes.values()) {
+                    promises.push(this.resolver.resolve(node.filePath).then(r => this.setCanvasTitle(node, r)));
+                }
             }
         }
 
@@ -77,23 +91,35 @@ export class InlineTitleManager extends AbstractManager {
     }
 
     private async setCanvasTitle(node: CanvasNode, title: string | null): Promise<void> {
-        while (!node.isContentMounted) {
+        while (!node.initialized) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         this.logger.log(`Set canvas title "${title ?? " "}" for ${node.filePath}`);
         this.addFakeTitleElement(node.labelEl, title);
 
+        this.addFakeTitleElement(node.placeholderEl, title);
+
         const inlineTitleEl = node.contentEl?.querySelector(".inline-title") as HTMLElement;
         this.addFakeTitleElement(inlineTitleEl, title);
+
     }
 
-    private addFakeTitleElement(originalElement: HTMLElement, title: string): void {
+    private addFakeTitleElement(originalElement: HTMLElement & { fakeTitleElement?: HTMLElement}, title: string): void {
         if (!originalElement) {
             return;
         }
 
         const container = originalElement.parentElement;
+
+        if (!container) {
+            if (originalElement.fakeTitleElement) {
+                originalElement.fakeTitleElement.remove();
+                originalElement.fakeTitleElement = null;
+            }
+            return;
+        }
+
         let el: HTMLDivElement = null;
         for (const i of Array.from(container.children)) {
             if (i.hasAttribute("data-ofmt") && i instanceof HTMLDivElement) {
@@ -127,6 +153,7 @@ export class InlineTitleManager extends AbstractManager {
                     el.hidden = false;
                 };
             };
+            originalElement.fakeTitleElement = el;
             container.insertBefore(el, originalElement);
         }
 

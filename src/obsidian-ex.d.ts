@@ -64,13 +64,15 @@ declare module "obsidian" {
 
     export class Canvas {
         nodes: Map<string, CanvasNode>;
+        requestFrame: (() => void) & { _originalFunc?: () => void };
     }
 
     export class CanvasNode {
         filePath: string;
         labelEl: HTMLDivElement;
         contentEl: HTMLDivElement;
-        isContentMounted: boolean;
+        placeholderEl: HTMLDivElement;
+        initialized: boolean;
     }
 
     export abstract class Chooser {
