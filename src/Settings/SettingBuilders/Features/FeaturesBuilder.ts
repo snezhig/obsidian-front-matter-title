@@ -71,6 +71,11 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
                 name: "Tabs",
                 desc: "Replace shown titles in tabs",
             },
+            {
+                feature: Feature.InlineTitle,
+                name: "Inline Title",
+                desc: "Replace shown titles in Inline Title",
+            },
         ];
         for (const item of data) {
             const builder = this.builderFactory(item.feature) ?? this.builderFactory("default");

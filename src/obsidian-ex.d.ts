@@ -58,6 +58,7 @@ declare module "obsidian" {
     export class MarkdownViewExt extends MarkdownView {
         titleEl: HTMLDivElement;
         titleContainerEl: HTMLDivElement;
+        inlineTitleEl: HTMLDivElement;
     }
 
     export abstract class Chooser {

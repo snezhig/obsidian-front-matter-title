@@ -34,6 +34,7 @@ export default class PluginHelper {
                 [Feature.Starred]: { enabled: false },
                 [Feature.Search]: { enabled: false },
                 [Feature.Suggest]: { enabled: false },
+                [Feature.InlineTitle]: { enabled: false },
             },
             processor: {
                 args: [],
