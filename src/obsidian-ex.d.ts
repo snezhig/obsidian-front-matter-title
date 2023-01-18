@@ -59,6 +59,18 @@ declare module "obsidian" {
         titleEl: HTMLDivElement;
         titleContainerEl: HTMLDivElement;
         inlineTitleEl: HTMLDivElement;
+        canvas: Canvas;
+    }
+
+    export class Canvas {
+        nodes: Map<string, CanvasNode>;
+    }
+
+    export class CanvasNode {
+        filePath: string;
+        labelEl: HTMLDivElement;
+        contentEl: HTMLDivElement;
+        isContentMounted: boolean;
     }
 
     export abstract class Chooser {

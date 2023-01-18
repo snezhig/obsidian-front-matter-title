@@ -6,7 +6,7 @@ import { AppEvents } from "@src/Types";
 import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { MarkdownViewExt } from "obsidian";
+import { CanvasNode, MarkdownViewExt } from "obsidian";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
@@ -64,13 +64,36 @@ export class InlineTitleManager extends AbstractManager {
                 promises.push(this.resolver.resolve(view.file.path).then(r => this.setTitle(view, r)));
             }
         }
+
+        const canvasViews = this.facade.getViewsOfType<MarkdownViewExt>("canvas");
+        for (const view of canvasViews) {
+            for (const node of view.canvas.nodes.values()) {
+                promises.push(this.resolver.resolve(node.filePath).then(r => this.setCanvasTitle(node, r)));
+            }
+        }
+
         await Promise.all(promises);
         return promises.length > 0;
     }
 
-    private setTitle(view: MarkdownViewExt, title: string | null): void {
-        this.logger.log(`Set inline title "${title ?? " "}" for ${view.file.path}`);
-        const container = view.inlineTitleEl.parentElement;
+    private async setCanvasTitle(node: CanvasNode, title: string | null): Promise<void> {
+        while (!node.isContentMounted) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        this.logger.log(`Set canvas title "${title ?? " "}" for ${node.filePath}`);
+        this.addFakeTitleElement(node.labelEl, title);
+
+        const inlineTitleEl = node.contentEl?.querySelector(".inline-title") as HTMLElement;
+        this.addFakeTitleElement(inlineTitleEl, title);
+    }
+
+    private addFakeTitleElement(originalElement: HTMLElement, title: string): void {
+        if (!originalElement) {
+            return;
+        }
+
+        const container = originalElement.parentElement;
         let el: HTMLDivElement = null;
         for (const i of Array.from(container.children)) {
             if (i.hasAttribute("data-ofmt") && i instanceof HTMLDivElement) {
@@ -82,35 +105,39 @@ export class InlineTitleManager extends AbstractManager {
             if (el) {
                 container.removeChild(el);
             }
-            view.inlineTitleEl.hidden = false;
+            originalElement.hidden = false;
             return;
         }
         if (title && el && el.innerText === title && !el.hidden) {
-            this.logger.log(`Set inline title for ${view.file.path} is skipped`);
+            this.logger.log("skipped");
             return;
         }
         if (el === null) {
             el = document.createElement("div");
-            el.className = "inline-title";
+            el.className = originalElement.className;
             el.dataset["ofmt"] = "true";
             el.innerText = title;
             el.hidden = true;
             el.onclick = () => {
                 el.hidden = true;
-                view.inlineTitleEl.hidden = false;
-                view.inlineTitleEl.focus();
-                view.inlineTitleEl.onblur = () => {
-                    view.inlineTitleEl.hidden = true;
+                originalElement.hidden = false;
+                originalElement.focus();
+                originalElement.onmouseleave = originalElement.onblur = () => {
+                    originalElement.hidden = true;
                     el.hidden = false;
                 };
             };
-            container.insertBefore(el, view.inlineTitleEl);
+            container.insertBefore(el, originalElement);
         }
 
         el.innerText = title;
         el.hidden = false;
-        view.inlineTitleEl.hidden = true;
-        return;
+        originalElement.hidden = true;
+    }
+
+    private setTitle(view: MarkdownViewExt, title: string | null): void {
+        this.logger.log(`Set inline title "${title ?? " "}" for ${view.file.path}`);
+        this.addFakeTitleElement(view.inlineTitleEl, title);
     }
 
     getId(): Feature {
