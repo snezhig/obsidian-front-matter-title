@@ -61,6 +61,9 @@ export class CanvasManager extends AbstractManager {
 
         const canvasViews = this.facade.getViewsOfType<MarkdownViewExt>("canvas");
         for (const view of canvasViews) {
+            if (!view.file) {
+                continue;
+            }
             const currentPath = view.file.path;
             if (!path || currentPath === path) {
                 const canvas = view.canvas;
