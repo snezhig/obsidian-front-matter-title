@@ -6,7 +6,10 @@ import { Feature } from "@src/enum";
 @injectable()
 export default abstract class AbstractManager extends AbstractFeature<Feature> implements ManagerFeatureInterface {
     disable(): void {
-        this.isEnabled() && this.doDisable();
+        if (this.isEnabled()) {
+            this.removeFakeTitleElements();
+            this.doDisable();
+        }
     }
 
     enable(): void {
@@ -113,6 +116,12 @@ export default abstract class AbstractManager extends AbstractFeature<Feature> i
         const srcElement = event.target as HTMLElement
         this.showFakeTitleElement(srcElement);
     }).bind(this);
+
+    private removeFakeTitleElements(): void {
+        for (const originalElement of this.fakeTitleElementMap.keys()) {
+            this.removeFakeTitleElement(originalElement);
+        }
+    }
 
     private removeFakeTitleElement(originalElement: HTMLElement): void {
         if (!originalElement) {
