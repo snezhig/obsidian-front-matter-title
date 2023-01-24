@@ -45,14 +45,8 @@ export default abstract class AbstractManager extends AbstractFeature<Feature> i
 
         const container = originalElement.parentElement;
 
-        if (!container) {
+        if (!container || !title) {
             this.removeFakeTitleElement(originalElement);
-            return;
-        }
-
-        if (!title) {
-            this.removeFakeTitleElement(originalElement);
-            originalElement.hidden = false;
             return;
         }
 
@@ -124,6 +118,8 @@ export default abstract class AbstractManager extends AbstractFeature<Feature> i
         if (!originalElement) {
             return;
         }
+
+        originalElement.hidden = false;
 
         const fakeTitleElement = this.fakeTitleElementMap.get(originalElement);
 
