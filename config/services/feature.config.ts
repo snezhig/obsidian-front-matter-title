@@ -20,6 +20,7 @@ import { StrategyInterface as AliasStrategyInterface, ValidatorInterface as Alia
 import { StrategyType as AliasStrategyType, ValidatorType as AliasValidatorType } from "../../src/Feature/Alias/Types";
 import { ValidatorAuto, ValidatorRequired } from "../../src/Feature/Alias/Validator";
 import { InlineTitleManager } from "@src/Feature/InlineTitle/InlineTitleManager";
+import { CanvasManager } from "@src/Feature/Canvas/CanvasManager";
 
 export default (container: Container) => {
     container.bind(SI["feature:composer"]).to(FeatureComposer).inSingletonScope();
@@ -36,6 +37,7 @@ export default (container: Container) => {
     container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(InlineTitleManager).whenTargetNamed(InlineTitleManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(CanvasManager).whenTargetNamed(CanvasManager.getId());
 
     container.bind(SI["factory:alias:modifier:strategy"]).toAutoNamedFactory<AliasStrategyInterface>(SI['alias:modifier:strategy']);
     container.bind(SI['alias:modifier:strategy']).to(EnsureStrategy).whenTargetNamed(AliasStrategyType.Ensure);
