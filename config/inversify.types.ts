@@ -42,6 +42,7 @@ const SI = {
     "placeholder:meta": "",
     "resolver": "",
     "service:note:link": "",
+    "service:fake_title_element": "",
     "settings:feature:builder": "",
     "settings:builder": "",
     "factory:settings:feature:builder": "",

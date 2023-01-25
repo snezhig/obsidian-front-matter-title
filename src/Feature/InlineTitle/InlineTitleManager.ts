@@ -9,6 +9,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import { CanvasNode, MarkdownViewExt } from "obsidian";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
 
 @injectable()
 export class InlineTitleManager extends AbstractManager {
@@ -25,7 +26,9 @@ export class InlineTitleManager extends AbstractManager {
         private resolver: ResolverInterface<Resolving.Async>,
         @inject(SI.logger)
         @named(`manager:${InlineTitleManager.getId()}`)
-        private logger: LoggerInterface
+        private logger: LoggerInterface,
+        @inject(SI["service:fake_title_element"])
+        private fakeTitleElementService: FakeTitleElementService
     ) {
         super();
     }
@@ -36,6 +39,7 @@ export class InlineTitleManager extends AbstractManager {
 
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
+        this.fakeTitleElementService.removeFakeTitleElements();
         this.enabled = false;
     }
 
@@ -71,7 +75,7 @@ export class InlineTitleManager extends AbstractManager {
 
     private setTitle(view: MarkdownViewExt, title: string | null): void {
         this.logger.log(`Set inline title "${title ?? " "}" for ${view.file.path}`);
-        this.addFakeTitleElement(view.inlineTitleEl, title);
+        this.fakeTitleElementService.addFakeTitleElement(view.inlineTitleEl, title);
     }
 
     getId(): Feature {

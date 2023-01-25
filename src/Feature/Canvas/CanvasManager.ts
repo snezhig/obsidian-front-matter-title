@@ -9,6 +9,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import { CanvasNode, MarkdownViewExt } from "obsidian";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
 
 @injectable()
 export class CanvasManager extends AbstractManager {
@@ -25,9 +26,12 @@ export class CanvasManager extends AbstractManager {
         private resolver: ResolverInterface<Resolving.Async>,
         @inject(SI.logger)
         @named(`manager:${CanvasManager.getId()}`)
-        private logger: LoggerInterface
+        private logger: LoggerInterface,
+        @inject(SI["service:fake_title_element"])
+        private fakeTitleElementService: FakeTitleElementService
     ) {
         super();
+        fakeTitleElementService.handleHoverEvents = true;
     }
 
     static getId(): Feature {
@@ -36,6 +40,7 @@ export class CanvasManager extends AbstractManager {
 
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
+        this.fakeTitleElementService.removeFakeTitleElements();
         this.enabled = false;
     }
 
@@ -93,12 +98,12 @@ export class CanvasManager extends AbstractManager {
         }
 
         this.logger.log(`Set canvas title "${title ?? " "}" for ${node.filePath}`);
-        this.addFakeTitleElement(node.labelEl, title);
+        this.fakeTitleElementService.addFakeTitleElement(node.labelEl, title);
 
-        this.addFakeTitleElement(node.placeholderEl, title);
+        this.fakeTitleElementService.addFakeTitleElement(node.placeholderEl, title);
 
         const inlineTitleEl = node.contentEl?.querySelector(".inline-title") as HTMLElement;
-        this.addFakeTitleElement(inlineTitleEl, title);
+        this.fakeTitleElementService.addFakeTitleElement(inlineTitleEl, title);
     }
 
     getId(): Feature {
