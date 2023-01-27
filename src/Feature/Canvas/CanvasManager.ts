@@ -72,16 +72,16 @@ export class CanvasManager extends AbstractManager {
             const currentPath = view.file.path;
             if (!path || currentPath === path) {
                 const canvas = view.canvas;
-                if (!canvas.requestFrame._originalFunc){
+                if (!canvas.requestFrame._originalFunc) {
                     const originalFunc = canvas.requestFrame;
                     const manager = this;
-                    canvas.requestFrame = function() {
-                        canvas.requestFrame._originalFunc.apply(this, arguments);
+                    canvas.requestFrame = function (...args) {
+                        canvas.requestFrame._originalFunc.apply(this, args);
                         manager.innerUpdate(currentPath);
-                    }
+                    };
                     canvas.requestFrame._originalFunc = originalFunc;
                 }
-    
+
                 for (const node of canvas.nodes.values()) {
                     promises.push(this.resolver.resolve(node.filePath).then(r => this.setCanvasTitle(node, r)));
                 }

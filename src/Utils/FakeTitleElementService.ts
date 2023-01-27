@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class FakeTitleElementService {
-    handleHoverEvents: boolean = false;
+    handleHoverEvents = false;
 
     addFakeTitleElement(originalElement: HTMLElement, title: string): void {
         if (!originalElement) {
@@ -59,23 +59,23 @@ export default class FakeTitleElementService {
         const fakeTitleElement = this.fakeTitleElementMap.get(originalElement);
         originalElement.hidden = true;
         fakeTitleElement.hidden = false;
-    };
+    }
 
     private mouseEnterHandler = ((event: MouseEvent) => {
-        const srcElement = event.target as HTMLElement
-        srcElement.dataset['hovered'] = 'true';
+        const srcElement = event.target as HTMLElement;
+        srcElement.dataset["hovered"] = "true";
     }).bind(this);
 
     private mouseLeaveHandler = ((event: MouseEvent) => {
-        const srcElement = event.target as HTMLElement
-        srcElement.dataset['hovered'] = 'false';
+        const srcElement = event.target as HTMLElement;
+        srcElement.dataset["hovered"] = "false";
         setTimeout(() => {
             this.restoreFakeTitleElement(srcElement);
         }, 500);
     }).bind(this);
 
     private restoreFakeTitleElement(srcElement: HTMLElement) {
-        if (srcElement.dataset['hovered'] === 'false') {
+        if (srcElement.dataset["hovered"] === "false") {
             if (document.activeElement !== srcElement) {
                 this.showFakeTitleElement(srcElement);
             } else {
@@ -87,7 +87,7 @@ export default class FakeTitleElementService {
     }
 
     private blurHandler = ((event: MouseEvent) => {
-        const srcElement = event.target as HTMLElement
+        const srcElement = event.target as HTMLElement;
         this.showFakeTitleElement(srcElement);
     }).bind(this);
 
