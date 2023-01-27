@@ -13,35 +13,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: "echo ${{github.repository}}. echo ${{github.ref}}"
-#       - uses: actions/checkout@v3
-#       - name: Use Node.js ${{ matrix.node-version }}
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: 16
-#           cache: "npm"
-#       - run: npm i
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+      - run: npm i
 
-#       - name: Eslint
-#         run: npm run eslint
+      - name: Eslint
+        run: npm run eslint
 
-#       - name: Run test
-#         run: npm run test
+      - name: Run test
+        run: npm run test
 
-#   pretty:
-#     needs: validate
-#     runs-on: ubuntu-latest
-#     if: github.repository == 'snezhig/obsidian-front-matter-title'
+  pretty:
+    needs: validate
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
-#         with:
-#           # Make sure the actual branch is checked out when running on pull requests
-#           ref: ${{ github.head_ref }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          # Make sure the actual branch is checked out when running on pull requests
+          ref: ${{ github.head_ref }}
 
-#       - name: Prettify code
-#         uses: creyD/prettier_action@v4.2
-#         with:
-#           # This part is also where you can pass other options, for example:
-#           prettier_options: --write *.ts *.json src test --ignore-path package-lock.json
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.2
+        with:
+          # This part is also where you can pass other options, for example:
+          prettier_options: --write *.ts *.json src test --ignore-path package-lock.json
