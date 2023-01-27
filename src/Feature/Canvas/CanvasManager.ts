@@ -77,7 +77,11 @@ export class CanvasManager extends AbstractManager {
                     const manager = this;
                     canvas.requestFrame = function (...args) {
                         canvas.requestFrame._originalFunc.apply(this, args);
-                        manager.innerUpdate(currentPath);
+                        if (manager.enabled) {
+                            manager.innerUpdate(currentPath);
+                        } else {
+                            canvas.requestFrame = canvas.requestFrame._originalFunc;
+                        }
                     };
                     canvas.requestFrame._originalFunc = originalFunc;
                 }
