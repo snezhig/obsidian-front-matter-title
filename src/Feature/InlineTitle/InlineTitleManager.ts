@@ -9,6 +9,7 @@ import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
+import { MarkdownViewExt } from "obsidian";
 
 @injectable()
 export class InlineTitleManager extends AbstractManager {
