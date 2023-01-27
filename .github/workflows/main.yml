@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: "echo ${{github.repository}}. echo ${{GITHUB_ACTION_REPOSITORY}}"
+      - run: "echo ${{github.repository}}. echo ${{github.action.repository}}"
 #       - uses: actions/checkout@v3
 #       - name: Use Node.js ${{ matrix.node-version }}
 #         uses: actions/setup-node@v3
