@@ -62,7 +62,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         await new Promise(r => setTimeout(r, delay));
     }
 
-    public async onload() {
+    public async onload(){
         this.bindServices();
         this.dispatcher = this.container.get(SI["event:dispatcher"]);
         this.logger = this.container.getNamed(SI.logger, "main");
