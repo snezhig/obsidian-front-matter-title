@@ -37,6 +37,7 @@ jobs:
         with:
           # Make sure the actual branch is checked out when running on pull requests
           ref: ${{ github.head_ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Prettify code
         uses: creyD/prettier_action@v4.2
