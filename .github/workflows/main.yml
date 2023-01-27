@@ -30,6 +30,7 @@ jobs:
   pretty:
     needs: validate
     runs-on: ubuntu-latest
+    if: github.repository == 'snezhig/obsidian-front-matter-title'
 
     steps:
       - name: Checkout
