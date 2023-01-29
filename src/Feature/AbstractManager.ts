@@ -2,9 +2,11 @@ import { injectable } from "inversify";
 import AbstractFeature from "@src/Feature/AbstractFeature";
 import ManagerFeatureInterface from "@src/Interfaces/ManagerFeatureInterface";
 import { Feature } from "@src/enum";
+import { ResolverInterface } from "../Resolver/Interfaces";
 
 @injectable()
 export default abstract class AbstractManager extends AbstractFeature<Feature> implements ManagerFeatureInterface {
+    protected resolver: ResolverInterface;
     disable(): void {
         this.isEnabled() && this.doDisable();
     }
@@ -24,6 +26,10 @@ export default abstract class AbstractManager extends AbstractFeature<Feature> i
         if (this.isEnabled()) {
             return this.doRefresh();
         }
+    }
+
+    setResolver(resolver: ResolverInterface): void {
+        this.resolver = resolver;
     }
 
     abstract isEnabled(): boolean;

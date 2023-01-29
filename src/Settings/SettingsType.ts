@@ -12,7 +12,7 @@ export type SF = { [K in Feature]: SFC & { [P in keyof SFExt]: P extends K ? SFE
 export type TemplateValue = { main: string | null; fallback: string | null };
 export type TemplateNames = "common" & Feature;
 export type SettingsType = {
-    templates: string[] | ({ [K in keyof Feature]?: TemplateValue } & { common: TemplateValue });
+    templates: { [K in Feature]?: TemplateValue } & { common: TemplateValue };
 
     processor: {
         type: ProcessorTypes | null;

@@ -1,11 +1,19 @@
 import { ResolverInterface, ResolverServiceInterface } from "@src/Resolver/Interfaces";
 import { NullResolverFactory, ResolverTemplateFactory } from "@src/Resolver/ResolverType";
+import { inject, injectable } from "inversify";
+import SI from "../../config/inversify.types";
 
+@injectable()
 export default class ResolverService implements ResolverServiceInterface {
     private resolvers: Map<string, ResolverInterface> = new Map();
     private templateNames: Map<string, Set<string>> = new Map();
 
-    constructor(private factory: NullResolverFactory, private templateFactory: ResolverTemplateFactory) {}
+    constructor(
+        @inject(SI["factory:resolver:resolver"])
+        private factory: NullResolverFactory,
+        @inject(SI["factory:resolver:template"])
+        private templateFactory: ResolverTemplateFactory
+    ) {}
 
     create(name: string) {
         const template = this.templateFactory(name);
@@ -36,7 +44,7 @@ export default class ResolverService implements ResolverServiceInterface {
     }
 
     private handleUnresolved(): void {
-        const template: string;
+        const template: string = "";
         for (const name of this.templateNames.get(template)) {
             const event = { template, name };
         }

@@ -19,21 +19,32 @@ import {MarkdownHeaderManager} from "@src/Feature/MarkdownHeader/MarkdownHeaderM
 import { StrategyInterface as AliasStrategyInterface, ValidatorInterface as AliasValidatorInterface } from "../../src/Feature/Alias/Interfaces";
 import { StrategyType as AliasStrategyType, ValidatorType as AliasValidatorType } from "../../src/Feature/Alias/Types";
 import { ValidatorAuto, ValidatorRequired } from "../../src/Feature/Alias/Validator";
+import AbstractManager from "../../src/Feature/AbstractManager";
+import ManagerService from "../../src/Feature/ManagerService";
 
 export default (container: Container) => {
+    container.bind(SI["feature:service"]).to(ManagerService).inSingletonScope();
     container.bind(SI["feature:composer"]).to(FeatureComposer).inSingletonScope();
     container.bind(SI["manager:composer"]).to(ManagerComposer).inSingletonScope();
 
-    container.bind(SI["factory:feature"]).toAutoNamedFactory<FeatureInterface<any>>(SI.feature);
-    container.bind<FeatureInterface<any>>(SI.feature).to(AliasManager).whenTargetNamed(AliasManager.getId());
+    container.bind(SI["factory:feature"]).toAutoNamedFactory<FeatureInterface<any>>(SI.feature).onActivation((c,i) => name => {
+        const feature: FeatureInterface<any> = i(name);
+        console.log('feature', feature);
+        if(feature instanceof AbstractManager){
+            const service: ManagerService = c.container.get(SI["feature:service"])
+            feature.setResolver(service.createResolver(feature.getId()))
+        }
+        return feature;
+    });
+    // container.bind<FeatureInterface<any>>(SI.feature).to(AliasManager).whenTargetNamed(AliasManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerManager).whenTargetNamed(ExplorerManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerSort).whenTargetNamed(ExplorerSort.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(SearchManager).whenTargetNamed(SearchManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
+    // container.bind<FeatureInterface<any>>(SI.feature).to(SearchManager).whenTargetNamed(SearchManager.getId());
+    // container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
+    // container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
+    // container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
+    // container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
+    // container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
 
     container.bind(SI["factory:alias:modifier:strategy"]).toAutoNamedFactory<AliasStrategyInterface>(SI['alias:modifier:strategy']);
     container.bind(SI['alias:modifier:strategy']).to(EnsureStrategy).whenTargetNamed(AliasStrategyType.Ensure);
@@ -43,5 +54,4 @@ export default (container: Container) => {
     container.bind(SI["factory:alias:modifier:validator"]).toAutoNamedFactory<AliasValidatorInterface>(SI['alias:modifier:validator']);
     container.bind(SI["alias:modifier:validator"]).to(ValidatorAuto).whenTargetNamed(AliasValidatorType.FrontmatterAuto);
     container.bind(SI["alias:modifier:validator"]).to(ValidatorRequired).whenTargetNamed(AliasValidatorType.FrontmatterRequired);
-
 }

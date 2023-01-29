@@ -68,12 +68,14 @@ describe("Test fillFrom", () => {
         baz: string;
         qux: any[];
         thud: number;
+        que: string[] | { objKey: string };
     };
     type dynamic<T> = { [K in keyof T]?: T[K] | null };
     const def = (): dynamic<obj> => ({
         foo: { bar: 23 },
         baz: "quux",
         qux: ["corge"],
+        que: { objKey: "value" },
     });
 
     test("Should return def without changes", () => {
@@ -97,5 +99,17 @@ describe("Test fillFrom", () => {
         const d = def();
         d.qux = [];
         expect(ObjectHelper.fillFrom(d, { qux: value })).toHaveProperty("qux", value);
+    });
+
+    test("Should replace que object with array", () => {
+        const value = ["foo", "bar"];
+        expect(ObjectHelper.fillFrom(def(), { que: value })).toHaveProperty("que", value);
+    });
+
+    test("Should replace que array with object", () => {
+        const value = { objKey: "value" };
+        const d = def();
+        d.que = ["value"];
+        expect(ObjectHelper.fillFrom(def(), { que: value })).toHaveProperty("que", value);
     });
 });

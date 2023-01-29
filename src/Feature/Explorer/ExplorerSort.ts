@@ -21,9 +21,6 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
     private refs: [ListenerRef<"manager:refresh">?, ListenerRef<"manager:update">?] = [];
 
     constructor(
-        @inject(SI.resolver)
-        @named(Resolving.Sync)
-        private resolver: ResolverInterface<Resolving.Sync>,
         @inject(SI.logger)
         @named("explorer:feature:sort")
         private logger: LoggerInterface,
@@ -123,8 +120,8 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
             } else if (!i && r) {
                 k = 1;
             } else {
-                const at = i ? a.name : this.resolver.resolve(a.path) ?? a.name;
-                const bt = r ? b.name : this.resolver.resolve(b.path) ?? b.name;
+                const at = i ? a.name : this.resolver?.resolve(a.path) ?? a.name;
+                const bt = r ? b.name : this.resolver?.resolve(b.path) ?? b.name;
                 k = at.localeCompare(bt);
                 k = this.isAsc(sortOrder) ? k : -k;
             }

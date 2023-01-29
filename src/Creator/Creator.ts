@@ -10,9 +10,8 @@ import { CreatorInterface } from "@src/Interfaces/CreatorInterfaceAdapter";
 
 @injectable()
 export default class Creator implements CreatorInterface {
+    private cache: Map<string, TemplateInterface> = new Map();
     constructor(
-        @inject(SI["cache"])
-        private cache: CacheInterface,
         @inject(SI["factory:creator:template"])
         private factory: TemplateFactory,
         @inject(SI.logger)
@@ -21,13 +20,12 @@ export default class Creator implements CreatorInterface {
     ) {}
 
     private pull(template: string): TemplateInterface {
-        const item = this.cache.getItem<TemplateInterface>(`template:${template}`);
-        if (!item.isHit()) {
+        const key = `template:${template}`;
+        if (this.cache.has(key) === false) {
             this.logger.log(`Create template fo ${template}`);
-            item.set(this.factory.create(template));
-            this.cache.save(item);
+            this.cache.set(key, this.factory.create(template));
         }
-        return item.get();
+        return this.cache.get(key);
     }
 
     create(path: string, template: string): string | null {

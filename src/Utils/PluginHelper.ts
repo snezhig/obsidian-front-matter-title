@@ -5,7 +5,7 @@ import { StrategyType, ValidatorType } from "../Feature/Alias/Types";
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
         return {
-            templates: [],
+            templates: { common: { main: "title", fallback: "head" } },
             rules: {
                 paths: {
                     mode: "black",

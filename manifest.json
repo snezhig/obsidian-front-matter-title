@@ -6,5 +6,6 @@
   "description": "Lets you define a title in frontmatter to be displayed as the filename",
   "author": "Snezhig",
   "authorUrl": "https://github.com/snezhig",
-  "isDesktopOnly": false
+  "isDesktopOnly": false,
+  "fundingUrl": "https://www.buymeacoffee.com/snezhig"
 }

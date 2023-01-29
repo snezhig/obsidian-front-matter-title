@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { CachedMetadata, Plugin } from "obsidian";
+import { CachedMetadata, Modal, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
@@ -39,12 +39,12 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private async loadSettings(): Promise<void> {
         let data: SettingsType = {
             ...PluginHelper.createDefaultSettings(),
-            ...{
-                templates: ["title"],
-                boot: { delay: 1000 },
-            },
+            ...{ boot: { delay: 1000 } },
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
+        if (Array.isArray(data.templates)) {
+            data.templates = { common: { main: data.templates?.[0] ?? "title", fallback: data.templates?.[1] ?? "" } };
+        }
         this.storage = new Storage<SettingsType>(data);
         this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
         this.addSettingTab(this.container.resolve(SettingsTab).getTab());
@@ -109,6 +109,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             Object.getPrototypeOf(this.app.workspace.editorSuggest.suggests[0].suggestions).constructor
         );
         Container.bind(SI["factory:obsidian:active:file"]).toFunction(() => this.app.workspace.getActiveFile());
+        Container.bind(SI["factory:obsidian:modal"]).toFunction(() => new Modal(this.app));
     }
 
     public onunload() {

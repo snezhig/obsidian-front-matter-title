@@ -7,6 +7,6 @@ export interface ResolverDynamicInterface extends ResolverInterface {
 }
 
 export interface ResolverServiceInterface {
-    create(template: string);
-    flush();
+    create(template: string): ResolverInterface;
+    flush(): void;
 }

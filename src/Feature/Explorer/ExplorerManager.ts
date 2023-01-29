@@ -2,7 +2,6 @@ import { TFileExplorerItem, TFileExplorerView } from "obsidian";
 import { Leaves, Feature } from "@src/enum";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import AbstractManager from "@src/Feature/AbstractManager";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
@@ -14,9 +13,6 @@ export default class ExplorerManager extends AbstractManager {
     private enabled = false;
 
     constructor(
-        @inject(SI.resolver)
-        @named(Resolving.Async)
-        private resolver: ResolverInterface<Resolving.Async>,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade
     ) {
@@ -73,7 +69,8 @@ export default class ExplorerManager extends AbstractManager {
     }
 
     private async setTitle(item: TFileExplorerItem): Promise<boolean> {
-        const title = await this.resolver.resolve(item.file.path).catch(() => null);
+        console.log(this.resolver.resolve(item.file.path));
+        const title = await (async () => this.resolver.resolve(item.file.path))().catch(() => null);
         if (this.isTitleEmpty(title)) {
             return this.restore(item);
         } else if (item.titleInnerEl.innerText !== title) {

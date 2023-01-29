@@ -5,8 +5,7 @@ import CreatorModule from "./services/creator.config";
 import bindFeature from "./services/feature.config";
 import bindSettings from "./services/settings.config";
 import processorModule from "./services/processors.config";
-import ResolverInterface, { Resolving } from "../src/Interfaces/ResolverInterface";
-import ResolverSync from "../src/Resolver/ResolverSync";
+import resolverModule from "./services/resolver.config";
 import FilterInterface from "../src/Interfaces/FilterInterface";
 import ExtensionFilter from "../src/Filters/ExtensionFilter";
 import PathListFilter from "../src/Filters/PathListFilter";
@@ -18,7 +17,6 @@ import Extractor from "@src/Components/Extractor/Extractor";
 import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorInterface";
 import StrategyInterface from "@src/Components/Extractor/Interfaces/StrategyInterface";
 import LiteralStrategy from "@src/Components/Extractor/LiteralStrategy";
-import ResolverAsync from "@src/Resolver/ResolverAsync";
 import ArrayStrategy from "@src/Components/Extractor/ArrayStrategy";
 import NullStrategy from "@src/Components/Extractor/NullStrategy";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
@@ -32,19 +30,13 @@ import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces
 import { EventDispatcher } from "@src/Components/EventDispatcher/EventDispatcher";
 import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteListListener";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import ResolverCachedProxy from "@src/Resolver/ResolverCachedProxy";
 import ProcessorListener from "../src/Components/Processor/ProccessorListener";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
 Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{[^{}]+?}})");
 
-Container.bind<ResolverInterface>(SI.resolver).to(ResolverCachedProxy).inSingletonScope().whenTargetNamed("sync");
-Container.bind<ResolverInterface>(SI.resolver).to(ResolverSync).inSingletonScope().whenTargetNamed("original");
-Container.bind<ResolverInterface<Resolving.Async>>(SI.resolver)
-    .to(ResolverAsync)
-    .inSingletonScope()
-    .whenTargetNamed("async");
+
 Container.bind<FilterInterface>(SI.filter).to(ExtensionFilter);
 Container.bind<FilterInterface>(SI.filter).to(PathListFilter);
 Container.bind<BlackWhiteListInterface>(SI["component:black_white_list"]).to(BlackWhiteList).inSingletonScope();
@@ -71,6 +63,7 @@ Container.load(CreatorModule);
 bindFeature(Container);
 bindSettings(Container);
 Container.load(processorModule);
+Container.load(resolverModule);
 
 
 Container.bind(SI.api).to(Api);
