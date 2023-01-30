@@ -123,8 +123,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         );
         this.app.workspace.onLayoutReady(async () => {
             this.registerEvent(
-                this.app.vault.on("rename", (e, o) =>
-                    this.dispatcher.dispatch("resolver:delete", new Event({ path: o }))
+                this.app.vault.on("rename", e =>
+                    this.dispatcher.dispatch("resolver:delete", new Event({ path: e.path }))
                 )
             );
             this.reloadFeatures();
