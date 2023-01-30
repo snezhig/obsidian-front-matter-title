@@ -8,25 +8,30 @@ import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import ResolverCachedProxy from "@src/Resolver/ResolverCachedProxy";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
 import { mock, mockClear } from "jest-mock-extended";
+import { AppEvents } from "../../../src/Types";
 
 const mockCacheItem = mock<CacheItemInterface<string | null>>();
 mockCacheItem.set.mockReturnThis();
 const mockCache = mock<CacheInterface>();
 mockCache.getItem.mockReturnValue(mockCacheItem);
 
-const mockDispatcher = mock<EventDispatcherInterface<ResolverEvents>>();
+const mockDispatcher = mock<EventDispatcherInterface<ResolverEvents & AppEvents>>();
 const mockResolver = mock<ResolverInterface>();
 
-let deleteCallback: Callback<ResolverEvents["resolver:delete"]> = null;
+let metadataCacheChangedCallback: Callback<AppEvents["metadata:cache:changed"]> = null;
+let fileRenameCallback: Callback<AppEvents["file:rename"]> = null;
 let clearCallback: Callback<ResolverEvents["resolver:clear"]> = null;
 
 mockDispatcher.addListener.mockImplementation(({ name, cb }) => {
     switch (name) {
-        case "resolver:delete":
-            deleteCallback = cb;
+        case "metadata:cache:changed":
+            metadataCacheChangedCallback = cb;
             break;
         case "resolver:clear":
             clearCallback = cb;
+            break;
+        case "file:rename":
+            fileRenameCallback = cb;
             break;
         default:
             throw new Error(`Event ${name} is not expected`);
@@ -48,8 +53,9 @@ describe("Test cached proxy", () => {
     });
 
     test("Should add 2 new listeners", () => {
-        expect(mockDispatcher.addListener).toBeCalledTimes(2);
-        expect(mockDispatcher.addListener).toBeCalledWith({ name: "resolver:delete", cb: expect.anything() });
+        expect(mockDispatcher.addListener).toBeCalledTimes(3);
+        expect(mockDispatcher.addListener).toBeCalledWith({ name: "metadata:cache:changed", cb: expect.anything() });
+        expect(mockDispatcher.addListener).toBeCalledWith({ name: "file:rename", cb: expect.anything() });
         expect(mockDispatcher.addListener).toBeCalledWith({ name: "resolver:clear", cb: expect.anything() });
     });
 
@@ -77,7 +83,7 @@ describe("Test cached proxy", () => {
 
     test("Should not dispatch 'resolver:unresolved' event and does not actualize title", () => {
         mockCacheItem.isHit.mockReturnValueOnce(false);
-        deleteCallback(new Event({ path }));
+        metadataCacheChangedCallback(new Event({ path }));
         expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
         expect(mockResolver.resolve).not.toHaveBeenCalled();
     });
@@ -90,7 +96,7 @@ describe("Test cached proxy", () => {
             return mockCacheItem;
         });
         mockResolver.resolve.mockReturnValueOnce(expected);
-        deleteCallback(new Event({ path }));
+        metadataCacheChangedCallback(new Event({ path }));
         expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
         expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
         expect(mockResolver.resolve).toHaveBeenCalledWith(path);
@@ -104,7 +110,7 @@ describe("Test cached proxy", () => {
             return mockCacheItem;
         });
         mockResolver.resolve.mockReturnValueOnce("bar");
-        deleteCallback(new Event({ path }));
+        metadataCacheChangedCallback(new Event({ path }));
         expect(mockDispatcher.dispatch).toHaveBeenCalledTimes(1);
         expect(mockDispatcher.dispatch).toHaveBeenCalledWith("resolver:unresolved", new Event({ path }));
         expect(mockResolver.resolve).toHaveBeenCalledTimes(1);

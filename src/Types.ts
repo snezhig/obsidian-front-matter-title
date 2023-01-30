@@ -4,6 +4,8 @@ import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import { SettingsEvent } from "@src/Settings/SettingsType";
 
 export type AppEvents = {
+    "file:rename": { old: string; actual: string };
+    "metadata:cache:changed": { path: string };
     "manager:update": { id: Feature; result: boolean };
     "manager:refresh": { id: Feature };
     "feature:state:changed": { id: Feature; enabled: boolean };
