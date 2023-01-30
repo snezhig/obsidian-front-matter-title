@@ -24,6 +24,7 @@ export default class ResolverCachedProxy implements ResolverInterface {
             name: "file:rename",
             cb: e => {
                 this.cache.delete(e.get().old);
+                this.cache.save(this.cache.getItem(e.get().actual).set(null));
                 this.handleDelete(e.get().actual);
             },
         });
