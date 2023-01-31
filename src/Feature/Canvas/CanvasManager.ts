@@ -10,11 +10,13 @@ import { CanvasNode, MarkdownViewExt } from "obsidian";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
+import { debounce } from "obsidian";
 
 @injectable()
 export class CanvasManager extends AbstractManager {
     private ref: ListenerRef<"layout:change"> = null;
     private enabled = false;
+    private debouncedInnerUpdate: (path?: string) => Promise<boolean>;
 
     constructor(
         @inject(SI["event:dispatcher"])
@@ -32,6 +34,15 @@ export class CanvasManager extends AbstractManager {
     ) {
         super();
         fakeTitleElementService.handleHoverEvents = true;
+
+        let innerUpdateResult = Promise.resolve(false);
+        const debouncedInnerUpdate = debounce((path?: string) => {
+            innerUpdateResult = this.innerUpdate(path);
+        }, 1000);
+        this.debouncedInnerUpdate = (path?: string) => {
+            debouncedInnerUpdate(path);
+            return innerUpdateResult;
+        };
     }
 
     static getId(): Feature {
@@ -53,12 +64,12 @@ export class CanvasManager extends AbstractManager {
     }
 
     protected async doRefresh(): Promise<{ [p: string]: boolean }> {
-        await this.innerUpdate();
+        await this.debouncedInnerUpdate();
         return Promise.resolve({});
     }
 
     protected async doUpdate(path: string): Promise<boolean> {
-        return this.innerUpdate(path);
+        return this.debouncedInnerUpdate(path);
     }
 
     private async innerUpdate(path: string = null): Promise<boolean> {
@@ -78,7 +89,7 @@ export class CanvasManager extends AbstractManager {
                     canvas.requestFrame = function (...args) {
                         canvas.requestFrame._originalFunc.apply(this, args);
                         if (manager.enabled) {
-                            manager.innerUpdate(currentPath);
+                            manager.debouncedInnerUpdate(currentPath);
                         } else {
                             canvas.requestFrame = canvas.requestFrame._originalFunc;
                         }
