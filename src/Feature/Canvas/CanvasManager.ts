@@ -87,6 +87,9 @@ export class CanvasManager extends AbstractManager {
                 }
 
                 for (const node of canvas.nodes.values()) {
+                    if (!node.filePath) {
+                        continue;
+                    }
                     promises.push(this.resolver.resolve(node.filePath).then(r => this.setCanvasTitle(node, r)));
                 }
             }
