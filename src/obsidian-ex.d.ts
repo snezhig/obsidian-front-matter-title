@@ -59,6 +59,8 @@ declare module "obsidian" {
         titleEl: HTMLDivElement;
         titleContainerEl: HTMLDivElement;
         inlineTitleEl: HTMLDivElement;
+    }
+    export abstract class CanvasViewExt extends FileView {
         canvas: Canvas;
     }
 

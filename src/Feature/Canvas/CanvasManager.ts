@@ -6,7 +6,7 @@ import { AppEvents } from "@src/Types";
 import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { CanvasNode, MarkdownViewExt } from "obsidian";
+import { CanvasNode, CanvasViewExt, MarkdownViewExt } from "obsidian";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
@@ -16,7 +16,7 @@ import { debounce } from "obsidian";
 export class CanvasManager extends AbstractManager {
     private ref: ListenerRef<"layout:change"> = null;
     private enabled = false;
-    private debouncedInnerUpdate: (path?: string) => Promise<boolean>;
+    private queue: Set<string> = new Set();
 
     constructor(
         @inject(SI["event:dispatcher"])
@@ -33,16 +33,6 @@ export class CanvasManager extends AbstractManager {
         private fakeTitleElementService: FakeTitleElementService
     ) {
         super();
-        fakeTitleElementService.handleHoverEvents = true;
-
-        let innerUpdateResult = Promise.resolve(false);
-        const debouncedInnerUpdate = debounce((path?: string) => {
-            innerUpdateResult = this.innerUpdate(path);
-        }, 1000);
-        this.debouncedInnerUpdate = (path?: string) => {
-            debouncedInnerUpdate(path);
-            return innerUpdateResult;
-        };
     }
 
     static getId(): Feature {
@@ -51,7 +41,7 @@ export class CanvasManager extends AbstractManager {
 
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
-        this.fakeTitleElementService.removeFakeTitleElements();
+        this.fakeTitleElementService.removeAll();
         this.enabled = false;
     }
 
@@ -64,45 +54,54 @@ export class CanvasManager extends AbstractManager {
     }
 
     protected async doRefresh(): Promise<{ [p: string]: boolean }> {
-        await this.debouncedInnerUpdate();
+        await this.innerUpdate();
         return Promise.resolve({});
     }
 
     protected async doUpdate(path: string): Promise<boolean> {
-        return this.debouncedInnerUpdate(path);
+        return this.innerUpdate(path);
     }
+
+    private updateByRequestFrame = debounce(
+        () => {
+            this.logger.log(`updateByRequestFrame`, this.queue);
+            Array.from(this.queue.values()).forEach(e => this.innerUpdate(e) && this.queue.delete(e));
+        },
+        1000,
+        true
+    );
 
     private async innerUpdate(path: string = null): Promise<boolean> {
         const promises = [];
+        this.logger.log(`inner update "${path}"`);
 
-        const canvasViews = this.facade.getViewsOfType<MarkdownViewExt>("canvas");
+        const canvasViews = this.facade.getViewsOfType<CanvasViewExt>("canvas");
         for (const view of canvasViews) {
             if (!view.file) {
                 continue;
             }
             const currentPath = view.file.path;
-            if (!path || currentPath === path) {
-                const canvas = view.canvas;
-                if (!canvas.requestFrame._originalFunc) {
-                    const originalFunc = canvas.requestFrame;
-                    const manager = this;
-                    canvas.requestFrame = function (...args) {
-                        canvas.requestFrame._originalFunc.apply(this, args);
-                        if (manager.enabled) {
-                            manager.debouncedInnerUpdate(currentPath);
-                        } else {
-                            canvas.requestFrame = canvas.requestFrame._originalFunc;
-                        }
-                    };
-                    canvas.requestFrame._originalFunc = originalFunc;
+            const canvas = view.canvas;
+            for (const node of canvas.nodes.values()) {
+                if (!node.filePath || (path && path !== node.filePath && path !== currentPath)) {
+                    continue;
                 }
+                promises.push(this.resolver.resolve(node.filePath).then(r => r && this.setCanvasTitle(node, r, view)));
+            }
 
-                for (const node of canvas.nodes.values()) {
-                    if (!node.filePath) {
-                        continue;
+            if (!canvas.requestFrame._originalFunc) {
+                const originalFunc = canvas.requestFrame;
+                const manager = this;
+                canvas.requestFrame = function (...args) {
+                    canvas.requestFrame._originalFunc.apply(this, args);
+                    if (manager.enabled) {
+                        manager.queue.add(currentPath);
+                        manager.updateByRequestFrame();
+                    } else {
+                        canvas.requestFrame = canvas.requestFrame._originalFunc;
                     }
-                    promises.push(this.resolver.resolve(node.filePath).then(r => this.setCanvasTitle(node, r)));
-                }
+                };
+                canvas.requestFrame._originalFunc = originalFunc;
             }
         }
 
@@ -110,18 +109,37 @@ export class CanvasManager extends AbstractManager {
         return promises.length > 0;
     }
 
-    private async setCanvasTitle(node: CanvasNode, title: string | null): Promise<void> {
-        while (!node.initialized) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+    private async setCanvasTitle(node: CanvasNode, title: string | null, view: CanvasViewExt): Promise<void> {
+        do {
+            await new Promise(resolve => setTimeout(resolve, 200));
+        } while (!node.initialized);
+
+        this.logger.log(`Set canvas title "${title}" for canvas "${view.file.path}" and node "${node.filePath}"`);
+
+        const prefix = `${node.filePath}-${view.file.path}`;
+
+        const labelId = `${prefix}-label`;
+        const label = this.fakeTitleElementService.getOrCreate({
+            original: node.labelEl,
+            title,
+            id: labelId,
+            events: ["hover"],
+        });
+
+        if (label?.created) {
+            this.fakeTitleElementService.setVisible(labelId, true);
         }
 
-        this.logger.log(`Set canvas title "${title ?? " "}" for ${node.filePath}`);
-        this.fakeTitleElementService.addFakeTitleElement(node.labelEl, title);
-
-        this.fakeTitleElementService.addFakeTitleElement(node.placeholderEl, title);
-
         const inlineTitleEl = node.contentEl?.querySelector(".inline-title") as HTMLElement;
-        this.fakeTitleElementService.addFakeTitleElement(inlineTitleEl, title);
+        const inline = this.fakeTitleElementService.getOrCreate({
+            original: inlineTitleEl,
+            title,
+            id: `${prefix}-inline`,
+            events: ["click"],
+        });
+        if (inline?.created) {
+            this.fakeTitleElementService.setVisible(`${prefix}-inline`, true);
+        }
     }
 
     getId(): Feature {

@@ -2,114 +2,132 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class FakeTitleElementService {
-    handleHoverEvents = false;
+    private readonly attr = {
+        fake: "ofmt-fake-id",
+        original: "ofmt-original-id",
+    };
+    private elements: Map<string, { original: HTMLElement; fake: HTMLElement; events: string[] }> = new Map();
 
-    addFakeTitleElement(originalElement: HTMLElement, title: string): void {
-        if (!originalElement) {
+    private events = {
+        click: (e: Event) => {
+            const id = this.extractId(e.target);
+            this.setVisible(id, false).getOriginal(id).focus();
+        },
+        blur: (e: Event) => this.setVisible(this.extractId(e.target), true),
+        hover: (e: Event) => this.setVisible(this.extractId(e.target), false),
+        out: (e: Event) => this.setVisible(this.extractId(e.target), true),
+    };
+
+    private extractId(e: any): string | null {
+        if (e instanceof HTMLElement) {
+            return e.getAttribute(this.attr.fake) ?? e.getAttribute(this.attr.original);
+        }
+        return null;
+    }
+
+    private getOriginal(id: string): HTMLElement | null {
+        return this.elements.get(id)?.original ?? null;
+    }
+
+    private has(id: string): boolean {
+        return this.elements.has(id);
+    }
+
+    remove(id: string): void {
+        if (!this.has(id)) {
             return;
         }
-
-        const container = originalElement.parentElement;
-
-        if (!container || !title) {
-            this.removeFakeTitleElement(originalElement);
-            return;
-        }
-
-        let fakeTitleElement = this.fakeTitleElementMap.get(originalElement);
-
-        if (fakeTitleElement?.innerText === title) {
-            return;
-        }
-
-        if (!fakeTitleElement) {
-            fakeTitleElement = document.createElement("div");
-            this.fakeTitleElementMap.set(originalElement, fakeTitleElement);
-            fakeTitleElement.className = originalElement.className;
-            fakeTitleElement.innerText = title;
-
-            if (this.handleHoverEvents) {
-                originalElement.addEventListener("mouseenter", this.mouseEnterHandler);
-                originalElement.addEventListener("mouseleave", this.mouseLeaveHandler);
+        this.setVisible(id, false);
+        const { fake, events, original } = this.elements.get(id);
+        this.elements.get(id)?.events.forEach(e => {
+            if (e === "click") {
+                original.removeEventListener("click", this.events.blur);
             }
-
-            originalElement.addEventListener("blur", this.blurHandler);
-
-            fakeTitleElement.addEventListener("click", () => {
-                fakeTitleElement.hidden = true;
-                originalElement.hidden = false;
-                originalElement.focus();
-            });
-            container.insertBefore(fakeTitleElement, originalElement);
-        }
-
-        fakeTitleElement.innerText = title;
-        this.showFakeTitleElement(originalElement);
-    }
-
-    removeFakeTitleElements(): void {
-        for (const originalElement of this.fakeTitleElementMap.keys()) {
-            this.removeFakeTitleElement(originalElement);
-        }
-    }
-
-    private fakeTitleElementMap = new Map<HTMLElement, HTMLElement>();
-
-    private showFakeTitleElement(originalElement: HTMLElement) {
-        const fakeTitleElement = this.fakeTitleElementMap.get(originalElement);
-        originalElement.hidden = true;
-        fakeTitleElement.hidden = false;
-    }
-
-    private mouseEnterHandler = ((event: MouseEvent) => {
-        const srcElement = event.target as HTMLElement;
-        srcElement.dataset["hovered"] = "true";
-    }).bind(this);
-
-    private mouseLeaveHandler = ((event: MouseEvent) => {
-        const srcElement = event.target as HTMLElement;
-        srcElement.dataset["hovered"] = "false";
-        setTimeout(() => {
-            this.restoreFakeTitleElement(srcElement);
-        }, 500);
-    }).bind(this);
-
-    private restoreFakeTitleElement(srcElement: HTMLElement) {
-        if (srcElement.dataset["hovered"] === "false") {
-            if (document.activeElement !== srcElement) {
-                this.showFakeTitleElement(srcElement);
-            } else {
-                setTimeout(() => {
-                    this.restoreFakeTitleElement(srcElement);
-                }, 500);
+            if (e === "hober") {
+                original.removeEventListener("mouseout", this.events.out);
             }
-        }
+        });
+        original.removeAttribute(this.attr.original);
+        fake.remove();
+        this.elements.delete(id);
     }
 
-    private blurHandler = ((event: MouseEvent) => {
-        const srcElement = event.target as HTMLElement;
-        this.showFakeTitleElement(srcElement);
-    }).bind(this);
+    removeAll(): void {
+        Array.from(this.elements.keys()).forEach(e => this.remove(e));
+    }
 
-    private removeFakeTitleElement(originalElement: HTMLElement): void {
-        if (!originalElement) {
+    getOrCreate<T extends HTMLElement>({
+        original,
+        title,
+        id,
+        events = [],
+    }: {
+        original: HTMLElement;
+        title: string;
+        id: string;
+        events?: ("click" | "hover")[];
+    }): { created: boolean; element: T } {
+        const container = original?.parentElement;
+        if (!container) {
             return;
         }
-
-        originalElement.hidden = false;
-
-        const fakeTitleElement = this.fakeTitleElementMap.get(originalElement);
-
-        if (fakeTitleElement) {
-            fakeTitleElement.remove();
-            this.fakeTitleElementMap.delete(originalElement);
+        let element = this.find(container, id) as T;
+        if (element) {
+            element.setText(title);
+            return { created: false, element };
         }
 
-        if (this.handleHoverEvents) {
-            originalElement.removeEventListener("mouseenter", this.mouseEnterHandler);
-            originalElement.removeEventListener("mouseleave", this.mouseLeaveHandler);
+        element = document.createElement(original.tagName) as T;
+        element.className = original.className;
+        element.setText(title);
+        element.setAttribute(this.attr.fake, id);
+        original.setAttribute(this.attr.original, id);
+        this.elements.set(id, { original, fake: element, events: [...events] });
+
+        if (events.contains("click")) {
+            this.bindClick(id);
+        }
+        if (events.contains("hover")) {
+            this.bindHover(id);
         }
 
-        originalElement.removeEventListener("blur", this.blurHandler);
+        container.insertBefore(element, original);
+
+        return { created: true, element };
+    }
+
+    public setVisible(id: string, visible: boolean): this {
+        if (this.elements.has(id)) {
+            const { fake, original } = this.elements.get(id);
+            original.hidden = visible;
+            fake.hidden = !visible;
+        }
+        return this;
+    }
+
+    private bindClick(id: string): void {
+        if (this.has(id)) {
+            const { fake, original } = this.elements.get(id);
+            fake.addEventListener("click", this.events.click);
+            original.addEventListener("blur", this.events.blur);
+        }
+    }
+
+    private bindHover(id: string): void {
+        if (this.has(id)) {
+            const { fake, original } = this.elements.get(id);
+            fake.addEventListener("mouseover", this.events.click);
+            original.addEventListener("mouseout", this.events.blur);
+        }
+    }
+
+    private find(container: HTMLElement, id: string): HTMLElement | null {
+        for (const node of Array.from(container.children)) {
+            const cId = node.getAttribute(this.attr.fake);
+            if (id === cId && node instanceof HTMLElement) {
+                return node;
+            }
+        }
+        return null;
     }
 }

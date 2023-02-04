@@ -39,7 +39,7 @@ export class InlineTitleManager extends AbstractManager {
 
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
-        this.fakeTitleElementService.removeFakeTitleElements();
+        this.fakeTitleElementService.removeAll();
         this.enabled = false;
     }
 
@@ -65,7 +65,12 @@ export class InlineTitleManager extends AbstractManager {
         const promises = [];
         for (const view of views) {
             if (!path || view.file.path === path) {
-                promises.push(this.resolver.resolve(view.file.path).then(r => this.setTitle(view, r)));
+                promises.push(
+                    this.resolver
+                        .resolve(view.file.path)
+                        .then(r => r && this.setTitle(view, r))
+                        .catch(console.error)
+                );
             }
         }
 
@@ -75,7 +80,12 @@ export class InlineTitleManager extends AbstractManager {
 
     private setTitle(view: MarkdownViewExt, title: string | null): void {
         this.logger.log(`Set inline title "${title ?? " "}" for ${view.file.path}`);
-        this.fakeTitleElementService.addFakeTitleElement(view.inlineTitleEl, title);
+        const id = `${this.getId()}-${view.file.path}`;
+        const original = view.inlineTitleEl;
+        const { created } = this.fakeTitleElementService.getOrCreate({ original, title, id, events: ["click"] });
+        if (created) {
+            this.fakeTitleElementService.setVisible(id, true);
+        }
     }
 
     getId(): Feature {
