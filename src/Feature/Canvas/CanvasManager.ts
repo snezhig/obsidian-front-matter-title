@@ -6,7 +6,7 @@ import { AppEvents } from "@src/Types";
 import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { CanvasNode, CanvasViewExt, MarkdownViewExt } from "obsidian";
+import { CanvasNode, CanvasViewExt } from "obsidian";
 import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
@@ -86,7 +86,15 @@ export class CanvasManager extends AbstractManager {
                 if (!node.filePath || (path && path !== node.filePath && path !== currentPath)) {
                     continue;
                 }
-                promises.push(this.resolver.resolve(node.filePath).then(r => r && this.setCanvasTitle(node, r, view)));
+                promises.push(
+                    this.resolver.resolve(node.filePath).then(title => {
+                        if (title) {
+                            this.setNodeTitle(node, title);
+                        } else {
+                            this.restoreNodeTitle(node);
+                        }
+                    })
+                );
             }
 
             if (!canvas.requestFrame._originalFunc) {
@@ -109,37 +117,52 @@ export class CanvasManager extends AbstractManager {
         return promises.length > 0;
     }
 
-    private async setCanvasTitle(node: CanvasNode, title: string | null, view: CanvasViewExt): Promise<void> {
+    private restoreNodeTitle(node: CanvasNode): void {
+        const ids = this.makeFakeElementIds(node.canvas.view.file.path, node.filePath);
+        this.fakeTitleElementService.remove(ids.label);
+        this.fakeTitleElementService.remove(ids.inline);
+    }
+
+    private async setNodeTitle(node: CanvasNode, title: string | null): Promise<void> {
         do {
             await new Promise(resolve => setTimeout(resolve, 200));
         } while (!node.initialized);
 
+        const view = node.canvas.view;
+
         this.logger.log(`Set canvas title "${title}" for canvas "${view.file.path}" and node "${node.filePath}"`);
 
-        const prefix = `${node.filePath}-${view.file.path}`;
+        const ids = this.makeFakeElementIds(view.file.path, node.filePath);
 
-        const labelId = `${prefix}-label`;
         const label = this.fakeTitleElementService.getOrCreate({
             original: node.labelEl,
             title,
-            id: labelId,
+            id: ids.label,
             events: ["hover"],
         });
 
         if (label?.created) {
-            this.fakeTitleElementService.setVisible(labelId, true);
+            this.fakeTitleElementService.setVisible(ids.label, true);
         }
 
         const inlineTitleEl = node.contentEl?.querySelector(".inline-title") as HTMLElement;
         const inline = this.fakeTitleElementService.getOrCreate({
             original: inlineTitleEl,
             title,
-            id: `${prefix}-inline`,
+            id: ids.inline,
             events: ["click"],
         });
         if (inline?.created) {
-            this.fakeTitleElementService.setVisible(`${prefix}-inline`, true);
+            this.fakeTitleElementService.setVisible(ids.inline, true);
         }
+    }
+
+    private makeFakeElementIds(canvasPath: string, nodePath: string): { label: string; inline: string } {
+        const prefix = `${canvasPath}-${nodePath}`;
+        return {
+            label: `${prefix}-label`,
+            inline: `${prefix}-inline`,
+        };
     }
 
     getId(): Feature {

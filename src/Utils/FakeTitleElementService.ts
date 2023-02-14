@@ -38,8 +38,8 @@ export default class FakeTitleElementService {
             return;
         }
         this.setVisible(id, false);
-        const { fake, events, original } = this.elements.get(id);
-        this.elements.get(id)?.events.forEach(e => {
+        const { fake, events = [], original } = this.elements.get(id);
+        events.forEach(e => {
             if (e === "click") {
                 original.removeEventListener("click", this.events.blur);
             }

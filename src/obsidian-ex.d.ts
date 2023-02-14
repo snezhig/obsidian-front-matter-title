@@ -75,6 +75,9 @@ declare module "obsidian" {
         contentEl: HTMLDivElement;
         placeholderEl: HTMLDivElement;
         initialized: boolean;
+        canvas: {
+            view: CanvasViewExt;
+        };
     }
 
     export abstract class Chooser {
