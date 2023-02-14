@@ -15,4 +15,6 @@ export enum Feature {
     Tab = "tab",
     Alias = "alias",
     Suggest = "suggest",
+    InlineTitle = "inlineTitle",
+    Canvas = "canvas",
 }
