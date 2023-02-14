@@ -8,6 +8,7 @@ export default class FakeTitleElementService {
     };
     private elements: Map<string, { original: HTMLElement; fake: HTMLElement; events: string[] }> = new Map();
 
+    //TODO: add logs for events
     private events = {
         click: (e: Event) => {
             const id = this.extractId(e.target);
@@ -43,7 +44,7 @@ export default class FakeTitleElementService {
             if (e === "click") {
                 original.removeEventListener("click", this.events.blur);
             }
-            if (e === "hober") {
+            if (e === "hover") {
                 original.removeEventListener("mouseout", this.events.out);
             }
         });
@@ -116,8 +117,8 @@ export default class FakeTitleElementService {
     private bindHover(id: string): void {
         if (this.has(id)) {
             const { fake, original } = this.elements.get(id);
-            fake.addEventListener("mouseover", this.events.click);
-            original.addEventListener("mouseout", this.events.blur);
+            fake.addEventListener("mouseover", this.events.hover);
+            original.addEventListener("mouseout", this.events.out);
         }
     }
 
