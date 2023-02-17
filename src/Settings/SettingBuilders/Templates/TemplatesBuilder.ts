@@ -1,19 +1,22 @@
 import { SettingsType, TemplateValue } from "@src/Settings/SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
-import { Modal, Setting } from "obsidian";
+import { Setting } from "obsidian";
 import { inject, injectable } from "inversify";
-import { ObsidianModalFactory } from "../../../../config/inversify.factory.types";
+import { ObsidianModalFactory } from "@config/inversify.factory.types";
 import SI from "../../../../config/inversify.types";
-import { Feature } from "../../../enum";
+import { Feature } from "@src/enum";
+import { FeatureInfoInterface } from "@src/Utils/FeatureInfo/Interfaces";
 
 @injectable()
 export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "templates"> {
     constructor(
         @inject(SI["factory:obsidian:modal"])
-        private factory: ObsidianModalFactory
+        private factory: ObsidianModalFactory,
+        private info: FeatureInfoInterface
     ) {
         super();
     }
+
     support(k: keyof SettingsType): boolean {
         return k === "templates";
     }
@@ -72,7 +75,7 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
                     }
 
                     const templates = this.item.get(feature);
-                    contentEl.createEl("h4", null, e => e.setText(feature[0].toUpperCase() + feature.substring(1)));
+                    contentEl.createEl("h4", null, e => e.setText(this.info.getName(feature)));
                     for (const type of Object.keys(templates.value()) as (keyof TemplateValue)[]) {
                         const s = new Setting(contentEl)
                             .setName(type[0].toUpperCase() + type.substring(1))
