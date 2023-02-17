@@ -1,7 +1,24 @@
-import { FeatureInfoInterface } from "@src/Utils/FeatureInfo/Interfaces";
 import { Feature } from "@src/enum";
+import { injectable } from "inversify";
 
-export default class FeatureInfo implements FeatureInfoInterface {
+@injectable()
+export default class FeatureHelper {
+    getOrderedFeatures(): Feature[] {
+        return [
+            Feature.Alias,
+            Feature.Explorer,
+            Feature.ExplorerSort,
+            Feature.Graph,
+            Feature.Header,
+            Feature.Starred,
+            Feature.Search,
+            Feature.Suggest,
+            Feature.Tab,
+            Feature.InlineTitle,
+            Feature.Canvas,
+        ];
+    }
+
     getName(feature: Feature): string {
         switch (feature) {
             case Feature.Alias:

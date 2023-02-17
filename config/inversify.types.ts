@@ -36,6 +36,7 @@ const SI = {
     "getter:delimiter": "",
     "listener": "",
     "logger": "",
+    "feature:helper": "",
     "logger:composer": "",
     "manager:composer": "",
     "obsidian:app": "",

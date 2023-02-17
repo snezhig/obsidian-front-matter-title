@@ -12,6 +12,7 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
     constructor(
         @inject(SI["factory:obsidian:modal"])
         private factory: ObsidianModalFactory,
+        @inject(SI["feature:helper"])
         private info: FeatureInfoInterface
     ) {
         super();
