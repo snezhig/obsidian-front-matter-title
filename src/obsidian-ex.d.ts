@@ -58,6 +58,26 @@ declare module "obsidian" {
     export class MarkdownViewExt extends MarkdownView {
         titleEl: HTMLDivElement;
         titleContainerEl: HTMLDivElement;
+        inlineTitleEl: HTMLDivElement;
+    }
+    export abstract class CanvasViewExt extends FileView {
+        canvas: Canvas;
+    }
+
+    export class Canvas {
+        nodes: Map<string, CanvasNode>;
+        requestFrame: (() => void) & { _originalFunc?: () => void };
+    }
+
+    export class CanvasNode {
+        filePath: string;
+        labelEl: HTMLDivElement;
+        contentEl: HTMLDivElement;
+        placeholderEl: HTMLDivElement;
+        initialized: boolean;
+        canvas: {
+            view: CanvasViewExt;
+        };
     }
 
     export abstract class Chooser {

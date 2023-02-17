@@ -31,6 +31,7 @@ import { EventDispatcher } from "@src/Components/EventDispatcher/EventDispatcher
 import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteListListener";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import ProcessorListener from "../src/Components/Processor/ProccessorListener";
+import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
@@ -55,6 +56,7 @@ Container.bind<LoggerInterface>(SI.logger)
     .when(() => true);
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
+Container.bind(SI["service:fake_title_element"]).to(FakeTitleElementService);
 Container.bind<ListenerInterface>(SI.listener).to(AliasListener);
 Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener);
 Container.bind<ListenerInterface>(SI.listener).to(ProcessorListener);

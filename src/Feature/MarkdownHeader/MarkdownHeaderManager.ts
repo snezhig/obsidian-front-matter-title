@@ -36,6 +36,7 @@ export class MarkdownHeaderManager extends AbstractManager {
 
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
+        this.facade.getViewsOfType<MarkdownViewExt>("markdown").forEach(this.revert.bind(this));
         this.enabled = false;
     }
 
@@ -71,46 +72,59 @@ export class MarkdownHeaderManager extends AbstractManager {
     private setTitle(view: MarkdownViewExt, title: string | null): void {
         this.logger.log(`Set title "${title ?? " "}" for ${view.file.path}`);
         const container = view.titleContainerEl as HTMLDivElement;
-        let el: HTMLDivElement = null;
-        for (const i of Array.from(container.children)) {
-            if (i.hasAttribute("data-ofmt") && i instanceof HTMLDivElement) {
-                el = i;
-                break;
-            }
-        }
+
         if (!title) {
-            if (el) {
-                container.removeChild(el);
-            }
-            view.titleEl.hidden = false;
-            return;
-        }
-        if (title && el && el.innerText === title && !el.hidden) {
-            this.logger.log(`Set title for ${view.file.path} is skipped`);
-            return;
-        }
-        if (el === null) {
-            el = document.createElement("div");
-            el.className = "view-header-title";
-            el.dataset["ofmt"] = "true";
-            el.innerText = title;
-            el.hidden = true;
-            el.onclick = () => {
-                el.hidden = true;
-                view.titleEl.hidden = false;
-                view.titleEl.focus();
-                view.titleEl.onblur = () => {
-                    view.titleEl.hidden = true;
-                    el.hidden = false;
-                };
-            };
-            container.appendChild(el);
+            return this.revert(view);
         }
 
+        let el = this.findExistingFakeEl(container);
+
+        if (title && el && el.innerText === title && !el.hidden) {
+            return this.logger.log(`Set title "${title}" for ${view.file.path} is skipped`);
+        }
+
+        el = el ?? this.createFakeEl(title, view);
         el.innerText = title;
         el.hidden = false;
         view.titleEl.hidden = true;
+    }
+
+    private revert(view: MarkdownViewExt): void {
+        const container = view.titleContainerEl as HTMLDivElement;
+        const el = this.findExistingFakeEl(container);
+        if (el) {
+            container.removeChild(el);
+        }
+        view.titleEl.hidden = false;
         return;
+    }
+
+    private findExistingFakeEl(container: HTMLElement): HTMLDivElement | null {
+        for (const i of Array.from(container.children)) {
+            if (i.hasAttribute("data-ofmt") && i instanceof HTMLDivElement) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    private createFakeEl(title: string, view: MarkdownViewExt): HTMLDivElement {
+        const el = document.createElement("div");
+        el.className = "view-header-title";
+        el.dataset["ofmt"] = "true";
+        el.innerText = title;
+        el.hidden = true;
+        el.onclick = () => {
+            el.hidden = true;
+            view.titleEl.hidden = false;
+            view.titleEl.focus();
+            view.titleEl.onblur = () => {
+                view.titleEl.hidden = true;
+                el.hidden = false;
+            };
+        };
+        (view.titleContainerEl as HTMLDivElement).appendChild(el);
+        return el;
     }
 
     getId(): Feature {

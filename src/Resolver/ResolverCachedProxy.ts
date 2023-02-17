@@ -3,11 +3,11 @@ import CacheInterface from "@src/Components/Cache/CacheInterface";
 import CacheItemInterface from "@src/Components/Cache/CacheItemInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 import { inject, injectable, named } from "inversify";
 import { ResolverEvents } from "./ResolverType";
 import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
 
+import { AppEvents } from "@src/Types";
 @injectable()
 export default class ResolverCachedProxy implements ResolverDynamicInterface {
     private template: string;
@@ -19,14 +19,21 @@ export default class ResolverCachedProxy implements ResolverDynamicInterface {
         @inject(SI.cache)
         private cache: CacheInterface,
         @inject(SI["event:dispatcher"])
-        private dispatcher: EventDispatcherInterface<ResolverEvents>
+        private dispatcher: EventDispatcherInterface<ResolverEvents & AppEvents>
     ) {
         dispatcher.addListener({ name: "resolver:clear", cb: () => this.cache.clear() });
-        dispatcher.addListener({ name: "resolver:delete", cb: this.handleDelete.bind(this) });
+        dispatcher.addListener({ name: "metadata:cache:changed", cb: e => this.handleDelete(e.get().path) });
+        dispatcher.addListener({
+            name: "file:rename",
+            cb: e => {
+                this.cache.delete(e.get().old);
+                this.cache.save(this.cache.getItem(e.get().actual).set(null));
+                this.handleDelete(e.get().actual);
+            },
+        });
     }
 
-    private handleDelete(e: EventInterface<ResolverEvents["resolver:delete"]>): void {
-        const path = e.get().path;
+    private handleDelete(path: string): void {
         const item = this.cache.getItem<string | null>(path);
 
         if (!item.isHit()) {
