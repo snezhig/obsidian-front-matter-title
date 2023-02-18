@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import SI from "../../config/inversify.types";
 
 @injectable()
-export default class ManagerService {
+export default class FeatureService {
     constructor(
         @inject(SI["resolver:service"])
         private service: ResolverServiceInterface

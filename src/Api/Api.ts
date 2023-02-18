@@ -5,8 +5,7 @@ import SI from "@config/inversify.types";
 
 @injectable()
 export default class Api implements ApiInterface {
-    constructor() // @named(Resolving.Sync) // @inject(SI.resolver)
-    // private resolver: ResolverInterface
+    constructor() // private resolver: ResolverInterface // @named(Resolving.Sync) // @inject(SI.resolver)
     {}
 
     async resolve(path: string): Promise<string | null> {

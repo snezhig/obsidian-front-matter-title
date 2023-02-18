@@ -7,7 +7,6 @@ import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import { MarkdownViewExt } from "obsidian";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 @injectable()
@@ -20,9 +19,6 @@ export class MarkdownHeaderManager extends AbstractManager {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
-        @named(Resolving.Async)
-        private resolver: ResolverInterface<Resolving.Async>,
         @inject(SI.logger)
         @named(`manager:${MarkdownHeaderManager.getId()}`)
         private logger: LoggerInterface
@@ -62,7 +58,7 @@ export class MarkdownHeaderManager extends AbstractManager {
         const promises = [];
         for (const view of views) {
             if (!path || view.file.path === path) {
-                promises.push(this.resolver.resolve(view.file.path).then(r => this.setTitle(view, r)));
+                promises.push((async () => this.resolver.resolve(view.file.path))().then(r => this.setTitle(view, r)));
             }
         }
         await Promise.all(promises);

@@ -35,7 +35,7 @@ export default class Creator implements CreatorInterface {
                 value = placeholder.makeValue(path) ?? "";
             } catch (e) {
                 if (e instanceof PathNotFoundException || e instanceof TypeNotSupportedException) {
-                    this.logger.log(`Error by path: ${path}`, e);
+                    this.logger.log(`Error by path: ${path}`);
                 } else {
                     throw e;
                 }

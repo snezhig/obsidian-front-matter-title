@@ -25,11 +25,11 @@ import { ValidatorAuto, ValidatorRequired } from "../../src/Feature/Alias/Valida
 import { InlineTitleManager } from "@src/Feature/InlineTitle/InlineTitleManager";
 import { CanvasManager } from "@src/Feature/Canvas/CanvasManager";
 import AbstractManager from "../../src/Feature/AbstractManager";
-import ManagerService from "../../src/Feature/ManagerService";
+import FeatureService from "../../src/Feature/ManagerService";
 import FeatureHelper from "@src/Utils/FeatureHelper";
 
 export default (container: Container) => {
-    container.bind(SI["feature:service"]).to(ManagerService).inSingletonScope();
+    container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
     container.bind(SI["feature:composer"]).to(FeatureComposer).inSingletonScope();
     container.bind(SI["manager:composer"]).to(ManagerComposer).inSingletonScope();
     container.bind(SI["feature:helper"]).to(FeatureHelper).inSingletonScope();
@@ -37,12 +37,12 @@ export default (container: Container) => {
     container
         .bind(SI["factory:feature"])
         .toAutoNamedFactory<FeatureInterface<any>>(SI.feature)
-        .onActivation((c, i) => name => {
+        .onActivation((c, i) => (name: string) => {
             console.log('------', i)
             const feature: FeatureInterface<any> = i(name);
             console.log("feature", feature);
             if (feature instanceof AbstractManager) {
-                const service: ManagerService = c.container.get(SI["feature:service"]);
+                const service: FeatureService = c.container.get(SI["feature:service"]);
                 feature.setResolver(service.createResolver(feature.getId()));
             }
             return feature;
@@ -55,11 +55,11 @@ export default (container: Container) => {
     // container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
     // container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
     // container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
-    // container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
-    // container
-    //     .bind<FeatureInterface<any>>(SI.feature)
-    //     .to(InlineTitleManager)
-    //     .whenTargetNamed(InlineTitleManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
+    container
+        .bind<FeatureInterface<any>>(SI.feature)
+        .to(InlineTitleManager)
+        .whenTargetNamed(InlineTitleManager.getId());
     // container.bind<FeatureInterface<any>>(SI.feature).to(CanvasManager).whenTargetNamed(CanvasManager.getId());
 
     container

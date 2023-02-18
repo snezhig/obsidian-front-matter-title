@@ -5,7 +5,7 @@ import { inject, injectable } from "inversify";
 import { ObsidianModalFactory } from "@config/inversify.factory.types";
 import SI from "../../../../config/inversify.types";
 import { Feature } from "@src/enum";
-import { FeatureInfoInterface } from "@src/Utils/FeatureInfo/Interfaces";
+import FeatureHelper from "../../../Utils/FeatureHelper";
 
 @injectable()
 export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "templates"> {
@@ -13,7 +13,7 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
         @inject(SI["factory:obsidian:modal"])
         private factory: ObsidianModalFactory,
         @inject(SI["feature:helper"])
-        private info: FeatureInfoInterface
+        private helper: FeatureHelper
     ) {
         super();
     }
@@ -76,7 +76,7 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
                     }
 
                     const templates = this.item.get(feature);
-                    contentEl.createEl("h4", null, e => e.setText(this.info.getName(feature)));
+                    contentEl.createEl("h4", null, e => e.setText(this.helper.getName(feature)));
                     for (const type of Object.keys(templates.value()) as (keyof TemplateValue)[]) {
                         const s = new Setting(contentEl)
                             .setName(type[0].toUpperCase() + type.substring(1))
