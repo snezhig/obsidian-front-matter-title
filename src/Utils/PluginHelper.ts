@@ -5,7 +5,10 @@ import { StrategyType, ValidatorType } from "../Feature/Alias/Types";
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
         return {
-            templates: { common: { main: "title", fallback: "head" } },
+            templates: {
+                common: { main: "title", fallback: "head" },
+                ...Object.fromEntries(Object.values(Feature).map(e => [e, { main: null, fallback: null }])),
+            },
             rules: {
                 paths: {
                     mode: "black",

@@ -69,7 +69,6 @@ export default class ExplorerManager extends AbstractManager {
     }
 
     private async setTitle(item: TFileExplorerItem): Promise<boolean> {
-        console.log(this.resolver.resolve(item.file.path));
         const title = await (async () => this.resolver.resolve(item.file.path))().catch(() => null);
         if (this.isTitleEmpty(title)) {
             return this.restore(item);

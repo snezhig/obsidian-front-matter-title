@@ -10,7 +10,6 @@ import { Resolver } from "../../src/Resolver/Resolver";
 export default new ContainerModule(bind => {
     bind<interfaces.Factory<string>>(SI["factory:resolver:template"]).toFactory<string, [string]>(c => value => {
         const storage = c.container.get<Storage<SettingsType>>(SI["settings:storage"]);
-        console.log(storage);
 
         const [name, type]: [TemplateNames, keyof TemplateValue] = value.split(':') as [TemplateNames, keyof TemplateValue]
         const targetTemplates = storage.get('templates').get(name);

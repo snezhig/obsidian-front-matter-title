@@ -38,9 +38,7 @@ export default (container: Container) => {
         .bind(SI["factory:feature"])
         .toAutoNamedFactory<FeatureInterface<any>>(SI.feature)
         .onActivation((c, i) => (name: string) => {
-            console.log('------', i)
             const feature: FeatureInterface<any> = i(name);
-            console.log("feature", feature);
             if (feature instanceof AbstractManager) {
                 const service: FeatureService = c.container.get(SI["feature:service"]);
                 feature.setResolver(service.createResolver(feature.getId()));

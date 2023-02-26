@@ -37,14 +37,18 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     private async loadSettings(): Promise<void> {
+        const loaded = await this.loadData();
+        if (Array.isArray(loaded.templates)) {
+            loaded.templates = {
+                common: { main: loaded.templates?.[0] ?? "title", fallback: loaded.templates?.[1] ?? "" },
+            };
+        }
         let data: SettingsType = {
             ...PluginHelper.createDefaultSettings(),
             ...{ boot: { delay: 1000 } },
         };
         data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
-        if (Array.isArray(data.templates)) {
-            data.templates = { common: { main: data.templates?.[0] ?? "title", fallback: data.templates?.[1] ?? "" } };
-        }
+
         this.storage = new Storage<SettingsType>(data);
         this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
         this.addSettingTab(this.container.resolve(SettingsTab).getTab());

@@ -97,6 +97,7 @@ export default class SettingsTab {
     private dispatch(): void {
         this.dispatcher.dispatch("settings:tab:close", null);
         const changed = ObjectHelper.compare(this.previous, this.storage.collect());
+
         if (Object.keys(changed).length === 0) {
             return;
         }

@@ -62,38 +62,41 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
                 ? `Current template will be used as ${type} for this feature`
                 : `Common ${type} will be used. Its value is "${this.item.get("common").get(type).value()}"`;
 
-        new Setting(this.container).setName("Managers`s templates").addButton(cb =>
-            cb.setButtonText("Manage").onClick(() => {
-                const modal = this.factory();
-                const { contentEl } = modal;
-                contentEl.setText("Manager`s templates");
-                for (const feature of Object.values(Feature)) {
-                    if (feature === Feature.ExplorerSort) {
-                        continue;
-                    }
-                    if (!this.item.get(feature)) {
-                        this.item.add(feature, { main: null, fallback: null });
-                    }
+        new Setting(this.container)
+            .setName("Managers' templates")
+            .setDesc("Manage templates for each feature individually")
+            .addButton(cb =>
+                cb.setButtonText("Manage").onClick(() => {
+                    const modal = this.factory();
+                    const { contentEl } = modal;
+                    contentEl.setText("Managers' templates");
+                    for (const feature of Object.values(Feature)) {
+                        if (feature === Feature.ExplorerSort) {
+                            continue;
+                        }
+                        if (!this.item.get(feature)) {
+                            this.item.add(feature, { main: null, fallback: null });
+                        }
 
-                    const templates = this.item.get(feature);
-                    contentEl.createEl("h4", null, e => e.setText(this.helper.getName(feature)));
-                    for (const type of Object.keys(templates.value()) as (keyof TemplateValue)[]) {
-                        const s = new Setting(contentEl)
-                            .setName(type[0].toUpperCase() + type.substring(1))
-                            .setDesc(getDesc(type, templates.get(type).value()))
-                            .addText(text =>
-                                text
-                                    .setPlaceholder(`Common ${type} is used`)
-                                    .setValue(templates.get(type).value())
-                                    .onChange(value => {
-                                        templates.get(type).set(value ? value : null);
-                                        s.setDesc(getDesc(type, value));
-                                    })
-                            );
+                        const templates = this.item.get(feature);
+                        contentEl.createEl("h4", null, e => e.setText(this.helper.getName(feature)));
+                        for (const type of Object.keys(templates.value()) as (keyof TemplateValue)[]) {
+                            const s = new Setting(contentEl)
+                                .setName(type[0].toUpperCase() + type.substring(1))
+                                .setDesc(getDesc(type, templates.get(type).value()))
+                                .addText(text =>
+                                    text
+                                        .setPlaceholder(`Common ${type} is used`)
+                                        .setValue(templates.get(type).value())
+                                        .onChange(value => {
+                                            templates.get(type).set(value ? value : null);
+                                            s.setDesc(getDesc(type, value));
+                                        })
+                                );
+                        }
                     }
-                }
-                modal.open();
-            })
-        );
+                    modal.open();
+                })
+            );
     }
 }
