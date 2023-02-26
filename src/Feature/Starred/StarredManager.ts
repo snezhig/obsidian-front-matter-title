@@ -2,7 +2,6 @@ import { EventRef, StarredPluginView } from "obsidian";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/enum";
 import AbstractManager from "@src/Feature/AbstractManager";
@@ -16,9 +15,6 @@ export default class StarredManager extends AbstractManager {
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
-        @named(Resolving.Sync)
-        private resolver: ResolverInterface<Resolving.Sync>,
         @inject(SI.logger)
         @named("manager:starred")
         private logger: LoggerInterface

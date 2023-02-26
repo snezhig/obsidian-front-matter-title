@@ -2,7 +2,6 @@ import AbstractManager from "@src/Feature/AbstractManager";
 import { inject, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { Feature } from "@src/enum";
@@ -18,9 +17,6 @@ export default class SearchManager extends AbstractManager {
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
-        @named(Resolving.Sync)
-        private resolver: ResolverInterface,
         @inject(SI.logger)
         @named("manager:starred")
         private logger: LoggerInterface

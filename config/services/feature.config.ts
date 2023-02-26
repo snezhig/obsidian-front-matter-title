@@ -47,20 +47,20 @@ export default (container: Container) => {
             }
             return feature;
         });
-    // container.bind<FeatureInterface<any>>(SI.feature).to(AliasManager).whenTargetNamed(AliasManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(AliasManager).whenTargetNamed(AliasManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerManager).whenTargetNamed(ExplorerManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerSort).whenTargetNamed(ExplorerSort.getId());
-    // container.bind<FeatureInterface<any>>(SI.feature).to(SearchManager).whenTargetNamed(SearchManager.getId());
-    // container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
-    // container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
-    // container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
-    // container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(SearchManager).whenTargetNamed(SearchManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
     container
         .bind<FeatureInterface<any>>(SI.feature)
         .to(InlineTitleManager)
         .whenTargetNamed(InlineTitleManager.getId());
-    // container.bind<FeatureInterface<any>>(SI.feature).to(CanvasManager).whenTargetNamed(CanvasManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(CanvasManager).whenTargetNamed(CanvasManager.getId());
 
     container
         .bind(SI["factory:alias:modifier:strategy"])

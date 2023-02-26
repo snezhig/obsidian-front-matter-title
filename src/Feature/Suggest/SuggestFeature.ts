@@ -1,5 +1,4 @@
 import { Feature } from "@src/enum";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { Chooser, SuggestModalChooserFileItem } from "obsidian";
 import AbstractFeature from "../AbstractFeature";
@@ -13,9 +12,6 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
     private state: boolean;
 
     constructor(
-        @inject(SI.resolver)
-        @named(Resolving.Sync)
-        private resolver: ResolverInterface,
         @inject(SI["newable:obsidian:chooser"])
         chooser: Newable<Chooser>
     ) {

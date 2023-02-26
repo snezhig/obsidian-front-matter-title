@@ -22,7 +22,6 @@ export default class GraphManager extends AbstractManager {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
         @inject(SI["factory:replacer"])
         private factory: FunctionReplacerFactory<GraphNode, "getDisplayText", GraphManager>,
         @inject(SI.logger)

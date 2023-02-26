@@ -18,7 +18,6 @@ export default class TabManager extends AbstractManager {
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["factory:obsidian:active:file"])
