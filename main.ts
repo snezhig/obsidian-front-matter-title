@@ -83,6 +83,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         this.fc = Container.get(SI["feature:composer"]);
         this.mc = Container.get(SI["manager:composer"]);
         this.bind();
+        this.registerCommands();
     }
 
     private bindServices(): void {
@@ -156,5 +157,21 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);
         }
+    }
+
+    private registerCommands(): void {
+        this.addCommand({
+            id: "ofmt-features-disable",
+            name: "Disable features",
+            callback: () => this.fc.disableAll(),
+        });
+        this.addCommand({
+            id: "ofmt-features-reload",
+            name: "Reload features",
+            callback: () => {
+                this.reloadFeatures();
+                this.mc.refresh();
+            },
+        });
     }
 }
