@@ -29,7 +29,7 @@ jobs:
         run: npm run test
 
   pretty:
-#     needs: validate
+    needs: validate
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'snezhig/obsidian-front-matter-title'
 
