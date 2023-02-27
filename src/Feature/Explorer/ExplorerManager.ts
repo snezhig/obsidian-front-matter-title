@@ -1,6 +1,6 @@
 import { TFileExplorerItem, TFileExplorerView } from "obsidian";
 import { Leaves, Feature } from "@src/enum";
-import { inject, injectable, named } from "inversify";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import AbstractManager from "@src/Feature/AbstractManager";
