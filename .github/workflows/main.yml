@@ -26,6 +26,7 @@ jobs:
           
   validate:
     needs: pre_validate
+    if: needs.pre_validate.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
 
     steps:
