@@ -40,8 +40,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         const loaded = await this.loadData();
         if (Array.isArray(loaded.templates)) {
             loaded.templates = {
-                common: { main: loaded.templates?.[0] ?? "title", fallback: loaded.templates?.[1] ?? "" },
                 ...PluginHelper.createDefaultSettings().templates,
+                common: { main: loaded.templates?.[0] ?? "title", fallback: loaded.templates?.[1] ?? "" },
             };
         }
         const data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
