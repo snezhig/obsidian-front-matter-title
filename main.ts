@@ -121,7 +121,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 this.dispatcher.dispatch("metadata:cache:changed", new Event({ path: file.path }))
             )
         );
-
         this.app.workspace.onLayoutReady(async () => {
             this.registerEvent(
                 this.app.vault.on("rename", ({ path: actual }, old) =>
