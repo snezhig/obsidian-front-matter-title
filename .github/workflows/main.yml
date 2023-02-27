@@ -10,23 +10,23 @@ on:
     branches: ["**"]
 
 jobs:
-#   validate:
-#     runs-on: ubuntu-latest
+  validate:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - uses: actions/checkout@v3
-#       - name: Use Node.js ${{ matrix.node-version }}
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: 16
-#           cache: "npm"
-#       - run: npm i
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
+      - run: npm i
 
-#       - name: Eslint
-#         run: npm run eslint
+      - name: Eslint
+        run: npm run eslint
 
-#       - name: Run test
-#         run: npm run test
+      - name: Run test
+        run: npm run test
 
   pretty:
 #     needs: validate
@@ -34,10 +34,6 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == 'snezhig/obsidian-front-matter-title'
 
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -45,7 +41,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Prettify code
-        uses: creyD/prettier_action@v4.2
+        uses: creyD/prettier_action@v4.3
         with:
           # This part is also where you can pass other options, for example:
           prettier_options: --write *.ts *.json src test --ignore-path package-lock.json
