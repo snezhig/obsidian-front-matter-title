@@ -1,52 +1,40 @@
 import { ResolverInterface, ResolverServiceInterface } from "@src/Resolver/Interfaces";
 import { NullResolverFactory, ResolverTemplateFactory } from "@src/Resolver/ResolverType";
-import { inject, injectable } from "inversify";
+import { inject, injectable, named } from "inversify";
 import SI from "../../config/inversify.types";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 
 @injectable()
 export default class ResolverService implements ResolverServiceInterface {
     private resolvers: Map<string, ResolverInterface> = new Map();
-    private templateNames: Map<string, Set<string>> = new Map();
 
     constructor(
         @inject(SI["factory:resolver:resolver"])
         private factory: NullResolverFactory,
         @inject(SI["factory:resolver:template"])
-        private templateFactory: ResolverTemplateFactory
+        private templateFactory: ResolverTemplateFactory,
+        @inject(SI.logger)
+        @named("resolver:service")
+        private logger: LoggerInterface
     ) {}
 
-    create(name: string) {
-        const template = this.templateFactory(name);
-        const resolver = this.getOrCreate(template);
-        this.keepTemplateName(template, name);
-        return resolver;
+    create(template: string): ResolverInterface {
+        this.logger.log(`Create "${template}" template`);
+        return this.getOrCreate(template);
+    }
+
+    createNamed(name: string) {
+        this.logger.log(`Create named "${name}" template`);
+        return this.create(this.templateFactory(name));
     }
 
     private getOrCreate(template: string): ResolverInterface {
         if (!this.resolvers.has(template)) {
+            this.logger.log(`Create resolver for "${template}" template`);
             const resolver = this.factory();
             resolver.setTemplate(template);
             this.resolvers.set(template, resolver);
         }
         return this.resolvers.get(template);
-    }
-
-    private keepTemplateName(template: string, name: string) {
-        if (!this.templateNames.has(template)) {
-            this.templateNames.set(template, new Set());
-        }
-        this.templateNames.get(template).add(name);
-    }
-
-    flush() {
-        this.templateNames.clear();
-        this.resolvers.clear();
-    }
-
-    private handleUnresolved(): void {
-        const template: string = "";
-        for (const name of this.templateNames.get(template)) {
-            const event = { template, name };
-        }
     }
 }

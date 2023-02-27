@@ -10,8 +10,8 @@ export default class FeatureService {
     ) {}
 
     public createResolver(name: string): ResolverInterface | null {
-        const main = this.service.create(`${name}:main`);
-        const fallback = this.service.create(`${name}:fallback`);
+        const main = this.service.createNamed(`${name}:main`);
+        const fallback = this.service.createNamed(`${name}:fallback`);
         return {
             resolve(path: string): string | null {
                 return main.resolve(path) ?? fallback.resolve(path);

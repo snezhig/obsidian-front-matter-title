@@ -1,8 +1,8 @@
-import TemplateInterface from "@src/Interfaces/TemplateInterface";
-import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
+import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import { inject, injectable } from "inversify";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
 import SI from "@config/inversify.types";
+import { TemplateInterface } from "@src/Creator/Interfaces";
 
 @injectable()
 export default class Composite implements TemplateInterface {

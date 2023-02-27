@@ -1,15 +1,16 @@
 import { mock } from "jest-mock-extended";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { EventRef, Events, Plugin, StarredPluginView } from "obsidian";
 import { Feature } from "@src/enum";
 import StarredManager from "@src/Feature/Starred/StarredManager";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 
 const mockFacade = mock<ObsidianFacade>();
-const mockResolver = mock<ResolverInterface<Resolving.Sync>>();
+const mockResolver = mock<ResolverInterface>();
 const path = "/path/to/file.md";
-const manager = new StarredManager(mockFacade, mockResolver, mock<LoggerInterface>());
+const manager = new StarredManager(mockFacade, mock<LoggerInterface>());
+manager.setResolver(mockResolver);
 
 const plugin = mock<Plugin & Events>({ on: jest.fn(() => ref) });
 const ref = mock<EventRef>();

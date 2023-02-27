@@ -4,11 +4,11 @@ import Event from "@src/Components/EventDispatcher/Event";
 import EventDispatcherInterface, {
     Callback,
 } from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import ResolverCachedProxy from "@src/Resolver/ResolverCachedProxy";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
-import { mock, mockClear } from "jest-mock-extended";
-import { AppEvents } from "../../../src/Types";
+import { mock } from "jest-mock-extended";
+import { AppEvents } from "@src/Types";
+import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
 
 const mockCacheItem = mock<CacheItemInterface<string | null>>();
 mockCacheItem.set.mockReturnThis();
@@ -16,7 +16,7 @@ const mockCache = mock<CacheInterface>();
 mockCache.getItem.mockReturnValue(mockCacheItem);
 
 const mockDispatcher = mock<EventDispatcherInterface<ResolverEvents & AppEvents>>();
-const mockResolver = mock<ResolverInterface>();
+const mockResolver = mock<ResolverDynamicInterface>();
 
 let metadataCacheChangedCallback: Callback<AppEvents["metadata:cache:changed"]> = null;
 let fileRenameCallback: Callback<AppEvents["file:rename"]> = null;
@@ -44,7 +44,7 @@ describe("Test cached proxy", () => {
     const expected = "foo";
 
     mockCacheItem.getKey.mockReturnValue(path);
-    const cached: ResolverInterface = new ResolverCachedProxy(mockResolver, mockCache, mockDispatcher);
+    const cached: ResolverDynamicInterface = new ResolverCachedProxy(mockResolver, mockCache, mockDispatcher);
 
     beforeEach(() => {
         mockResolver.resolve.mockClear();

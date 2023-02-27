@@ -11,7 +11,7 @@ import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import { ResolverInterface } from "../../Resolver/Interfaces";
-import FeatureService from "../ManagerService";
+import FeatureService from "../FeatureService";
 
 @injectable()
 export default class ExplorerSort extends AbstractFeature<Feature> {

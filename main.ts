@@ -41,14 +41,10 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         if (Array.isArray(loaded.templates)) {
             loaded.templates = {
                 common: { main: loaded.templates?.[0] ?? "title", fallback: loaded.templates?.[1] ?? "" },
+                ...PluginHelper.createDefaultSettings().templates,
             };
         }
-        let data: SettingsType = {
-            ...PluginHelper.createDefaultSettings(),
-            ...{ boot: { delay: 1000 } },
-        };
-        data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
-
+        const data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
         this.storage = new Storage<SettingsType>(data);
         this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
         this.addSettingTab(this.container.resolve(SettingsTab).getTab());
@@ -170,7 +166,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             name: "Reload features",
             callback: () => {
                 this.reloadFeatures();
-                this.mc.refresh();
+                this.mc.refresh().catch(console.error);
             },
         });
     }

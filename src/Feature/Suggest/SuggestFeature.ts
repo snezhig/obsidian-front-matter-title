@@ -2,20 +2,26 @@ import { Feature } from "@src/enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { Chooser, SuggestModalChooserFileItem } from "obsidian";
 import AbstractFeature from "../AbstractFeature";
-import { inject, injectable, interfaces, named } from "inversify";
+import { inject, injectable, interfaces } from "inversify";
 import SI from "@config/inversify.types";
 import Newable = interfaces.Newable;
+import FeatureService from "@src/Feature/FeatureService";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 
 @injectable()
 export default class SuggestFeature extends AbstractFeature<Feature> {
     private replacer: FunctionReplacer<Chooser, "setSuggestions", SuggestFeature> = null;
     private state: boolean;
+    private resolver: ResolverInterface;
 
     constructor(
         @inject(SI["newable:obsidian:chooser"])
-        chooser: Newable<Chooser>
+        chooser: Newable<Chooser>,
+        @inject(SI["feature:service"])
+        service: FeatureService
     ) {
         super();
+        this.resolver = service.createResolver(this.getId());
         this.createChooserReplacer(chooser);
     }
 

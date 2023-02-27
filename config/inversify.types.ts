@@ -1,6 +1,5 @@
 const SI = {
     "factory:replacer": "",
-    "factory:templates": "",
     "event:dispatcher": "",
     "alias:modifier": "",
     "alias:modifier:strategy": "",
@@ -10,7 +9,6 @@ const SI = {
     "component:extractor": "",
     "component:extractor:strategy": "",
     "creator:creator": "",
-    "creator:creator:adapter": "",
     "creator:fallback": "",
     "creator:template": "",
     "delimiter": "",
@@ -56,7 +54,6 @@ const SI = {
     "factory:settings:builder": "",
     "settings:storage": "",
     "template:pattern": "",
-    "templates": "",
     api: "",
     defer: "",
     "factory:api": "",

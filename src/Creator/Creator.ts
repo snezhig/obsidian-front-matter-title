@@ -1,12 +1,10 @@
-import TemplateInterface from "../Interfaces/TemplateInterface";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import PathNotFoundException from "@src/Components/Extractor/Exceptions/PathNotFoundException";
 import TypeNotSupportedException from "@src/Components/Extractor/Exceptions/TypeNotSupportedException";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import CacheInterface from "@src/Components/Cache/CacheInterface";
 import TemplateFactory from "@src/Creator/Template/Factory";
-import { CreatorInterface } from "@src/Interfaces/CreatorInterfaceAdapter";
+import { CreatorInterface, TemplateInterface } from "@src/Creator/Interfaces";
 
 @injectable()
 export default class Creator implements CreatorInterface {

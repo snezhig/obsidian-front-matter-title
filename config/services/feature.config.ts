@@ -21,12 +21,12 @@ import {
     ValidatorInterface as AliasValidatorInterface,
 } from "../../src/Feature/Alias/Interfaces";
 import { StrategyType as AliasStrategyType, ValidatorType as AliasValidatorType } from "../../src/Feature/Alias/Types";
-import { ValidatorAuto, ValidatorRequired } from "../../src/Feature/Alias/Validator";
+import { ValidatorAuto, ValidatorRequired } from "@src/Feature/Alias/Validator";
 import { InlineTitleManager } from "@src/Feature/InlineTitle/InlineTitleManager";
 import { CanvasManager } from "@src/Feature/Canvas/CanvasManager";
 import AbstractManager from "../../src/Feature/AbstractManager";
-import FeatureService from "../../src/Feature/ManagerService";
 import FeatureHelper from "@src/Utils/FeatureHelper";
+import FeatureService from "@src/Feature/FeatureService";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -35,7 +35,7 @@ export default (container: Container) => {
     container.bind(SI["feature:helper"]).to(FeatureHelper).inSingletonScope();
 
     container
-        .bind(SI["factory:feature"])
+        .bind<interfaces.AutoNamedFactory<FeatureInterface<any>>>(SI["factory:feature"])
         .toAutoNamedFactory<FeatureInterface<any>>(SI.feature)
         .onActivation((c, i) => (name: string) => {
             const feature: FeatureInterface<any> = i(name);

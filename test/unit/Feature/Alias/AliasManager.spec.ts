@@ -1,11 +1,10 @@
 import { mock } from "jest-mock-extended";
-import { MetadataCacheFactory } from "@config/inversify.factory.types";
-import { CachedMetadata, FrontMatterCache, MetadataCache, MetadataCacheExt, Pos } from "obsidian";
+import { CachedMetadata, FrontMatterCache, MetadataCacheExt, Pos } from "obsidian";
 import { AliasManager } from "@src/Feature/Alias/AliasManager";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/enum";
-import { StrategyInterface, ValidatorInterface } from "../../../../src/Feature/Alias/Interfaces";
-import { StrategyType, ValidatorType } from "../../../../src/Feature/Alias/Types";
+import { StrategyInterface, ValidatorInterface } from "@src/Feature/Alias/Interfaces";
+import { StrategyType, ValidatorType } from "@src/Feature/Alias/Types";
 
 const mockValidator = mock<ValidatorInterface>({ validate: jest.fn(() => true) });
 const mockValidatorFactory = jest.fn(() => mockValidator);

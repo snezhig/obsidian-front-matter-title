@@ -1,6 +1,6 @@
-import TemplateInterface from "../../Interfaces/TemplateInterface";
 import { inject, injectable } from "inversify";
 import SI from "../../../config/inversify.types";
+import { TemplateInterface } from "@src/Creator/Interfaces";
 
 @injectable()
 export default class Factory {

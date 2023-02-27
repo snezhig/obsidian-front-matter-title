@@ -6,7 +6,7 @@ export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
         return {
             templates: {
-                common: { main: "title", fallback: "head" },
+                common: { main: "title", fallback: "fallback_title" },
                 ...Object.fromEntries(Object.values(Feature).map(e => [e, { main: null, fallback: null }])),
             },
             rules: {
@@ -21,7 +21,7 @@ export default class PluginHelper {
             },
             debug: false,
             boot: {
-                delay: 0,
+                delay: 1000,
             },
             features: {
                 [Feature.Alias]: {

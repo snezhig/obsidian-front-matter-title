@@ -20,9 +20,7 @@ const dispatcher = Container.get<EventDispatcherInterface<SettingsEvent>>(SI["ev
 const createDefaultSettings = (): SettingsType => PluginHelper.createDefaultSettings();
 describe("Test App", () => {
     new App();
-    test("Templates should not exist", () => {
-        expect(Container.isBound(SI.templates)).toBeFalsy();
-    });
+
     test("Delimiter should not exist", () => {
         expect(Container.isBound(SI.delimiter)).toBeFalsy();
     });
@@ -38,12 +36,9 @@ describe("Test App", () => {
         });
         test("Dispatch event", () => {
             const settings = createDefaultSettings();
-            settings.templates = ["title", "fallback_title"];
+            settings.templates = { common: { main: "title", fallback: "fallback_title" } };
             settings.rules.paths = { values: ["foo"], mode: "black" };
             dispatcher.dispatch("settings.loaded", new Event({ settings }));
-        });
-        test("Should bind templates", () => {
-            expect(Container.get(SI.templates)).toEqual(["title", "fallback_title"]);
         });
 
         test("Should bind delimiter", () => {
@@ -55,18 +50,6 @@ describe("Test App", () => {
     describe('Test "settings.changed event"', () => {
         afterEach(() => spy.dispatch.mockClear());
         beforeAll(() => spy.dispatch.mockClear());
-        test("Should change templates and dispatch new event", () => {
-            const old = createDefaultSettings();
-            const actual = createDefaultSettings();
-            actual.templates = ["actual_title"];
-            const changed = ObjectHelper.compare(old, actual);
-
-            dispatcher.dispatch("settings:changed", new Event({ old, actual, changed }));
-
-            expect(Container.get<string>(SI.templates)).toEqual(["actual_title"]);
-            expect(spy.dispatch).toHaveBeenCalledWith("resolver:clear", null);
-            expect(spy.dispatch).toHaveBeenCalledTimes(2);
-        });
 
         test("Should change delimiter", () => {
             const old = createDefaultSettings();

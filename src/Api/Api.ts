@@ -1,11 +1,10 @@
 import { ApiInterface } from "front-matter-plugin-api-provider";
-import { inject, injectable, named } from "inversify";
-import SI from "@config/inversify.types";
-// import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
+import { injectable } from "inversify";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 
 @injectable()
 export default class Api implements ApiInterface {
-    constructor() {} // private resolver: ResolverInterface // @named(Resolving.Sync) // @inject(SI.resolver)
+    private resolver: ResolverInterface;
 
     async resolve(path: string): Promise<string | null> {
         return this.resolveSync(path);
@@ -13,5 +12,10 @@ export default class Api implements ApiInterface {
 
     resolveSync(path: string): string | null {
         return this.resolver.resolve(path);
+    }
+
+    setResolver(resolver: ResolverInterface): ApiInterface {
+        this.resolver = resolver;
+        return this;
     }
 }

@@ -1,10 +1,10 @@
-import { inject, injectable, named } from "inversify";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import Alias from "@src/Feature/Alias/Alias";
 import { StrategyInterface } from "../Interfaces";
-import FeatureService from "../../ManagerService";
-import { ResolverInterface } from "../../../Resolver/Interfaces";
-import { Feature } from "../../../enum";
+import FeatureService from "../../FeatureService";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
+import { Feature } from "@src/enum";
 
 @injectable()
 export default abstract class AbstractStrategy implements StrategyInterface {

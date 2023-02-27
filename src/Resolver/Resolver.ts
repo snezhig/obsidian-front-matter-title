@@ -1,15 +1,15 @@
 import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
-import { CreatorInterface } from "@src/Interfaces/CreatorInterfaceAdapter";
 import { inject, injectable, multiInject } from "inversify";
 import SI from "../../config/inversify.types";
 import FilterInterface from "../Interfaces/FilterInterface";
 import EventDispatcherInterface from "../Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { ResolverEvents } from "./ResolverType";
 import Event from "../Components/EventDispatcher/Event";
+import { CreatorInterface } from "@src/Creator/Interfaces";
 
 @injectable()
 export class Resolver implements ResolverDynamicInterface {
-    private template: string = "";
+    private template = "";
 
     constructor(
         @multiInject(SI.filter)

@@ -1,23 +1,17 @@
 import { ContainerModule, interfaces } from "inversify";
-import TemplateInterface from "../../src/Interfaces/TemplateInterface";
 import SI from "../inversify.types";
 import TemplateFactory from "../../src/Creator/Template/Factory";
 import Simple from "../../src/Creator/Template/Simple";
-import TemplatePlaceholderInterface from "../../src/Interfaces/TemplatePlaceholderInterface";
 import MetaPlaceholder from "../../src/Creator/Template/Placeholders/MetaPlaceholder";
-import CreatorInterfaceAdapter, { CreatorInterface } from "@src/Interfaces/CreatorInterfaceAdapter";
 import Creator from "../../src/Creator/Creator";
 import PlaceholderFactory from "../../src/Creator/Template/Placeholders/Factory";
 import Composite from "@src/Creator/Template/Composite";
 import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlaceholder";
 import FilePlaceholder from "@src/Creator/Template/Placeholders/FilePlaceholder";
 import HeadingPlaceholder from "@src/Creator/Template/Placeholders/HeadingPlaceholder";
-import CreatorAdapter from "@src/Adapters/CreatorAdapter";
+import { CreatorInterface, TemplateInterface, TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 
 export default new ContainerModule(bind => {
-    bind<string>(SI["factory:templates"]).toFactory<string[]>(
-        context => () => context.container.get<string[]>(SI.templates).filter(e => e)
-    );
     bind<TemplateFactory>(SI["factory:creator:template"]).to(TemplateFactory);
 
     bind<interfaces.Factory<TemplateInterface>>(SI["factory:template:resolver"]).toAutoNamedFactory<TemplateInterface>(
@@ -34,7 +28,6 @@ export default new ContainerModule(bind => {
     bind<TemplatePlaceholderInterface>(SI.placeholder).to(HeadingPlaceholder).whenTargetNamed("heading");
 
     bind<CreatorInterface>(SI["creator:creator"]).to(Creator);
-    bind<CreatorInterfaceAdapter>(SI["creator:creator:adapter"]).to(CreatorAdapter);
 
     bind<interfaces.Factory<TemplatePlaceholderInterface>>(SI["factory:placeholder:resolver"]).toFactory<
         TemplatePlaceholderInterface,
