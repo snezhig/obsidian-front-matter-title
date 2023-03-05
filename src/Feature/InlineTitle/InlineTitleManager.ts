@@ -78,13 +78,12 @@ export class InlineTitleManager extends AbstractManager {
     }
 
     private resetTitle(path: string): void {
-        const id = `${this.getId()}-${path}`;
-        this.fakeTitleElementService.remove(id);
+        this.fakeTitleElementService.remove(this.getId());
     }
 
     private setTitle(view: MarkdownViewExt, title: string | null): void {
         this.logger.log(`Set inline title "${title ?? " "}" for ${view.file.path}`);
-        const id = `${this.getId()}-${view.file.path}`;
+        const id = this.getId();
         const original = view.inlineTitleEl;
         const { created } = this.fakeTitleElementService.getOrCreate({ original, title, id, events: ["click"] });
         if (created) {

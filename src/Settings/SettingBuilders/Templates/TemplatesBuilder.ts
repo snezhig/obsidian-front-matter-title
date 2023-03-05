@@ -63,13 +63,13 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
                 : `Common ${type} will be used. Its value is "${this.item.get("common").get(type).value()}"`;
 
         new Setting(this.container)
-            .setName("Managers' templates")
+            .setName("Features' templates")
             .setDesc("Manage templates for each feature individually")
             .addButton(cb =>
                 cb.setButtonText("Manage").onClick(() => {
                     const modal = this.factory();
                     const { contentEl } = modal;
-                    contentEl.setText("Managers' templates");
+                    contentEl.setText("Features' templates");
                     for (const feature of Object.values(Feature)) {
                         if (feature === Feature.ExplorerSort) {
                             continue;
