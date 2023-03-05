@@ -27,6 +27,7 @@ import { CanvasManager } from "@src/Feature/Canvas/CanvasManager";
 import AbstractManager from "../../src/Feature/AbstractManager";
 import FeatureHelper from "@src/Utils/FeatureHelper";
 import FeatureService from "@src/Feature/FeatureService";
+import BacklinkManager from "../../src/Feature/Backlink/BacklingManager";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -54,6 +55,7 @@ export default (container: Container) => {
     container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(BacklinkManager).whenTargetNamed(BacklinkManager.getId());
     container
         .bind<FeatureInterface<any>>(SI.feature)
         .to(InlineTitleManager)

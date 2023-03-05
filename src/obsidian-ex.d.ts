@@ -80,6 +80,9 @@ declare module "obsidian" {
         };
     }
 
+    export abstract class BacklinkViewExt extends View
+
+
     export abstract class Chooser {
         setSuggestions(e: any): any;
     }

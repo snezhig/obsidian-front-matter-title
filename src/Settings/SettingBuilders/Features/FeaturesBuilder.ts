@@ -6,6 +6,7 @@ import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces
 import { inject, injectable } from "inversify";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import SI from "@config/inversify.types";
+import FeatureHelper from "../../../Utils/FeatureHelper";
 
 @injectable()
 export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "features"> {
@@ -14,7 +15,9 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
         @inject(SI["factory:settings:feature:builder"])
         private builderFactory: SettingsFeatureBuildFactory,
         @inject(SI["event:dispatcher"])
-        private dispatcher: EventDispatcherInterface<SettingsEvent>
+        private dispatcher: EventDispatcherInterface<SettingsEvent>,
+        @inject(SI["feature:helper"])
+        private helper: FeatureHelper
     ) {
         super();
     }
@@ -37,51 +40,13 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
     doBuild(): void {
         this.bind();
         this.container.createEl("h4", { text: "Features" });
-        const data: { feature: Feature; name: string; desc: string }[] = [
-            {
-                feature: Feature.Alias,
-                name: "Alias title",
-                desc: "Modify alias in metadata cache. The real alias will not be affected.",
-            },
-            { feature: Feature.Explorer, name: "Explorer title", desc: "Replace shown titles in the file explorer" },
-            { feature: Feature.ExplorerSort, name: "Explorer Sort", desc: "" },
-            { feature: Feature.Graph, name: "Graph title", desc: "Replace shown titles in the graph/local-graph" },
-            {
-                feature: Feature.Header,
-                name: "Header title",
-                desc: "Replace titles in header of leaves and update them",
-            },
-            {
-                feature: Feature.Starred,
-                name: "Starred",
-                desc: "Replace shown titles in starred plugin",
-            },
-            {
-                feature: Feature.Search,
-                name: "Search",
-                desc: "Replace shown titles in search leaf",
-            },
-            {
-                feature: Feature.Suggest,
-                name: "Suggest",
-                desc: "Replace shown titles in suggest modals",
-            },
-            {
-                feature: Feature.Tab,
-                name: "Tabs",
-                desc: "Replace shown titles in tabs",
-            },
-            {
-                feature: Feature.InlineTitle,
-                name: "Inline Title",
-                desc: "Replace shown titles in Inline Title",
-            },
-            {
-                feature: Feature.Canvas,
-                name: "Canvas",
-                desc: "Replace shown titles in Canvas",
-            },
-        ];
+        const data: { feature: Feature; name: string; desc: string }[] = this.helper
+            .getOrderedFeatures()
+            .map(feature => ({
+                desc: this.helper.getDescription(feature),
+                feature,
+                name: this.helper.getName(feature),
+            }));
         for (const item of data) {
             const builder = this.builderFactory(item.feature) ?? this.builderFactory("default");
             const settings = this.item.get(item.feature).value();

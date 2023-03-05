@@ -17,4 +17,5 @@ export enum Feature {
     Suggest = "suggest",
     InlineTitle = "inlineTitle",
     Canvas = "canvas",
+    Backlink = "backlink",
 }
