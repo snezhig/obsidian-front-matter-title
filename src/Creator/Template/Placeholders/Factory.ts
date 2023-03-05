@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import TemplatePlaceholderInterface from "../../../Interfaces/TemplatePlaceholderInterface";
+import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import SI from "../../../../config/inversify.types";
 
 @injectable()

@@ -3,16 +3,19 @@ import CacheInterface from "@src/Components/Cache/CacheInterface";
 import CacheItemInterface from "@src/Components/Cache/CacheItemInterface";
 import Event from "@src/Components/EventDispatcher/Event";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import { inject, injectable, named } from "inversify";
 import { ResolverEvents } from "./ResolverType";
+import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
+
 import { AppEvents } from "@src/Types";
 @injectable()
-export default class ResolverCachedProxy implements ResolverInterface {
+export default class ResolverCachedProxy implements ResolverDynamicInterface {
+    private template: string;
+
     constructor(
         @inject(SI.resolver)
         @named("original")
-        private resolver: ResolverInterface,
+        private resolver: ResolverDynamicInterface,
         @inject(SI.cache)
         private cache: CacheInterface,
         @inject(SI["event:dispatcher"])
@@ -59,5 +62,10 @@ export default class ResolverCachedProxy implements ResolverInterface {
             this.actualize(item);
         }
         return item.get() ?? null;
+    }
+
+    setTemplate(template: string): void {
+        this.template = template;
+        this.resolver.setTemplate(template);
     }
 }

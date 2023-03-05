@@ -2,7 +2,6 @@ import FunctionReplacer from "../../Utils/FunctionReplacer";
 import { AppEvents } from "@src/Types";
 import { inject, injectable, named } from "inversify";
 import SI from "../../../config/inversify.types";
-import ResolverInterface, { Resolving } from "../../Interfaces/ResolverInterface";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
@@ -11,6 +10,8 @@ import AbstractFeature from "../AbstractFeature";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
+import { ResolverInterface } from "../../Resolver/Interfaces";
+import FeatureService from "../FeatureService";
 
 @injectable()
 export default class ExplorerSort extends AbstractFeature<Feature> {
@@ -19,20 +20,21 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
     private readonly cb: (e: { id: Feature; result?: boolean }) => void;
     private refs: [ListenerRef<"manager:refresh">?, ListenerRef<"manager:update">?] = [];
+    private resolver: ResolverInterface;
 
     constructor(
-        @inject(SI.resolver)
-        @named(Resolving.Sync)
-        private resolver: ResolverInterface<Resolving.Sync>,
         @inject(SI.logger)
         @named("explorer:feature:sort")
         private logger: LoggerInterface,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
         @inject(SI["event:dispatcher"])
-        private dispatcher: EventDispatcherInterface<AppEvents>
+        private dispatcher: EventDispatcherInterface<AppEvents>,
+        @inject(SI["feature:service"])
+        service: FeatureService
     ) {
         super();
+        this.resolver = service.createResolver(Feature.Explorer);
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
         this.cb = e => {
             if (e.id === Feature.Explorer && (e.result === true || e.result === undefined)) {

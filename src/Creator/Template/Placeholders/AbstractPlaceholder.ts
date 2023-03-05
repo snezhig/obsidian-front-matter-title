@@ -1,8 +1,6 @@
-import TemplatePlaceholderInterface from "../../../Interfaces/TemplatePlaceholderInterface";
+import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import { injectable } from "inversify";
 
-// const PREFIXES_LINK = {};
-// const PREFIXES = Object.keys(PREFIXES_LINK);
 @injectable()
 export default abstract class AbstractPlaceholder implements TemplatePlaceholderInterface {
     protected placeholder: string;

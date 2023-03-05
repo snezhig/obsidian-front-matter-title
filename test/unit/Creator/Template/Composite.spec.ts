@@ -3,7 +3,7 @@ import Container from "../../../../config/inversify.config";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
 import SI from "@config/inversify.types";
 import { mock } from "jest-mock-extended";
-import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
+import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 
 const factory = mock<Factory>();
 const create = (template: string) => {

@@ -1,6 +1,6 @@
 import Factory from "@src/Creator/Template/Factory";
-import TemplateInterface from "@src/Interfaces/TemplateInterface";
 import { mock } from "jest-mock-extended";
+import { TemplateInterface } from "@src/Creator/Interfaces";
 
 describe("Factory Test", () => {
     beforeEach(() => resolver.mockClear);

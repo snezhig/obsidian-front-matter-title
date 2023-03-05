@@ -1,11 +1,10 @@
 import { mock, mockClear } from "jest-mock-extended";
 import FilterInterface from "../../../src/Interfaces/FilterInterface";
-import CreatorInterface from "../../../src/Interfaces/CreatorInterface";
-import ResolverSync from "../../../src/Resolver/ResolverSync";
-import { expect } from "@jest/globals";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
 import Event from "@src/Components/EventDispatcher/Event";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { Resolver } from "@src/Resolver/Resolver";
+import { CreatorInterface } from "@src/Creator/Interfaces";
 
 describe("Resolver Sync Test", () => {
     const path = "/test/path/file.md";
@@ -15,8 +14,9 @@ describe("Resolver Sync Test", () => {
     const creator = mock<CreatorInterface>();
 
     const dispatcher = mock<EventDispatcherInterface<ResolverEvents>>();
-
-    const resolver = new ResolverSync([filter], creator, dispatcher);
+    const template = "some.template";
+    const resolver = new Resolver([filter], creator, dispatcher);
+    resolver.setTemplate(template);
 
     afterEach(() => {
         mockClear(filter);
@@ -53,7 +53,7 @@ describe("Resolver Sync Test", () => {
         beforeEach(() => dispatcher.dispatch.mockClear());
         test("Case when cache item is not hit", () => {
             expect(resolver.resolve(path)).toEqual(title);
-            expect(creator.create).toHaveBeenNthCalledWith(1, path);
+            expect(creator.create).toHaveBeenNthCalledWith(1, path, template);
             expect(dispatcher.dispatch).toHaveBeenCalledTimes(1);
             expect(dispatcher.dispatch).toHaveBeenCalledWith(
                 "resolver:resolved",
@@ -71,7 +71,7 @@ describe("Resolver Sync Test", () => {
                 throw new Error(`Event ${name} is not expected`);
             });
             expect(resolver.resolve(path)).toEqual("bar");
-            expect(creator.create).toHaveBeenNthCalledWith(1, path);
+            expect(creator.create).toHaveBeenNthCalledWith(1, path, template);
             expect(dispatcher.dispatch).toHaveBeenCalledTimes(1);
             expect(dispatcher.dispatch).toHaveBeenCalledWith(
                 "resolver:resolved",

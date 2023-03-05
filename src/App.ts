@@ -29,17 +29,12 @@ export default class App {
     }
 
     private init(settings: SettingsType): void {
-        this.container.bind(SI.templates).toConstantValue(settings.templates);
         this.container.bind(SI.delimiter).toConstantValue(settings.rules.delimiter);
         this.container.get<LoggerComposer>(SI["logger:composer"])[settings.debug ? "enable" : "disable"]();
     }
 
     private onSettingsChanged({ actual, changed }: SettingsEvent["settings:changed"]): void {
         type events = ResolverEvents & AppEvents;
-
-        if (changed.templates) {
-            this.container.rebind(SI.templates).toConstantValue(actual.templates);
-        }
 
         if (changed?.rules?.delimiter) {
             this.container.rebind(SI.delimiter).toConstantValue(actual.rules.delimiter);

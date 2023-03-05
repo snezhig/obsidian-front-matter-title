@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { CachedMetadata, Plugin } from "obsidian";
+import { CachedMetadata, Modal, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
@@ -37,14 +37,14 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     private async loadSettings(): Promise<void> {
-        let data: SettingsType = {
-            ...PluginHelper.createDefaultSettings(),
-            ...{
-                templates: ["title"],
-                boot: { delay: 1000 },
-            },
-        };
-        data = ObjectHelper.fillFrom(data, (await this.loadData()) ?? {});
+        const loaded = await this.loadData();
+        if (Array.isArray(loaded.templates)) {
+            loaded.templates = {
+                ...PluginHelper.createDefaultSettings().templates,
+                common: { main: loaded.templates?.[0] ?? "title", fallback: loaded.templates?.[1] ?? "" },
+            };
+        }
+        const data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
         this.storage = new Storage<SettingsType>(data);
         this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
         this.addSettingTab(this.container.resolve(SettingsTab).getTab());
@@ -79,6 +79,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         this.fc = Container.get(SI["feature:composer"]);
         this.mc = Container.get(SI["manager:composer"]);
         this.bind();
+        this.registerCommands();
     }
 
     private bindServices(): void {
@@ -109,6 +110,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             Object.getPrototypeOf(this.app.workspace.editorSuggest.suggests[0].suggestions).constructor
         );
         Container.bind(SI["factory:obsidian:active:file"]).toFunction(() => this.app.workspace.getActiveFile());
+        Container.bind(SI["factory:obsidian:modal"]).toFunction(() => new Modal(this.app));
     }
 
     public onunload() {
@@ -150,5 +152,21 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         for (const [id, state] of states) {
             this.fc.toggle(id, state as boolean);
         }
+    }
+
+    private registerCommands(): void {
+        this.addCommand({
+            id: "ofmt-features-disable",
+            name: "Disable features",
+            callback: () => this.fc.disableAll(),
+        });
+        this.addCommand({
+            id: "ofmt-features-reload",
+            name: "Reload features",
+            callback: () => {
+                this.reloadFeatures();
+                this.mc.refresh().catch(console.error);
+            },
+        });
     }
 }

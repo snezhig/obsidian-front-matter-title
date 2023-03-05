@@ -1,7 +1,7 @@
 import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlaceholder";
 import { mock } from "jest-mock-extended";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
-import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
+import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 
 describe("Brackets Placeholder Test", () => {
     const factory = mock<Factory>();

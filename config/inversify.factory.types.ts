@@ -1,4 +1,4 @@
-import {MetadataCache, TFile} from "obsidian";
+import {MetadataCache, Modal, TFile} from "obsidian";
 import {SF, SFC} from "@src/Settings/SettingsType";
 import FeatureBuildInterface from "@src/Settings/Interface/FeatureBuildInterface";
 import FunctionReplacer, {FunctionPropertyNames, Implementation} from "@src/Utils/FunctionReplacer";
@@ -16,3 +16,4 @@ export type FunctionReplacerFactory<Target, Method extends FunctionPropertyNames
     args: O,
     implementation: Implementation<Target, Method, O>
 ) => FunctionReplacer<Target, Method, O>
+export type ObsidianModalFactory = () => Modal;

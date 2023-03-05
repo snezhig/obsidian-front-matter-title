@@ -1,11 +1,11 @@
 import { mock } from "jest-mock-extended";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { SearchPluginView, SearchViewDOM, TFile } from "obsidian";
 import SearchManager from "@src/Feature/Search/SearchManager";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 
 const addResult = jest.fn();
 const mockDom = mock<SearchViewDOM>({ addResult }, { deep: true });
@@ -19,7 +19,8 @@ const spyCreate = jest.spyOn(FunctionReplacer, "create").mockImplementation((t, 
 });
 const mockFacade = mock<ObsidianFacade>();
 const mockResolver = mock<ResolverInterface>();
-const manager = new SearchManager(mockFacade, mockResolver, mock<LoggerInterface>());
+const manager = new SearchManager(mockFacade, mock<LoggerInterface>());
+manager.setResolver(mockResolver);
 
 test(`Should return ${Feature.Search}`, () => expect(manager.getId()).toEqual(Feature.Search));
 

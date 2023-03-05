@@ -1,13 +1,13 @@
 import ProcessorListener from "../../../../src/Components/Processor/ProccessorListener";
-import { AppEvents } from "../../../../src/Types";
-import { ProcessorTypes } from "../../../../src/Components/Processor/ProcessorUtils";
+import { AppEvents } from "@src/Types";
+import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
 import ListenerRef from "../../../../src/Components/EventDispatcher/Interfaces/ListenerRef";
-import { Callback } from "../../../../src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { Callback } from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import EventDispatcherMock from "../../../../__mocks__/EventDispatcherMock";
 import Event from "../../../../src/Components/EventDispatcher/Event";
 import { mock } from "jest-mock-extended";
 import ProcessorInterface from "../../../../src/Components/Processor/Interfaces";
-import { ResolverEvents } from "../../../../src/Resolver/ResolverType";
+import { ResolverEvents } from "@src/Resolver/ResolverType";
 
 type Events = AppEvents & ResolverEvents;
 const events: Map<ListenerRef<keyof Events>, Callback<Events[keyof Events]>> = new Map();
@@ -44,7 +44,7 @@ test("Should not do anything on settings loaded, because processor is null", () 
     expect(mockDispatcher.addListener).not.toHaveBeenCalled();
 });
 
-test("Should create a processor and bind new event", () => {
+test("Should createNamed a processor and bind new event", () => {
     mockDispatcher.dispatch(
         "settings.loaded",
         new Event({ settings: { processor: { type: ProcessorTypes.Function, args: ["foo"] } } })
@@ -55,7 +55,7 @@ test("Should create a processor and bind new event", () => {
     expect(mockDispatcher.addListener).toHaveBeenCalledTimes(1);
 });
 
-test("Should create new processor without binding new event", () => {
+test("Should createNamed new processor without binding new event", () => {
     mockDispatcher.dispatch(
         "settings:changed",
         new Event({ actual: { processor: { type: ProcessorTypes.Replace, args: ["bar"] } } })

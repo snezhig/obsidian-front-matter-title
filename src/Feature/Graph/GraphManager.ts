@@ -8,7 +8,6 @@ import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef"
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { GraphNode, GraphView } from "obsidian";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { FunctionReplacerFactory } from "@config/inversify.factory.types";
 
@@ -23,9 +22,6 @@ export default class GraphManager extends AbstractManager {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
-        @named(Resolving.Sync)
-        private resolver: ResolverInterface<Resolving.Sync>,
         @inject(SI["factory:replacer"])
         private factory: FunctionReplacerFactory<GraphNode, "getDisplayText", GraphManager>,
         @inject(SI.logger)

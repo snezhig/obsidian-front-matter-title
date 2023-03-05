@@ -9,8 +9,11 @@ export type SFExt = {
 export type SFC = { enabled: boolean };
 export type SF = { [K in Feature]: SFC & { [P in keyof SFExt]: P extends K ? SFExt[P] : object }[keyof SFExt] };
 
+export type TemplateValue = { main: string | null; fallback: string | null };
+export type TemplateNames = "common" & Feature;
 export type SettingsType = {
-    templates: string[];
+    templates: { [K in Feature]?: TemplateValue } & { common: TemplateValue };
+
     processor: {
         type: ProcessorTypes | null;
         args: string[];

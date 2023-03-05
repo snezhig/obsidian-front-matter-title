@@ -1,7 +1,7 @@
-import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
 import { inject, injectable } from "inversify";
 import Factory from "@src/Creator/Template/Placeholders/Factory";
 import SI from "@config/inversify.types";
+import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 
 @injectable()
 export default class BracketsPlaceholder implements TemplatePlaceholderInterface {

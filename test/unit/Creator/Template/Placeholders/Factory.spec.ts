@@ -1,6 +1,6 @@
 import Factory from "@src/Creator/Template/Placeholders/Factory";
 import { mock } from "jest-mock-extended";
-import TemplatePlaceholderInterface from "@src/Interfaces/TemplatePlaceholderInterface";
+import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 
 describe("Factory Test", () => {
     const resolver = jest.fn((type: string, placeholder: string) => mock<TemplatePlaceholderInterface>());

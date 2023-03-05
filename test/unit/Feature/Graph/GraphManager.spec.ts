@@ -4,13 +4,13 @@ import EventDispatcherInterface, {
 } from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface from "@src/Interfaces/ResolverInterface";
 import GraphManager from "@src/Feature/Graph/GraphManager";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/enum";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import { GraphNode, GraphView } from "obsidian";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 
 jest.useFakeTimers();
 jest.spyOn(global, "setTimeout");
@@ -24,13 +24,15 @@ const mockFacade = mock<ObsidianFacade>({ getViewsOfType: jest.fn(() => []) });
 const mockResolver = mock<ResolverInterface>();
 
 test(`Should return ${Feature.Graph} as Id`, () => {
-    const manager = new GraphManager(mockDispatcher, mockFacade, mockResolver, mockFactory, mock<LoggerInterface>());
+    const manager = new GraphManager(mockDispatcher, mockFacade, mockFactory, mock<LoggerInterface>());
+    manager.setResolver(mockResolver);
     expect(GraphManager.getId()).toEqual(Feature.Graph);
     expect(manager.getId()).toEqual(Feature.Graph);
 });
 
 describe("Flow is case the graph is not opened yet", () => {
-    const manager = new GraphManager(mockDispatcher, mockFacade, mockResolver, mockFactory, mock<LoggerInterface>());
+    const manager = new GraphManager(mockDispatcher, mockFacade, mockFactory, mock<LoggerInterface>());
+    manager.setResolver(mockResolver);
     const mockReplacer = mock<FunctionReplacer<any, any, any>>();
 
     let callback: Callback<AppEvents["layout:change"]> = null;
@@ -116,7 +118,8 @@ describe("Flow is case the graph is not opened yet", () => {
 });
 
 describe("Flow in case graph is opened already", () => {
-    const manager = new GraphManager(mockDispatcher, mockFacade, mockResolver, mockFactory, mock<LoggerInterface>());
+    const manager = new GraphManager(mockDispatcher, mockFacade, mockFactory, mock<LoggerInterface>());
+    manager.setResolver(mockResolver);
     const mockReplacer = mock<FunctionReplacer<any, any, any>>();
     const renderer = {
         nodes: [mock<GraphNode>()],
@@ -127,7 +130,7 @@ describe("Flow in case graph is opened already", () => {
         mockFactory.mockReturnValueOnce(mockReplacer);
     });
 
-    test("Should not bind listener, but be enabled and create replacer", () => {
+    test("Should not bind listener, but be enabled and createNamed replacer", () => {
         expect(manager.isEnabled()).toBeFalsy();
         expect(renderer.onIframeLoad).not.toBeCalled();
 

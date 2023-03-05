@@ -1,5 +1,5 @@
 import { mock } from "jest-mock-extended";
-import { ValidatorAuto, ValidatorRequired } from "../../../../src/Feature/Alias/Validator";
+import { ValidatorAuto, ValidatorRequired } from "@src/Feature/Alias/Validator";
 import { CachedMetadata, FrontMatterCache } from "obsidian";
 
 describe("Test Required Validator", () => {
@@ -27,7 +27,7 @@ describe("Test Auto Validator", () => {
     const empty: FrontMatterCache = {
         position: { end: { col: 0, line: 0, offset: 0 }, start: { col: 0, line: 0, offset: 0 } },
     };
-    test("Should create empty frontmatter", () => {
+    test("Should createNamed empty frontmatter", () => {
         const cache = {} as CachedMetadata;
         expect(validator.validate(cache)).toBeTruthy();
         expect(cache).toHaveProperty("frontmatter", empty);

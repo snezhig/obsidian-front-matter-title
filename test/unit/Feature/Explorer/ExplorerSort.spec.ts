@@ -1,5 +1,4 @@
 import { mock } from "jest-mock-extended";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import { TFileExplorerView, WorkspaceLeaf } from "obsidian";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
@@ -10,23 +9,26 @@ import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface, {
     Callback,
 } from "../../../../src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import { AppEvents } from "../../../../src/Types";
+import { AppEvents } from "@src/Types";
+import FeatureService from "@src/Feature/FeatureService";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 
 jest.useFakeTimers();
 jest.spyOn(global, "setTimeout");
 
 const facade = mock<ObsidianFacade>();
 let callback: Callback<AppEvents[keyof AppEvents]>;
-const dispatcher = mock<EventDispatcherInterface<any>>();
+const mockDispatcher = mock<EventDispatcherInterface<any>>();
 const refs: [any?, any?] = [];
-dispatcher.addListener.mockImplementation(({ name, cb }) => {
+mockDispatcher.addListener.mockImplementation(({ name, cb }) => {
     callback = cb;
     const ref = { getName: () => name };
     refs.push(ref);
     return ref;
 });
-
-const sort = new ExplorerSort(mock<ResolverInterface<Resolving.Sync>>(), mock<LoggerInterface>(), facade, dispatcher);
+const mockFeatureService = mock<FeatureService>();
+mockFeatureService.createResolver.mockReturnValue(mock<ResolverInterface>());
+const sort = new ExplorerSort(mock<LoggerInterface>(), facade, mockDispatcher, mockFeatureService);
 
 const view = mock<TFileExplorerView>();
 // @ts-ignore
@@ -43,9 +45,9 @@ test("Should add listener after enabled", async () => {
     facade.getLeavesOfType.mockReturnValueOnce([leaf]);
     await sort.enable();
     expect(sort.isEnabled()).toBeTruthy();
-    expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:update", cb: expect.anything() });
-    expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:refresh", cb: expect.anything() });
-    expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
+    expect(mockDispatcher.addListener).toHaveBeenCalledWith({ name: "manager:update", cb: expect.anything() });
+    expect(mockDispatcher.addListener).toHaveBeenCalledWith({ name: "manager:refresh", cb: expect.anything() });
+    expect(mockDispatcher.addListener).toHaveBeenCalledTimes(2);
 });
 
 test("Should init timer to find item", () => {
@@ -64,9 +66,9 @@ test("Should switch off, requestSort and do not call requestSort by event", asyn
     await sort.disable();
     expect(sort.isEnabled()).toBeFalsy();
     expect(view.requestSort).toHaveBeenCalledTimes(1);
-    expect(dispatcher.removeListener).toHaveBeenCalledTimes(2);
-    expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[0]);
-    expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[1]);
+    expect(mockDispatcher.removeListener).toHaveBeenCalledTimes(2);
+    expect(mockDispatcher.removeListener).toHaveBeenCalledWith(refs[0]);
+    expect(mockDispatcher.removeListener).toHaveBeenCalledWith(refs[1]);
     callback(new Event({ id: Feature.Explorer }));
     expect(view.requestSort).toHaveBeenCalledTimes(1);
 });
@@ -77,5 +79,5 @@ test("Should not init times after disabling", () => {
 });
 
 test("Should not dispatch anything", () => {
-    expect(dispatcher.dispatch).not.toHaveBeenCalled();
+    expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
 });

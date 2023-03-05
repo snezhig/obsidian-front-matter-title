@@ -1,22 +1,22 @@
-import { ApiInterface } from "front-matter-plugin-api-provider";
 import { mock } from "jest-mock-extended";
 import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Api/Defer";
-import { expect } from "@jest/globals";
+import ResolverService from "@src/Resolver/ResolverService";
+import Api from "@src/Api/Api";
 
-const mockFactory = jest.fn(() => mock<ApiInterface>());
-
-const defer = new Defer(mockFactory);
+const mockFactory = jest.fn(() => mock<Api>());
+const mockService = mock<ResolverService>();
+const defer = new Defer(mockFactory, mockService);
 
 test("Should not been booted and bound", () => {
     expect(defer.isFeaturesReady()).toBeFalsy();
     expect(defer.isPluginReady()).toBeFalsy();
 });
 
-test("Should throw error", () => {
+test("Should be null", () => {
     expect(defer.getApi()).toBeNull();
 });
 
-test("Should call factory to create Api", async () => {
+test("Should call factory to createNamed Api", async () => {
     defer.setFlag(DeferPluginReady);
     expect(defer.isPluginReady()).toBeTruthy();
     expect(defer.isFeaturesReady()).toBeFalsy();

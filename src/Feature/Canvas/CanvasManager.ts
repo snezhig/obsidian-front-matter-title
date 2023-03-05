@@ -7,7 +7,6 @@ import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import { CanvasNode, CanvasViewExt } from "obsidian";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
 import { debounce } from "obsidian";
@@ -23,9 +22,6 @@ export class CanvasManager extends AbstractManager {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
-        @named(Resolving.Async)
-        private resolver: ResolverInterface<Resolving.Async>,
         @inject(SI.logger)
         @named(`manager:${CanvasManager.getId()}`)
         private logger: LoggerInterface,
@@ -71,6 +67,10 @@ export class CanvasManager extends AbstractManager {
         true
     );
 
+    private async resolve(path: string): Promise<string | null> {
+        return this.resolver.resolve(path);
+    }
+
     private async innerUpdate(path: string = null): Promise<boolean> {
         const promises = [];
         this.logger.log(`inner update "${path}"`);
@@ -87,7 +87,7 @@ export class CanvasManager extends AbstractManager {
                     continue;
                 }
                 promises.push(
-                    this.resolver.resolve(node.filePath).then(title => {
+                    this.resolve(node.filePath).then(title => {
                         if (title) {
                             this.setNodeTitle(node, title);
                         } else {

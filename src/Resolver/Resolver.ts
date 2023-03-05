@@ -1,30 +1,36 @@
-import FilterInterface from "../Interfaces/FilterInterface";
-import ResolverInterface, { Resolving, Return } from "../Interfaces/ResolverInterface";
-import CreatorInterface from "../Interfaces/CreatorInterface";
+import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
 import { inject, injectable, multiInject } from "inversify";
 import SI from "../../config/inversify.types";
-import { ResolverEvents } from "@src/Resolver/ResolverType";
-import Event from "@src/Components/EventDispatcher/Event";
-import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import FilterInterface from "../Interfaces/FilterInterface";
+import EventDispatcherInterface from "../Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { ResolverEvents } from "./ResolverType";
+import Event from "../Components/EventDispatcher/Event";
+import { CreatorInterface } from "@src/Creator/Interfaces";
 
 @injectable()
-export default class ResolverSync implements ResolverInterface {
+export class Resolver implements ResolverDynamicInterface {
+    private template = "";
+
     constructor(
         @multiInject(SI.filter)
         private filters: FilterInterface[],
-        @inject(SI.creator)
+        @inject(SI["creator:creator"])
         private creator: CreatorInterface,
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<ResolverEvents>
     ) {}
 
-    resolve(path: string): Return<Resolving.Sync> {
+    setTemplate(template: string): void {
+        this.template = template;
+    }
+
+    resolve(path: string): string | null {
         return this.valid(path) ? this.get(path) : null;
     }
 
     private get(path: string): string | null {
         try {
-            return this.dispatch(this.creator.create(path)) ?? null;
+            return this.dispatch(this.creator.create(path, this.template)) ?? null;
         } catch (e) {
             console.error(`Error by path ${path}`, e);
         }

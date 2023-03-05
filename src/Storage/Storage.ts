@@ -42,6 +42,11 @@ class StorageObjectItem<T extends ObjectItem> implements ObjectItemInterface<T> 
         this.set(data);
     }
 
+    add<K extends keyof T>(key: K, value: T[K]): DynamicItem<T[K]> {
+        this.items[key] = create(value);
+        return this.get(key);
+    }
+
     get<K extends keyof T>(key: K): DynamicItem<T[K]> {
         return this.items[key];
     }

@@ -1,8 +1,7 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import { inject, injectable, named } from "inversify";
+import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ResolverInterface, { Resolving } from "@src/Interfaces/ResolverInterface";
 import { Feature } from "@src/enum";
 import { MarkdownLeaf } from "obsidian";
 import { AppEvents } from "@src/Types";
@@ -19,9 +18,6 @@ export default class TabManager extends AbstractManager {
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI.resolver)
-        @named(Resolving.Sync)
-        private resolver: ResolverInterface,
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["factory:obsidian:active:file"])
