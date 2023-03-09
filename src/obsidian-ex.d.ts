@@ -2,6 +2,11 @@ import "obsidian";
 import { Events, MarkdownView, MetadataCache, Plugin, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
 
 declare module "obsidian" {
+    export class AppExt extends App {
+        internalPlugins: {
+            getEnabledPluginById: (id: string) => Plugin | null;
+        };
+    }
     export interface TFileExplorerItem {
         file: TFile | TFolder;
         titleEl: HTMLDivElement;
@@ -80,8 +85,13 @@ declare module "obsidian" {
         };
     }
 
-    export abstract class BacklinkViewExt extends View
-
+    export abstract class BacklinkViewExt extends View {
+        backlink: {
+            backlinkDom: {
+                resultDomLookup: Map<TFile, { containerEl: HTMLDivElement }>;
+            };
+        };
+    }
 
     export abstract class Chooser {
         setSuggestions(e: any): any;

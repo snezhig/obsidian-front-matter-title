@@ -19,4 +19,5 @@ export type AppEvents = {
         links: NoteLink[];
     };
     "layout:change": undefined;
+    "active:leaf:change": undefined;
 } & SettingsEvent;
