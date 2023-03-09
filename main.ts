@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { CachedMetadata, Modal, Plugin } from "obsidian";
+import { AppExt, CachedMetadata, Modal, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
@@ -68,6 +68,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         this.logger = this.container.getNamed(SI.logger, "main");
 
         this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", null));
+        this.app.workspace.on("active-leaf-change", () => this.dispatcher.dispatch("active:leaf:change", null));
         new App(); //replace with static
         this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
         await this.loadSettings();
@@ -99,9 +100,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 (path: string, type: string): any =>
                     this.app.metadataCache.getCache(path)?.[type as keyof CachedMetadata]
         );
-        Container.bind<ObsidianFacade>(SI["facade:obsidian"]).toConstantValue(
-            new ObsidianFacade(this.app.vault, this.app.metadataCache, this.app.workspace)
-        );
+        Container.bind<ObsidianFacade>(SI["facade:obsidian"]).toConstantValue(new ObsidianFacade(this.app as AppExt));
+
         Container.bind<ObsidianMetaFactory>(SI["factory:metadata:cache"]).toFunction(() => this.app.metadataCache);
         Container.bind(SI["obsidian:app"]).toConstantValue(this.app);
         Container.bind(SI["obsidian:plugin"]).toConstantValue(this);
