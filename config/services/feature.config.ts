@@ -27,7 +27,7 @@ import { CanvasManager } from "@src/Feature/Canvas/CanvasManager";
 import AbstractManager from "../../src/Feature/AbstractManager";
 import FeatureHelper from "@src/Utils/FeatureHelper";
 import FeatureService from "@src/Feature/FeatureService";
-import BacklinkManager from "../../src/Feature/Backlink/BacklingManager";
+import BacklinkManager from "../../src/Feature/Backlink/BacklinkFeature";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();

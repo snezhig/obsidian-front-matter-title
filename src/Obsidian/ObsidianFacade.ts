@@ -1,15 +1,4 @@
-import {
-    App,
-    AppExt,
-    CachedMetadata,
-    LinkCache,
-    MetadataCache,
-    TFile,
-    Vault,
-    View,
-    Workspace,
-    WorkspaceLeaf,
-} from "obsidian";
+import { AppExt, CachedMetadata, LinkCache, TFile, View, WorkspaceLeaf } from "obsidian";
 
 export default class ObsidianFacade {
     constructor(private app: AppExt) {}

@@ -1,5 +1,5 @@
 import FeatureComposer from "@src/Feature/FeatureComposer";
-import { Feature } from "@src/enum";
+import { Feature, Managers } from "@src/enum";
 import AbstractManager from "@src/Feature/AbstractManager";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
@@ -10,7 +10,7 @@ import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces
 
 @injectable()
 export default class ManagerComposer {
-    private ids: Feature[] = Object.values(Feature).filter(e => ![Feature.ExplorerSort, Feature.Suggest].includes(e));
+    private ids: Feature[] = Managers;
 
     constructor(
         @inject(SI["feature:composer"])

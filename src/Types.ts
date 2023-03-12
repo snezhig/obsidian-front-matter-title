@@ -2,6 +2,7 @@ import { Feature } from "@src/enum";
 import { NoteLink } from "./Utils/FileNoteLinkService";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import { SettingsEvent } from "@src/Settings/SettingsType";
+import { TFile } from "obsidian";
 
 export type AppEvents = {
     "file:rename": { old: string; actual: string };
@@ -20,4 +21,5 @@ export type AppEvents = {
     };
     "layout:change": undefined;
     "active:leaf:change": undefined;
+    "file:open": TFile;
 } & SettingsEvent;
