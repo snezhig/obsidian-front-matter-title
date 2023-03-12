@@ -1,7 +1,7 @@
 {
   "id": "obsidian-front-matter-title-plugin",
   "name": "Front Matter Title",
-  "version": "3.0.0-beta",
+  "version": "3.1.0-beta",
   "minAppVersion": "1.1.15",
   "description": "Lets you define a title in frontmatter to be displayed as the filename",
   "author": "Snezhig",
