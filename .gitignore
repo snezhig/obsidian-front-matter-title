@@ -23,3 +23,5 @@ data.json
 
 .packs
 var
+
+*.js

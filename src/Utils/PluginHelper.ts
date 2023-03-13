@@ -39,6 +39,7 @@ export default class PluginHelper {
                 [Feature.Suggest]: { enabled: false },
                 [Feature.InlineTitle]: { enabled: false },
                 [Feature.Canvas]: { enabled: false },
+                [Feature.Backlink]: { enabled: false },
             },
             processor: {
                 args: [],
