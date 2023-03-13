@@ -40,6 +40,7 @@ export default class PluginHelper {
                 [Feature.InlineTitle]: { enabled: false },
                 [Feature.Canvas]: { enabled: false },
                 [Feature.Backlink]: { enabled: false },
+                [Feature.NoteLink]: { enabled: false },
             },
             processor: {
                 args: [],

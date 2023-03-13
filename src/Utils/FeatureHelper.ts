@@ -17,6 +17,7 @@ export default class FeatureHelper {
             Feature.InlineTitle,
             Feature.Canvas,
             Feature.Backlink,
+            Feature.NoteLink,
         ];
     }
 
@@ -46,6 +47,8 @@ export default class FeatureHelper {
                 return "Canvas";
             case Feature.Backlink:
                 return "Backlink";
+            case Feature.NoteLink:
+                return "Note Link";
         }
     }
 

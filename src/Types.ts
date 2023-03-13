@@ -21,5 +21,5 @@ export type AppEvents = {
     };
     "layout:change": undefined;
     "active:leaf:change": undefined;
-    "file:open": TFile;
+    "file:open": TFile | null;
 } & SettingsEvent;

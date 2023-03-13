@@ -18,8 +18,17 @@ export enum Feature {
     InlineTitle = "inlineTitle",
     Canvas = "canvas",
     Backlink = "backlink",
+    NoteLink = "noteLink",
 }
 
-export const Managers = Object.values(Feature).filter(
-    e => ![Feature.ExplorerSort, Feature.Suggest, Feature.Backlink].includes(e)
-);
+export const Managers = [
+    Feature.Explorer,
+    Feature.Graph,
+    Feature.Header,
+    Feature.Starred,
+    Feature.Search,
+    Feature.Tab,
+    Feature.Alias,
+    Feature.InlineTitle,
+    Feature.Canvas,
+];
