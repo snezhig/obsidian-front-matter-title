@@ -37,12 +37,13 @@ export default class BacklinkManager extends AbstractFeature<Feature> {
     public enable(): void {
         this.enabled = this.facade.isInternalPluginEnabled(this.getId());
         this.logger.log(`Manager state is ${this.enabled}`);
-        if (this.enabled) {
-            this.ref = this.dispatcher.addListener({
-                name: "file:open",
-                cb: () => setTimeout(() => this.process(), 20),
-            });
+        if (!this.enabled) {
+            return;
         }
+        this.ref = this.dispatcher.addListener({
+            name: "file:open",
+            cb: () => setTimeout(() => this.process(), 20),
+        });
         this.process();
     }
     public disable(): void {
@@ -50,9 +51,10 @@ export default class BacklinkManager extends AbstractFeature<Feature> {
         if (this.ref) {
             this.dispatcher.removeListener(this.ref);
             this.ref = null;
+            this.process(null, true);
         }
     }
-    private process(path: string = null): void {
+    private process(path: string = null, restore = false): void {
         const view = this.facade.getViewsOfType<BacklinkViewExt>(this.getId())[0] ?? null;
         const lookup = view?.backlink?.backlinkDom?.resultDomLookup ?? new Map();
 
@@ -61,7 +63,7 @@ export default class BacklinkManager extends AbstractFeature<Feature> {
                 continue;
             }
             const node = item.containerEl.firstElementChild;
-            const text = this.resolver.resolve(file.path) ?? file.basename;
+            const text = (restore ? null : this.resolver.resolve(file.path)) ?? file.basename;
             if (node.getText() !== text) {
                 item.containerEl.firstElementChild.setText(text);
             }
