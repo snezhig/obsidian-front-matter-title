@@ -1,23 +1,27 @@
-import { CachedMetadata, LinkCache, MetadataCache, TFile, Vault, View, Workspace, WorkspaceLeaf } from "obsidian";
+import { AppExt, CachedMetadata, LinkCache, TFile, View, WorkspaceLeaf } from "obsidian";
 
 export default class ObsidianFacade {
-    constructor(private vault: Vault, private metadataCache: MetadataCache, private workspace: Workspace) {}
+    constructor(private app: AppExt) {}
+
+    public isInternalPluginEnabled(id: string): boolean {
+        return this.app.internalPlugins.getEnabledPluginById(id) !== null;
+    }
 
     public getTFile(path: string): TFile | null {
-        const file = this.vault.getAbstractFileByPath(path);
+        const file = this.app.vault.getAbstractFileByPath(path);
         return file instanceof TFile ? file : null;
     }
 
     public getFileContent(file: TFile): Promise<string> {
-        return this.vault.cachedRead(file);
+        return this.app.vault.cachedRead(file);
     }
 
     public modifyFile(file: TFile, c: string): Promise<void> {
-        return this.vault.modify(file, c);
+        return this.app.vault.modify(file, c);
     }
 
     public getFileCache(path: string): CachedMetadata | null {
-        return this.metadataCache.getCache(path);
+        return this.app.metadataCache.getCache(path);
     }
 
     public getFileLinksCache(path: string): LinkCache[] {
@@ -25,7 +29,7 @@ export default class ObsidianFacade {
     }
 
     public getLeavesOfType<T extends WorkspaceLeaf = WorkspaceLeaf>(type: string): T[] {
-        return this.workspace.getLeavesOfType(type) as T[];
+        return this.app.workspace.getLeavesOfType(type) as T[];
     }
 
     public getViewsOfType<T extends View = View>(type: string): T[] {
@@ -33,6 +37,6 @@ export default class ObsidianFacade {
     }
 
     public getFirstLinkpathDest(linkpath: string): TFile | null {
-        return this.metadataCache.getFirstLinkpathDest(linkpath, "");
+        return this.app.metadataCache.getFirstLinkpathDest(linkpath, "");
     }
 }

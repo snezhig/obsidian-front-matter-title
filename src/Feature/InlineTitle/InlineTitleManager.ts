@@ -67,7 +67,7 @@ export class InlineTitleManager extends AbstractManager {
             if (!path || view.file.path === path) {
                 promises.push(
                     this.resolve(view.file.path)
-                        .then(r => (r ? this.setTitle(view, r) : this.resetTitle(view.file.path)))
+                        .then(r => (r ? this.setTitle(view, r) : this.resetTitle()))
                         .catch(console.error)
                 );
             }
@@ -77,7 +77,7 @@ export class InlineTitleManager extends AbstractManager {
         return promises.length > 0;
     }
 
-    private resetTitle(path: string): void {
+    private resetTitle(): void {
         this.fakeTitleElementService.remove(this.getId());
     }
 

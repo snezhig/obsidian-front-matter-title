@@ -16,6 +16,7 @@ export default class FeatureHelper {
             Feature.Tab,
             Feature.InlineTitle,
             Feature.Canvas,
+            Feature.Backlink,
         ];
     }
 
@@ -43,6 +44,8 @@ export default class FeatureHelper {
                 return "Inline";
             case Feature.Canvas:
                 return "Canvas";
+            case Feature.Backlink:
+                return "Backlink";
         }
     }
 
@@ -70,6 +73,8 @@ export default class FeatureHelper {
                 return "Replace shown titles in Inline Title";
             case Feature.Canvas:
                 return "Replace shown titles in Canvas";
+            case Feature.Backlink:
+                return "Replace shown titles in Backlink(Linked mentions)";
         }
     }
 }
