@@ -6,7 +6,7 @@ import { AppEvents } from "@src/Types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import GraphManager from "@src/Feature/Graph/GraphManager";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import { GraphNode, GraphView } from "obsidian";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";

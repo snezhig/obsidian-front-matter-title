@@ -1,5 +1,5 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { inject, injectable, named } from "inversify";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";

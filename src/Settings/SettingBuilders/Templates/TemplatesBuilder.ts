@@ -4,7 +4,7 @@ import { Setting } from "obsidian";
 import { inject, injectable } from "inversify";
 import { ObsidianModalFactory } from "@config/inversify.factory.types";
 import SI from "../../../../config/inversify.types";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import FeatureHelper from "../../../Utils/FeatureHelper";
 
 @injectable()

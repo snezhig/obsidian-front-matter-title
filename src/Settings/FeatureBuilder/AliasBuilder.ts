@@ -1,5 +1,5 @@
 import { BuildParams } from "@src/Settings/Interface/FeatureBuildInterface";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { DropdownComponent, Setting, ToggleComponent } from "obsidian";
 import Event from "@src/Components/EventDispatcher/Event";
 import AbstractBuilder from "./AbstractBuilder";

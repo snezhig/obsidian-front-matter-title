@@ -4,7 +4,7 @@ import Alias from "@src/Feature/Alias/Alias";
 import { StrategyInterface } from "../Interfaces";
 import FeatureService from "../../FeatureService";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 
 @injectable()
 export default abstract class AbstractStrategy implements StrategyInterface {

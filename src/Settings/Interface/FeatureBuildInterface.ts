@@ -1,5 +1,5 @@
 import { SF, SFC, SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 export type BuildParams<K> = {

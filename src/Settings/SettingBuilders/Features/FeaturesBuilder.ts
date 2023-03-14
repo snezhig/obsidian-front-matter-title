@@ -1,6 +1,6 @@
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { inject, injectable } from "inversify";

@@ -3,7 +3,7 @@ import Container = interfaces.Container;
 import SI from "@config/inversify.types";
 import DefaultBuilder from "@src/Settings/FeatureBuilder/DefaultBuilder";
 import AliasBuilder from "@src/Settings/FeatureBuilder/AliasBuilder";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { SettingsBuilderFactory, SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
 import ExplorerSortBuilder from "@src/Settings/FeatureBuilder/ExplorerSortBuilder";
 import TemplatesBuilder from "@src/Settings/SettingBuilders/Templates/TemplatesBuilder";

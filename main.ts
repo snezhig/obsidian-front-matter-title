@@ -14,7 +14,7 @@ import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import FeatureComposer from "@src/Feature/FeatureComposer";
 import ManagerComposer from "@src/Feature/ManagerComposer";

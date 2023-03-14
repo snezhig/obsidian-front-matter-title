@@ -5,7 +5,7 @@ import SI from "../../../config/inversify.types";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
-import { Leaves, Feature } from "@src/enum";
+import { Leaves, Feature } from "@src/Enum";
 import AbstractFeature from "../AbstractFeature";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";

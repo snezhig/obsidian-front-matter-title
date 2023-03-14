@@ -3,7 +3,7 @@ import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import AbstractManager from "@src/Feature/AbstractManager";
 
 @injectable()

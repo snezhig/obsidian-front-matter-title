@@ -1,5 +1,5 @@
 import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { Changed } from "@src/Utils/ObjectHelper";
 import { StrategyType as AliasStrategyType, ValidatorType as AliasValidatorType } from "../Feature/Alias/Types";
 

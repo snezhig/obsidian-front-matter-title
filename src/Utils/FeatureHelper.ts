@@ -1,4 +1,4 @@
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { injectable } from "inversify";
 
 @injectable()

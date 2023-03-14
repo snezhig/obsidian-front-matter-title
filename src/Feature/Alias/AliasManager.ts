@@ -2,7 +2,7 @@ import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import Alias from "@src/Feature/Alias/Alias";
 import { MetadataCacheExt } from "obsidian";
 import { MetadataCacheFactory } from "@config/inversify.factory.types";

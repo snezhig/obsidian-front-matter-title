@@ -1,5 +1,5 @@
 import { SettingsType } from "@src/Settings/SettingsType";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { StrategyType, ValidatorType } from "../Feature/Alias/Types";
 
 export default class PluginHelper {

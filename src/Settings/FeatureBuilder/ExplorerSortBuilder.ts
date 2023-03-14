@@ -1,5 +1,5 @@
 import AbstractBuilder from "@src/Settings/FeatureBuilder/AbstractBuilder";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { BuildParams } from "@src/Settings/Interface/FeatureBuildInterface";
 import { Setting, ToggleComponent } from "obsidian";
 import Event from "@src/Components/EventDispatcher/Event";
