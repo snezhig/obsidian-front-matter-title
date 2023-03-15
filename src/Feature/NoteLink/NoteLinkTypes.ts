@@ -1,1 +1,1 @@
-export type NoteLinkChange = { current: string; replace: string };
+export type NoteLinkChange = { original: string; replace: string };

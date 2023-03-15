@@ -59,13 +59,12 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
             const title = this.resolver.resolve(link.dest);
             if (title && title !== link.alias) {
                 changes.push({
-                    current: link.alias,
-                    replace: title,
+                    original: link.original,
+                    replace: `[[${link.link}|${title}]]`,
                 });
             }
         }
         this.dispatcher.dispatch("note:link:changes:approve", new Event({ path, changes }));
-        this.dispatcher.dispatch("note:link:changes:execute", new Event({ path, changes }));
     }
 
     private async executeChanges(path: string, changes: NoteLinkChange[]): Promise<void> {
@@ -75,8 +74,8 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
             return;
         }
         console.log(content);
-        for (const { current, replace } of changes) {
-            content = content.replace(current, replace);
+        for (const { original, replace } of changes) {
+            content = content.replace(original, replace);
         }
         console.log(content);
     }

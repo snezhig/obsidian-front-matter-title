@@ -29,6 +29,8 @@ import FeatureHelper from "@src/Utils/FeatureHelper";
 import FeatureService from "@src/Feature/FeatureService";
 import BacklinkManager from "../../src/Feature/Backlink/BacklinkFeature";
 import NoteLinkFeature from "../../src/Feature/NoteLink/NoteLinkFeature";
+import ListenerInterface from "../../src/Interfaces/ListenerInterface";
+import NoteLinkListener from "../../src/Feature/NoteLink/NoteLinkListener";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -82,4 +84,6 @@ export default (container: Container) => {
         .bind(SI["alias:modifier:validator"])
         .to(ValidatorRequired)
         .whenTargetNamed(AliasValidatorType.FrontmatterRequired);
+
+    container.bind<ListenerInterface>(SI.listener).to(NoteLinkListener);
 };
