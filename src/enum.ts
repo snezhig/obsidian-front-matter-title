@@ -21,5 +21,5 @@ export enum Feature {
 }
 
 export const Managers = Object.values(Feature).filter(
-    e => ![Feature.ExplorerSort, Feature.Suggest, Feature.Backlink].includes(e)
+    e => ![Feature.ExplorerSort, Feature.Suggest, Feature.Backlink, Feature.Alias].includes(e)
 );

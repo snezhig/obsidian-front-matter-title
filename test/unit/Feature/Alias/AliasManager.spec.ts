@@ -1,6 +1,6 @@
 import { mock } from "jest-mock-extended";
 import { CachedMetadata, FrontMatterCache, MetadataCacheExt, Pos } from "obsidian";
-import { AliasManager } from "@src/Feature/Alias/AliasManager";
+import { AliasFeature } from "@src/Feature/Alias/AliasFeature";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/enum";
 import { StrategyInterface, ValidatorInterface } from "@src/Feature/Alias/Interfaces";
@@ -12,14 +12,14 @@ const mockStrategy = mock<StrategyInterface>();
 const mockStrategyFactory = jest.fn(() => mockStrategy);
 const mockCache = mock<MetadataCacheExt>();
 const mockCacheFactory = jest.fn(() => mockCache);
-const manager = new AliasManager(mockStrategyFactory, mockValidatorFactory, mock<LoggerInterface>(), mockCacheFactory);
+const manager = new AliasFeature(mockStrategyFactory, mockValidatorFactory, mock<LoggerInterface>(), mockCacheFactory);
 const fooPath = "path/to/foo.md";
 const barPath = "path/to/bar.md";
 const quotePath = "path/to/quote.md";
 
 describe("Test ID", () => {
     expect(manager.getId()).toEqual(Feature.Alias);
-    expect(AliasManager.getId()).toEqual(Feature.Alias);
+    expect(AliasFeature.getId()).toEqual(Feature.Alias);
 });
 
 describe("Test disabled state", () => {

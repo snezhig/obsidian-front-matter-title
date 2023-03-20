@@ -2,7 +2,7 @@ import { CachedMetadata } from "obsidian";
 import Alias from "./Alias";
 import { ValidatorType } from "./Types";
 
-export interface AliasManagerInterface {
+export interface AliasFeatureInterface {
     setStrategy(name: string): void;
     setValidator(validator: ValidatorType): void;
 }

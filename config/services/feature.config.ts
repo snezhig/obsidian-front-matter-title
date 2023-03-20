@@ -8,7 +8,7 @@ import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 import ManagerComposer from "@src/Feature/ManagerComposer";
 import SearchManager from "@src/Feature/Search/SearchManager";
 import TabManager from "@src/Feature/Tab/TabManager";
-import { AliasManager } from "@src/Feature/Alias/AliasManager";
+import { AliasFeature } from "@src/Feature/Alias/AliasFeature";
 import EnsureStrategy from "@src/Feature/Alias/Strategy/EnsureStrategy";
 import AdjustStrategy from "@src/Feature/Alias/Strategy/AdjustStrategy";
 import ReplaceStrategy from "@src/Feature/Alias/Strategy/ReplaceStrategy";
@@ -28,6 +28,7 @@ import AbstractManager from "../../src/Feature/AbstractManager";
 import FeatureHelper from "@src/Utils/FeatureHelper";
 import FeatureService from "@src/Feature/FeatureService";
 import BacklinkManager from "../../src/Feature/Backlink/BacklinkFeature";
+import AliasConfig from "@src/Feature/Alias/AliasConfig";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -46,7 +47,7 @@ export default (container: Container) => {
             }
             return feature;
         });
-    container.bind<FeatureInterface<any>>(SI.feature).to(AliasManager).whenTargetNamed(AliasManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(AliasFeature).whenTargetNamed(AliasFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerManager).whenTargetNamed(ExplorerManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerSort).whenTargetNamed(ExplorerSort.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SearchManager).whenTargetNamed(SearchManager.getId());
@@ -69,6 +70,7 @@ export default (container: Container) => {
     container.bind(SI["alias:modifier:strategy"]).to(AdjustStrategy).whenTargetNamed(AliasStrategyType.Adjust);
     container.bind(SI["alias:modifier:strategy"]).to(ReplaceStrategy).whenTargetNamed(AliasStrategyType.Replace);
 
+    container.bind(SI["feature:alias:config"]).to(AliasConfig);
     container
         .bind(SI["factory:alias:modifier:validator"])
         .toAutoNamedFactory<AliasValidatorInterface>(SI["alias:modifier:validator"]);
