@@ -17,11 +17,11 @@ export default class AliasConfig {
         return this.storage.get("features").get(Feature.Alias);
     }
 
-    public get strategy(): StrategyType {
+    public getStrategy(): StrategyType {
         return this.config.get("strategy").value();
     }
 
-    public get validator(): ValidatorType {
+    public getValidator(): ValidatorType {
         return this.config.get("validator").value();
     }
 }

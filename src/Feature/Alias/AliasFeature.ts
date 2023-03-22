@@ -3,10 +3,10 @@ import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/enum";
 import Alias from "@src/Feature/Alias/Alias";
-import { MetadataCacheExt } from "obsidian";
+import { CachedMetadata, MetadataCacheExt } from "obsidian";
 import { MetadataCacheFactory } from "@config/inversify.factory.types";
 import { StrategyFactory, StrategyType, ValidatorFactory, ValidatorType } from "./Types";
-import { AliasFeatureInterface, StrategyInterface, ValidatorInterface } from "./Interfaces";
+import { StrategyInterface, ValidatorInterface } from "./Interfaces";
 import AbstractFeature from "@src/Feature/AbstractFeature";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";
@@ -14,7 +14,7 @@ import AliasConfig from "@src/Feature/Alias/AliasConfig";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 
 @injectable()
-export class AliasFeature extends AbstractFeature<Feature> implements AliasFeatureInterface {
+export class AliasFeature extends AbstractFeature<Feature> {
     private enabled = false;
     private strategy: StrategyInterface = null;
     private validator: ValidatorInterface = null;
@@ -39,12 +39,12 @@ export class AliasFeature extends AbstractFeature<Feature> implements AliasFeatu
         super();
     }
 
-    public setValidator(type: ValidatorType): void {
+    private setValidator(type: ValidatorType): void {
         this.validator = this.validatorFactory(type);
         this.logger.log(`Set validator [${type}]. Status: ${this.validator !== null}`);
     }
 
-    public setStrategy(type: StrategyType): void {
+    private setStrategy(type: StrategyType): void {
         this.strategy = this.strategyFactory(type);
         this.logger.log(`Set strategy [${type}]. Status: ${this.strategy !== null}`);
     }
@@ -59,10 +59,10 @@ export class AliasFeature extends AbstractFeature<Feature> implements AliasFeatu
     enable(): void {
         this.ref = this.dispatcher.addListener({
             name: "metadata:cache:changed",
-            cb: e => this.update(e.get().path),
+            cb: e => this.update(e.get().path, e.get().cache),
         });
-        this.setValidator(this.config.validator);
-        this.setStrategy(this.config.strategy);
+        this.setValidator(this.config.getValidator());
+        this.setStrategy(this.config.getStrategy());
         this.enabled = true;
         this.refresh().catch(console.error);
     }
@@ -84,17 +84,17 @@ export class AliasFeature extends AbstractFeature<Feature> implements AliasFeatu
         this.items = {};
     }
 
-    private async update(path: string): Promise<void> {
-        const cache = this.factory();
-        const metadata = cache.getCache(path);
-        this.validator.validate(metadata) ? this.process(metadata.frontmatter, path) : false;
+    private async update(path: string, metadata: CachedMetadata = null): Promise<void> {
+        if (this.validator.validate(metadata)) {
+            this.process(metadata.frontmatter, path);
+        }
     }
 
     private async refresh(): Promise<void> {
         const cache = this.factory();
         const promises = [];
         for (const path of cache.getCachedFiles()) {
-            promises.push(this.update(path));
+            promises.push(this.update(path, cache.getCache(path)));
         }
         await Promise.all(promises);
     }
