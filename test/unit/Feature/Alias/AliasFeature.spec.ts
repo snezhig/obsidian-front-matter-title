@@ -43,7 +43,7 @@ test("Should add listener, set validator, strategy and refresh", () => {
     mockConfig.getStrategy.mockReturnValueOnce(strategyType);
     mockCache.getCachedFiles.mockReturnValueOnce([fooPath]);
     mockCache.getCache.mockReturnValueOnce(metadata);
-    mockValidator.validate.mockReturnValueOnce(true);
+    mockValidator.validate.mockReturnValueOnce(false);
     feature.enable();
     expect(mockDispatcher.addListener).toBeCalledTimes(1);
     expect(mockDispatcher.addListener).toBeCalledWith({ name: "metadata:cache:changed", cb: expect.anything() });
@@ -57,6 +57,7 @@ test("Should add listener, set validator, strategy and refresh", () => {
     expect(mockCache.getCache).toHaveBeenCalledWith(fooPath);
     expect(mockValidator.validate).toHaveBeenCalledTimes(1);
     expect(mockValidator.validate).toHaveBeenCalledWith(metadata);
+    expect(mockStrategy.process).not.toHaveBeenCalled();
 });
 //
 // describe("Test enabled state", () => {
