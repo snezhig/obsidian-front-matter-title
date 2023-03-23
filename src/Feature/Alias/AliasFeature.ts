@@ -1,20 +1,25 @@
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import AbstractManager from "@src/Feature/AbstractManager";
 import { Feature } from "@src/enum";
 import Alias from "@src/Feature/Alias/Alias";
-import { MetadataCacheExt } from "obsidian";
+import { CachedMetadata, MetadataCacheExt } from "obsidian";
 import { MetadataCacheFactory } from "@config/inversify.factory.types";
 import { StrategyFactory, StrategyType, ValidatorFactory, ValidatorType } from "./Types";
-import { AliasManagerInterface, StrategyInterface, ValidatorInterface } from "./Interfaces";
+import { StrategyInterface, ValidatorInterface } from "./Interfaces";
+import AbstractFeature from "@src/Feature/AbstractFeature";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { AppEvents } from "@src/Types";
+import AliasConfig from "@src/Feature/Alias/AliasConfig";
+import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 
 @injectable()
-export class AliasManager extends AbstractManager implements AliasManagerInterface {
+export class AliasFeature extends AbstractFeature<Feature> {
     private enabled = false;
     private strategy: StrategyInterface = null;
     private validator: ValidatorInterface = null;
     private items: { [k: string]: Alias } = {};
+    private ref: ListenerRef<"metadata:cache:changed"> = null;
 
     constructor(
         @inject(SI["factory:alias:modifier:strategy"])
@@ -25,28 +30,41 @@ export class AliasManager extends AbstractManager implements AliasManagerInterfa
         @named("alias:modifier")
         private logger: LoggerInterface,
         @inject(SI["factory:metadata:cache"])
-        private factory: MetadataCacheFactory<MetadataCacheExt>
+        private factory: MetadataCacheFactory<MetadataCacheExt>,
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<AppEvents>,
+        @inject(SI["feature:alias:config"])
+        private config: AliasConfig
     ) {
         super();
     }
 
-    public setValidator(type: ValidatorType): void {
+    private setValidator(type: ValidatorType): void {
         this.validator = this.validatorFactory(type);
         this.logger.log(`Set validator [${type}]. Status: ${this.validator !== null}`);
     }
 
-    public setStrategy(type: StrategyType): void {
+    private setStrategy(type: StrategyType): void {
         this.strategy = this.strategyFactory(type);
         this.logger.log(`Set strategy [${type}]. Status: ${this.strategy !== null}`);
     }
 
-    doDisable(): void {
+    disable(): void {
         this.reset();
+        this.dispatcher.removeListener(this.ref);
+        this.ref = null;
         this.enabled = false;
     }
 
-    doEnable(): void {
+    enable(): void {
+        this.ref = this.dispatcher.addListener({
+            name: "metadata:cache:changed",
+            cb: e => this.update(e.get().path, e.get().cache),
+        });
+        this.setValidator(this.config.getValidator());
+        this.setStrategy(this.config.getStrategy());
         this.enabled = true;
+        this.refresh().catch(console.error);
     }
 
     private process(frontmatter: { [k: string]: any }, path: string): boolean {
@@ -66,21 +84,19 @@ export class AliasManager extends AbstractManager implements AliasManagerInterfa
         this.items = {};
     }
 
-    protected async doUpdate(path: string): Promise<boolean> {
-        const cache = this.factory();
-        const metadata = cache.getCache(path);
-        return this.validator.validate(metadata) ? this.process(metadata.frontmatter, path) : false;
+    private async update(path: string, metadata: CachedMetadata = null): Promise<void> {
+        if (this.validator.validate(metadata)) {
+            this.process(metadata.frontmatter, path);
+        }
     }
 
-    protected async doRefresh(): Promise<{ [p: string]: boolean }> {
+    private async refresh(): Promise<void> {
         const cache = this.factory();
-        const res: { [k: string]: boolean } = {};
         const promises = [];
         for (const path of cache.getCachedFiles()) {
-            promises.push(this.doUpdate(path).then(r => (res[path] = r)));
+            promises.push(this.update(path, cache.getCache(path)));
         }
         await Promise.all(promises);
-        return res;
     }
 
     static getId(): Feature {
@@ -88,7 +104,7 @@ export class AliasManager extends AbstractManager implements AliasManagerInterfa
     }
 
     getId(): Feature {
-        return AliasManager.getId();
+        return AliasFeature.getId();
     }
 
     isEnabled(): boolean {

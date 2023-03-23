@@ -21,8 +21,8 @@ export default class ResolverCachedProxy implements ResolverDynamicInterface {
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<ResolverEvents & AppEvents>
     ) {
-        dispatcher.addListener({ name: "resolver:clear", cb: () => this.cache.clear() });
-        dispatcher.addListener({ name: "metadata:cache:changed", cb: e => this.handleDelete(e.get().path) });
+        dispatcher.addListener({ name: "resolver:clear", cb: () => this.cache.clear(), sort: 0 });
+        dispatcher.addListener({ name: "metadata:cache:changed", cb: e => this.handleDelete(e.get().path), sort: 0 });
         dispatcher.addListener({
             name: "file:rename",
             cb: e => {

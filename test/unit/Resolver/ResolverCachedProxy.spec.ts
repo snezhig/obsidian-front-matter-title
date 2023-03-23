@@ -9,6 +9,7 @@ import { ResolverEvents } from "@src/Resolver/ResolverType";
 import { mock } from "jest-mock-extended";
 import { AppEvents } from "@src/Types";
 import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
+import { CachedMetadata } from "obsidian";
 
 const mockCacheItem = mock<CacheItemInterface<string | null>>();
 mockCacheItem.set.mockReturnThis();
@@ -54,9 +55,13 @@ describe("Test cached proxy", () => {
 
     test("Should add 2 new listeners", () => {
         expect(mockDispatcher.addListener).toBeCalledTimes(3);
-        expect(mockDispatcher.addListener).toBeCalledWith({ name: "metadata:cache:changed", cb: expect.anything() });
+        expect(mockDispatcher.addListener).toBeCalledWith({
+            name: "metadata:cache:changed",
+            cb: expect.anything(),
+            sort: 0,
+        });
         expect(mockDispatcher.addListener).toBeCalledWith({ name: "file:rename", cb: expect.anything() });
-        expect(mockDispatcher.addListener).toBeCalledWith({ name: "resolver:clear", cb: expect.anything() });
+        expect(mockDispatcher.addListener).toBeCalledWith({ name: "resolver:clear", cb: expect.anything(), sort: 0 });
     });
 
     test("Should call original resolver and save value", () => {
@@ -83,7 +88,7 @@ describe("Test cached proxy", () => {
 
     test("Should not dispatch 'resolver:unresolved' event and does not actualize title", () => {
         mockCacheItem.isHit.mockReturnValueOnce(false);
-        metadataCacheChangedCallback(new Event({ path }));
+        metadataCacheChangedCallback(new Event({ path, cache: mock<CachedMetadata>() }));
         expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
         expect(mockResolver.resolve).not.toHaveBeenCalled();
     });
@@ -96,7 +101,7 @@ describe("Test cached proxy", () => {
             return mockCacheItem;
         });
         mockResolver.resolve.mockReturnValueOnce(expected);
-        metadataCacheChangedCallback(new Event({ path }));
+        metadataCacheChangedCallback(new Event({ path, cache: mock<CachedMetadata>() }));
         expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
         expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
         expect(mockResolver.resolve).toHaveBeenCalledWith(path);
@@ -110,7 +115,7 @@ describe("Test cached proxy", () => {
             return mockCacheItem;
         });
         mockResolver.resolve.mockReturnValueOnce("bar");
-        metadataCacheChangedCallback(new Event({ path }));
+        metadataCacheChangedCallback(new Event({ path, cache: mock<CachedMetadata>() }));
         expect(mockDispatcher.dispatch).toHaveBeenCalledTimes(1);
         expect(mockDispatcher.dispatch).toHaveBeenCalledWith("resolver:unresolved", new Event({ path }));
         expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
