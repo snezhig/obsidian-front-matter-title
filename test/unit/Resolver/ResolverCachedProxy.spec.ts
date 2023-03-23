@@ -9,7 +9,7 @@ import { ResolverEvents } from "@src/Resolver/ResolverType";
 import { mock } from "jest-mock-extended";
 import { AppEvents } from "@src/Types";
 import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
-import {CachedMetadata} from "obsidian";
+import { CachedMetadata } from "obsidian";
 
 const mockCacheItem = mock<CacheItemInterface<string | null>>();
 mockCacheItem.set.mockReturnThis();
@@ -55,7 +55,11 @@ describe("Test cached proxy", () => {
 
     test("Should add 2 new listeners", () => {
         expect(mockDispatcher.addListener).toBeCalledTimes(3);
-        expect(mockDispatcher.addListener).toBeCalledWith({ name: "metadata:cache:changed", cb: expect.anything(), sort: 0 });
+        expect(mockDispatcher.addListener).toBeCalledWith({
+            name: "metadata:cache:changed",
+            cb: expect.anything(),
+            sort: 0,
+        });
         expect(mockDispatcher.addListener).toBeCalledWith({ name: "file:rename", cb: expect.anything() });
         expect(mockDispatcher.addListener).toBeCalledWith({ name: "resolver:clear", cb: expect.anything(), sort: 0 });
     });
