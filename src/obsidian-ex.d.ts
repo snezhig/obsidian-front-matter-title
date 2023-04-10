@@ -9,8 +9,16 @@ declare module "obsidian" {
     }
     export interface TFileExplorerItem {
         file: TFile | TFolder;
-        titleEl: HTMLDivElement;
-        titleInnerEl: HTMLDivElement;
+        /**
+         * @deprecated After Obsidian 1.2.0, use `selfEl` instead.
+         */
+        titleEl?: HTMLDivElement;
+        /**
+         * @deprecated After Obsidian 1.2.0, use `innerEl` instead.
+         */
+        titleInnerEl?: HTMLDivElement;
+        selfEl: HTMLDivElement;
+        innerEl: HTMLDivElement;
         sort?: () => void;
         vChildren?: {
             setChildren(items: any[]): void;
