@@ -23,7 +23,6 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
-import AliasListener from "@src/Feature/Alias/Listener";
 import Api from "@src/Api/Api";
 import Defer from "@src/Api/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
@@ -57,7 +56,6 @@ Container.bind<LoggerInterface>(SI.logger)
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
 Container.bind(SI["service:fake_title_element"]).to(FakeTitleElementService);
-Container.bind<ListenerInterface>(SI.listener).to(AliasListener);
 Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener);
 Container.bind<ListenerInterface>(SI.listener).to(ProcessorListener);
 

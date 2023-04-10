@@ -28,7 +28,6 @@ export const Managers = [
     Feature.Starred,
     Feature.Search,
     Feature.Tab,
-    Feature.Alias,
     Feature.InlineTitle,
     Feature.Canvas,
 ];

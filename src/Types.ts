@@ -4,11 +4,12 @@ import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import { SettingsEvent } from "@src/Settings/SettingsType";
 import { TAbstractFile, TFile } from "obsidian";
 import { NoteLinkChange } from "./Feature/NoteLink/NoteLinkTypes";
+import { CachedMetadata, TFile } from "obsidian";
 
 export type AppEvents = {
     "file:rename": { old: string; actual: string };
     "file:modify": TAbstractFile;
-    "metadata:cache:changed": { path: string };
+    "metadata:cache:changed": { path: string; cache: CachedMetadata };
     "manager:update": { id: Feature; result: boolean };
     "manager:refresh": { id: Feature };
     "feature:state:changed": { id: Feature; enabled: boolean };
