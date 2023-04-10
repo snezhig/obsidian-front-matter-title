@@ -1,7 +1,7 @@
 import { SettingsType, SF } from "@src/Settings/SettingsType";
 import Storage from "@src/Storage/Storage";
 import { ObjectItemInterface } from "@src/Storage/Interfaces";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import { StrategyType, ValidatorType } from "@src/Feature/Alias/Types";

@@ -1,9 +1,8 @@
-import { TAbstractFile, TFile } from "obsidian";
 import EventDispatcherInterface from "../../Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import { ResolverInterface } from "../../Resolver/Interfaces";
-import { AppEvents } from "../../Types";
-import FileNoteLinkService from "../../Utils/FileNoteLinkService";
-import { Feature } from "../../Enum";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
+import { AppEvents } from "@src/Types";
+import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
+import { Feature } from "@src/Enum";
 import AbstractFeature from "../AbstractFeature";
 import FeatureService from "../FeatureService";
 import ListenerRef from "../../Components/EventDispatcher/Interfaces/ListenerRef";
@@ -12,6 +11,7 @@ import SI from "../../../config/inversify.types";
 import Event from "../../Components/EventDispatcher/Event";
 import { NoteLinkChange } from "./NoteLinkTypes";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
+import { TFile } from "obsidian";
 
 export default class NoteLinkFeature extends AbstractFeature<Feature> {
     private enabled = false;
@@ -53,7 +53,6 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
 
     private requestApprove(path: string): void {
         const links = this.service.getNoteLinks(path);
-        console.log(links);
         const changes = [];
         for (const link of links) {
             const title = this.resolver.resolve(link.dest);
@@ -64,7 +63,9 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
                 });
             }
         }
-        this.dispatcher.dispatch("note:link:changes:approve", new Event({ path, changes }));
+        if (changes.length) {
+            this.dispatcher.dispatch("note:link:changes:approve", new Event({ path, changes }));
+        }
     }
 
     private async executeChanges(path: string, changes: NoteLinkChange[]): Promise<void> {
@@ -77,7 +78,7 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         for (const { original, replace } of changes) {
             content = content.replace(original, replace);
         }
-        console.log(content);
+        this.facade.modifyFile(file, content);
     }
 
     getId(): Feature {
