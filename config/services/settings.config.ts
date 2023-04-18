@@ -13,6 +13,7 @@ import UtilBuilder from "@src/Settings/SettingBuilders/Util/UtilBuilder";
 import RulesDelimiterBuilder from "@src/Settings/SettingBuilders/Rules/RulesDelimiterBuilder";
 import RulesPathsBuilder from "@src/Settings/SettingBuilders/Rules/RulesPathsBuilder";
 import ProcessorBuilder from "../../src/Settings/SettingBuilders/Processor/ProcessorBuilder";
+import NoteLinkBuilder from "@src/Settings/FeatureBuilder/NoteLinkBuilder";
 
 export default (c: Container) => {
     c.bind(SI["settings:feature:builder"])
@@ -24,6 +25,9 @@ export default (c: Container) => {
     c.bind(SI["settings:feature:builder"])
         .toDynamicValue(() => new ExplorerSortBuilder())
         .whenTargetNamed(Feature.ExplorerSort);
+    c.bind(SI["settings:feature:builder"])
+        .toDynamicValue(() => new NoteLinkBuilder())
+        .whenTargetNamed(Feature.NoteLink);
     c.bind<SettingsFeatureBuildFactory>(SI["factory:settings:feature:builder"]).toFunction((name: string) =>
         c.isBoundNamed(SI["settings:feature:builder"], name) ? c.getNamed(SI["settings:feature:builder"], name) : null
     );

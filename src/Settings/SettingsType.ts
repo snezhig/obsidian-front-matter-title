@@ -2,10 +2,11 @@ import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
 import { Feature } from "@src/Enum";
 import { Changed } from "@src/Utils/ObjectHelper";
 import { StrategyType as AliasStrategyType, ValidatorType as AliasValidatorType } from "../Feature/Alias/Types";
+import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
 
 export type SFExt = {
     [Feature.Alias]: { strategy: AliasStrategyType; validator: AliasValidatorType };
-    [Feature.NoteLink]: { approval: boolean };
+    [Feature.NoteLink]: { approval: boolean; strategy: NoteLinkStrategy };
 };
 export type SFC = { enabled: boolean };
 export type SF = { [K in Feature]: SFC & { [P in keyof SFExt]: P extends K ? SFExt[P] : object }[keyof SFExt] };
