@@ -9,16 +9,18 @@ import { NoteLinkChange } from "./NoteLinkTypes";
 import Event from "../../Components/EventDispatcher/Event";
 import { Modal } from "obsidian";
 import { SettingsType } from "@src/Settings/SettingsType";
+import NoteLinkConfig from "@src/Feature/NoteLink/NoteLinkConfig";
 
 @injectable()
 export default class NoteLinkListener implements ListenerInterface {
     private refs: ListenerRef<any>[] = [];
-    private showModal = true;
     constructor(
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcher<AppEvents>,
         @inject(SI["factory:obsidian:modal"])
-        private factory: () => Modal
+        private factory: () => Modal,
+        @inject(SI["feature:note:link:config"])
+        private config: NoteLinkConfig
     ) {}
 
     bind(): void {
@@ -28,23 +30,6 @@ export default class NoteLinkListener implements ListenerInterface {
                 cb: this.approve.bind(this),
             })
         );
-        this.refs.push(
-            this.dispatcher.addListener<"settings:changed">({
-                name: "settings:changed",
-                cb: e => this.handleSettings(e.get().actual),
-            })
-        );
-        this.refs.push(
-            this.dispatcher.addListener<"settings.loaded">({
-                name: "settings.loaded",
-                cb: e => this.handleSettings(e.get().settings),
-                once: true,
-            })
-        );
-    }
-
-    private handleSettings(settings: SettingsType): void {
-        this.showModal = settings.features.noteLink.approval;
     }
 
     unbind(): void {
@@ -54,7 +39,7 @@ export default class NoteLinkListener implements ListenerInterface {
 
     private approve(event: EventInterface<AppEvents["note:link:changes:approve"]>): void {
         const { path, changes } = event.get();
-        if (this.showModal === false) {
+        if (this.config.approval === false) {
             return this.dispatchExecute(path, changes);
         }
         const modal = this.factory();

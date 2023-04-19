@@ -71,7 +71,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         this.app.workspace.on("active-leaf-change", () => this.dispatcher.dispatch("active:leaf:change", null));
         this.app.workspace.on("file-open", file => this.dispatcher.dispatch("file:open", new Event(file)));
         new App(); //replace with static
-        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
+        this.container.getAllNamed<ListenerInterface>(SI.listener, "unnamed").map(e => e.bind());
         await this.loadSettings();
         this.app.workspace.onLayoutReady(() => {
             this.container.get<Defer>(SI.defer).setFlag(DeferPluginReady);

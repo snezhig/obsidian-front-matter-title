@@ -78,6 +78,8 @@ export default class FeatureHelper {
                 return "Replace shown titles in Canvas";
             case Feature.Backlink:
                 return "Replace shown titles in Backlink(Linked mentions)";
+            case Feature.NoteLink:
+                return "Replace internal links in files";
         }
     }
 }

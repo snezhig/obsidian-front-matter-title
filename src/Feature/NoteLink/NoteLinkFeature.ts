@@ -6,17 +6,20 @@ import { Feature } from "@src/Enum";
 import AbstractFeature from "../AbstractFeature";
 import FeatureService from "../FeatureService";
 import ListenerRef from "../../Components/EventDispatcher/Interfaces/ListenerRef";
-import { inject } from "inversify";
+import { inject, named } from "inversify";
 import SI from "../../../config/inversify.types";
 import Event from "../../Components/EventDispatcher/Event";
-import { NoteLinkChange } from "./NoteLinkTypes";
+import { NoteLinkChange, NoteLinkStrategy } from "./NoteLinkTypes";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import { TFile } from "obsidian";
+import ListenerInterface from "@src/Interfaces/ListenerInterface";
+import NoteLinkConfig from "@src/Feature/NoteLink/NoteLinkConfig";
 
 export default class NoteLinkFeature extends AbstractFeature<Feature> {
     private enabled = false;
     private resolver: ResolverInterface;
     private refs: ListenerRef<any>[] = [];
+
     constructor(
         @inject(SI["feature:service"])
         featureService: FeatureService,
@@ -24,18 +27,27 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         private service: FileNoteLinkService,
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents>,
+        @inject(SI["listener"])
+        @named(NoteLinkFeature.getId())
+        private listener: ListenerInterface,
         @inject(SI["facade:obsidian"])
-        private facade: ObsidianFacade
+        private facade: ObsidianFacade,
+        @inject(SI["feature:note:link:config"])
+        private config: NoteLinkConfig
     ) {
         super();
         this.resolver = featureService.createResolver(this.getId());
     }
+
     disable(): void {
+        this.listener.unbind();
         this.refs.forEach(e => this.dispatcher.removeListener(e));
         this.refs = [];
         this.enabled = false;
     }
+
     enable(): void {
+        this.listener.bind();
         this.refs.push(
             this.dispatcher.addListener<"metadata:cache:changed">({
                 name: "metadata:cache:changed",
@@ -56,11 +68,14 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         const changes = [];
         for (const link of links) {
             const title = this.resolver.resolve(link.dest);
-            if (title && title !== link.alias) {
-                changes.push({
-                    original: link.original,
-                    replace: `[[${link.link}|${title}]]`,
-                });
+            const hasAlias = /.+\|.+/.test(link.original);
+            if (this.config.strategy === NoteLinkStrategy.All || !hasAlias) {
+                if (title && title !== link.alias) {
+                    changes.push({
+                        original: link.original,
+                        replace: `[[${link.link}|${title}]]`,
+                    });
+                }
             }
         }
         if (changes.length) {
@@ -74,19 +89,20 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         if (!content) {
             return;
         }
-        console.log(content);
         for (const { original, replace } of changes) {
             content = content.replace(original, replace);
         }
-        this.facade.modifyFile(file, content);
+        this.facade.modifyFile(file, content).catch(console.error);
     }
 
     getId(): Feature {
         return NoteLinkFeature.getId();
     }
+
     isEnabled(): boolean {
         return this.enabled;
     }
+
     static getId(): Feature {
         return Feature.NoteLink;
     }

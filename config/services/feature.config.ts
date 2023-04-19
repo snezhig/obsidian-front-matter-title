@@ -32,6 +32,7 @@ import NoteLinkFeature from "../../src/Feature/NoteLink/NoteLinkFeature";
 import ListenerInterface from "../../src/Interfaces/ListenerInterface";
 import NoteLinkListener from "../../src/Feature/NoteLink/NoteLinkListener";
 import AliasConfig from "@src/Feature/Alias/AliasConfig";
+import NoteLinkConfig from "@src/Feature/NoteLink/NoteLinkConfig";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -58,7 +59,10 @@ export default (container: Container) => {
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
+    container
+        .bind<FeatureInterface<any>>(SI.feature)
+        .to(MarkdownHeaderManager)
+        .whenTargetNamed(MarkdownHeaderManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(BacklinkManager).whenTargetNamed(BacklinkManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(NoteLinkFeature).whenTargetNamed(NoteLinkFeature.getId());
     container
@@ -87,5 +91,6 @@ export default (container: Container) => {
         .to(ValidatorRequired)
         .whenTargetNamed(AliasValidatorType.FrontmatterRequired);
 
-    container.bind<ListenerInterface>(SI.listener).to(NoteLinkListener);
+    container.bind<ListenerInterface>(SI.listener).to(NoteLinkListener).whenTargetNamed(NoteLinkFeature.getId());
+    container.bind(SI["feature:note:link:config"]).to(NoteLinkConfig);
 };

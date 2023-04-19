@@ -1,4 +1,4 @@
-import { SettingsType, SF } from "@src/Settings/SettingsType";
+import { SettingsType, SettingsFeature } from "@src/Settings/SettingsType";
 import Storage from "@src/Storage/Storage";
 import { ObjectItemInterface } from "@src/Storage/Interfaces";
 import { Feature } from "@src/Enum";
@@ -13,7 +13,7 @@ export default class AliasConfig {
         private storage: Storage<SettingsType>
     ) {}
 
-    private get config(): ObjectItemInterface<SF[Feature.Alias]> {
+    private get config(): ObjectItemInterface<SettingsFeature[Feature.Alias]> {
         return this.storage.get("features").get(Feature.Alias);
     }
 

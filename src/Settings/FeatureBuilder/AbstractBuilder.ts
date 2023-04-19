@@ -1,7 +1,7 @@
 import FeatureBuildInterface, { BuildParams, Context } from "@src/Settings/Interface/FeatureBuildInterface";
-import { SF, SFC } from "@src/Settings/SettingsType";
+import { SettingsFeature, SettingsFeatureCommon } from "@src/Settings/SettingsType";
 
-export default abstract class AbstractBuilder<K extends keyof SF | SFC = SFC> implements FeatureBuildInterface<K> {
+export default abstract class AbstractBuilder<K extends keyof SettingsFeature | SettingsFeatureCommon = SettingsFeatureCommon> implements FeatureBuildInterface<K> {
     protected context: Context;
     setContext(context: Context): void {
         this.context = context;
