@@ -33,6 +33,9 @@ import ListenerInterface from "../../src/Interfaces/ListenerInterface";
 import NoteLinkListener from "../../src/Feature/NoteLink/NoteLinkListener";
 import AliasConfig from "@src/Feature/Alias/AliasConfig";
 import NoteLinkConfig from "@src/Feature/NoteLink/NoteLinkConfig";
+import { KeyStorageInterface } from "../../src/Storage/Interfaces";
+import { SettingsType } from "../../src/Settings/SettingsType";
+import { Feature } from "../../src/Enum";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -93,4 +96,10 @@ export default (container: Container) => {
 
     container.bind<ListenerInterface>(SI.listener).to(NoteLinkListener).whenTargetNamed(NoteLinkFeature.getId());
     container.bind(SI["feature:note:link:config"]).to(NoteLinkConfig);
+    container.bind(SI["feature:config"])
+        .toDynamicValue((c) => {
+            const feature = c.currentRequest.target.getNamedTag().value as Feature
+            return c.container.get<KeyStorageInterface<SettingsType>>(SI["settings:storage"]).get('features').get(feature).value()
+        }).when(() => true)
+
 };

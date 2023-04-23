@@ -14,6 +14,7 @@ import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import { TFile } from "obsidian";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
 import NoteLinkConfig from "@src/Feature/NoteLink/NoteLinkConfig";
+import { FeatureConfig } from "../Types";
 
 export default class NoteLinkFeature extends AbstractFeature<Feature> {
     private enabled = false;
@@ -32,8 +33,8 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         private listener: ListenerInterface,
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
-        @inject(SI["feature:note:link:config"])
-        private config: NoteLinkConfig
+        @inject(SI["feature:config"])
+        private config: FeatureConfig<Feature.NoteLink>
     ) {
         super();
         this.resolver = featureService.createResolver(this.getId());
