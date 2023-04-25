@@ -1,5 +1,5 @@
 import { mock } from "jest-mock-extended";
-import { CachedMetadata, MetadataCacheExt, } from "obsidian";
+import { CachedMetadata, MetadataCacheExt } from "obsidian";
 import { AliasFeature } from "@src/Feature/Alias/AliasFeature";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { Feature } from "@src/Enum";

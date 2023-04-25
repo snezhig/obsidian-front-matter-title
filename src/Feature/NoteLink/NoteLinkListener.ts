@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { inject, injectable, named } from "inversify";
 import { EventDispatcher } from "@src/Components/EventDispatcher/EventDispatcher";
 import ListenerInterface from "../../Interfaces/ListenerInterface";
 import { AppEvents } from "@src/Types";
@@ -8,19 +8,20 @@ import EventInterface from "../../Components/EventDispatcher/Interfaces/EventInt
 import { NoteLinkChange } from "./NoteLinkTypes";
 import Event from "../../Components/EventDispatcher/Event";
 import { Modal } from "obsidian";
-import { SettingsType } from "@src/Settings/SettingsType";
-import NoteLinkConfig from "@src/Feature/NoteLink/NoteLinkConfig";
+import { FeatureConfig } from "../Types";
+import { Feature } from "../../Enum";
 
 @injectable()
-export default class NoteLinkListener implements ListenerInterface {
+export default class NoteLinkApprove implements ListenerInterface {
     private refs: ListenerRef<any>[] = [];
     constructor(
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcher<AppEvents>,
         @inject(SI["factory:obsidian:modal"])
         private factory: () => Modal,
-        @inject(SI["feature:note:link:config"])
-        private config: NoteLinkConfig
+        @inject(SI["feature:config"])
+        @named(Feature.NoteLink)
+        private config: FeatureConfig<Feature.NoteLink>
     ) {}
 
     bind(): void {

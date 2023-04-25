@@ -13,7 +13,6 @@ import { NoteLinkChange, NoteLinkStrategy } from "./NoteLinkTypes";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import { TFile } from "obsidian";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
-import NoteLinkConfig from "@src/Feature/NoteLink/NoteLinkConfig";
 import { FeatureConfig } from "../Types";
 
 export default class NoteLinkFeature extends AbstractFeature<Feature> {
@@ -34,6 +33,7 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
         @inject(SI["feature:config"])
+        @named(Feature.NoteLink)
         private config: FeatureConfig<Feature.NoteLink>
     ) {
         super();

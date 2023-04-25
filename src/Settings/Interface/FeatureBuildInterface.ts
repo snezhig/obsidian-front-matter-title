@@ -13,7 +13,9 @@ export type Context = {
     getDispatcher: () => EventDispatcherInterface<SettingsEvent>;
     getSettings: () => SettingsType["features"];
 };
-export default interface FeatureBuildInterface<K extends keyof SettingsFeature | SettingsFeatureCommon = SettingsFeatureCommon> {
+export default interface FeatureBuildInterface<
+    K extends keyof SettingsFeature | SettingsFeatureCommon = SettingsFeatureCommon
+> {
     build(options: BuildParams<K>): void;
     setContext(context: Context): void;
 }
