@@ -14,7 +14,7 @@ export class EventDispatcher<E> implements EventDispatcherInterface<E> {
         @inject(SI.logger)
         @named("event:dispatcher")
         private logger: LoggerInterface
-    ) { }
+    ) {}
     private readonly events: Map<
         keyof E,
         { cb: Callback<E[keyof E]>; sort: number; once: boolean; ref: ListenerRef<keyof E> }[]
@@ -27,7 +27,7 @@ export class EventDispatcher<E> implements EventDispatcherInterface<E> {
         const event = { cb, sort, ref, once };
         events.push(event);
         events.sort((a, b) => a.sort - b.sort);
-        this.logger.log(`Added listener: ${name.toString()}`, event)
+        this.logger.log(`Added listener: ${name.toString()}`, event);
         this.events.set(name, events);
 
         return ref;
@@ -48,7 +48,7 @@ export class EventDispatcher<E> implements EventDispatcherInterface<E> {
         for (const [i, item] of this.events.get(ref.getName()).entries()) {
             if (item.ref === ref) {
                 this.events.get(ref.getName()).splice(i, 1);
-                this.logger.log(`Removed listener: ${ref.getName().toString()}`)
+                this.logger.log(`Removed listener: ${ref.getName().toString()}`);
                 return;
             }
         }
