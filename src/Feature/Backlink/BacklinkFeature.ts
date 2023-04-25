@@ -1,6 +1,6 @@
 import { inject, injectable, named } from "inversify";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
-import { Feature } from "../../enum";
+import { Feature } from "../../Enum";
 import SI from "../../../config/inversify.types";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import { BacklinkViewExt } from "obsidian";

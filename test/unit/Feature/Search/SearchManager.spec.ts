@@ -1,7 +1,7 @@
 import { mock } from "jest-mock-extended";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { SearchPluginView, SearchViewDOM, TFile } from "obsidian";
 import SearchManager from "@src/Feature/Search/SearchManager";

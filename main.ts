@@ -14,7 +14,7 @@ import Event from "@src/Components/EventDispatcher/Event";
 import PluginHelper from "@src/Utils/PluginHelper";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import FeatureComposer from "@src/Feature/FeatureComposer";
 import ManagerComposer from "@src/Feature/ManagerComposer";
@@ -69,9 +69,9 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
         this.app.workspace.on("layout-change", () => this.dispatcher.dispatch("layout:change", null));
         this.app.workspace.on("active-leaf-change", () => this.dispatcher.dispatch("active:leaf:change", null));
-        this.app.workspace.on("file-open", () => this.dispatcher.dispatch("file:open", null));
+        this.app.workspace.on("file-open", file => this.dispatcher.dispatch("file:open", new Event(file)));
         new App(); //replace with static
-        this.container.getAll<ListenerInterface>(SI.listener).map(e => e.bind());
+        this.container.getAllNamed<ListenerInterface>(SI.listener, "unnamed").map(e => e.bind());
         await this.loadSettings();
         this.app.workspace.onLayoutReady(() => {
             this.container.get<Defer>(SI.defer).setFlag(DeferPluginReady);

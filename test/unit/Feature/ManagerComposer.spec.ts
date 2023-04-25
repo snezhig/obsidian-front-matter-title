@@ -5,7 +5,7 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ManagerFeatureInterface from "@src/Interfaces/ManagerFeatureInterface";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import { AppEvents } from "../../../src/Types";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import EventDispatcherInterface from "../../../src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 const mockComposer = mock<FeatureComposer>();

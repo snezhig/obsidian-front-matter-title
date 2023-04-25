@@ -1,4 +1,4 @@
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { Chooser, SuggestModalChooserFileItem } from "obsidian";
 import AbstractFeature from "../AbstractFeature";
