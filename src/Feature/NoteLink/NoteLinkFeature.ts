@@ -81,7 +81,7 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
 
         const exec = this.config.approval ? await this.approve.request(path, changes) : true;
         if (exec) {
-            this.executeChanges(path, changes);
+            await this.executeChanges(path, changes);
         }
     }
 
@@ -94,7 +94,7 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         for (const { original, replace } of changes) {
             content = content.replace(original, replace);
         }
-        this.facade.modifyFile(file, content).catch(console.error);
+        await this.facade.modifyFile(file, content).catch(console.error);
     }
 
     getId(): Feature {
