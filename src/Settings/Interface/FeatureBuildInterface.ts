@@ -7,6 +7,7 @@ export type BuildParams<K> = {
     name: string;
     desc: string;
     settings: K extends keyof SettingsFeature ? SettingsFeature[K] : SettingsFeatureCommon;
+    doc: { link: string };
 };
 export type Context = {
     getContainer: () => HTMLElement;

@@ -82,4 +82,13 @@ export default class FeatureHelper {
                 return "Replace internal links in files";
         }
     }
+
+    getDocSection(feature: Feature): string {
+        switch (feature) {
+            case Feature.NoteLink:
+                return "Note Link";
+            default:
+                return feature;
+        }
+    }
 }
