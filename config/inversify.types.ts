@@ -31,6 +31,7 @@ const SI = {
     "feature:composer": "",
     "feature:service": "",
     "feature:alias:config": "",
+    "feature:notelink:approve": "",
     "feature:config": "",
     filter: "",
     "getter:delimiter": "",
