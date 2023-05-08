@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import AbstractFeature from "@src/Feature/AbstractFeature";
 import ManagerFeatureInterface from "@src/Interfaces/ManagerFeatureInterface";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { ResolverInterface } from "../Resolver/Interfaces";
 
 @injectable()

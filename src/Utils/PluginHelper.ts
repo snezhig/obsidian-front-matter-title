@@ -1,6 +1,7 @@
 import { SettingsType } from "@src/Settings/SettingsType";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { StrategyType, ValidatorType } from "../Feature/Alias/Types";
+import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
 
 export default class PluginHelper {
     public static createDefaultSettings(): SettingsType {
@@ -40,6 +41,7 @@ export default class PluginHelper {
                 [Feature.InlineTitle]: { enabled: false },
                 [Feature.Canvas]: { enabled: false },
                 [Feature.Backlink]: { enabled: false },
+                [Feature.NoteLink]: { enabled: false, strategy: NoteLinkStrategy.OnlyEmpty, approval: true },
             },
             processor: {
                 args: [],

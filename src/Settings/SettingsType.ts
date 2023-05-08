@@ -1,13 +1,19 @@
 import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { Changed } from "@src/Utils/ObjectHelper";
 import { StrategyType as AliasStrategyType, ValidatorType as AliasValidatorType } from "../Feature/Alias/Types";
+import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
 
-export type SFExt = {
+type SettingsFeatureSpecific = {
     [Feature.Alias]: { strategy: AliasStrategyType; validator: AliasValidatorType };
+    [Feature.NoteLink]: { approval: boolean; strategy: NoteLinkStrategy };
 };
-export type SFC = { enabled: boolean };
-export type SF = { [K in Feature]: SFC & { [P in keyof SFExt]: P extends K ? SFExt[P] : object }[keyof SFExt] };
+export type SettingsFeatureCommon = { enabled: boolean };
+export type SettingsFeature = {
+    [K in Feature]: K extends keyof SettingsFeatureSpecific
+        ? SettingsFeatureSpecific[K] & SettingsFeatureCommon
+        : SettingsFeatureCommon;
+};
 
 export type TemplateValue = { main: string | null; fallback: string | null };
 export type TemplateNames = "common" & Feature;
@@ -26,7 +32,7 @@ export type SettingsType = {
     boot: {
         delay: number;
     };
-    features: SF;
+    features: SettingsFeature;
 };
 
 export type SettingsEvent = {
@@ -34,5 +40,5 @@ export type SettingsEvent = {
     "settings:tab:close": null;
     "settings.loaded": { settings: SettingsType };
     "settings:tab:manager:changed": { id: Feature; value: boolean };
-    "settings:tab:feature:changed": { id: Feature; value: SF[keyof SF] };
+    "settings:tab:feature:changed": { id: Feature; value: SettingsFeature[keyof SettingsFeature] };
 };

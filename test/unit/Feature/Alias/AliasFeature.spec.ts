@@ -1,8 +1,8 @@
 import { mock } from "jest-mock-extended";
-import { CachedMetadata, FrontMatterCache, MetadataCacheExt, Pos } from "obsidian";
+import { CachedMetadata, MetadataCacheExt } from "obsidian";
 import { AliasFeature } from "@src/Feature/Alias/AliasFeature";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { StrategyInterface, ValidatorInterface } from "@src/Feature/Alias/Interfaces";
 import { StrategyType, ValidatorType } from "@src/Feature/Alias/Types";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";

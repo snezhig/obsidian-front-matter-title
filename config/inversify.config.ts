@@ -36,7 +36,6 @@ const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
 Container.bind<string>(SI["template:pattern"]).toConstantValue("(?<placeholder>{{[^{}]+?}})");
 
-
 Container.bind<FilterInterface>(SI.filter).to(ExtensionFilter);
 Container.bind<FilterInterface>(SI.filter).to(PathListFilter);
 Container.bind<BlackWhiteListInterface>(SI["component:black_white_list"]).to(BlackWhiteList).inSingletonScope();
@@ -56,15 +55,14 @@ Container.bind<LoggerInterface>(SI.logger)
 
 Container.bind(SI["service:note:link"]).to(FileNoteLinkService).inSingletonScope();
 Container.bind(SI["service:fake_title_element"]).to(FakeTitleElementService);
-Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener);
-Container.bind<ListenerInterface>(SI.listener).to(ProcessorListener);
+Container.bind<ListenerInterface>(SI.listener).to(BlackWhiteListListener).whenTargetNamed("unnamed");
+Container.bind<ListenerInterface>(SI.listener).to(ProcessorListener).whenTargetNamed("unnamed");
 
 Container.load(CreatorModule);
 bindFeature(Container);
 bindSettings(Container);
 Container.load(processorModule);
 Container.load(resolverModule);
-
 
 Container.bind(SI.api).to(Api);
 Container.bind(SI["factory:api"]).toFactory(c => () => c.container.get(SI.api));
