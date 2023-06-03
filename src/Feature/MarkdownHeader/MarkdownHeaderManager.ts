@@ -58,7 +58,16 @@ export class MarkdownHeaderManager extends AbstractManager {
         const promises = [];
         for (const view of views) {
             if (!path || view.file.path === path) {
-                promises.push((async () => this.resolver.resolve(view.file.path))().then(r => this.setTitle(view, r)));
+                promises.push((async () => {
+                    const path = view.file.path;
+                    const title = await this.resolver.resolve(path);
+                    const currentPath = view.file?.path;
+                    if (currentPath === path) {
+                        this.setTitle(view, title)
+                    } else {
+                        this.logger.log(`View path changed from ${path} to ${currentPath}`)
+                    }
+                })());
             }
         }
         await Promise.all(promises);
