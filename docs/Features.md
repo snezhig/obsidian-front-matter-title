@@ -72,3 +72,18 @@
 |               Disabled                |               Enabled                |
 |:-------------------------------------:|:------------------------------------:|
 | ![](./../resources/img/Tab%20Off.png) | ![](./../resources/img/Tab%20On.png) |
+
+## Note Link
+> Changes aliases of links to internal files (references)
+
+**Options**
+- **Approve**: 
+  - **Use auto approve** - Any changes will be applied automatically
+  - **Show approve modal** - Any changes will trigger modal with supposed changes, which can be declined
+- **Replace**:
+  - **Replace all links** - Feature will compare any link and change them
+  - **Replace only without alias** - Feature will only compare links without aliases
+
+|               Approve example               |
+|:-------------------------------------------:|
+| ![](./../resources/img/NoteLinkFeature.png) |
