@@ -55,25 +55,16 @@ export class MarkdownHeaderManager extends AbstractManager {
 
     private async innerUpdate(path: string = null): Promise<boolean> {
         const views = this.facade.getViewsOfType<MarkdownViewExt>("markdown");
-        const promises = [];
+        let updated = false;
         for (const view of views) {
             if (!path || view.file.path === path) {
-                promises.push(
-                    (async () => {
-                        const path = view.file.path;
-                        const title = await this.resolver.resolve(path);
-                        const currentPath = view.file?.path;
-                        if (currentPath === path) {
-                            this.setTitle(view, title);
-                        } else {
-                            this.logger.log(`View path changed from ${path} to ${currentPath}`);
-                        }
-                    })()
-                );
+                const title = this.resolver.resolve(view.file.path);
+                this.setTitle(view, title);
+                updated = true;
             }
         }
-        await Promise.all(promises);
-        return promises.length > 0;
+
+        return updated;
     }
 
     private setTitle(view: MarkdownViewExt, title: string | null): void {
