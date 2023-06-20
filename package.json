@@ -34,7 +34,7 @@
     "eslint": "^8.14.0",
     "jest": "^27.5.1",
     "jest-mock-extended": "^2.0.6",
-    "obsidian": "^1.1.1",
+    "obsidian": "^1.2.8",
     "prettier": "^2.7.1",
     "ts-debounce": "^4.0.0",
     "ts-jest": "^27.1.4",
