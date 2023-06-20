@@ -21,7 +21,7 @@ import ManagerComposer from "@src/Feature/ManagerComposer";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
 import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
-import Defer, { DeferPluginReady } from "@src/Api/Defer";
+import Defer, { DeferPluginReady } from "@src/Components/ApiAdapter/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {

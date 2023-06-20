@@ -1,11 +1,9 @@
 import { mock } from "jest-mock-extended";
-import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Api/Defer";
-import ResolverService from "@src/Resolver/ResolverService";
-import Api from "@src/Api/Api";
+import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Components/ApiAdapter/Defer";
+import Api from "@src/Components/ApiAdapter/Api";
 
 const mockFactory = jest.fn(() => mock<Api>());
-const mockService = mock<ResolverService>();
-const defer = new Defer(mockFactory, mockService);
+const defer = new Defer(mockFactory);
 
 test("Should not been booted and bound", () => {
     expect(defer.isFeaturesReady()).toBeFalsy();
