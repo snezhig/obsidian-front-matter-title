@@ -28,7 +28,12 @@ import AbstractManager from "../../src/Feature/AbstractManager";
 import FeatureHelper from "@src/Utils/FeatureHelper";
 import FeatureService from "@src/Feature/FeatureService";
 import BacklinkManager from "../../src/Feature/Backlink/BacklinkFeature";
+import NoteLinkFeature from "../../src/Feature/NoteLink/NoteLinkFeature";
+import NoteLinkApprove from "../../src/Feature/NoteLink/NoteLinkApprove";
 import AliasConfig from "@src/Feature/Alias/AliasConfig";
+import { KeyStorageInterface } from "../../src/Storage/Interfaces";
+import { SettingsType } from "../../src/Settings/SettingsType";
+import { Feature } from "../../src/Enum";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -55,8 +60,12 @@ export default (container: Container) => {
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(MarkdownHeaderManager).whenTargetNamed(MarkdownHeaderManager.getId());
+    container
+        .bind<FeatureInterface<any>>(SI.feature)
+        .to(MarkdownHeaderManager)
+        .whenTargetNamed(MarkdownHeaderManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(BacklinkManager).whenTargetNamed(BacklinkManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(NoteLinkFeature).whenTargetNamed(NoteLinkFeature.getId());
     container
         .bind<FeatureInterface<any>>(SI.feature)
         .to(InlineTitleManager)
@@ -82,4 +91,12 @@ export default (container: Container) => {
         .bind(SI["alias:modifier:validator"])
         .to(ValidatorRequired)
         .whenTargetNamed(AliasValidatorType.FrontmatterRequired);
+
+    container.bind(SI["feature:notelink:approve"]).to(NoteLinkApprove);
+    container.bind(SI["feature:config"])
+        .toDynamicValue((c) => {
+            const feature = c.currentRequest.target.getNamedTag().value as Feature
+            return c.container.get<KeyStorageInterface<SettingsType>>(SI["settings:storage"]).get('features').get(feature).value()
+        }).when(() => true)
+
 };

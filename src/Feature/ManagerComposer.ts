@@ -1,5 +1,5 @@
 import FeatureComposer from "@src/Feature/FeatureComposer";
-import { Feature, Managers } from "@src/enum";
+import { Feature, Managers } from "@src/Enum";
 import AbstractManager from "@src/Feature/AbstractManager";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";

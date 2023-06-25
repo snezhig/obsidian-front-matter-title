@@ -4,7 +4,7 @@ import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { SearchPluginView, SearchViewDOM } from "obsidian";
 
 type Replacer = FunctionReplacer<SearchViewDOM, "addResult", SearchManager>;

@@ -1,4 +1,4 @@
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { injectable } from "inversify";
 
 @injectable()
@@ -17,6 +17,7 @@ export default class FeatureHelper {
             Feature.InlineTitle,
             Feature.Canvas,
             Feature.Backlink,
+            Feature.NoteLink,
         ];
     }
 
@@ -46,6 +47,8 @@ export default class FeatureHelper {
                 return "Canvas";
             case Feature.Backlink:
                 return "Backlink";
+            case Feature.NoteLink:
+                return "Note Link";
         }
     }
 
@@ -75,6 +78,17 @@ export default class FeatureHelper {
                 return "Replace shown titles in Canvas";
             case Feature.Backlink:
                 return "Replace shown titles in Backlink(Linked mentions)";
+            case Feature.NoteLink:
+                return "Replace internal links in files";
+        }
+    }
+
+    getDocSection(feature: Feature): string {
+        switch (feature) {
+            case Feature.NoteLink:
+                return "Note Link";
+            default:
+                return feature;
         }
     }
 }

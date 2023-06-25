@@ -1,5 +1,5 @@
 import { TFileExplorerItem, TFileExplorerView } from "obsidian";
-import { Leaves, Feature } from "@src/enum";
+import { Leaves, Feature } from "@src/Enum";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
@@ -40,6 +40,10 @@ export default class ExplorerManager extends AbstractManager {
         this.enabled = true;
     }
 
+    private getFileItemInnerTitleEl(fileItem: TFileExplorerItem): HTMLElement {
+        return fileItem.titleInnerEl ?? fileItem.innerEl;
+    }
+
     private getExplorerView(): TFileExplorerView | null {
         const leaves = this.facade.getLeavesOfType(Leaves.FE);
 
@@ -72,9 +76,10 @@ export default class ExplorerManager extends AbstractManager {
         const title = await (async () => this.resolver.resolve(item.file.path))().catch(() => null);
         if (this.isTitleEmpty(title)) {
             return this.restore(item);
-        } else if (item.titleInnerEl.innerText !== title) {
+        } else if (this.getFileItemInnerTitleEl(item).innerText !== title) {
             this.keepOrigin(item);
-            item.titleInnerEl.innerText = title;
+            // Need to be on .nav-file-title-content, not on .nav-file-title
+            this.getFileItemInnerTitleEl(item).innerText = title;
             return true;
         }
         return false;
@@ -84,7 +89,7 @@ export default class ExplorerManager extends AbstractManager {
 
     private keepOrigin(item: TFileExplorerItem): void {
         if (!this.originTitles.has(item.file.path)) {
-            this.originTitles.set(item.file.path, item.titleInnerEl.innerText);
+            this.originTitles.set(item.file.path, this.getFileItemInnerTitleEl(item).innerText);
         }
     }
 
@@ -94,7 +99,7 @@ export default class ExplorerManager extends AbstractManager {
 
     private restore(item: TFileExplorerItem): boolean {
         if (this.originTitles.has(item.file.path)) {
-            item.titleInnerEl.innerText = this.originTitles.get(item.file.path);
+            this.getFileItemInnerTitleEl(item).innerText = this.originTitles.get(item.file.path);
             this.originTitles.delete(item.file.path);
             return true;
         }

@@ -3,7 +3,7 @@ import { TFileExplorerView, WorkspaceLeaf } from "obsidian";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
 import Event from "@src/Components/EventDispatcher/Event";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface, {

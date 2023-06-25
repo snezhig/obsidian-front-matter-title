@@ -2,7 +2,7 @@ import AbstractManager from "@src/Feature/AbstractManager";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import { MarkdownLeaf } from "obsidian";
 import { AppEvents } from "@src/Types";
 import { ObsidianActiveFile } from "@config/inversify.factory.types";

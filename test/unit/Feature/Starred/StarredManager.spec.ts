@@ -2,7 +2,7 @@ import { mock } from "jest-mock-extended";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { EventRef, Events, Plugin, StarredPluginView } from "obsidian";
-import { Feature } from "@src/enum";
+import { Feature } from "@src/Enum";
 import StarredManager from "@src/Feature/Starred/StarredManager";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
 
