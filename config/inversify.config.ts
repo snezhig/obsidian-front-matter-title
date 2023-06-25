@@ -6,6 +6,7 @@ import bindFeature from "./services/feature.config";
 import bindSettings from "./services/settings.config";
 import processorModule from "./services/processors.config";
 import resolverModule from "./services/resolver.config";
+import apiAdapterModule from "./services/api.adapter.config";
 import FilterInterface from "../src/Interfaces/FilterInterface";
 import ExtensionFilter from "../src/Filters/ExtensionFilter";
 import PathListFilter from "../src/Filters/PathListFilter";
@@ -23,8 +24,6 @@ import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import LoggerComposer from "@src/Components/Debug/LoggerComposer";
 import FileNoteLinkService from "@src/Utils/FileNoteLinkService";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
-import Api from "@src/Api/Api";
-import Defer from "@src/Api/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { EventDispatcher } from "@src/Components/EventDispatcher/EventDispatcher";
 import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteListListener";
@@ -63,10 +62,8 @@ bindFeature(Container);
 bindSettings(Container);
 Container.load(processorModule);
 Container.load(resolverModule);
+Container.load(apiAdapterModule);
 
-Container.bind(SI.api).to(Api);
-Container.bind(SI["factory:api"]).toFactory(c => () => c.container.get(SI.api));
-Container.bind(SI.defer).to(Defer).inSingletonScope();
 
 Container.bind(SI["factory:replacer"]).toFunction((t: any, m: any, a: unknown, i: any) =>
     FunctionReplacer.create(t, m, a, i)

@@ -1,8 +1,7 @@
 import { ApiInterface, DeferInterface } from "front-matter-plugin-api-provider";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
-import Api from "@src/Api/Api";
-import ResolverService from "@src/Resolver/ResolverService";
+import Api from "@src/Components/ApiAdapter/Api";
 
 export const DeferPluginReady = 2;
 export const DeferFeaturesReady = 4;
@@ -22,9 +21,7 @@ export default class Defer implements DeferInterface {
 
     constructor(
         @inject(SI["factory:api"])
-        private factory: () => Api,
-        @inject(SI["resolver:service"])
-        private service: ResolverService
+        private factory: () => Api
     ) {
         this.promises.plugin = new Promise(r => (this.resolves.plugin = r));
         this.promises.managers = new Promise(r => (this.resolves.managers = r));
@@ -63,6 +60,6 @@ export default class Defer implements DeferInterface {
     }
 
     getApi(): ApiInterface | null {
-        return (this.isPluginReady() ? this.factory() : null)?.setResolver(this.service.createNamed("common")) ?? null;
+        return this.isPluginReady() ? this.factory() : null;
     }
 }

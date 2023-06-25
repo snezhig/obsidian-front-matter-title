@@ -21,7 +21,7 @@ import ManagerComposer from "@src/Feature/ManagerComposer";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
 import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
-import Defer, { DeferPluginReady } from "@src/Api/Defer";
+import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Components/ApiAdapter/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
@@ -32,7 +32,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private fc: FeatureComposer;
     private mc: ManagerComposer;
 
-    public getDefer(): DeferInterface {
+    public getDefer(): Defer {
         return this.container.get(SI.defer);
     }
 
@@ -73,9 +73,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         new App(); //replace with static
         this.container.getAllNamed<ListenerInterface>(SI.listener, "unnamed").map(e => e.bind());
         await this.loadSettings();
-        this.app.workspace.onLayoutReady(() => {
-            this.container.get<Defer>(SI.defer).setFlag(DeferPluginReady);
-        });
+        this.app.workspace.onLayoutReady(() => this.getDefer().setFlag(DeferPluginReady));
         await this.delay();
 
         this.fc = Container.get(SI["feature:composer"]);
@@ -132,6 +130,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             );
             this.reloadFeatures();
             await this.mc.refresh();
+            this.getDefer().setFlag(DeferFeaturesReady);
         });
         this.dispatcher.addListener({
             name: "resolver:unresolved",
