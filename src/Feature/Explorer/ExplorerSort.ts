@@ -18,7 +18,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
     private view: TFileExplorerView;
     private enabled = false;
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
-    private readonly cb: (e: { id: Feature; result?: boolean }) => void;
+    private readonly cb: (e: { id: string; result?: boolean }) => void;
     private refs: [ListenerRef<"manager:refresh">?, ListenerRef<"manager:update">?] = [];
     private resolver: ResolverInterface;
 

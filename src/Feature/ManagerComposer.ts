@@ -33,7 +33,7 @@ export default class ManagerComposer {
                 promises.push(
                     manager.update(path).then(r => {
                         result[i] = r;
-                        this.dispatcher.dispatch("manager:update", new Event({ id: i, result: r }));
+                        this.dispatcher.dispatch("manager:update", new Event({ id: i, result: r, path }));
                     })
                 );
             }
