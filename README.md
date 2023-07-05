@@ -2,12 +2,16 @@
 
 This is a plugin for [Obsidian](https://obsidian.md).
 
+Why this plugin exist? I use zettelkasten method what means that all my files has names like timestamps `202208251731`.
+Plugin give some options to display data from yaml block instead of original filename.
+
 ---
 
 - [Installation](#installation)
 - [Get started](#get-started)
 - [Template Examples](./docs/TemplateExamples.md)
 - [Features](./docs/Features.md)
+- [Processor](./docs/Processor.md)
 - [Api](#api)
 
 ---
