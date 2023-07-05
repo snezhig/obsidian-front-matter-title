@@ -70,7 +70,7 @@ For example: `_basename` means that plugin will use value from `basename` field
 
 ### Heading
 
-If you set template as `#heading`, plugin will you first heading from file
+If you set template as `#heading`, plugin will use first heading from file
 
 ## Types
 
