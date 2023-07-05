@@ -2,7 +2,7 @@ import FeatureBuildInterface, { BuildParams, Context } from "@src/Settings/Inter
 import { SettingsFeature, SettingsFeatureCommon } from "@src/Settings/SettingsType";
 
 export default abstract class AbstractBuilder<
-    K extends keyof SettingsFeature | SettingsFeatureCommon = SettingsFeatureCommon
+    K extends keyof SettingsFeature | SettingsFeatureCommon = SettingsFeatureCommon,
 > implements FeatureBuildInterface<K>
 {
     protected context: Context;
