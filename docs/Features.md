@@ -6,7 +6,7 @@
 
 |                Disabled                 |                Enabled                 |
 |:---------------------------------------:|:--------------------------------------:|
-| ![](./../resources/img/Alias%20Off.png) | ![](./../resources/img/Alias%20On.png) |
+| ![](img/Alias%20Off.png) | ![](img/Alias%20On.png) |
 
 ## Explorer
 
@@ -14,7 +14,7 @@
 
 |                  Disabled                  |                  Enabled                  |
 |:------------------------------------------:|:-----------------------------------------:|
-| ![](./../resources/img/Explorer%20Off.png) | ![](./../resources/img/Explorer%20On.png) |
+| ![](img/Explorer%20Off.png) | ![](img/Explorer%20On.png) |
 
 ## Explorer Sort
 
@@ -22,7 +22,7 @@
 
 |                 Disabled                  |                    Enabled                    |
 |:-----------------------------------------:|:---------------------------------------------:|
-| ![](./../resources/img/Explorer%20On.png) | ![](./../resources/img/ExplorerSort%20On.png) |
+| ![](img/Explorer%20On.png) | ![](img/ExplorerSort%20On.png) |
 
 ## Graph
 
@@ -30,7 +30,7 @@
 
 |                Disabled                 |                Enabled                 |
 |:---------------------------------------:|:--------------------------------------:|
-| ![](./../resources/img/Graph%20Off.png) | ![](./../resources/img/Graph%20On.png) |
+| ![](img/Graph%20Off.png) | ![](img/Graph%20On.png) |
 
 ## Header
 
@@ -38,7 +38,7 @@
 
 |                 Disabled                  |                 Enabled                  |
 |:-----------------------------------------:|:----------------------------------------:|
-| ![](./../resources/img/Heading%20Off.png) | ![](./../resources/img/Heading%20On.png) |
+| ![](img/Heading%20Off.png) | ![](img/Heading%20On.png) |
 
 ## Starred
 
@@ -46,7 +46,7 @@
 
 |                 Disabled                  |                 Enabled                  |
 |:-----------------------------------------:|:----------------------------------------:|
-| ![](./../resources/img/Starred%20Off.png) | ![](./../resources/img/Starred%20on.png) |
+| ![](img/Starred%20Off.png) | ![](img/Starred%20on.png) |
 
 ## Search
 
@@ -54,7 +54,7 @@
 
 |                 Disabled                 |                 Enabled                 |
 |:----------------------------------------:|:---------------------------------------:|
-| ![](./../resources/img/Search%20Off.png) | ![](./../resources/img/Search%20On.png) |
+| ![](img/Search%20Off.png) | ![](img/Search%20On.png) |
 
 ## Suggest
 
@@ -62,8 +62,8 @@
 
 |                   Disabled                    |                   Enabled                    |
 |:---------------------------------------------:|:--------------------------------------------:|
-| ![](./../resources/img/Suggest%20Off%201.png) | ![](./../resources/img/Suggest%20On%201.png) |
-| ![](./../resources/img/Suggest%20Off%202.png) | ![](./../resources/img/Suggest%20On%202.png) |
+| ![](img/Suggest%20Off%201.png) | ![](img/Suggest%20On%201.png) |
+| ![](img/Suggest%20Off%202.png) | ![](img/Suggest%20On%202.png) |
 
 ## Tab
 
@@ -71,19 +71,7 @@
 
 |               Disabled                |               Enabled                |
 |:-------------------------------------:|:------------------------------------:|
-| ![](./../resources/img/Tab%20Off.png) | ![](./../resources/img/Tab%20On.png) |
+| ![](img/Tab%20Off.png) | ![](img/Tab%20On.png) |
 
 ## Note Link
-> Changes aliases of links to internal files (references)
-
-**Options**
-- **Approve**: 
-  - **Use auto approve** - Any changes will be applied automatically
-  - **Show approve modal** - Any changes will trigger modal with supposed changes, which can be declined
-- **Replace**:
-  - **Replace all links** - Feature will compare any link and change them
-  - **Replace only without alias** - Feature will only compare links without aliases
-
-|               Approve example               |
-|:-------------------------------------------:|
-| ![](./../resources/img/NoteLinkFeature.png) |
+> [Click Here](./Features/NoteLink.md)
