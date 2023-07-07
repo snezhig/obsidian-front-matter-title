@@ -16,6 +16,9 @@
   "keywords": [],
   "author": "snezhig",
   "license": "MIT",
+  "overrides": {
+    "semver": ">=7.5.2"
+  },
   "engines": {
     "node": ">=12.0.0"
   },
