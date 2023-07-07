@@ -1,7 +1,8 @@
 import { Setting, TextComponent } from "obsidian";
 import { SettingsType } from "../../SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
-import { ProcessorTypes } from "../../../Components/Processor/ProcessorUtils";
+import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
+import { GITHUB_DOCS } from "@src/Enum";
 
 export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "processor"> {
     private setting: Setting;
@@ -11,7 +12,13 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
     }
 
     doBuild(): void {
-        this.setting = new Setting(this.container).setName("Processor");
+        const fragment = createFragment(e =>
+            e.createEl("a", {
+                text: "Processor",
+                href: GITHUB_DOCS + "Processor.md",
+            })
+        );
+        this.setting = new Setting(this.container).setName(fragment);
         this.buildDynamic();
     }
 

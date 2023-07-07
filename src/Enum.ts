@@ -31,3 +31,5 @@ export const Managers = [
     Feature.InlineTitle,
     Feature.Canvas,
 ];
+
+export const GITHUB_DOCS = "https://github.com/snezhig/obsidian-front-matter-title/blob/master/docs/";

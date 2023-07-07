@@ -1,6 +1,6 @@
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
-import { Feature } from "@src/Enum";
+import { Feature, GITHUB_DOCS } from "@src/Enum";
 import { SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { inject, injectable } from "inversify";
@@ -11,6 +11,7 @@ import FeatureHelper from "../../../Utils/FeatureHelper";
 @injectable()
 export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "features"> {
     private ref: ListenerRef<"settings:tab:feature:changed"> = null;
+
     constructor(
         @inject(SI["factory:settings:feature:builder"])
         private builderFactory: SettingsFeatureBuildFactory,
@@ -21,6 +22,7 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
     ) {
         super();
     }
+
     support(k: keyof SettingsType): boolean {
         return k === "features";
     }
@@ -47,9 +49,7 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
                 feature,
                 name: this.helper.getName(feature),
                 doc: {
-                    link: `https://github.com/snezhig/obsidian-front-matter-title/blob/master/docs/Features.md#${this.helper.getDocSection(
-                        feature
-                    )}`,
+                    link: `${GITHUB_DOCS}/${this.helper.getDocSection(feature)}`,
                 },
             }));
         for (const item of data) {
