@@ -86,7 +86,7 @@ export default class FeatureHelper {
     getDocSection(feature: Feature): string {
         switch (feature) {
             case Feature.NoteLink:
-                return "Note Link";
+                return "Features/NoteLink.md";
             default:
                 return feature;
         }

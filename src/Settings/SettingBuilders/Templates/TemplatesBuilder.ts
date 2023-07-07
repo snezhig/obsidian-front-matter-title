@@ -4,7 +4,7 @@ import { Setting } from "obsidian";
 import { inject, injectable } from "inversify";
 import { ObsidianModalFactory } from "@config/inversify.factory.types";
 import SI from "../../../../config/inversify.types";
-import { Feature } from "@src/Enum";
+import { Feature, GITHUB_DOCS } from "@src/Enum";
 import FeatureHelper from "../../../Utils/FeatureHelper";
 
 @injectable()
@@ -28,9 +28,18 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
         this.buildConfigButton();
     }
 
+    private createDocFragment(text: string, section: string = null): DocumentFragment {
+        return createFragment(e =>
+            e.createEl("a", {
+                href: GITHUB_DOCS + "Templates.md" + (section ? `#${section}` : ""),
+                text,
+            })
+        );
+    }
+
     private buildTemplate(): void {
         new Setting(this.container)
-            .setName("Common main template")
+            .setName(this.createDocFragment("Common main template"))
             .setDesc(
                 `Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}".
     Also you can use #heading to use first Heading from a file or _basename and another reserved words. 
@@ -46,7 +55,7 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
 
     private buildFallbackTemplate(): void {
         new Setting(this.container)
-            .setName("Common fallback template")
+            .setName(this.createDocFragment("Common fallback template"))
             .setDesc("This template will be used as a fallback option if the main template is not resolved")
             .addText(text =>
                 text
@@ -63,7 +72,7 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
                 : `Common ${type} will be used. Its value is "${this.item.get("common").get(type).value()}"`;
 
         new Setting(this.container)
-            .setName("Features' templates")
+            .setName(this.createDocFragment("Features' templates", "Features' Templates"))
             .setDesc("Manage templates for each feature individually")
             .addButton(cb =>
                 cb.setButtonText("Manage").onClick(() => {

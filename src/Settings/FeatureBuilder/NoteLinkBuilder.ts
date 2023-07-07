@@ -14,12 +14,8 @@ export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
 
     build({ id, name, desc, settings, doc }: BuildParams<Feature.NoteLink>): void {
         this.id = id;
-        const descFragment = createFragment(e => {
-            e.createEl("a", { text: `[Doc]`, href: doc.link });
-            e.createEl("br");
-            e.createSpan({ text: desc });
-        });
-        this.setting = new Setting(this.context.getContainer()).setName(name).setDesc(descFragment);
+        const fragment = createFragment(e => e.createEl("a", { text: name, href: doc.link }));
+        this.setting = new Setting(this.context.getContainer()).setName(fragment).setDesc(desc);
         this.setting.addDropdown(e => (this.strategy = e));
         this.strategy
             .addOptions({
