@@ -3,7 +3,7 @@ import { Config } from "@jest/types";
 const config: Config.InitialOptions = {
     preset: "ts-jest",
     testEnvironment: "node",
-    moduleDirectories: ["node_modules", "."],
+    moduleDirectories: ["node_modules", __dirname],
     bail: true,
     setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
     cacheDirectory: "<rootDir>/var/cache",
