@@ -21,7 +21,8 @@
       "ES2019.Object",
       "ES2018.Regexp",
       "ES2021.String",
-      "ES2021.Promise"
+      "ES2021.Promise",
+      "ESNext"
     ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

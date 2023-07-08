@@ -57,6 +57,10 @@ declare module "obsidian" {
         view: GraphView;
     }
 
+    export class WorkspaceLeafExt extends WorkspaceLeaf {
+        id: string;
+    }
+
     export class GraphView extends View {
         renderer?: {
             nodes?: GraphNode[];
@@ -72,6 +76,7 @@ declare module "obsidian" {
         titleEl: HTMLDivElement;
         titleContainerEl: HTMLDivElement;
         inlineTitleEl: HTMLDivElement;
+        leaf: WorkspaceLeafExt;
     }
     export abstract class CanvasViewExt extends FileView {
         canvas: Canvas;

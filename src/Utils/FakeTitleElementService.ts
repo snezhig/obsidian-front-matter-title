@@ -34,6 +34,15 @@ export default class FakeTitleElementService {
         return this.elements.has(id);
     }
 
+    removeExcept(id: string | string[]) {
+        const ids = Array.isArray(id) ? id : [id];
+        for (const key of this.elements.keys()) {
+            if (!ids.includes(key)) {
+                this.elements.delete(key);
+            }
+        }
+    }
+
     remove(id: string): void {
         if (!this.has(id)) {
             return;

@@ -3,7 +3,7 @@
   "name": "Front Matter Title",
   "version": "3.3.1",
   "minAppVersion": "0.16.3",
-  "description": "Lets you define a title in frontmatter to be displayed as the filename",
+  "description": "Lets you define a title in frontmatter to be displayed as the filename for explorer, graph, search and etc.",
   "author": "Snezhig",
   "authorUrl": "https://github.com/snezhig",
   "isDesktopOnly": false,

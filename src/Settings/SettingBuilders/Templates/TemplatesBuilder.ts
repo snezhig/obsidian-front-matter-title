@@ -72,7 +72,7 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
                 : `Common ${type} will be used. Its value is "${this.item.get("common").get(type).value()}"`;
 
         new Setting(this.container)
-            .setName(this.createDocFragment("Features' templates", "Features' Templates"))
+            .setName(this.createDocFragment("Features' templates", "features-templates"))
             .setDesc("Manage templates for each feature individually")
             .addButton(cb =>
                 cb.setButtonText("Manage").onClick(() => {
