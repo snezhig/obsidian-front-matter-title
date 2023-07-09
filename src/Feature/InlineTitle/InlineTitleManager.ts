@@ -63,32 +63,40 @@ export class InlineTitleManager extends AbstractManager {
     private async innerUpdate(path: string = null): Promise<boolean> {
         const views = this.facade.getViewsOfType<MarkdownViewExt>("markdown");
         const promises = [];
+        const ids: string[] = [];
         for (const view of views) {
             if (!path || view.file.path === path) {
                 promises.push(
                     this.resolve(view.file.path)
-                        .then(r => (r ? this.setTitle(view, r) : this.resetTitle()))
+                        .then(title =>
+                            title ? ids.push(this.setTitle(view, title)) : this.resetTitle(this.getTitleElId(view))
+                        )
                         .catch(console.error)
                 );
             }
         }
 
         await Promise.all(promises);
+        this.fakeTitleElementService.removeExcept(ids);
         return promises.length > 0;
     }
 
-    private resetTitle(): void {
-        this.fakeTitleElementService.remove(this.getId());
+    private resetTitle(id: string): void {
+        this.fakeTitleElementService.remove(id);
     }
 
-    private setTitle(view: MarkdownViewExt, title: string | null): void {
+    private setTitle(view: MarkdownViewExt, title: string | null): string {
         this.logger.log(`Set inline title "${title ?? " "}" for ${view.file.path}`);
-        const id = this.getId();
+        const id = this.getTitleElId(view);
         const original = view.inlineTitleEl;
         const { created } = this.fakeTitleElementService.getOrCreate({ original, title, id, events: ["click"] });
         if (created) {
             this.fakeTitleElementService.setVisible(id, true);
         }
+        return id;
+    }
+    private getTitleElId(view: MarkdownViewExt): string {
+        return `${this.getId()}-${view.leaf.id}`;
     }
 
     getId(): Feature {
