@@ -4,6 +4,7 @@ const SI = {
     "alias:modifier": "",
     "alias:modifier:strategy": "",
     "alias:modifier:validator": "",
+    "backlink:helper": "",
     cache: "",
     "component:black_white_list": "",
     "component:extractor": "",

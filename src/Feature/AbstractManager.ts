@@ -22,7 +22,7 @@ export default abstract class AbstractManager extends AbstractFeature<Feature> i
         return this.doUpdate(path);
     }
 
-    async refresh(): Promise<{ [k: string]: boolean }> {
+    async refresh(): Promise<{ [k: string]: boolean }| void> {
         if (this.isEnabled()) {
             return this.doRefresh();
         }
@@ -40,5 +40,5 @@ export default abstract class AbstractManager extends AbstractFeature<Feature> i
 
     protected abstract doUpdate(path: string): Promise<boolean>;
 
-    protected abstract doRefresh(): Promise<{ [k: string]: boolean }>;
+    protected abstract doRefresh(): Promise<{ [k: string]: boolean } | void>;
 }

@@ -1,6 +1,6 @@
 import { inject, injectable, named } from "inversify";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
-import { Feature } from "../../Enum";
+import { Feature, Leaves } from "../../Enum";
 import SI from "../../../config/inversify.types";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import { BacklinkViewExt } from "obsidian";
@@ -10,9 +10,10 @@ import { AppEvents } from "../../Types";
 import AbstractFeature from "../AbstractFeature";
 import { ResolverInterface } from "../../Resolver/Interfaces";
 import FeatureService from "../FeatureService";
+import BacklinkHelper from "../../Utils/BacklinkHelper";
 
 @injectable()
-export default class BacklinkManager extends AbstractFeature<Feature> {
+export default class BacklinkFeature extends AbstractFeature<Feature> {
     private enabled = false;
     private ref: ListenerRef<"file:open"> = null;
     private resolver: ResolverInterface;
@@ -26,7 +27,9 @@ export default class BacklinkManager extends AbstractFeature<Feature> {
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcher<AppEvents>,
         @inject(SI["feature:service"])
-        service: FeatureService
+        service: FeatureService,
+        @inject(SI["backlink:helper"])
+        private helper: BacklinkHelper
     ) {
         super();
         this.resolver = service.createResolver(this.getId());
@@ -55,23 +58,14 @@ export default class BacklinkManager extends AbstractFeature<Feature> {
         }
     }
     private process(path: string = null, restore = false): void {
-        const view = this.facade.getViewsOfType<BacklinkViewExt>(this.getId())[0] ?? null;
-        const lookup = view?.backlink?.backlinkDom?.resultDomLookup ?? new Map();
-
-        for (const [file, item] of lookup.entries()) {
-            if (path && file.path !== path) {
-                continue;
-            }
-            const node = item.containerEl.firstElementChild;
-            const text = (restore ? null : this.resolver.resolve(file.path)) ?? file.basename;
-            if (node.getText() !== text) {
-                item.containerEl.firstElementChild.setText(text);
-            }
+        const view = this.facade.getViewsOfType<BacklinkViewExt>(Leaves.BL)[0] ?? null;
+        if (view.backlink) {
+            this.helper.processTitles(view.backlink, this.resolver, path, restore);
         }
     }
 
     getId(): Feature {
-        return BacklinkManager.getId();
+        return BacklinkFeature.getId();
     }
     static getId() {
         return Feature.Backlink;

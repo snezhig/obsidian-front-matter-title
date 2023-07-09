@@ -3,6 +3,7 @@ export enum Leaves {
     G = "graph",
     LG = "localgraph",
     MD = "markdown",
+    BL = "backlink"
 }
 
 export enum Feature {
@@ -17,7 +18,8 @@ export enum Feature {
     Suggest = "suggest",
     InlineTitle = "inlineTitle",
     Canvas = "canvas",
-    Backlink = "backlink",
+    Backlink = Leaves.BL,
+    BacklinkMarkdown = "backlinkMarkdown",
     NoteLink = "noteLink",
 }
 
@@ -30,6 +32,7 @@ export const Managers = [
     Feature.Tab,
     Feature.InlineTitle,
     Feature.Canvas,
+    Feature.BacklinkMarkdown,
 ];
 
 export const GITHUB_DOCS = "https://github.com/snezhig/obsidian-front-matter-title/blob/master/docs/";
