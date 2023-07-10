@@ -30,6 +30,7 @@ import BlackWhiteListListener from "@src/Components/BlackWhiteList/BlackWhiteLis
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import ProcessorListener from "../src/Components/Processor/ProccessorListener";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
+import BooleanStrategy from "@src/Components/Extractor/BooleanStrategy";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
@@ -43,6 +44,7 @@ Container.bind<ExtractorInterface>(SI["component:extractor"]).to(Extractor);
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(LiteralStrategy);
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(ArrayStrategy);
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(NullStrategy);
+Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(BooleanStrategy);
 Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
 Container.bind<LoggerInterface>(SI.logger)
     .toDynamicValue(context => {
@@ -63,7 +65,6 @@ bindSettings(Container);
 Container.load(processorModule);
 Container.load(resolverModule);
 Container.load(apiAdapterModule);
-
 
 Container.bind(SI["factory:replacer"]).toFunction((t: any, m: any, a: unknown, i: any) =>
     FunctionReplacer.create(t, m, a, i)
