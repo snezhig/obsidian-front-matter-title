@@ -96,7 +96,7 @@ export class InlineTitleManager extends AbstractManager {
         return id;
     }
     private getTitleElId(view: MarkdownViewExt): string {
-        return `${this.getId()}-${view.leaf.id}`;
+        return `${view.getState().mode}-${this.getId()}-${view.leaf.id}`;
     }
 
     getId(): Feature {
