@@ -4,6 +4,8 @@ export enum Leaves {
     LG = "localgraph",
     MD = "markdown",
     BL = "backlink",
+    S = "search",
+    ST = "starred",
 }
 
 export enum Feature {
