@@ -1,5 +1,5 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import { inject, injectable, named } from "inversify";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";
@@ -75,7 +75,7 @@ export class CanvasManager extends AbstractManager {
         const promises = [];
         this.logger.log(`inner update "${path}"`);
 
-        const canvasViews = this.facade.getViewsOfType<CanvasViewExt>("canvas");
+        const canvasViews = this.facade.getViewsOfType<CanvasViewExt>(Leaves.CV);
         for (const view of canvasViews) {
             if (!view.file) {
                 continue;
@@ -154,6 +154,9 @@ export class CanvasManager extends AbstractManager {
         });
         if (inline?.created) {
             this.fakeTitleElementService.setVisible(ids.inline, true);
+        }
+        if (node.placeholderEl.getText() !== title) {
+            node.placeholderEl.setText(title);
         }
     }
 

@@ -3,6 +3,7 @@ export enum Leaves {
     G = "graph",
     LG = "localgraph",
     MD = "markdown",
+    CV = "canvas",
 }
 
 export enum Feature {
