@@ -20,7 +20,7 @@ export default class ManagerComposer {
         private logger: LoggerInterface,
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents>
-    ) { }
+    ) {}
 
     public async update(path: string, id: Feature = null): Promise<{ [K in Feature]?: boolean }> {
         const ids = id ? [id] : this.ids;

@@ -17,7 +17,6 @@ export default class FeatureHelper {
             Feature.InlineTitle,
             Feature.Canvas,
             Feature.Backlink,
-            Feature.BacklinkMarkdown,
             Feature.NoteLink,
         ];
     }
@@ -50,8 +49,6 @@ export default class FeatureHelper {
                 return "Backlink";
             case Feature.NoteLink:
                 return "Note Link";
-            case Feature.BacklinkMarkdown:
-                return "Backlink in document"
         }
     }
 
@@ -83,8 +80,6 @@ export default class FeatureHelper {
                 return "Replace shown titles in Backlink(Linked mentions)";
             case Feature.NoteLink:
                 return "Replace internal links in files";
-            case Feature.BacklinkMarkdown:
-                return "Replace shown title in Backlink in document"
         }
     }
 

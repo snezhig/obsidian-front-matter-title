@@ -2,7 +2,7 @@ import { AppExt, CachedMetadata, LinkCache, TFile, View, WorkspaceLeaf } from "o
 import { Leaves } from "../Enum";
 
 export default class ObsidianFacade {
-    constructor(private app: AppExt) { }
+    constructor(private app: AppExt) {}
 
     public isInternalPluginEnabled(id: string): boolean {
         return this.app.internalPlugins.getEnabledPluginById(id) !== null;

@@ -42,7 +42,6 @@ export default class PluginHelper {
                 [Feature.Canvas]: { enabled: false },
                 [Feature.Backlink]: { enabled: false },
                 [Feature.NoteLink]: { enabled: false, strategy: NoteLinkStrategy.OnlyEmpty, approval: true },
-                [Feature.BacklinkMarkdown]: { enabled: false }
             },
             processor: {
                 args: [],

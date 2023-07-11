@@ -27,22 +27,19 @@ import { CanvasManager } from "@src/Feature/Canvas/CanvasManager";
 import AbstractManager from "../../src/Feature/AbstractManager";
 import FeatureHelper from "@src/Utils/FeatureHelper";
 import FeatureService from "@src/Feature/FeatureService";
-import BacklinkFeature from "../../src/Feature/Backlink/BacklinkFeature";
+import BacklinkManager from "../../src/Feature/Backlink/BacklinkFeature";
 import NoteLinkFeature from "../../src/Feature/NoteLink/NoteLinkFeature";
 import NoteLinkApprove from "../../src/Feature/NoteLink/NoteLinkApprove";
 import AliasConfig from "@src/Feature/Alias/AliasConfig";
 import { KeyStorageInterface } from "../../src/Storage/Interfaces";
 import { SettingsType } from "../../src/Settings/SettingsType";
 import { Feature } from "../../src/Enum";
-import BacklinkHelper from "../../src/Utils/BacklinkHelper";
-import BacklinkMarkdownManager from "../../src/Feature/BacklinkMarkdown/BacklinkMarkdownManager";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
     container.bind(SI["feature:composer"]).to(FeatureComposer).inSingletonScope();
     container.bind(SI["manager:composer"]).to(ManagerComposer).inSingletonScope();
     container.bind(SI["feature:helper"]).to(FeatureHelper).inSingletonScope();
-    container.bind(SI["backlink:helper"]).to(BacklinkHelper).inSingletonScope();
 
     container
         .bind<interfaces.AutoNamedFactory<FeatureInterface<any>>>(SI["factory:feature"])
@@ -67,14 +64,13 @@ export default (container: Container) => {
         .bind<FeatureInterface<any>>(SI.feature)
         .to(MarkdownHeaderManager)
         .whenTargetNamed(MarkdownHeaderManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(BacklinkFeature).whenTargetNamed(BacklinkFeature.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(BacklinkManager).whenTargetNamed(BacklinkManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(NoteLinkFeature).whenTargetNamed(NoteLinkFeature.getId());
     container
         .bind<FeatureInterface<any>>(SI.feature)
         .to(InlineTitleManager)
         .whenTargetNamed(InlineTitleManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(CanvasManager).whenTargetNamed(CanvasManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(BacklinkMarkdownManager).whenTargetNamed(BacklinkMarkdownManager.getId());
 
     container
         .bind(SI["factory:alias:modifier:strategy"])
