@@ -6,6 +6,7 @@ export enum Leaves {
     BL = "backlink",
     S = "search",
     ST = "starred",
+    CV = "canvas",
 }
 
 export enum Feature {

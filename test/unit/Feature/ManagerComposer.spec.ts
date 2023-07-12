@@ -49,7 +49,7 @@ test("Should try to refresh only one feature", async () => {
     const feature = mock<ManagerFeatureInterface & FeatureInterface<Feature>>();
     feature.refresh.mockResolvedValueOnce({ [path]: true });
     mockComposer.get.mockReturnValueOnce(feature);
-    expect(await composer.refresh(Feature.Tab)).toEqual({ [Feature.Tab]: { [path]: true } });
+    await composer.refresh(Feature.Tab);
     expect(feature.refresh).toHaveBeenCalledTimes(1);
     expect(mockComposer.get).toHaveBeenCalledTimes(1);
     expect(mockComposer.get).toHaveBeenCalledWith(Feature.Tab);
@@ -69,7 +69,7 @@ test("Should try to refresh all", async () => {
         result[id] = { [path]: false };
         return bar;
     });
-    expect(await composer.refresh()).toEqual(result);
+    await composer.refresh();
     expect(foo.refresh).toHaveBeenCalledTimes(1);
     expect(bar.refresh).toHaveBeenCalledTimes(1);
 });

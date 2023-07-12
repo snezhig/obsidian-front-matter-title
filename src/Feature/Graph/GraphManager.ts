@@ -109,11 +109,11 @@ export default class GraphManager extends AbstractManager {
         this.enabled = true;
     }
 
-    protected doRefresh(): Promise<{ [p: string]: boolean }> {
+    protected doRefresh(): Promise<void> {
         for (const view of this.getViews()) {
             view.renderer?.onIframeLoad();
         }
-        return Promise.resolve({});
+        return Promise.resolve();
     }
 
     protected async doUpdate(path: string): Promise<boolean> {
