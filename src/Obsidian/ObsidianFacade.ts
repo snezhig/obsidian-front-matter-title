@@ -39,4 +39,7 @@ export default class ObsidianFacade {
     public getFirstLinkpathDest(linkpath: string): TFile | null {
         return this.app.metadataCache.getFirstLinkpathDest(linkpath, "");
     }
+    public getLeftLeaf(): WorkspaceLeaf {
+        return this.app.workspace.getLeftLeaf(false);
+    }
 }
