@@ -1,5 +1,5 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import { inject, injectable, named } from "inversify";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";
@@ -61,7 +61,7 @@ export class InlineTitleManager extends AbstractManager {
     }
 
     private async innerUpdate(path: string = null): Promise<boolean> {
-        const views = this.facade.getViewsOfType<MarkdownViewExt>("markdown");
+        const views = this.facade.getViewsOfType<MarkdownViewExt>(Leaves.MD);
         const promises = [];
         const ids: string[] = [];
         for (const view of views) {
