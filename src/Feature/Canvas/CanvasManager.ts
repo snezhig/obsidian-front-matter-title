@@ -74,7 +74,7 @@ export class CanvasManager extends AbstractManager {
         const promises = [];
         this.logger.log(`inner update "${path}"`);
 
-        const canvasViews = this.facade.getViewsOfType<CanvasViewExt>(Leaves.LG);
+        const canvasViews = this.facade.getViewsOfType<CanvasViewExt>(Leaves.CV);
         for (const view of canvasViews) {
             if (!view.file) {
                 continue;
@@ -153,6 +153,9 @@ export class CanvasManager extends AbstractManager {
         });
         if (inline?.created) {
             this.fakeTitleElementService.setVisible(ids.inline, true);
+        }
+        if (node.placeholderEl.getText() !== title) {
+            node.placeholderEl.setText(title);
         }
     }
 
