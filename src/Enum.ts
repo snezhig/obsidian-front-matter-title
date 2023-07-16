@@ -3,6 +3,9 @@ export enum Leaves {
     G = "graph",
     LG = "localgraph",
     MD = "markdown",
+    BL = "backlink",
+    S = "search",
+    ST = "starred",
     CV = "canvas",
 }
 
@@ -18,7 +21,7 @@ export enum Feature {
     Suggest = "suggest",
     InlineTitle = "inlineTitle",
     Canvas = "canvas",
-    Backlink = "backlink",
+    Backlink = Leaves.BL,
     NoteLink = "noteLink",
 }
 

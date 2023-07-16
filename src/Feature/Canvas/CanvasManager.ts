@@ -6,10 +6,9 @@ import { AppEvents } from "@src/Types";
 import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { CanvasNode, CanvasViewExt } from "obsidian";
+import { CanvasNode, CanvasViewExt, debounce } from "obsidian";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
-import { debounce } from "obsidian";
 
 @injectable()
 export class CanvasManager extends AbstractManager {

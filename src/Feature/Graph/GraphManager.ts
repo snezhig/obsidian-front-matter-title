@@ -1,5 +1,5 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import { inject, injectable, named } from "inversify";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";
@@ -93,7 +93,7 @@ export default class GraphManager extends AbstractManager {
     }
 
     private getViews(): GraphView[] {
-        return [...this.facade.getViewsOfType("graph"), ...this.facade.getViewsOfType("localgraph")];
+        return [...this.facade.getViewsOfType(Leaves.G), ...this.facade.getViewsOfType(Leaves.LG)];
     }
 
     protected doDisable(): void {
@@ -109,11 +109,11 @@ export default class GraphManager extends AbstractManager {
         this.enabled = true;
     }
 
-    protected doRefresh(): Promise<{ [p: string]: boolean }> {
+    protected doRefresh(): Promise<void> {
         for (const view of this.getViews()) {
             view.renderer?.onIframeLoad();
         }
-        return Promise.resolve({});
+        return Promise.resolve();
     }
 
     protected async doUpdate(path: string): Promise<boolean> {

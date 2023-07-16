@@ -4,7 +4,7 @@ import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
-import { Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import { SearchPluginView, SearchViewDOM } from "obsidian";
 
 type Replacer = FunctionReplacer<SearchViewDOM, "addResult", SearchManager>;
@@ -25,7 +25,7 @@ export default class SearchManager extends AbstractManager {
     }
 
     private getView(): SearchPluginView | null {
-        return this.facade.getViewsOfType<SearchPluginView>("search")?.[0] ?? null;
+        return this.facade.getViewsOfType<SearchPluginView>(Leaves.S)?.[0] ?? null;
     }
 
     private getSearchDom(): SearchViewDOM | null {
