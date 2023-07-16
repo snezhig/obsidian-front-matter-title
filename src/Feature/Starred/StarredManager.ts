@@ -3,7 +3,7 @@ import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
-import { Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import AbstractManager from "@src/Feature/AbstractManager";
 
 @injectable()
@@ -31,7 +31,7 @@ export default class StarredManager extends AbstractManager {
     }
 
     private initView(): boolean {
-        const view = this.facade.getViewsOfType<StarredPluginView>("starred")?.[0] ?? null;
+        const view = this.facade.getViewsOfType<StarredPluginView>(Leaves.ST)?.[0] ?? null;
         if (view === null) {
             this.logger.log("Could not find a view of starred type");
             return false;

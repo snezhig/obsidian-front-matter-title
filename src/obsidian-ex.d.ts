@@ -77,6 +77,7 @@ declare module "obsidian" {
         titleContainerEl: HTMLDivElement;
         inlineTitleEl: HTMLDivElement;
         leaf: WorkspaceLeafExt;
+        backlinks: Backlink;
     }
     export abstract class CanvasViewExt extends FileView {
         canvas: Canvas;
@@ -99,10 +100,12 @@ declare module "obsidian" {
     }
 
     export abstract class BacklinkViewExt extends View {
-        backlink: {
-            backlinkDom: {
-                resultDomLookup: Map<TFile, { containerEl: HTMLDivElement }>;
-            };
+        backlink: Backlink;
+    }
+
+    export abstract class Backlink {
+        backlinkDom: {
+            resultDomLookup: Map<TFile, { containerEl: HTMLDivElement }>;
         };
     }
 

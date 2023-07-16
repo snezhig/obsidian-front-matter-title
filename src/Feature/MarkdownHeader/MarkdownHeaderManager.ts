@@ -1,5 +1,5 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import { inject, injectable, named } from "inversify";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";
@@ -32,7 +32,7 @@ export class MarkdownHeaderManager extends AbstractManager {
 
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
-        this.facade.getViewsOfType<MarkdownViewExt>("markdown").forEach(this.revert.bind(this));
+        this.facade.getViewsOfType<MarkdownViewExt>(Leaves.MD).forEach(this.revert.bind(this));
         this.enabled = false;
     }
 
@@ -54,7 +54,7 @@ export class MarkdownHeaderManager extends AbstractManager {
     }
 
     private async innerUpdate(path: string = null): Promise<boolean> {
-        const views = this.facade.getViewsOfType<MarkdownViewExt>("markdown");
+        const views = this.facade.getViewsOfType<MarkdownViewExt>(Leaves.MD);
         let updated = false;
         for (const view of views) {
             if (!path || view.file.path === path) {

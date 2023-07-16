@@ -1,15 +1,14 @@
 import AbstractManager from "@src/Feature/AbstractManager";
-import { Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import { inject, injectable, named } from "inversify";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "@src/Types";
 import SI from "@config/inversify.types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { CanvasNode, CanvasViewExt } from "obsidian";
+import { CanvasNode, CanvasViewExt, debounce } from "obsidian";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
-import { debounce } from "obsidian";
 
 @injectable()
 export class CanvasManager extends AbstractManager {
@@ -75,7 +74,7 @@ export class CanvasManager extends AbstractManager {
         const promises = [];
         this.logger.log(`inner update "${path}"`);
 
-        const canvasViews = this.facade.getViewsOfType<CanvasViewExt>("canvas");
+        const canvasViews = this.facade.getViewsOfType<CanvasViewExt>(Leaves.CV);
         for (const view of canvasViews) {
             if (!view.file) {
                 continue;
@@ -154,6 +153,9 @@ export class CanvasManager extends AbstractManager {
         });
         if (inline?.created) {
             this.fakeTitleElementService.setVisible(ids.inline, true);
+        }
+        if (node.placeholderEl.getText() !== title) {
+            node.placeholderEl.setText(title);
         }
     }
 

@@ -1,4 +1,5 @@
 import { AppExt, CachedMetadata, LinkCache, TFile, View, WorkspaceLeaf } from "obsidian";
+import { Leaves } from "../Enum";
 
 export default class ObsidianFacade {
     constructor(private app: AppExt) {}
@@ -32,11 +33,14 @@ export default class ObsidianFacade {
         return this.app.workspace.getLeavesOfType(type) as T[];
     }
 
-    public getViewsOfType<T extends View = View>(type: string): T[] {
+    public getViewsOfType<T extends View = View>(type: Leaves): T[] {
         return this.getLeavesOfType(type).map(e => e.view) as T[];
     }
 
     public getFirstLinkpathDest(linkpath: string): TFile | null {
         return this.app.metadataCache.getFirstLinkpathDest(linkpath, "");
+    }
+    public getLeftLeaf(): WorkspaceLeaf {
+        return this.app.workspace.getLeftLeaf(false);
     }
 }

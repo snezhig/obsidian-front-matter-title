@@ -42,23 +42,18 @@ export default class ManagerComposer {
         return result;
     }
 
-    public async refresh(id: Feature = null): Promise<{ [K in Feature]?: { [k: string]: boolean } }> {
+    public async refresh(id: Feature = null): Promise<void> {
         this.logger.log("refresh");
         const ids = id ? [id] : this.ids;
-        const result: { [K in Feature]?: { [k: string]: boolean } } = {};
         const promises = [];
         for (const i of ids) {
             const manager = this.features.get<AbstractManager>(i);
             if (manager) {
                 promises.push(
-                    manager.refresh().then(r => {
-                        result[i] = r;
-                        this.dispatcher.dispatch("manager:refresh", new Event({ id: i }));
-                    })
+                    manager.refresh().then(() => this.dispatcher.dispatch("manager:refresh", new Event({ id: i })))
                 );
             }
         }
         await Promise.all(promises);
-        return result;
     }
 }

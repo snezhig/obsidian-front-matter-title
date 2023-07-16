@@ -2,18 +2,20 @@ import AbstractManager from "@src/Feature/AbstractManager";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { Feature } from "@src/Enum";
-import { MarkdownLeaf } from "obsidian";
+import { Feature, Leaves } from "@src/Enum";
+import { MarkdownLeaf, WorkspaceLeaf } from "obsidian";
 import { AppEvents } from "@src/Types";
 import { ObsidianActiveFile } from "@config/inversify.factory.types";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
+import FunctionReplacer from "../../Utils/FunctionReplacer";
 
 @injectable()
 export default class TabManager extends AbstractManager {
     private enabled = false;
     private readonly callback: () => void = null;
     private ref: ListenerRef<"layout:change">;
+    private replacer: FunctionReplacer<WorkspaceLeaf, "setPinned", TabManager> = null;
 
     constructor(
         @inject(SI["facade:obsidian"])
@@ -32,6 +34,7 @@ export default class TabManager extends AbstractManager {
 
     protected async doDisable(): Promise<void> {
         this.dispatcher.removeListener(this.ref);
+        this.replacer?.disable();
         this.ref = null;
         this.reset();
         this.enabled = false;
@@ -39,9 +42,28 @@ export default class TabManager extends AbstractManager {
 
     protected async doEnable(): Promise<void> {
         this.enabled = true;
+        this.initReplacer();
         this.ref = this.dispatcher.addListener({ name: "layout:change", cb: this.callback });
         return;
     }
+
+    private initReplacer(): void {
+        const leaf = this.facade.getLeftLeaf();
+        this.replacer = FunctionReplacer.create(
+            Object.getPrototypeOf(leaf),
+            "setPinned",
+            this,
+            function (self, [pinned], vanilla) {
+                const result = vanilla.call(this, pinned);
+                if (this?.view?.getViewType() === Leaves.MD) {
+                    self.innerUpdate(this.view.file.path);
+                }
+                return result;
+            }
+        );
+        this.replacer.enable();
+    }
+
     private reset() {
         const leaves = this.facade.getLeavesOfType<MarkdownLeaf>("markdown");
         for (const leaf of leaves) {
