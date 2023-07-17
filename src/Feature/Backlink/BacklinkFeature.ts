@@ -71,11 +71,11 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
             .getViewsOfType<MarkdownViewExt>(Leaves.MD)
             .forEach(e => lookups.push(e?.backlinks?.backlinkDom?.resultDomLookup ?? new Map()));
         for (const lookup of lookups) {
-            for (const [file, item] of lookup.entries()) {
-                const node = item.containerEl.firstElementChild;
+            for (const [file, item] of lookup) {
+                const node = item.containerEl.firstElementChild.find(".tree-item-inner");
                 const text = (restore ? null : this.resolver.resolve(file.path)) ?? file.basename;
                 if (node.getText() !== text) {
-                    item.containerEl.firstElementChild.setText(text);
+                    node.setText(text);
                 }
             }
         }
