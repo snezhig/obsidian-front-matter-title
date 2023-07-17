@@ -48,7 +48,7 @@ export default class TabManager extends AbstractManager {
     }
 
     private initReplacer(): void {
-        const leaf = this.facade.getLeftLeaf();
+        const leaf = this.facade.getActiveLeaf();
         this.replacer = FunctionReplacer.create(
             Object.getPrototypeOf(leaf),
             "setPinned",
