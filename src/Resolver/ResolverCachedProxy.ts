@@ -10,8 +10,6 @@ import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
 import { AppEvents } from "@src/Types";
 @injectable()
 export default class ResolverCachedProxy implements ResolverDynamicInterface {
-    private template: string;
-
     constructor(
         @inject(SI.resolver)
         @named("original")
@@ -65,7 +63,6 @@ export default class ResolverCachedProxy implements ResolverDynamicInterface {
     }
 
     setTemplate(template: string): void {
-        this.template = template;
         this.resolver.setTemplate(template);
     }
 }

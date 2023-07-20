@@ -25,4 +25,18 @@ describe("Search feature test", () => {
     test("Should throw exception because there is no leave", () => {
         expect(() => feature.enable()).toThrow(`View of ${Leaves.S} not found`);
     });
+    test("Should call service and be enabled", () => {
+        mockFacade.getViewsOfType.mockReturnValueOnce([mockView]);
+        feature.enable();
+        expect(mockService.wrapDom).toBeCalledTimes(1);
+        expect(mockService.wrapDom).toBeCalledWith(mockDom, mockResolver, feature.getId());
+        expect(feature.isEnabled()).toBeTruthy();
+    });
+    test("Should destroy wrap and be disabled", () => {
+        feature.disable();
+        expect(feature.isEnabled()).toBeFalsy();
+        expect(mockFacade.getViewsOfType).not.toBeCalled();
+        expect(mockService.destroyByTag).toBeCalledTimes(1);
+        expect(mockService.destroyByTag).toBeCalledWith(feature.getId());
+    });
 });
