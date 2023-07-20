@@ -22,7 +22,6 @@ export default class ResultDomWrapper {
 
     private process(): void {
         const lookup = this.replacer?.getTarget()?.resultDomLookup ?? new Map();
-        console.log(lookup);
         for (const [file, item] of lookup) {
             this.processLookupItem(file, item);
         }

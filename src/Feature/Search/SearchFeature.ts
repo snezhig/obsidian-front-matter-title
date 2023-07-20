@@ -52,7 +52,6 @@ export default class SearchManager extends AbstractFeature<Feature> {
             throw new Error(`View of ${Leaves.S} not found`);
         }
         this.service.wrapDom(dom, this.resolver, this.getId());
-        console.log(this.service);
         this.enabled = true;
     }
 
