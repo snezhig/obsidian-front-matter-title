@@ -10,12 +10,16 @@ import { AppEvents } from "@src/Types";
 import AbstractFeature from "../AbstractFeature";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
 import FeatureService from "../FeatureService";
+import SearchDomWrapperService from "../../Utils/SearchDomWrapperService";
 
 @injectable()
 export default class BacklinkFeature extends AbstractFeature<Feature> {
     private enabled = false;
-    private refs: [ListenerRef<"file:open">, ListenerRef<"metadata:cache:changed">] | never[] = [];
+    private refs: ListenerRef<keyof AppEvents>[] | never[] = [];
     private resolver: ResolverInterface;
+    private dProcess: () => void = null;
+    private timer: NodeJS.Timer = null;
+    private isBacklinkWrapped = false;
 
     constructor(
         @inject(SI["facade:obsidian"])
@@ -26,10 +30,18 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcher<AppEvents>,
         @inject(SI["feature:service"])
-        service: FeatureService
+        service: FeatureService,
+        @inject(SI["service:search:dom:wrapper"])
+        private mutateService: SearchDomWrapperService
     ) {
         super();
         this.resolver = service.createResolver(this.getId());
+        this.dProcess = () => {
+            if (this.timer) {
+                clearTimeout(this.timer);
+            }
+            this.timer = setTimeout(this.process.bind(this), 50);
+        };
     }
 
     isEnabled(): boolean {
@@ -44,12 +56,12 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
         }
         this.refs = [
             this.dispatcher.addListener({
-                name: "file:open",
-                cb: () => setTimeout(() => this.process(), 20),
+                name: "metadata:cache:changed",
+                cb: this.dProcess.bind(this),
             }),
             this.dispatcher.addListener({
-                name: "metadata:cache:changed",
-                cb: () => setTimeout(() => this.process(), 20),
+                name: "layout:change",
+                cb: this.dProcess.bind(this),
             }),
         ];
         this.process();
@@ -60,25 +72,30 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
         if (this.refs.length) {
             this.refs.forEach(e => this.dispatcher.removeListener(e));
             this.refs = [];
-            this.process(true);
+            this.mutateService.destroyByTag(this.getId());
         }
     }
 
-    private process(restore = false): void {
-        const view = this.facade.getViewsOfType<BacklinkViewExt>(Leaves.BL)[0] ?? null;
-        const lookups = [view?.backlink?.backlinkDom.resultDomLookup ?? new Map()];
-        this.facade
-            .getViewsOfType<MarkdownViewExt>(Leaves.MD)
-            .forEach(e => lookups.push(e?.backlinks?.backlinkDom?.resultDomLookup ?? new Map()));
-        for (const lookup of lookups) {
-            for (const [file, item] of lookup) {
-                const node = item.containerEl.firstElementChild.find(".tree-item-inner");
-                const text = (restore ? null : this.resolver.resolve(file.path)) ?? file.basename;
-                if (node.getText() !== text) {
-                    node.setText(text);
-                }
+    private process(): void {
+        this.logger.log("process");
+        this.processBacklinkLayout();
+
+        for (const view of this.facade.getViewsOfType<MarkdownViewExt>(Leaves.MD)) {
+            const dom = view?.backlinks?.backlinkDom;
+            if (dom) {
+                this.mutateService.wrapDom(dom, this.resolver, this.getId());
             }
         }
+    }
+    private processBacklinkLayout(): void {
+        if (this.isBacklinkWrapped) {
+            return;
+        }
+        const view = this.facade.getViewsOfType<BacklinkViewExt>(Leaves.BL)[0] ?? null;
+        if (view?.backlink?.backlinkDom) {
+            this.mutateService.wrapDom(view.backlink.backlinkDom, this.resolver, this.getId());
+        }
+        this.isBacklinkWrapped = true;
     }
 
     getId(): Feature {

@@ -33,7 +33,7 @@ export default class Creator implements CreatorInterface {
                 value = placeholder.makeValue(path) ?? "";
             } catch (e) {
                 if (e instanceof PathNotFoundException || e instanceof TypeNotSupportedException) {
-                    this.logger.log(`Error by path: ${path}`);
+                    this.logger.log(`Error by path: ${path}. ${e.message}`);
                 } else {
                     throw e;
                 }
@@ -41,7 +41,7 @@ export default class Creator implements CreatorInterface {
             template = template.replace(placeholder.getPlaceholder(), value);
         }
         if (template?.trim()?.length) {
-            return template;
+            return template.trim();
         }
         return null;
     }
