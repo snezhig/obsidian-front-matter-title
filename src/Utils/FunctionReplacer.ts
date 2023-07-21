@@ -16,6 +16,9 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
     ) {
         this.valid();
     }
+    public getTarget(): Target {
+        return this.target;
+    }
 
     private valid(): void {
         if (typeof this.target[this.method] !== "function") {

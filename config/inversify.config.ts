@@ -31,6 +31,7 @@ import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import ProcessorListener from "../src/Components/Processor/ProccessorListener";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
 import BooleanStrategy from "@src/Components/Extractor/BooleanStrategy";
+import SearchDomWrapperService from "../src/Utils/SearchDomWrapperService";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
@@ -69,5 +70,6 @@ Container.load(apiAdapterModule);
 Container.bind(SI["factory:replacer"]).toFunction((t: any, m: any, a: unknown, i: any) =>
     FunctionReplacer.create(t, m, a, i)
 );
+Container.bind(SI["service:search:dom:wrapper"]).to(SearchDomWrapperService).inSingletonScope();
 
 export default Container;

@@ -52,7 +52,7 @@ export default class Extractor implements ExtractorInterface {
      */
     private extractInternal(key: string, obj: { [p: string]: any }): any | never {
         if (obj === undefined || obj?.[key] === undefined) {
-            throw new PathNotFoundException(`Key ${key} not found in ${JSON.stringify(obj)}`);
+            throw new PathNotFoundException(`Key ${key} not found`);
         }
         return obj[key];
     }

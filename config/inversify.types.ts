@@ -51,6 +51,7 @@ const SI = {
     "factory:resolver:resolver": "",
     "service:note:link": "",
     "service:fake_title_element": "",
+    "service:search:dom:wrapper": "",
     "settings:feature:builder": "",
     "settings:builder": "",
     "factory:settings:feature:builder": "",

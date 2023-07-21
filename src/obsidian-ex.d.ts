@@ -104,9 +104,7 @@ declare module "obsidian" {
     }
 
     export abstract class Backlink {
-        backlinkDom: {
-            resultDomLookup: Map<TFile, { containerEl: HTMLDivElement }>;
-        };
+        backlinkDom: SearchDOM;
     }
 
     export abstract class Chooser {
@@ -120,14 +118,15 @@ declare module "obsidian" {
         alias?: string;
     }
 
-    export interface SearchViewDOM {
+    export interface SearchDOM {
         addResult(f: TFile, ...other: unknown[]): unknown;
+        el: HTMLDivElement;
 
-        resultDomLookup: Map<TFile, unknown>;
+        resultDomLookup: Map<TFile, HTMLDivElement>;
     }
 
     export abstract class SearchPluginView extends View {
-        dom: SearchViewDOM;
+        dom: SearchDOM;
         startSearch: () => any;
     }
 
