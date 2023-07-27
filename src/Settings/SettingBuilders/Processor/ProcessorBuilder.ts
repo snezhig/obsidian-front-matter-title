@@ -3,6 +3,7 @@ import { SettingsType } from "../../SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
 import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
 import { GITHUB_DOCS } from "@src/Enum";
+import { t } from "../../../i18n/Locale";
 
 export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "processor"> {
     private setting: Setting;
@@ -14,7 +15,7 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
     doBuild(): void {
         const fragment = createFragment(e =>
             e.createEl("a", {
-                text: "Processor",
+                text: t("processor.name"),
                 href: GITHUB_DOCS + "Processor.md",
             })
         );
@@ -24,13 +25,13 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
 
     private updateDesc(): void {
         const fragment = createFragment();
-        fragment.appendText("Modifies resolved title.");
+        fragment.appendText(t("processor.desc"));
         let additional: (string | HTMLElement)[] = [];
         switch (this.item.get("type").value()) {
             case ProcessorTypes.Replace:
                 additional = [
                     "",
-                    "What will be executed:",
+                    t("processor.replace.desc"),
                     "title.replace(",
                     createSpan(
                         "",
@@ -46,8 +47,8 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
             case ProcessorTypes.Function:
                 additional = [
                     "",
-                    "How it will work:",
-                    "const value = new Function('title', #Your value of text area#)",
+                    t("processor.function.desc"),
+                    `const value = new Function('title', #${t("processor.function.valueDesc")}#)`,
                 ];
                 break;
         }
@@ -63,9 +64,9 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
         this.setting.addDropdown(c =>
             c
                 .addOptions({
-                    "": "Disabled",
-                    [ProcessorTypes.Replace]: "Replace",
-                    [ProcessorTypes.Function]: "Function",
+                    "": t("disabled"),
+                    [ProcessorTypes.Replace]: t("processor.replace.name"),
+                    [ProcessorTypes.Function]: t("processor.function.name"),
                 })
                 .setValue(this.item.get("type").value() ?? "")
                 .onChange((v: ProcessorTypes | "") => {
@@ -98,11 +99,11 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
     private buildReplace(): void {
         const items = [
             {
-                name: "Pattern",
-                desc: "Will be used as a first argument of RegExp first, and then as a first argument of replace()",
+                name: t("processor.replace.pattern.name"),
+                desc: t("processor.replace.pattern.desc"),
             },
-            { name: "Flags", desc: "Will be used as a second argument of new RegExp" },
-            { name: "Replacement", desc: "Will be used as a second argument of replace()" },
+            { name: t("processor.replace.flags.name"), desc: t("processor.replace.flags.desc") },
+            { name: t("processor.replace.replacement.name"), desc: t("processor.replace.replacement.desc") },
         ];
         const container = createDiv({ attr: { style: "margin-left: 20px" } });
         let margin = "10px";

@@ -2,6 +2,7 @@ import { DropdownComponent, Setting, TextComponent } from "obsidian";
 import AbstractBuilder from "../AbstractBuilder";
 import { injectable } from "inversify";
 import { SettingsType } from "@src/Settings/SettingsType";
+import { t } from "../../../i18n/Locale";
 
 @injectable()
 export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsType["rules"], "delimiter"> {
@@ -11,9 +12,7 @@ export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsType[
         return k === "delimiter";
     }
     doBuild(): void {
-        this.setting = new Setting(this.container)
-            .setName("List values")
-            .setDesc("Set the rule about how to process list values");
+        this.setting = new Setting(this.container).setName(t("rule.delimiter.name")).setDesc(t("rule.delimiter.desc"));
         this.buildDropdown();
         this.buildText();
     }
@@ -21,7 +20,7 @@ export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsType[
     private buildDropdown(): void {
         const enabled = this.item.get("enabled");
         new DropdownComponent(this.setting.controlEl)
-            .addOptions({ N: "Use first value", Y: "Join all by delimiter" })
+            .addOptions({ N: t("rule.delimiter.first"), Y: t("rule.delimiter.join") })
             .setValue(enabled.value() ? "Y" : "N")
             .onChange(e => {
                 enabled.set(e === "Y");
@@ -43,7 +42,7 @@ export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsType[
     }
 
     private getPlaceholder(): string {
-        return this.isEnabled() ? "Type a delimiter" : "First value will be used";
+        return this.isEnabled() ? t("rule.delimiter.placeholder.join") : t("rule.delimiter.placeholder.first");
     }
 
     private isEnabled(): boolean {

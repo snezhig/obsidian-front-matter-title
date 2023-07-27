@@ -1,5 +1,6 @@
 import { Feature } from "@src/Enum";
 import { injectable } from "inversify";
+import { t } from "../i18n/Locale";
 
 @injectable()
 export default class FeatureHelper {
@@ -55,31 +56,31 @@ export default class FeatureHelper {
     getDescription(feature: Feature): string {
         switch (feature) {
             case Feature.Alias:
-                return "Modify alias in metadata cache. The real alias will not be affected";
+                return t("feature.alias.desc");
             case Feature.Explorer:
-                return "Replace shown titles in the file explorer";
+                return t("feature.explorer.desc");
             case Feature.ExplorerSort:
-                return "Sort files in explorer by titles from Explorer feature";
+                return t("feature.explorer:sort.desc");
             case Feature.Graph:
-                return "Replace shown titles in the graph/local-graph";
+                return t("feature.graph.desc");
             case Feature.Header:
-                return "Replace titles in header of leaves and update them";
+                return t("feature.header.desc");
             case Feature.Starred:
-                return "Replace shown titles in built-in starred plugin";
+                return t("feature.starred.desc");
             case Feature.Search:
-                return "Replace shown titles in search leaf";
+                return t("feature.search.desc");
             case Feature.Suggest:
-                return "Replace shown titles in suggest modals";
+                return t("feature.suggest.desc");
             case Feature.Tab:
-                return "Replace shown titles in tabs";
+                return t("feature.tab.desc");
             case Feature.InlineTitle:
-                return "Replace shown titles in Inline Title";
+                return t("feature.inlineTitle.desc");
             case Feature.Canvas:
-                return "Replace shown titles in Canvas";
+                return t("feature.canvas.desc");
             case Feature.Backlink:
-                return "Replace shown titles in Backlink(Linked mentions)";
+                return t("feature.backlink.desc");
             case Feature.NoteLink:
-                return "Replace internal links in files";
+                return t("feature.noteLink.desc");
         }
     }
 

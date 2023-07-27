@@ -9,12 +9,12 @@ export default class FileNoteLinkService {
     private readonly REGEXP = /^\[\[.+\]\]$/;
     constructor(
         @inject(SI["facade:obsidian"])
-        private facade: ObsidianFacade,
-    ) { }
+        private facade: ObsidianFacade
+    ) {}
 
     public getNoteLinks(path: string): NoteLink[] {
         const links = this.facade.getFileLinksCache(path);
-        console.log(links)
+        console.log(links);
         const result: NoteLink[] = [];
         for (const link of links) {
             if (!this.REGEXP.test(link.original)) {
@@ -22,7 +22,7 @@ export default class FileNoteLinkService {
             }
             const file = this.facade.getFirstLinkpathDest(link.link, path);
             if (file instanceof TFile === false) {
-                continue
+                continue;
             }
             result.push({
                 dest: file.path,

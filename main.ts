@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { AppExt, CachedMetadata, Modal, Plugin } from "obsidian";
+import { AppExt, CachedMetadata, Modal, Plugin, moment } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
@@ -23,6 +23,7 @@ import ListenerInterface from "@src/Interfaces/ListenerInterface";
 import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
 import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Components/ApiAdapter/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { t } from "./src/i18n/Locale";
 
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;

@@ -7,6 +7,7 @@ import { inject, injectable } from "inversify";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import SI from "@config/inversify.types";
 import FeatureHelper from "../../../Utils/FeatureHelper";
+import { t } from "../../../i18n/Locale";
 
 @injectable()
 export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "features"> {
@@ -41,7 +42,7 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
 
     doBuild(): void {
         this.bind();
-        this.container.createEl("h4", { text: "Features" });
+        this.container.createEl("h4", { text: t("features") });
         const data: { feature: Feature; name: string; desc: string; doc: { link: string } }[] = this.helper
             .getOrderedFeatures()
             .map(feature => ({

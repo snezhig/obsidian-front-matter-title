@@ -6,6 +6,7 @@ import { ObsidianModalFactory } from "@config/inversify.factory.types";
 import SI from "../../../../config/inversify.types";
 import { Feature, GITHUB_DOCS } from "@src/Enum";
 import FeatureHelper from "../../../Utils/FeatureHelper";
+import { t } from "../../../i18n/Locale";
 
 @injectable()
 export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "templates"> {
@@ -39,15 +40,11 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
 
     private buildTemplate(): void {
         new Setting(this.container)
-            .setName(this.createDocFragment("Common main template"))
-            .setDesc(
-                `Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}".
-    Also you can use #heading to use first Heading from a file or _basename and another reserved words. 
-    See Readme to find out more`
-            )
+            .setName(this.createDocFragment(t("template.commmon.main.name")))
+            .setDesc(t("template.commmon.main.desc"))
             .addText(text =>
                 text
-                    .setPlaceholder("Type a template")
+                    .setPlaceholder(t("template.placeholder"))
                     .setValue(this.item.get("common").get("main").value() ?? "")
                     .onChange(async value => this.item.get("common").get("main").set(value))
             );
@@ -55,11 +52,11 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
 
     private buildFallbackTemplate(): void {
         new Setting(this.container)
-            .setName(this.createDocFragment("Common fallback template"))
-            .setDesc("This template will be used as a fallback option if the main template is not resolved")
+            .setName(this.createDocFragment(t("template.commmon.fallback.name")))
+            .setDesc(t("template.commmon.fallback.desc"))
             .addText(text =>
                 text
-                    .setPlaceholder("Type a template")
+                    .setPlaceholder(t("template.placeholder"))
                     .setValue(this.item.get("common").get("fallback").value() ?? "")
                     .onChange(async value => this.item.get("common").get("fallback").set(value))
             );
@@ -67,18 +64,16 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
 
     private buildConfigButton(): void {
         const getDesc = (type: keyof TemplateValue, value: string | null) =>
-            value
-                ? `Current template will be used as ${type} for this feature`
-                : `Common ${type} will be used. Its value is "${this.item.get("common").get(type).value()}"`;
+            value ? t("template.specific") : t("template.used", { value: this.item.get("common").get(type).value() });
 
         new Setting(this.container)
-            .setName(this.createDocFragment("Features' templates", "features-templates"))
-            .setDesc("Manage templates for each feature individually")
+            .setName(this.createDocFragment(t("template.features.name"), "features-templates"))
+            .setDesc(t("template.features.desc"))
             .addButton(cb =>
-                cb.setButtonText("Manage").onClick(() => {
+                cb.setButtonText(t("manage")).onClick(() => {
                     const modal = this.factory();
                     const { contentEl } = modal;
-                    contentEl.setText("Features' templates");
+                    contentEl.setText(t("template.features.name"));
                     for (const feature of Object.values(Feature)) {
                         if (feature === Feature.ExplorerSort) {
                             continue;
@@ -91,11 +86,11 @@ export default class TemplatesBuilder extends AbstractBuilder<SettingsType, "tem
                         contentEl.createEl("h4", null, e => e.setText(this.helper.getName(feature)));
                         for (const type of Object.keys(templates.value()) as (keyof TemplateValue)[]) {
                             const s = new Setting(contentEl)
-                                .setName(type[0].toUpperCase() + type.substring(1))
+                                .setName(t(`template.${type}`))
                                 .setDesc(getDesc(type, templates.get(type).value()))
                                 .addText(text =>
                                     text
-                                        .setPlaceholder(`Common ${type} is used`)
+                                        .setPlaceholder(this.item.get("common").get(type).value())
                                         .setValue(templates.get(type).value())
                                         .onChange(value => {
                                             templates.get(type).set(value ? value : null);

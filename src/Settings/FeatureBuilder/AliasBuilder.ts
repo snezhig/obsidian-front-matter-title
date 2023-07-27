@@ -4,6 +4,7 @@ import { DropdownComponent, Setting, ToggleComponent } from "obsidian";
 import Event from "@src/Components/EventDispatcher/Event";
 import AbstractBuilder from "./AbstractBuilder";
 import { StrategyType, ValidatorType } from "../../Feature/Alias/Types";
+import { t } from "../../i18n/Locale";
 
 export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     private setting: Setting;
@@ -26,8 +27,8 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     private buildValidatorDropdown(value: string): void {
         this.validatorDropdown = new DropdownComponent(this.setting.controlEl)
             .addOptions({
-                [ValidatorType.FrontmatterAuto]: "Frontmatter Auto",
-                [ValidatorType.FrontmatterRequired]: "Frontmatter Required",
+                [ValidatorType.FrontmatterAuto]: t("feature.alias.validator.auto.name"),
+                [ValidatorType.FrontmatterRequired]: t("feature.alias.validator.required.name"),
             })
             .setValue(value ? value : ValidatorType.FrontmatterRequired)
             .onChange(this.onChange.bind(this));
@@ -36,9 +37,9 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     private buildStrategyDropdown(value: string): void {
         this.strategyDropdown = new DropdownComponent(this.setting.controlEl)
             .addOptions({
-                [StrategyType.Ensure]: "Ensure",
-                [StrategyType.Adjust]: "Adjust",
-                [StrategyType.Replace]: "Replace",
+                [StrategyType.Ensure]: t("feature.alias.strategy.ensure.name"),
+                [StrategyType.Adjust]: t("feature.alias.strategy.adjust.name"),
+                [StrategyType.Replace]: t("feature.alias.strategy.replace.name"),
             })
             .setValue(value ? value : StrategyType.Ensure)
             .onChange(this.onChange.bind(this));
@@ -67,17 +68,17 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
         let text = "";
         switch (this.strategyDropdown.getValue()) {
             case StrategyType.Ensure:
-                text = "Set title as an alias only if the one does not exist";
+                text = t("feature.alias.strategy.ensure.desc");
                 break;
             case StrategyType.Replace:
-                text = "Replace current alias with title";
+                text = t("feature.alias.strategy.replace.desc");
                 break;
             case StrategyType.Adjust:
-                text = "Add title to alias and without affect on existing alias";
+                text = t("feature.alias.strategy.adjust.desc");
                 break;
         }
         const fragment = createFragment();
-        fragment.createEl("b", "", e => e.setText("Strategy: "));
+        fragment.createEl("b", "", e => e.setText(`${t("strategy")}: `));
         fragment.appendText(text);
         return fragment;
     }
@@ -86,16 +87,16 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
         let text = "";
         switch (this.validatorDropdown.getValue()) {
             case ValidatorType.FrontmatterAuto: {
-                text = "If frontmatter does not exist, it will be created in cache. Side-effects may occur.";
+                text = t("feature.alias.validator.auto.desc");
                 break;
             }
             case ValidatorType.FrontmatterRequired: {
-                text = "Only files with frontmatter will be processed.";
+                text = t("feature.alias.validator.required.desc");
                 break;
             }
         }
         const fragment = createFragment();
-        fragment.createEl("b", "", e => e.setText("Validator: "));
+        fragment.createEl("b", "", e => e.setText(`${t("validator")}: `));
         fragment.appendText(text);
         return fragment;
     }
