@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import SI from "../../../config/inversify.types";
 import { NoteLinkChange } from "./NoteLinkTypes";
 import { Modal } from "obsidian";
+import { t } from "../../i18n/Locale";
 
 @injectable()
 export default class NoteLinkApprove {
@@ -21,11 +22,11 @@ export default class NoteLinkApprove {
                 changes.forEach(e => ul.createEl("li", { text: `${e.original} => ${e.replace}` }))
             );
             const btnContainer = contentEl.createDiv("modal-button-container");
-            btnContainer.createEl("button", { cls: "mod-cta", text: "Apply" }).addEventListener("click", () => {
+            btnContainer.createEl("button", { cls: "mod-cta", text: t("apply") }).addEventListener("click", () => {
                 approved = true;
                 modal.close();
             });
-            btnContainer.createEl("button", { text: "Cancel" }).addEventListener("click", () => modal.close());
+            btnContainer.createEl("button", { text: t("cancel") }).addEventListener("click", () => modal.close());
             modal.open();
         });
     }

@@ -4,6 +4,8 @@ import { Feature } from "../../Enum";
 const en = {
     validator: "Validator",
     strategy: "Strategy",
+    cancel: "Cancel",
+    apply: "Apply",
     feature: {
         [Feature.Alias]: {
             desc: "Modify alias in metadata cache. The real alias will not be affected",
@@ -67,6 +69,14 @@ const en = {
         },
         [Feature.NoteLink]: {
             desc: "Replace internal links in files",
+            strategy: {
+                all: "Repalce all links",
+                onlyEmpty: "Replace only links without alias",
+            },
+            approval: {
+                showModal: "Show approve modal",
+                auto: "Use auto approve",
+            },
         },
     },
     manage: "Manage",

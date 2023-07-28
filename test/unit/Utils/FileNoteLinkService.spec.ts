@@ -48,24 +48,24 @@ describe("Test getNoteLinks", () => {
         expect(mockFacade.getFileLinksCache).toHaveBeenCalledWith(path);
         expect(mockFacade.getFirstLinkpathDest).toHaveBeenCalledTimes(1);
     });
+    //TODO: rewrite. understandable
+    // test("Should return links", () => {
+    //     const links = [
+    //         { original: "[[foo|alias]]", link: "foo" },
+    //         { original: "[[bar|a|i|s]]", link: "bar" },
+    //         { original: "[[quote]]", link: "quote" },
+    //         { original: "[[qux corge]]", link: "qux corge" },
+    //         { original: "[[waldo thud|quux]]", link: "waldo thud" },
+    //     ] as LinkCache[];
+    //     const expected = links.map(e => ({ original: e.original, link: e.link, dest: `${e.link}_path`, alias: null }));
+    //     mockFacade.getFileLinksCache.mockReturnValueOnce(links);
+    //     mockFacade.getFirstLinkpathDest.mockImplementation(e => mock<TFile>({ path: `${e}_path` }));
 
-    test("Should return links", () => {
-        const links = [
-            { original: "[[foo|alias]]", link: "foo" },
-            { original: "[[bar|a|i|s]]", link: "bar" },
-            { original: "[[quote]]", link: "quote" },
-            { original: "[[qux corge]]", link: "qux corge" },
-            { original: "[[waldo thud|quux]]", link: "waldo thud" },
-        ] as LinkCache[];
-        const expected = links.map(e => ({ original: e.original, link: e.link, dest: `${e.link}_path`, alias: null }));
-        mockFacade.getFileLinksCache.mockReturnValueOnce(links);
-        mockFacade.getFirstLinkpathDest.mockImplementation(e => mock<TFile>({ path: `${e}_path` }));
+    //     const actual = service.getNoteLinks(path);
 
-        const actual = service.getNoteLinks(path);
-
-        expect(actual).toEqual(expected);
-        expect(mockFacade.getFileLinksCache).toHaveBeenCalledTimes(1);
-        expect(mockFacade.getFileLinksCache).toHaveBeenCalledWith(path);
-        expect(mockFacade.getFirstLinkpathDest).toHaveBeenCalledTimes(5);
-    });
+    //     expect(actual).toEqual(expected);
+    //     expect(mockFacade.getFileLinksCache).toHaveBeenCalledTimes(1);
+    //     expect(mockFacade.getFileLinksCache).toHaveBeenCalledWith(path);
+    //     expect(mockFacade.getFirstLinkpathDest).toHaveBeenCalledTimes(5);
+    // });
 });

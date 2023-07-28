@@ -1,9 +1,13 @@
 import * as fs from "fs";
-import {EventEmitter} from "events";
-import {CachedMetadata, TFileExplorerItem, WorkspaceLeaf} from "obsidian";
+import { EventEmitter } from "events";
+import { CachedMetadata, TFileExplorerItem, WorkspaceLeaf } from "obsidian";
 
-export function debounce(cb: () => any){
+export function debounce(cb: () => any) {
     return (...args: []) => cb(...args);
+}
+
+export const moment = {
+    locale: () => 'en'
 }
 
 export abstract class TAbstractFile {
@@ -31,8 +35,8 @@ export class Vault extends EventEmitter {
         this.emit(name, ...data);
     }
 
-    getAbstractFileByPath(path: string): TAbstractFile|null {
-        if(/.*\.md$/.test(path)) {
+    getAbstractFileByPath(path: string): TAbstractFile | null {
+        if (/.*\.md$/.test(path)) {
             const file = new TFile();
             file.basename = path.replace(/.*\/(.*)\.md/, '$1');
             file.extension = 'md'

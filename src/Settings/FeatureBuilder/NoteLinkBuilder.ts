@@ -4,6 +4,7 @@ import { BuildParams } from "@src/Settings/Interface/FeatureBuildInterface";
 import { DropdownComponent, Setting, ToggleComponent } from "obsidian";
 import Event from "@src/Components/EventDispatcher/Event";
 import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
+import { t } from "../../i18n/Locale";
 
 export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
     private id: Feature;
@@ -19,14 +20,14 @@ export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
         this.setting.addDropdown(e => (this.strategy = e));
         this.strategy
             .addOptions({
-                [NoteLinkStrategy.All]: "Replace all links",
-                [NoteLinkStrategy.OnlyEmpty]: "Replace only links without alias",
+                [NoteLinkStrategy.All]: t("feature.noteLink.strategy.all"),
+                [NoteLinkStrategy.OnlyEmpty]: t("feature.noteLink.strategy.onlyEmpty"),
             })
             .setValue(settings.strategy ?? NoteLinkStrategy.OnlyEmpty)
             .onChange(this.onChange.bind(this));
         this.setting.addDropdown(e => (this.approval = e));
         this.approval
-            .addOptions({ Y: "Show approve modal", N: "Use auto approve" })
+            .addOptions({ Y: t("feature.noteLink.approval.showModal"), N: t("feature.noteLink.approval.auto") })
             .setValue(settings.approval ? "Y" : "N")
             .onChange(this.onChange.bind(this));
         this.setting.addToggle(e => (this.toggle = e));
