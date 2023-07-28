@@ -8,6 +8,7 @@ import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import { KeyStorageInterface } from "@src/Storage/Interfaces";
 import { SettingsBuilderFactory } from "@config/inversify.factory.types";
+import { t } from "../i18n/Locale";
 
 @injectable()
 export default class SettingsTab {
@@ -47,7 +48,7 @@ export default class SettingsTab {
         const { containerEl } = this;
 
         containerEl.empty();
-        containerEl.createEl("h2", { text: "Settings for plugin." });
+        containerEl.createEl("h2", { text: t("settings") });
 
         const builders = this.factory<SettingsType>("main");
         for (const k of this.orderedKeys) {
@@ -76,8 +77,7 @@ export default class SettingsTab {
         div.style.margin = "0 auto";
 
         const text = document.createElement("p");
-        text.textContent =
-            "If you like this plugin and you would like to help support continued development, you can use the buttons below:";
+        text.textContent = t("coffee");
         div.appendChild(text);
 
         const anchor = document.createElement("a");

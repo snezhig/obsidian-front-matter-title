@@ -37,8 +37,8 @@ export default class ObsidianFacade {
         return this.getLeavesOfType(type).map(e => e.view) as T[];
     }
 
-    public getFirstLinkpathDest(linkpath: string): TFile | null {
-        return this.app.metadataCache.getFirstLinkpathDest(linkpath, "");
+    public getFirstLinkpathDest(linkpath: string, from: string): TFile | null {
+        return this.app.metadataCache.getFirstLinkpathDest(linkpath, from);
     }
     public getActiveLeaf(): WorkspaceLeaf | null {
         return this.app.workspace?.activeLeaf ?? null;

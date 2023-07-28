@@ -17,3 +17,7 @@ export interface KeyStorageInterface<T extends ObjectItem> {
     get<K extends keyof T>(key: K): DynamicItem<T[K]>;
     set(value: T): void;
 }
+
+export interface ReadObjectItemInterface<T extends ObjectItem> {
+    g<K extends keyof T>(key: K): T[K] extends [object] ? ReadObjectItemInterface<T[K]> : T[K];
+}

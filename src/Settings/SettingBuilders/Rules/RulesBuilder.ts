@@ -3,6 +3,7 @@ import { SettingsType } from "../../SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
 import SI from "@config/inversify.types";
 import { SettingsBuilderFactory } from "../../../../config/inversify.factory.types";
+import { t } from "../../../i18n/Locale";
 
 @injectable()
 export default class RulesBuiler extends AbstractBuilder<SettingsType, "rules"> {
@@ -13,7 +14,7 @@ export default class RulesBuiler extends AbstractBuilder<SettingsType, "rules"> 
         super();
     }
     public doBuild(): void {
-        this.container.createEl("h4", { text: "Rules" });
+        this.container.createEl("h4", { text: t("rule.name") });
         const builders = this.factory<SettingsType["rules"]>("rules");
         for (const key of this.orderedKeys) {
             for (const builder of builders) {

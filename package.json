@@ -1,6 +1,6 @@
 {
   "name": "obsidian-sample-plugin",
-  "version": "3.5.2",
+  "version": "3.5.3",
   "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
   "main": "main.js",
   "scripts": {
@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "gts": "^3.1.1",
+    "i18next": "^23.3.0",
     "inversify": "^6.0.1",
     "reflect-metadata": "^0.1.13"
   }
