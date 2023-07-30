@@ -8,6 +8,7 @@ const en = {
     apply: "Apply",
     feature: {
         [Feature.Alias]: {
+            name: "Alias",
             desc: "Modify alias in metadata cache. The real alias will not be affected",
             validator: {
                 auto: {
@@ -35,39 +36,51 @@ const en = {
             },
         },
         [Feature.Explorer]: {
+            name: "Explorer",
             desc: "Replace shown titles in the file explorer",
         },
         [Feature.ExplorerSort]: {
+            name: "Explorer sort",
             desc: "Sort files in explorer by titles from Explorer feature",
         },
         [Feature.Graph]: {
+            name: "Graph",
             desc: "Replace shown titles in the graph/local-graph",
         },
         [Feature.Header]: {
+            name: "Header",
             desc: "Replace titles in header of leaves and update them",
         },
         [Feature.Starred]: {
+            name: "Starred",
             desc: "Replace shown titles in built-in starred plugin",
         },
         [Feature.Search]: {
+            name: "Search",
             desc: "Replace shown titles in search leaf",
         },
         [Feature.Suggest]: {
+            name: "Suggest",
             desc: "Replace shown titles in suggest modals",
         },
         [Feature.Tab]: {
+            name: "Tabs",
             desc: "Replace shown titles in tabs",
         },
         [Feature.InlineTitle]: {
+            name: "Inline",
             desc: "Replace shown titles in Inline Title",
         },
         [Feature.Canvas]: {
+            name: "Canvas",
             desc: "Replace shown titles in Canvas",
         },
         [Feature.Backlink]: {
+            name: "Backlink",
             desc: "Replace shown titles in Backlink(Linked mentions)",
         },
         [Feature.NoteLink]: {
+            name: "Note Link",
             desc: "Replace internal links in files",
             strategy: {
                 all: "Repalce all links",
@@ -163,6 +176,12 @@ const en = {
             name: "Function",
             desc: "How it will work:",
             valueDesc: "Your value of text area",
+        },
+    },
+    command: {
+        features: {
+            reload: "Reload features",
+            disable: "Disable features",
         },
     },
 };

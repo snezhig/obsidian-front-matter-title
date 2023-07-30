@@ -25,31 +25,31 @@ export default class FeatureHelper {
     getName(feature: Feature): string {
         switch (feature) {
             case Feature.Alias:
-                return "Alias";
+                return t("feature.alias.name");
             case Feature.Explorer:
-                return "Explorer";
+                return t("feature.explorer.name");
             case Feature.ExplorerSort:
-                return "Explorer Sort";
+                return t("feature.explorer:sort.name");
             case Feature.Graph:
-                return "Graph";
+                return t("feature.graph.name");
             case Feature.Header:
-                return "Header";
+                return t("feature.header.name");
             case Feature.Starred:
-                return "Starred";
+                return t("feature.starred.name");
             case Feature.Search:
-                return "Search";
+                return t("feature.search.name");
             case Feature.Suggest:
-                return "Suggest";
+                return t("feature.suggest.name");
             case Feature.Tab:
-                return "Tabs";
+                return t("feature.tab.name");
             case Feature.InlineTitle:
-                return "Inline";
+                return t("feature.inlineTitle.name");
             case Feature.Canvas:
-                return "Canvas";
+                return t("feature.canvas.name");
             case Feature.Backlink:
-                return "Backlink";
+                return t("feature.backlink.name");
             case Feature.NoteLink:
-                return "Note Link";
+                return t("feature.noteLink.name");
         }
     }
 

@@ -158,12 +158,12 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private registerCommands(): void {
         this.addCommand({
             id: "ofmt-features-disable",
-            name: "Disable features",
+            name: t("command.features.disable"),
             callback: () => this.fc.disableAll(),
         });
         this.addCommand({
             id: "ofmt-features-reload",
-            name: "Reload features",
+            name: t("command.features.reload"),
             callback: () => {
                 this.reloadFeatures();
                 this.mc.refresh().catch(console.error);
