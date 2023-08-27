@@ -70,8 +70,11 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
     private modifySuggestions(items: SuggestModalChooserFileItem[]): SuggestModalChooserFileItem[] {
         const aliases: Set<string> = new Set();
         for (const item of items) {
+            if (!item?.file) {
+                continue;
+            }
             aliases.add(item.alias + item.file.path);
-            if (!item || !item.type || item.type !== "file" || !item.file) {
+            if (!item || !item.type || item.type !== "file") {
                 continue;
             }
             const alias = this.resolver.resolve(item.file.path);
