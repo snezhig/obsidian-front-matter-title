@@ -21,11 +21,12 @@ export default class LogicPlaceholder implements TemplatePlaceholderInterface {
         }
     }
 
-    setPlaceholder(placeholder: string) {
+    setPlaceholder(placeholder: string): TemplatePlaceholderInterface {
         this.placeholder = placeholder;
         for (const item of this.placeholder.split(this.DELIMITER)) {
             this.children.push(this.factory.create(item.trim()));
         }
+        return this;
     }
     getPlaceholder(): string {
         return this.placeholder;

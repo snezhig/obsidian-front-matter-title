@@ -23,7 +23,7 @@ export default class BracketsPlaceholder implements TemplatePlaceholderInterface
         return value ? `${this.leftSpace}${value}${this.rightSpace}` : null;
     }
 
-    setPlaceholder(placeholder: string): void {
+    setPlaceholder(placeholder: string): TemplatePlaceholderInterface {
         this.placeholder = placeholder;
         const {
             groups: { left, key, right },
@@ -31,5 +31,6 @@ export default class BracketsPlaceholder implements TemplatePlaceholderInterface
         this.leftSpace = left ?? "";
         this.rightSpace = right ?? "";
         this.child = this.factory.create(key);
+        return this;
     }
 }

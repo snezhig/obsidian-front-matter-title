@@ -15,7 +15,7 @@ export interface TemplatePlaceholderInterface {
 
     makeValue(path: string): string | null;
 
-    setPlaceholder(placeholder: string): void;
+    setPlaceholder(placeholder: string): TemplatePlaceholderInterface;
 }
 
 export interface TemplatePlaceholderFactoryInterface {

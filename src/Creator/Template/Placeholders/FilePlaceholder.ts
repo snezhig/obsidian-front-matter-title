@@ -3,6 +3,7 @@ import ExtractorInterface from "@src/Components/Extractor/Interfaces/ExtractorIn
 import { inject } from "inversify";
 import SI from "@config/inversify.types";
 import { ObsidianFileFactory } from "@config/inversify.factory.types";
+import { TemplatePlaceholderInterface } from "../../Interfaces";
 
 export default class FilePlaceholder extends AbstractPlaceholder {
     private path: string;
@@ -20,8 +21,8 @@ export default class FilePlaceholder extends AbstractPlaceholder {
         return this.extractor.extract(this.path, this.factory(path));
     }
 
-    setPlaceholder(placeholder: string): void {
-        this.placeholder = placeholder;
+    setPlaceholder(placeholder: string): TemplatePlaceholderInterface {
         this.path = placeholder.substring(1);
+        return super.setPlaceholder(placeholder);
     }
 }

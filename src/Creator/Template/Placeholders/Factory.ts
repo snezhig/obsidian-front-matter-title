@@ -18,9 +18,9 @@ export default class Factory {
             type = AbstractPlaceholder.FILE;
         } else if (placeholder === "#heading") {
             type = AbstractPlaceholder.HEADING;
-        } else if (placeholder.contains("|")) {
+        } else if (placeholder.includes("|")) {
             type = AbstractPlaceholder.LOGIC;
         }
-        return this.factory(type, placeholder);
+        return this.factory(type, placeholder).setPlaceholder(placeholder);
     }
 }

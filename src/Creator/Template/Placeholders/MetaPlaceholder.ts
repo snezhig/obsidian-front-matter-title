@@ -18,8 +18,4 @@ export default class MetaPlaceholder extends AbstractPlaceholder {
     makeValue(path: string): string {
         return this.extractor.extract(this.placeholder, this.factory(path, "frontmatter"));
     }
-
-    setPlaceholder(placeholder: string): void {
-        this.placeholder = placeholder;
-    }
 }
