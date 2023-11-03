@@ -17,3 +17,9 @@ export interface TemplatePlaceholderInterface {
 
     setPlaceholder(placeholder: string): void;
 }
+
+export interface TemplatePlaceholderFactoryInterface {
+    create(placeholder: string): TemplatePlaceholderInterface;
+}
+
+export type PlaceholderType = string;

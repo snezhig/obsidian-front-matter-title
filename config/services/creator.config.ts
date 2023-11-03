@@ -10,6 +10,8 @@ import BracketsPlaceholder from "@src/Creator/Template/Placeholders/BracketsPlac
 import FilePlaceholder from "@src/Creator/Template/Placeholders/FilePlaceholder";
 import HeadingPlaceholder from "@src/Creator/Template/Placeholders/HeadingPlaceholder";
 import { CreatorInterface, TemplateInterface, TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
+import AbstractPlaceholder from "@src/Creator/Template/Placeholders/AbstractPlaceholder";
+import LogicPlaceholder from "@src/Creator/Template/Placeholders/LogicPlaceholder";
 
 export default new ContainerModule(bind => {
     bind<TemplateFactory>(SI["factory:creator:template"]).to(TemplateFactory);
@@ -22,21 +24,21 @@ export default new ContainerModule(bind => {
 
     bind<TemplateInterface>(SI["creator:template"]).to(Composite).whenTargetNamed("composite");
 
-    bind<TemplatePlaceholderInterface>(SI.placeholder).to(MetaPlaceholder).whenTargetNamed("meta");
-    bind<TemplatePlaceholderInterface>(SI.placeholder).to(FilePlaceholder).whenTargetNamed("file");
-    bind<TemplatePlaceholderInterface>(SI.placeholder).to(BracketsPlaceholder).whenTargetNamed("brackets");
-    bind<TemplatePlaceholderInterface>(SI.placeholder).to(HeadingPlaceholder).whenTargetNamed("heading");
+    bind<TemplatePlaceholderInterface>(SI.placeholder).to(MetaPlaceholder).whenTargetNamed(AbstractPlaceholder.META);
+    bind<TemplatePlaceholderInterface>(SI.placeholder).to(FilePlaceholder).whenTargetNamed(AbstractPlaceholder.FILE);
+    bind<TemplatePlaceholderInterface>(SI.placeholder)
+        .to(BracketsPlaceholder)
+        .whenTargetNamed(AbstractPlaceholder.BRACKETS);
+    bind<TemplatePlaceholderInterface>(SI.placeholder)
+        .to(HeadingPlaceholder)
+        .whenTargetNamed(AbstractPlaceholder.HEADING);
+    bind<TemplatePlaceholderInterface>(SI.placeholder).to(LogicPlaceholder).whenTargetNamed(AbstractPlaceholder.LOGIC);
 
     bind<CreatorInterface>(SI["creator:creator"]).to(Creator);
 
-    bind<interfaces.Factory<TemplatePlaceholderInterface>>(SI["factory:placeholder:resolver"]).toFactory<
-        TemplatePlaceholderInterface,
-        [string, string]
-    >(context => (type: string, placeholder: string) => {
-        const item = context.container.getNamed<TemplatePlaceholderInterface>(SI.placeholder, type);
-        item.setPlaceholder(placeholder);
-        return item;
-    });
+    bind<interfaces.Factory<TemplatePlaceholderInterface>>(SI["factory:placeholder:resolver"]).toAutoNamedFactory(
+        SI.placeholder
+    );
 
     bind(SI["getter:delimiter"]).toDynamicValue(c => () => c.container.get(SI.delimiter));
     bind<PlaceholderFactory>(SI["factory:placeholder"]).to(PlaceholderFactory).inSingletonScope();
