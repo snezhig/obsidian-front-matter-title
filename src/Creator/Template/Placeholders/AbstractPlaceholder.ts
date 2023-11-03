@@ -1,4 +1,4 @@
-import { PlaceholderType, TemplateInterface, TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
+import { PlaceholderType, TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import { injectable } from "inversify";
 
 @injectable()

@@ -1,4 +1,3 @@
-import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
