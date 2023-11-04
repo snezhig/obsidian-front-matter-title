@@ -1,8 +1,13 @@
-import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
+import { PlaceholderType, TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import { injectable } from "inversify";
 
 @injectable()
 export default abstract class AbstractPlaceholder implements TemplatePlaceholderInterface {
+    static readonly META: PlaceholderType = "meta";
+    static readonly BRACKETS: PlaceholderType = "brackets";
+    static readonly HEADING: PlaceholderType = "heading";
+    static readonly FILE: PlaceholderType = "file";
+    static readonly LOGIC: PlaceholderType = "logic";
     protected placeholder: string;
 
     getPlaceholder(): string {
@@ -11,5 +16,8 @@ export default abstract class AbstractPlaceholder implements TemplatePlaceholder
 
     abstract makeValue(path: string): string;
 
-    abstract setPlaceholder(placeholder: string): void;
+    setPlaceholder(placeholder: string): TemplatePlaceholderInterface {
+        this.placeholder = placeholder;
+        return this;
+    }
 }

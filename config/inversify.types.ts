@@ -43,8 +43,6 @@ const SI = {
     "obsidian:app": "",
     "obsidian:plugin": "",
     placeholder: "",
-    "placeholder:brackets": "",
-    "placeholder:meta": "",
     resolver: "",
     "resolver:service": "",
     "factory:resolver:template": "",

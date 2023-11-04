@@ -1,6 +1,5 @@
-import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
+import { TemplatePlaceholderFactoryInterface, TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import { inject, injectable } from "inversify";
-import Factory from "./Placeholders/Factory";
 import SI from "../../../config/inversify.types";
 import { TemplateInterface } from "@src/Creator/Interfaces";
 
@@ -9,8 +8,8 @@ export default class Simple implements TemplateInterface {
     private placeholder: TemplatePlaceholderInterface = null;
     private template: string;
     constructor(
-        @inject<Factory>(SI["factory:placeholder"])
-        private factory: Factory
+        @inject<TemplatePlaceholderFactoryInterface>(SI["factory:placeholder"])
+        private factory: TemplatePlaceholderFactoryInterface
     ) {}
 
     getPlaceholders(): TemplatePlaceholderInterface[] {

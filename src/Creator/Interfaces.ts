@@ -13,7 +13,13 @@ export interface TemplateInterface {
 export interface TemplatePlaceholderInterface {
     getPlaceholder(): string;
 
-    makeValue(path: string): string;
+    makeValue(path: string): string | null;
 
-    setPlaceholder(placeholder: string): void;
+    setPlaceholder(placeholder: string): TemplatePlaceholderInterface;
 }
+
+export interface TemplatePlaceholderFactoryInterface {
+    create(placeholder: string): TemplatePlaceholderInterface;
+}
+
+export type PlaceholderType = string;

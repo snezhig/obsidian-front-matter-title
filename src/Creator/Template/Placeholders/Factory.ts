@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { TemplatePlaceholderInterface } from "@src/Creator/Interfaces";
 import SI from "../../../../config/inversify.types";
+import AbstractPlaceholder from "@src/Creator/Template/Placeholders/AbstractPlaceholder";
 
 @injectable()
 export default class Factory {
@@ -10,14 +11,16 @@ export default class Factory {
     ) {}
 
     public create(placeholder: string): TemplatePlaceholderInterface {
-        let type = "meta";
+        let type = AbstractPlaceholder.META;
         if (placeholder.startsWith("{{") && placeholder.endsWith("}}")) {
-            type = "brackets";
+            type = AbstractPlaceholder.BRACKETS;
         } else if (placeholder.startsWith("_")) {
-            type = "file";
+            type = AbstractPlaceholder.FILE;
         } else if (placeholder === "#heading") {
-            type = "heading";
+            type = AbstractPlaceholder.HEADING;
+        } else if (placeholder.includes("|")) {
+            type = AbstractPlaceholder.LOGIC;
         }
-        return this.factory(type, placeholder);
+        return this.factory(type, placeholder).setPlaceholder(placeholder);
     }
 }
