@@ -31,5 +31,5 @@ But if `Replace` is `Replace only without alias` the modal will be different:
 
 ![img.png](../img/NoteLinkWithoutAlias.png)
 
-Because `[[202210141918|Go]]` already has `Go` alias, feature does not try to change it
+Because `[[202210141918|Go]]` already has `Go` alias, this feature does not try to change it.
 
