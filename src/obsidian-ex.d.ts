@@ -23,6 +23,9 @@ declare module "obsidian" {
         vChildren?: {
             setChildren(items: any[]): void;
         };
+        updateTitle(): void;
+        startRename(): void;
+        getTitle(): string;
     }
 
     export abstract class StarredPluginView extends ViewPluginEventable {

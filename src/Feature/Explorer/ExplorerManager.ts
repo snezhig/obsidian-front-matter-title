@@ -1,20 +1,24 @@
-import { TFileExplorerItem, TFileExplorerView } from "obsidian";
+import { TFile, TFileExplorerItem, TFileExplorerView } from "obsidian";
 import { Leaves, Feature } from "@src/Enum";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import AbstractManager from "@src/Feature/AbstractManager";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
+import { ExplorerFileItemMutator } from "./ExplorerFileItemMutator";
+import { ResolverInterface } from "../../Resolver/Interfaces";
 
 @injectable()
 export default class ExplorerManager extends AbstractManager {
     private explorerView: TFileExplorerView = null;
-    private originTitles = new Map<string, string>();
+    private modified = new WeakMap<TFileExplorerItem, ExplorerFileItemMutator>();
     private enabled = false;
 
     constructor(
         @inject(SI["facade:obsidian"])
-        private facade: ObsidianFacade
+        private facade: ObsidianFacade,
+        @inject(SI["feature:explorer:file_mutator:factory"])
+        private factory: (item: TFileExplorerItem, resolver: ResolverInterface) => ExplorerFileItemMutator
     ) {
         super();
     }
@@ -40,20 +44,17 @@ export default class ExplorerManager extends AbstractManager {
         this.enabled = true;
     }
 
-    private getFileItemInnerTitleEl(fileItem: TFileExplorerItem): HTMLElement {
-        return fileItem.titleInnerEl ?? fileItem.innerEl;
-    }
-
     private getExplorerView(): TFileExplorerView | null {
-        const leaves = this.facade.getLeavesOfType(Leaves.FE);
+        const views = this.facade.getViewsOfType(Leaves.FE);
 
-        if (leaves.length > 1) {
+        if (views.length > 1) {
             throw new Error("There are some explorers' leaves");
         }
 
-        const view = leaves?.[0]?.view;
+        const view = views?.[0];
+
         //TODO: what if it be later?
-        if (view === undefined) {
+        if (view === undefined || view === null) {
             throw new ExplorerViewUndefined("Explorer view is undefined");
         }
 
@@ -61,36 +62,16 @@ export default class ExplorerManager extends AbstractManager {
     }
 
     private async updateInternal(items: TFileExplorerItem[]): Promise<{ [k: string]: boolean }> {
-        if (!items.filter(e => e).length) {
-            return {};
+        for (const i of items) {
+            if (i.file instanceof TFile == false) {
+                continue;
+            }
+            if (!this.modified.has(i)) {
+                this.modified.set(i, this.factory(i, this.resolver));
+            }
+            i.updateTitle();
         }
-
-        const result: { [k: string]: boolean } = {};
-        const promises = items.map(e => this.setTitle(e).then(r => (result[e.file.path] = r)));
-
-        await Promise.all(promises);
-        return result;
-    }
-
-    private async setTitle(item: TFileExplorerItem): Promise<boolean> {
-        const title = await (async () => this.resolver.resolve(item.file.path))().catch(() => null);
-        if (this.isTitleEmpty(title)) {
-            return this.restore(item);
-        } else if (this.getFileItemInnerTitleEl(item).innerText !== title) {
-            this.keepOrigin(item);
-            // Need to be on .nav-file-title-content, not on .nav-file-title
-            this.getFileItemInnerTitleEl(item).innerText = title;
-            return true;
-        }
-        return false;
-    }
-
-    private isTitleEmpty = (title: string): boolean => title === null || title === "" || title === undefined;
-
-    private keepOrigin(item: TFileExplorerItem): void {
-        if (!this.originTitles.has(item.file.path)) {
-            this.originTitles.set(item.file.path, this.getFileItemInnerTitleEl(item).innerText);
-        }
+        return {};
     }
 
     private restoreTitles(): void {
@@ -98,9 +79,10 @@ export default class ExplorerManager extends AbstractManager {
     }
 
     private restore(item: TFileExplorerItem): boolean {
-        if (this.originTitles.has(item.file.path)) {
-            this.getFileItemInnerTitleEl(item).innerText = this.originTitles.get(item.file.path);
-            this.originTitles.delete(item.file.path);
+        if (this.modified.has(item)) {
+            this.modified.get(item).destroy();
+            item.updateTitle();
+            this.modified.delete(item);
             return true;
         }
         return false;
@@ -112,8 +94,8 @@ export default class ExplorerManager extends AbstractManager {
 
     protected async doUpdate(path: string): Promise<boolean> {
         const item = this.explorerView.fileItems[path];
-        const result = await this.updateInternal(item ? [item] : []);
-        return result[path] === true;
+        await this.updateInternal(item ? [item] : []);
+        return !!item;
     }
 
     static getId(): Feature {
