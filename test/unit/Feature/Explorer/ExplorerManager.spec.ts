@@ -1,157 +1,138 @@
-import { mock } from "jest-mock-extended";
-import { TFileExplorerItem, TFileExplorerView } from "obsidian";
+import { mock, mockDeep, mockReset } from "jest-mock-extended";
+import { TFile, TFileExplorerItem, TFileExplorerView } from "obsidian";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import ExplorerManager from "@src/Feature/Explorer/ExplorerManager";
-import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
-import { ResolverInterface } from "@src/Resolver/Interfaces";
+import { ExplorerFileItemMutator } from "../../../../src/Feature/Explorer/ExplorerFileItemMutator";
+import ExplorerManager from "../../../../src/Feature/Explorer/ExplorerManager";
+import { ResolverInterface } from "../../../../src/Resolver/Interfaces";
+import ExplorerViewUndefined from "../../../../src/Feature/Explorer/ExplorerViewUndefined";
 
-const path = "path/to/file.md";
-const mockResolver = mock<ResolverInterface>();
-const getFileItems = jest.fn(() => ({}));
-//@ts-ignore
-const viewMock: TFileExplorerView = {
-    requestSort: jest.fn(() => {}),
-    get fileItems() {
-        return getFileItems() as any;
-    },
-} as TFileExplorerView;
+// Mock dependencies
+const mockedFacade = mock<ObsidianFacade>();
+const factory = jest.fn();
+const resolver = mock<ResolverInterface>();
 
-const facade = mock<ObsidianFacade>();
-facade.getLeavesOfType.mockReturnValue([]);
+// Mock methods and properties that will be used in the tests
+mockedFacade.getLeavesOfType.mockReturnValue([]);
+factory.mockImplementation(item => mock<ExplorerFileItemMutator>());
 
-describe("Test enable exceptions", () => {
-    const manager = new ExplorerManager(facade);
-    manager.setResolver(mockResolver);
-    test("Should throw error with undefined view", () => {
-        facade.getLeavesOfType.mockReturnValueOnce([]);
-        expect(() => manager.enable()).toThrow(ExplorerViewUndefined);
-        //@ts-ignore
-        facade.getLeavesOfType.mockReturnValueOnce([{}]);
-        expect(() => manager.enable()).toThrow(ExplorerViewUndefined);
-    });
-    test("Should throw error because more than 1 leaf", () => {
-        //@ts-ignore
-        facade.getLeavesOfType.mockReturnValueOnce([{}, {}]);
-        expect(() => manager.enable()).toThrow("There are some explorers' leaves");
-    });
-});
+describe("ExplorerManager", () => {
+    let explorerManager: ExplorerManager;
 
-test("Should do nothing because it is not enabled", () => {
-    const manager = new ExplorerManager(facade);
-    manager.setResolver(mockResolver);
-    expect(manager.update(path)).resolves.toBeFalsy();
-    expect(mockResolver.resolve).not.toHaveBeenCalled();
-});
+    beforeEach(() => {
+        // Reset all mocks before each test
+        mockReset(mockedFacade);
+        mockReset(resolver);
+        factory.mockClear();
 
-describe("Test flow", () => {
-    beforeEach(() => mockResolver.resolve.mockClear());
-    const items = {
-        "/path/first.md": {
-            file: { path: "/path/first.md" },
-            titleInnerEl: { innerText: "first" },
-        } as TFileExplorerItem,
-        "/path/second.md": {
-            file: { path: "/path/second.md" },
-            titleInnerEl: { innerText: "second" },
-        } as TFileExplorerItem,
-    };
-    getFileItems.mockReturnValue(items);
-    //@ts-ignore
-    facade.getLeavesOfType.mockReturnValue([{ view: viewMock }]);
-    const manager = new ExplorerManager(facade);
-    manager.setResolver(mockResolver);
-    test("Should be enabled", async () => {
-        await manager.enable();
-        expect(manager.isEnabled()).toBeTruthy();
+        // Create an instance of the class to be tested
+        explorerManager = new ExplorerManager(mockedFacade, factory);
+        explorerManager.setResolver(resolver);
     });
 
-    test("Should not call resolver because explorer does not have files", async () => {
-        getFileItems.mockReturnValueOnce({});
-        expect(await manager.refresh()).toEqual({});
-        expect(await manager.update(path)).toBeFalsy();
-        expect(mockResolver.resolve).not.toHaveBeenCalled();
+    it("should enable the explorer feature", () => {
+        // Assume that the method getLeavesOfType returns a non-empty array
+        mockedFacade.getViewsOfType.mockReturnValue([mock<TFileExplorerView>()]);
+
+        explorerManager.enable();
+
+        expect(explorerManager.isEnabled()).toBe(true);
     });
 
-    test("Should call resolver, but update nothing", async () => {
-        for (const value of [null, undefined, ""]) {
-            mockResolver.resolve.mockReturnValue(value);
-            expect(await manager.refresh()).toEqual({
-                "/path/first.md": false,
-                "/path/second.md": false,
-            });
-        }
-        expect(mockResolver.resolve).toHaveBeenCalledTimes(6);
+    it("should throw an error if multiple explorer views are found", () => {
+        mockedFacade.getViewsOfType.mockReturnValue([mockDeep<TFileExplorerView>(), mockDeep<TFileExplorerView>()]);
 
-        expect(items["/path/first.md"].titleInnerEl.innerText).toEqual("first");
-        expect(items["/path/second.md"].titleInnerEl.innerText).toEqual("second");
+        expect(() => {
+            explorerManager.enable();
+        }).toThrow("There are some explorers' leaves");
     });
 
-    describe("Should update and restore only first item", () => {
-        const item = items["/path/first.md"];
+    it("should disable the explorer feature", () => {
+        mockedFacade.getViewsOfType.mockReturnValue([mockDeep<TFileExplorerView>()]);
+        explorerManager.enable();
+        explorerManager.disable();
 
-        for (const v of ["first_resolved", "first_resolved_again"]) {
-            test(`Should update only first item with "${v}" value`, async () => {
-                mockResolver.resolve.mockReturnValueOnce(v);
-                expect(await manager.update(item.file.path)).toBeTruthy();
-                expect(item.titleInnerEl.innerText).toEqual(v);
-                expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
-                expect(mockResolver.resolve).toHaveBeenCalledWith(item.file.path);
-                expect(items["/path/second.md"].titleInnerEl.innerText).toEqual("second");
-                mockResolver.resolve.mockClear();
-            });
-        }
-        test("Should restore first value", async () => {
-            mockResolver.resolve.mockReturnValueOnce(null);
-            expect(await manager.update(item.file.path)).toBeTruthy();
-            expect(item.titleInnerEl.innerText).toEqual("first");
-            expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
-            expect(mockResolver.resolve).toHaveBeenCalledWith(item.file.path);
-        });
-
-        test("Should update and restore because of resolver reject", async () => {
-            mockResolver.resolve.mockReturnValueOnce("first_reject" as any);
-            expect(await manager.update(item.file.path)).toBeTruthy();
-            expect(item.titleInnerEl.innerText).toEqual("first_reject");
-            mockResolver.resolve.mockImplementationOnce(() => {
-                throw new Error();
-            });
-            expect(await manager.update(item.file.path)).toBeTruthy();
-            expect(item.titleInnerEl.innerText).toEqual("first");
-        });
+        expect(explorerManager.isEnabled()).toBe(false);
     });
 
-    describe("Should update and restore all", () => {
-        beforeEach(() => mockResolver.resolve.mockClear());
-        test("Should update all", async () => {
-            mockResolver.resolve.mockImplementation(v => `${v}_resolved`);
-            expect(await manager.refresh()).toEqual({
-                "/path/first.md": true,
-                "/path/second.md": true,
-            });
-            for (const v of Object.values(items)) {
-                expect(v.titleInnerEl.innerText).toEqual(`${v.file.path}_resolved`);
-                expect(mockResolver.resolve).toHaveBeenCalledWith(v.file.path);
-            }
-            expect(mockResolver.resolve).toHaveBeenCalledTimes(2);
-        });
-        test("Should restore all", async () => {
-            mockResolver.resolve.mockReturnValue(null);
-            await manager.refresh();
-            expect(items["/path/first.md"].titleInnerEl.innerText).toEqual("first");
-            expect(items["/path/second.md"].titleInnerEl.innerText).toEqual("second");
-            expect(mockResolver.resolve).toHaveBeenCalledTimes(2);
-            expect(mockResolver.resolve).toHaveBeenCalledWith("/path/first.md");
-            expect(mockResolver.resolve).toHaveBeenCalledWith("/path/second.md");
-        });
+    it("doRefresh should update titles of all file items", async () => {
+        const mockExplorerView = mock<TFileExplorerView>();
+        const mockFileItem = mock<TFileExplorerItem>();
+        mockFileItem.file = new TFile();
+        mockExplorerView.fileItems = { path: mockFileItem };
+        mockedFacade.getViewsOfType.mockReturnValue([mockExplorerView]);
 
-        test("Should update and resolve by disabling", async () => {
-            mockResolver.resolve.mockImplementation(() => Math.random().toString());
-            await manager.refresh();
-            expect(items["/path/first.md"].titleInnerEl.innerText).not.toEqual("first");
-            expect(items["/path/second.md"].titleInnerEl.innerText).not.toEqual("second");
-            await manager.disable();
-            expect(items["/path/first.md"].titleInnerEl.innerText).toEqual("first");
-            expect(items["/path/second.md"].titleInnerEl.innerText).toEqual("second");
-        });
+        explorerManager.enable();
+        await explorerManager.refresh();
+
+        expect(factory).toHaveBeenCalledWith(mockFileItem, resolver);
+        expect(mockFileItem.updateTitle).toHaveBeenCalled();
+    });
+
+    it("doUpdate should update the title of a specific file item", async () => {
+        const mockExplorerView = mock<TFileExplorerView>();
+        const file = new TFile();
+        const mockFileItem = mock<TFileExplorerItem>();
+        mockFileItem.file = file;
+        const mockSecondFileItem = mock<TFileExplorerItem>();
+        mockSecondFileItem.file = file;
+        const path = "test/path";
+        mockExplorerView.fileItems = { [path]: mockFileItem, "": mockSecondFileItem };
+        mockedFacade.getViewsOfType.mockReturnValue([mockExplorerView]);
+
+        explorerManager.enable();
+        const result = await explorerManager.update(path);
+
+        expect(result).toBe(true);
+        expect(factory).toHaveBeenCalledWith(mockFileItem, resolver);
+        expect(mockFileItem.updateTitle).toHaveBeenCalled();
+        expect(mockSecondFileItem.updateTitle).not.toHaveBeenCalled();
+    });
+
+    it("doUpdate should handle an undefined file item", async () => {
+        const mockExplorerView = mock<TFileExplorerView>();
+        const path = "test/path";
+        mockExplorerView.fileItems = {};
+        mockedFacade.getViewsOfType.mockReturnValue([mockExplorerView]);
+
+        explorerManager.enable();
+        const result = await explorerManager.update(path);
+
+        expect(result).toBe(false);
+    });
+
+    it("should handle the case when the explorer view is undefined", () => {
+        mockedFacade.getViewsOfType.mockReturnValue([]);
+
+        expect(() => {
+            explorerManager.enable();
+        }).toThrow(ExplorerViewUndefined);
+    });
+
+    // Coverage for exceptional cases
+    it("should throw an exception if there is no explorer view", () => {
+        mockedFacade.getViewsOfType.mockReturnValue([null]); // No view
+
+        expect(() => {
+            explorerManager.enable();
+        }).toThrow(ExplorerViewUndefined);
+    });
+
+    // Testing the restoration of titles
+    it("restoreTitles should restore titles for all modified items", () => {
+        const mockExplorerView = mock<TFileExplorerView>();
+        const mockFileItem = mock<TFileExplorerItem>();
+        const mockMutator = mock<ExplorerFileItemMutator>();
+
+        mockExplorerView.fileItems = { path: mockFileItem };
+        mockedFacade.getViewsOfType.mockReturnValue([mockExplorerView]);
+        explorerManager.enable();
+
+        // Simulating file modification
+        explorerManager["modified"].set(mockFileItem, mockMutator);
+
+        explorerManager.disable(); // should trigger restoreTitles
+
+        expect(mockMutator.destroy).toHaveBeenCalled();
+        expect(mockFileItem.updateTitle).toHaveBeenCalled();
     });
 });

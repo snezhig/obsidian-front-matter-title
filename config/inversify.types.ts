@@ -33,6 +33,7 @@ const SI = {
     "feature:alias:config": "",
     "feature:notelink:approve": "",
     "feature:config": "",
+    "feature:explorer:file_mutator:factory": "",
     filter: "",
     "getter:delimiter": "",
     listener: "",
