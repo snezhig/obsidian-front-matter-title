@@ -63,7 +63,7 @@ export default class ExplorerManager extends AbstractManager {
 
     private async updateInternal(items: TFileExplorerItem[]): Promise<{ [k: string]: boolean }> {
         for (const i of items) {
-            if (i.file instanceof TFile == false) {
+            if (!(i.file instanceof TFile)) {
                 continue;
             }
             if (!this.modified.has(i)) {

@@ -43,7 +43,7 @@ describe("ExplorerManager", () => {
 
         expect(() => {
             explorerManager.enable();
-        }).toThrow("Multiple explorer views detected");
+        }).toThrow("There are some explorers' leaves");
     });
 
     it("should disable the explorer feature", () => {
