@@ -11,4 +11,6 @@ export default abstract class AbstractBuilder<
     }
 
     abstract build(options: BuildParams<K>): void;
+
+    protected addTemplates(): void {}
 }

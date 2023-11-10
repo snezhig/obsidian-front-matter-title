@@ -8,7 +8,7 @@ type SettingsFeatureSpecific = {
     [Feature.Alias]: { strategy: AliasStrategyType; validator: AliasValidatorType };
     [Feature.NoteLink]: { approval: boolean; strategy: NoteLinkStrategy };
 };
-export type SettingsFeatureCommon = { enabled: boolean };
+export type SettingsFeatureCommon = { enabled: boolean; template: TemplateValue };
 export type SettingsFeature = {
     [K in Feature]: K extends keyof SettingsFeatureSpecific
         ? SettingsFeatureSpecific[K] & SettingsFeatureCommon

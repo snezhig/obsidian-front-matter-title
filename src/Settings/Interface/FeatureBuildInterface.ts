@@ -2,11 +2,12 @@ import { SettingsFeature, SettingsFeatureCommon, SettingsEvent, SettingsType } f
 import { Feature } from "@src/Enum";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
+export type BuildSettingParam<K> = K extends keyof SettingsFeature ? SettingsFeature[K] : SettingsFeatureCommon;
 export type BuildParams<K> = {
     id: K extends keyof SettingsFeature ? K : Feature;
     name: string;
     desc: string;
-    settings: K extends keyof SettingsFeature ? SettingsFeature[K] : SettingsFeatureCommon;
+    settings: BuildSettingParam<K>;
     doc: { link: string };
 };
 export type Context = {

@@ -17,32 +17,72 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     build({ id, name, desc, settings }: BuildParams<Feature.Alias>): void {
         this.id = id;
         this.desc = desc;
-        this.setting = new Setting(this.context.getContainer()).setName(name).setDesc(desc);
+        this.context.getContainer().createEl("h5", { text: name });
+        this.setting = new Setting(this.context.getContainer()).setName(desc);
         this.buildValidatorDropdown(settings.validator);
         this.buildStrategyDropdown(settings.strategy);
         this.buildToggle(settings.enabled);
-        this.actualizeDesc();
     }
 
     private buildValidatorDropdown(value: string): void {
-        this.validatorDropdown = new DropdownComponent(this.setting.controlEl)
+        const s = new Setting(this.context.getContainer()).setName(t("strategy"));
+        this.validatorDropdown = new DropdownComponent(s.controlEl)
             .addOptions({
                 [ValidatorType.FrontmatterAuto]: t("feature.alias.validator.auto.name"),
                 [ValidatorType.FrontmatterRequired]: t("feature.alias.validator.required.name"),
             })
             .setValue(value ? value : ValidatorType.FrontmatterRequired)
-            .onChange(this.onChange.bind(this));
+            .onChange(v => {
+                this.actualizeValidatorDesc(s, v);
+                this.onChange();
+            });
+        this.actualizeValidatorDesc(s, this.validatorDropdown.getValue());
+    }
+
+    private actualizeValidatorDesc(setting: Setting, value: string): string {
+        let text = "";
+        switch (value) {
+            case ValidatorType.FrontmatterAuto: {
+                text = t("feature.alias.validator.auto.desc");
+                break;
+            }
+            case ValidatorType.FrontmatterRequired: {
+                text = t("feature.alias.validator.required.desc");
+                break;
+            }
+        }
+        setting.setDesc(text);
     }
 
     private buildStrategyDropdown(value: string): void {
-        this.strategyDropdown = new DropdownComponent(this.setting.controlEl)
+        const s = new Setting(this.context.getContainer()).setName(t("strategy"));
+        this.strategyDropdown = new DropdownComponent(s.controlEl)
             .addOptions({
                 [StrategyType.Ensure]: t("feature.alias.strategy.ensure.name"),
                 [StrategyType.Adjust]: t("feature.alias.strategy.adjust.name"),
                 [StrategyType.Replace]: t("feature.alias.strategy.replace.name"),
             })
             .setValue(value ? value : StrategyType.Ensure)
-            .onChange(this.onChange.bind(this));
+            .onChange(v => {
+                this.onChange();
+                this.actualizeStrategyDesc(s, v);
+            });
+        this.actualizeStrategyDesc(s, this.strategyDropdown.getValue());
+    }
+    private actualizeStrategyDesc(setting: Setting, value: string): string {
+        let desc = "";
+        switch (value) {
+            case StrategyType.Ensure:
+                desc = t("feature.alias.strategy.ensure.desc");
+                break;
+            case StrategyType.Replace:
+                desc = t("feature.alias.strategy.replace.desc");
+                break;
+            case StrategyType.Adjust:
+                desc = t("feature.alias.strategy.adjust.desc");
+                break;
+        }
+        setting.setDesc(desc);
     }
 
     private buildToggle(value: boolean): void {
@@ -61,54 +101,5 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
                 },
             })
         );
-        this.actualizeDesc();
-    }
-
-    private getStrategyFragment(): DocumentFragment {
-        let text = "";
-        switch (this.strategyDropdown.getValue()) {
-            case StrategyType.Ensure:
-                text = t("feature.alias.strategy.ensure.desc");
-                break;
-            case StrategyType.Replace:
-                text = t("feature.alias.strategy.replace.desc");
-                break;
-            case StrategyType.Adjust:
-                text = t("feature.alias.strategy.adjust.desc");
-                break;
-        }
-        const fragment = createFragment();
-        fragment.createEl("b", "", e => e.setText(`${t("strategy")}: `));
-        fragment.appendText(text);
-        return fragment;
-    }
-
-    private getValidatorFragment(): DocumentFragment {
-        let text = "";
-        switch (this.validatorDropdown.getValue()) {
-            case ValidatorType.FrontmatterAuto: {
-                text = t("feature.alias.validator.auto.desc");
-                break;
-            }
-            case ValidatorType.FrontmatterRequired: {
-                text = t("feature.alias.validator.required.desc");
-                break;
-            }
-        }
-        const fragment = createFragment();
-        fragment.createEl("b", "", e => e.setText(`${t("validator")}: `));
-        fragment.appendText(text);
-        return fragment;
-    }
-
-    private actualizeDesc(): void {
-        const fragment = createFragment();
-        fragment.appendText(this.desc);
-        fragment.createEl("br");
-        fragment.append(this.getValidatorFragment());
-        fragment.createEl("br");
-        fragment.append(this.getStrategyFragment());
-
-        this.setting.setDesc(fragment);
     }
 }

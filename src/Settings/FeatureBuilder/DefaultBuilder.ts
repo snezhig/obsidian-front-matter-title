@@ -6,6 +6,7 @@ import AbstractBuilder from "./AbstractBuilder";
 
 export default class DefaultBuilder extends AbstractBuilder {
     build({ id, name, desc, settings }: BuildParams<SettingsFeatureCommon>) {
+        this.context.getContainer().createEl("h5", { text: name });
         new Setting(this.context.getContainer())
             .setName(name)
             .setDesc(desc)
