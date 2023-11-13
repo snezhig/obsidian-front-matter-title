@@ -101,7 +101,7 @@ const zh_tw: Translation = {
         main: "主範本",
         fallback: "備用",
         placeholder: "輸入範本",
-        commmon: {
+        common: {
             main: {
                 name: "通用主範本",
                 desc: `設置 yaml 路徑，該值將用於檔標題。值必須是字串或數值。還可以使用類似範本路徑 "{{ }}"。

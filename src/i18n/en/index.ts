@@ -95,13 +95,13 @@ const en = {
     manage: "Manage",
     template: {
         features: {
-            name: "Features' templates",
-            desc: "Manage templates for each feature individually",
+            name: "Feature's templates",
+            desc: "Manage templates for this feature individually",
         },
         main: "Main",
         fallback: "Fallback",
         placeholder: "Type a template",
-        commmon: {
+        common: {
             main: {
                 name: "Common main template",
                 desc: `Set a yaml path, which value will be used as a file title. Value must be string or numeric. Also you can use template-like path using "{{ }}".
@@ -113,7 +113,7 @@ const en = {
                 desc: "This template will be used as a fallback option if the main template is not resolved",
             },
         },
-        used: "Common template will be used. It's value is {{value}}",
+        used: 'Common template will be used. It\'s value is "{{value}}"',
         specific: "Current template will be used for this feature",
     },
     settings: "Settings for plugin",

@@ -14,7 +14,8 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     private id: Feature;
     private desc: string;
 
-    build({ id, name, desc, settings }: BuildParams<Feature.Alias>): void {
+    doBuild(): void {
+        const { id, name, desc, settings } = this.options;
         this.id = id;
         this.desc = desc;
         this.context.getContainer().createEl("h5", { text: name });

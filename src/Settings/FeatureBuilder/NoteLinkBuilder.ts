@@ -13,7 +13,8 @@ export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
     private approval: DropdownComponent;
     private strategy: DropdownComponent;
 
-    build({ id, name, desc, settings, doc }: BuildParams<Feature.NoteLink>): void {
+    doBuild(): void {
+        const { id, name, desc, settings, doc } = this.options;
         this.id = id;
         const fragment = createFragment(e => e.createEl("a", { text: name, href: doc.link }));
         this.setting = new Setting(this.context.getContainer()).setName(fragment).setDesc(desc);

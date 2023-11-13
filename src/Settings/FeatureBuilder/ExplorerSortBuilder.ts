@@ -14,11 +14,11 @@ export default class ExplorerSortBuilder extends AbstractBuilder<Feature.Explore
         super();
     }
 
-    build(options: BuildParams<Feature.ExplorerSort>): void {
+    doBuild(): void {
         this.bind();
-        this.setting = new Setting(this.context.getContainer()).setName(options.name).setDesc(options.desc);
+        this.setting = new Setting(this.context.getContainer()).setName(this.options.name).setDesc(this.options.desc);
         this.setting.addToggle(c => (this.toggle = c));
-        this.toggle.setValue(options.settings.enabled).onChange(v =>
+        this.toggle.setValue(this.options.settings.enabled).onChange(v =>
             this.context.getDispatcher().dispatch(
                 "settings:tab:feature:changed",
                 new Event({

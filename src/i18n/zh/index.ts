@@ -101,7 +101,7 @@ const zh: Translation = {
         main: "主模板",
         fallback: "备用",
         placeholder: "输入模板",
-        commmon: {
+        common: {
             main: {
                 name: "通用主模板",
                 desc: `设置 yaml 路径，该值将用于文件标题。值必须是字符串或数值。还可以使用类似模板路径 "{{ }}"。
