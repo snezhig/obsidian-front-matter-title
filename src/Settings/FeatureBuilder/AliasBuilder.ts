@@ -1,32 +1,27 @@
-import { BuildParams } from "@src/Settings/Interface/FeatureBuildInterface";
 import { Feature } from "@src/Enum";
-import { DropdownComponent, Setting, ToggleComponent } from "obsidian";
-import Event from "@src/Components/EventDispatcher/Event";
+import { DropdownComponent, Setting } from "obsidian";
 import AbstractBuilder from "./AbstractBuilder";
-import { StrategyType, ValidatorType } from "../../Feature/Alias/Types";
-import { t } from "../../i18n/Locale";
+import { StrategyType, ValidatorType } from "@src/Feature/Alias/Types";
+import { t } from "@src/i18n/Locale";
 
 export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
-    private setting: Setting;
-    private toggle: ToggleComponent;
     private validatorDropdown: DropdownComponent;
     private strategyDropdown: DropdownComponent;
-    private id: Feature;
-    private desc: string;
+    private extraSettingContainerEl: HTMLElement;
 
     doBuild(): void {
-        const { id, name, desc, settings } = this.options;
-        this.id = id;
-        this.desc = desc;
-        this.context.getContainer().createEl("h5", { text: name });
-        this.setting = new Setting(this.context.getContainer()).setName(desc);
-        this.buildValidatorDropdown(settings.validator);
-        this.buildStrategyDropdown(settings.strategy);
-        this.buildToggle(settings.enabled);
+        this.buildEnable();
+        this.extraSettingContainerEl = this.context.getContainer().createDiv();
+        this.buildValidatorDropdown(this.options.settings.validator);
+        this.buildStrategyDropdown(this.options.settings.strategy);
+    }
+
+    protected getExtraSettingContainer(): HTMLElement | null {
+        return this.extraSettingContainerEl;
     }
 
     private buildValidatorDropdown(value: string): void {
-        const s = new Setting(this.context.getContainer()).setName(t("strategy"));
+        const s = new Setting(this.extraSettingContainerEl).setName(t("strategy"));
         this.validatorDropdown = new DropdownComponent(s.controlEl)
             .addOptions({
                 [ValidatorType.FrontmatterAuto]: t("feature.alias.validator.auto.name"),
@@ -35,7 +30,8 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
             .setValue(value ? value : ValidatorType.FrontmatterRequired)
             .onChange(v => {
                 this.actualizeValidatorDesc(s, v);
-                this.onChange();
+                this.options.settings.validator = v;
+                this.dispatchChanges();
             });
         this.actualizeValidatorDesc(s, this.validatorDropdown.getValue());
     }
@@ -56,7 +52,7 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     }
 
     private buildStrategyDropdown(value: string): void {
-        const s = new Setting(this.context.getContainer()).setName(t("strategy"));
+        const s = new Setting(this.extraSettingContainerEl).setName(t("strategy"));
         this.strategyDropdown = new DropdownComponent(s.controlEl)
             .addOptions({
                 [StrategyType.Ensure]: t("feature.alias.strategy.ensure.name"),
@@ -65,8 +61,9 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
             })
             .setValue(value ? value : StrategyType.Ensure)
             .onChange(v => {
-                this.onChange();
                 this.actualizeStrategyDesc(s, v);
+                this.options.settings.strategy = v;
+                this.dispatchChanges();
             });
         this.actualizeStrategyDesc(s, this.strategyDropdown.getValue());
     }
@@ -84,23 +81,5 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
                 break;
         }
         setting.setDesc(desc);
-    }
-
-    private buildToggle(value: boolean): void {
-        this.setting.addToggle(e => (this.toggle = e.setValue(value).onChange(this.onChange.bind(this))));
-    }
-
-    private onChange(): void {
-        this.context.getDispatcher().dispatch(
-            "settings:tab:feature:changed",
-            new Event({
-                id: this.id,
-                value: {
-                    enabled: this.toggle.getValue(),
-                    strategy: this.strategyDropdown.getValue(),
-                    validator: this.validatorDropdown.getValue(),
-                },
-            })
-        );
     }
 }

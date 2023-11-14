@@ -16,17 +16,15 @@ export default class ExplorerSortBuilder extends AbstractBuilder<Feature.Explore
 
     doBuild(): void {
         this.bind();
-        this.setting = new Setting(this.context.getContainer()).setName(this.options.name).setDesc(this.options.desc);
+        this.setting = new Setting(this.context.getContainer())
+            .setName(this.options.name)
+            .setDesc(this.options.desc)
+            .setClass("setting-feature-name");
         this.setting.addToggle(c => (this.toggle = c));
-        this.toggle.setValue(this.options.settings.enabled).onChange(v =>
-            this.context.getDispatcher().dispatch(
-                "settings:tab:feature:changed",
-                new Event({
-                    id: options.id,
-                    value: { enabled: v },
-                })
-            )
-        );
+        this.toggle.setValue(this.options.settings.enabled).onChange(v => {
+            this.options.settings.enable = v;
+            this.dispatchChanges();
+        });
         if (!this.context.getSettings().explorer.enabled) {
             this.setting.settingEl.hide();
         }

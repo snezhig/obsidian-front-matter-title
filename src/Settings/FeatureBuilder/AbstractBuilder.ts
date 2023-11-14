@@ -7,6 +7,7 @@ import { t } from "@src/i18n/Locale";
 import { Feature } from "@src/Enum";
 import { ObsidianModalFactory } from "@config/inversify.factory.types";
 import Storage from "@src/Storage/Storage";
+import Event from "@src/Components/EventDispatcher/Event";
 
 @injectable()
 export default abstract class AbstractBuilder<
@@ -28,12 +29,37 @@ export default abstract class AbstractBuilder<
     build(options: BuildParams<K>): void {
         this.options = options;
         this.doBuild();
+        this.setExtraSettingContainerVisible(this.options.settings.enabled);
     }
     doBuild(): void {}
 
-    protected addTemplateManageButton(containerEl: HTMLElement): void {
+    protected dispatchChanges(): void {
+        this.context
+            .getDispatcher()
+            .dispatch("settings:tab:feature:changed", new Event({ id: this.options.id, value: this.options.settings }));
+    }
+
+    protected buildEnable(): Setting {
+        return new Setting(this.context.getContainer())
+            .setName(this.options.name)
+            .setDesc(this.options.desc)
+            .addToggle(e =>
+                e.setValue(this.options.settings.enabled).onChange(v => {
+                    this.options.settings.enabled = v;
+                    this.setExtraSettingContainerVisible(v);
+                    this.dispatchChanges();
+                })
+            )
+            .setClass("setting-feature-name");
+    }
+
+    private setExtraSettingContainerVisible(visible: boolean): void {
+        this.getExtraSettingContainer()?.[visible ? "show" : "hide"]();
+    }
+
+    protected addTemplateManageButton(): void {
         const templateStorage = this.storage.get("templates");
-        new Setting(containerEl)
+        new Setting(this.getExtraSettingContainer())
             .setName(t("template.features.name"))
             .setDesc(t("template.features.desc"))
             .addButton(cb =>
@@ -63,5 +89,9 @@ export default abstract class AbstractBuilder<
         } else {
             return t("template.used", { value: this.storage.get("templates").get("common").get(type).value() });
         }
+    }
+
+    protected getExtraSettingContainer(): HTMLElement | null {
+        return null;
     }
 }

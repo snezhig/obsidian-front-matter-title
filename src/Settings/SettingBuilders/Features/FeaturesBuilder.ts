@@ -56,8 +56,9 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
         for (const item of data) {
             const builder = this.builderFactory(item.feature) ?? this.builderFactory("default");
             const settings = this.item.get(item.feature).value();
+            const container = this.container.createDiv({ cls: "test" });
             builder.setContext({
-                getContainer: () => this.container,
+                getContainer: () => container,
                 getSettings: () => this.item.value(),
                 getDispatcher: () => this.dispatcher,
             });
