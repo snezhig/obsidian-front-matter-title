@@ -34,9 +34,10 @@ import AliasConfig from "@src/Feature/Alias/AliasConfig";
 import { KeyStorageInterface } from "../../src/Storage/Interfaces";
 import { SettingsType } from "../../src/Settings/SettingsType";
 import { Feature } from "../../src/Enum";
-import { TFileExplorerItem } from "obsidian";
+import {MetadataCacheExt, TFileExplorerItem} from "obsidian";
 import { ResolverInterface } from "../../src/Resolver/Interfaces";
 import { ExplorerFileItemMutator } from "../../src/Feature/Explorer/ExplorerFileItemMutator";
+import {MetadataCacheFactory} from "@config/inversify.factory.types";
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -102,5 +103,8 @@ export default (container: Container) => {
             return c.container.get<KeyStorageInterface<SettingsType>>(SI["settings:storage"]).get('features').get(feature).value()
         }).when(() => true)
 
-    container.bind(SI["feature:explorer:file_mutator:factory"]).toFunction((item: TFileExplorerItem, resolver: ResolverInterface) => new ExplorerFileItemMutator(item, resolver))
+    container.bind(SI["feature:explorer:file_mutator:factory"])
+        .toFunction((item: TFileExplorerItem, resolver: ResolverInterface, factory: MetadataCacheFactory<MetadataCacheExt>) => {
+            return new ExplorerFileItemMutator(item, resolver, factory);
+        })
 };

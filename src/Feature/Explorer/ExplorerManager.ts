@@ -1,4 +1,4 @@
-import { TFile, TFileExplorerItem, TFileExplorerView } from "obsidian";
+import { MetadataCacheExt, TFile, TFileExplorerItem, TFileExplorerView } from "obsidian";
 import { Leaves, Feature } from "@src/Enum";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
@@ -7,18 +7,28 @@ import AbstractManager from "@src/Feature/AbstractManager";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import { ExplorerFileItemMutator } from "./ExplorerFileItemMutator";
 import { ResolverInterface } from "../../Resolver/Interfaces";
+import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import {AppEvents} from "@src/Types";
+import { MetadataCacheFactory } from "@config/inversify.factory.types";
+
 
 @injectable()
 export default class ExplorerManager extends AbstractManager {
     private explorerView: TFileExplorerView = null;
     private modified = new WeakMap<TFileExplorerItem, ExplorerFileItemMutator>();
     private enabled = false;
+    private ref: ListenerRef<"metadata:cache:changed"> = null;
 
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
+        @inject(SI["factory:metadata:cache"])
+        private metadataCacheFactory: MetadataCacheFactory<MetadataCacheExt>,
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["feature:explorer:file_mutator:factory"])
-        private factory: (item: TFileExplorerItem, resolver: ResolverInterface) => ExplorerFileItemMutator
+        private factory: (item: TFileExplorerItem, resolver: ResolverInterface, factory: MetadataCacheFactory<MetadataCacheExt>) => ExplorerFileItemMutator
     ) {
         super();
     }
@@ -36,12 +46,27 @@ export default class ExplorerManager extends AbstractManager {
             this.restoreTitles();
             this.explorerView = null;
         }
+
+        // detaching
+        this.dispatcher.removeListener(this.ref);
+        this.ref = null;
+
         this.enabled = false;
     }
 
     protected doEnable() {
         this.explorerView = this.getExplorerView();
         this.enabled = true;
+
+        // attach
+        this.ref = this.dispatcher.addListener({
+            name: "metadata:cache:changed",
+            cb: e => {
+                const path = e.get().path;
+                this.doUpdate(path);
+            }
+        });
+        this.refresh().catch(console.error);
     }
 
     private getExplorerView(): TFileExplorerView | null {
@@ -67,7 +92,7 @@ export default class ExplorerManager extends AbstractManager {
                 continue;
             }
             if (!this.modified.has(i)) {
-                this.modified.set(i, this.factory(i, this.resolver));
+                this.modified.set(i, this.factory(i, this.resolver, this.metadataCacheFactory));
             }
             i.updateTitle();
         }
