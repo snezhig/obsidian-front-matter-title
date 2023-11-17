@@ -3,9 +3,38 @@ import { Feature } from "@src/Enum";
 import { StrategyType, ValidatorType } from "../Feature/Alias/Types";
 import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
 
+declare const PLUGIN_VERSION: string;
+
+export type CompareOperation = ">" | ">=" | "=" | "!=" | "<" | "<=";
 export default class PluginHelper {
+    public static compareVersion(left: string, operation: CompareOperation, right: string): boolean {
+        const leftV = left.split(".").map(e => parseInt(e));
+        const rightV = right.split(".").map(e => parseInt(e));
+        let result = true;
+        for (const [k, i] of leftV.entries()) {
+            if (operation.includes(">")) {
+                if (i !== rightV[k]) {
+                    result = i > rightV[k];
+                    break;
+                }
+            } else if (operation.includes("<")) {
+                if (i !== rightV[k]) {
+                    result = i < rightV[k];
+                    break;
+                }
+            } else if (operation.includes("=")) {
+                if (i !== rightV[k]) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return operation.includes("!") ? !result : result;
+    }
+
     public static createDefaultSettings(): SettingsType {
         return {
+            version: PLUGIN_VERSION,
             templates: {
                 common: { main: "title", fallback: "fallback_title" },
                 ...Object.fromEntries(Object.values(Feature).map(e => [e, { main: null, fallback: null }])),
@@ -32,7 +61,7 @@ export default class PluginHelper {
                     templates: { main: "", fallback: "" },
                 },
                 [Feature.Explorer]: { enabled: false, templates: { main: "", fallback: "" } },
-                [Feature.ExplorerSort]: { enabled: false },
+                [Feature.ExplorerSort]: { enabled: false, templates: { main: "", fallback: "" } },
                 [Feature.Tab]: { enabled: false, templates: { main: "", fallback: "" } },
                 [Feature.Header]: { enabled: false, templates: { main: "", fallback: "" } },
                 [Feature.Graph]: { enabled: false, templates: { main: "", fallback: "" } },

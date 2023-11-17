@@ -12,8 +12,8 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     doBuild(): void {
         this.buildEnable();
         this.extraSettingContainerEl = this.context.getContainer().createDiv();
-        this.buildValidatorDropdown(this.options.settings.validator);
-        this.buildStrategyDropdown(this.options.settings.strategy);
+        this.buildValidatorDropdown(this.config.validator);
+        this.buildStrategyDropdown(this.config.strategy);
     }
 
     protected getExtraSettingContainer(): HTMLElement | null {
@@ -30,13 +30,13 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
             .setValue(value ? value : ValidatorType.FrontmatterRequired)
             .onChange(v => {
                 this.actualizeValidatorDesc(s, v);
-                this.options.settings.validator = v;
+                this.config.validator = v as ValidatorType;
                 this.dispatchChanges();
             });
         this.actualizeValidatorDesc(s, this.validatorDropdown.getValue());
     }
 
-    private actualizeValidatorDesc(setting: Setting, value: string): string {
+    private actualizeValidatorDesc(setting: Setting, value: string): void {
         let text = "";
         switch (value) {
             case ValidatorType.FrontmatterAuto: {
@@ -62,12 +62,12 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
             .setValue(value ? value : StrategyType.Ensure)
             .onChange(v => {
                 this.actualizeStrategyDesc(s, v);
-                this.options.settings.strategy = v;
+                this.options.config.strategy = v as StrategyType;
                 this.dispatchChanges();
             });
         this.actualizeStrategyDesc(s, this.strategyDropdown.getValue());
     }
-    private actualizeStrategyDesc(setting: Setting, value: string): string {
+    private actualizeStrategyDesc(setting: Setting, value: string): void {
         let desc = "";
         switch (value) {
             case StrategyType.Ensure:

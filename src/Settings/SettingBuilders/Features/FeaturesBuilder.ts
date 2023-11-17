@@ -7,7 +7,7 @@ import { inject, injectable } from "inversify";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import SI from "@config/inversify.types";
 import FeatureHelper from "../../../Utils/FeatureHelper";
-import { t } from "../../../i18n/Locale";
+import { t } from "@src/i18n/Locale";
 
 @injectable()
 export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "features"> {
@@ -62,7 +62,7 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
                 getSettings: () => this.item.value(),
                 getDispatcher: () => this.dispatcher,
             });
-            builder.build({ id: item.feature, desc: item.desc, name: item.name, settings, doc: item.doc });
+            builder.build({ id: item.feature, desc: item.desc, name: item.name, config: settings, doc: item.doc });
         }
     }
 }

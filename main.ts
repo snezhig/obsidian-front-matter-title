@@ -24,7 +24,8 @@ import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provide
 import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Components/ApiAdapter/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { t } from "./src/i18n/Locale";
-
+import { Migrator } from "@src/Migrator/Migrator";
+declare const PLUGIN_VERSION: string;
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private container: interfaces.Container = Container;
@@ -39,13 +40,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async loadSettings(): Promise<void> {
         const loaded = await this.loadData();
-        if (Array.isArray(loaded?.templates)) {
-            loaded.templates = {
-                ...PluginHelper.createDefaultSettings().templates,
-                common: { main: loaded.templates?.[0] ?? "title", fallback: loaded.templates?.[1] ?? "" },
-            };
-        }
-        const data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
+        let data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
+        data = new Migrator(data).migrate(PLUGIN_VERSION);
         this.storage = new Storage<SettingsType>(data);
         this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
         this.addSettingTab(this.container.resolve(SettingsTab).getTab());

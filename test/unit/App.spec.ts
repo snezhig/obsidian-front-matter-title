@@ -29,7 +29,7 @@ describe("Test App", () => {
         expect(spy.addListener).toHaveBeenCalledWith({ name: "settings.loaded", cb: expect.anything(), once: true });
     });
 
-    describe('Test "settings.loaded" event', () => {
+    describe('Test "config.loaded" event', () => {
         beforeAll(() => spy.dispatch.mockClear());
         afterAll(() => {
             spy.dispatch.mockClear();
@@ -47,7 +47,7 @@ describe("Test App", () => {
         });
     });
 
-    describe('Test "settings.changed event"', () => {
+    describe('Test "config.changed event"', () => {
         afterEach(() => spy.dispatch.mockClear());
         beforeAll(() => spy.dispatch.mockClear());
 

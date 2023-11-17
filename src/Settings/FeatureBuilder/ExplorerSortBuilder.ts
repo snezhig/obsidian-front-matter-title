@@ -10,10 +10,6 @@ export default class ExplorerSortBuilder extends AbstractBuilder<Feature.Explore
     private setting: Setting = null;
     private ref: ListenerRef<"settings:tab:feature:changed"> = null;
 
-    constructor() {
-        super();
-    }
-
     doBuild(): void {
         this.bind();
         this.setting = new Setting(this.context.getContainer())
@@ -21,8 +17,8 @@ export default class ExplorerSortBuilder extends AbstractBuilder<Feature.Explore
             .setDesc(this.options.desc)
             .setClass("setting-feature-name");
         this.setting.addToggle(c => (this.toggle = c));
-        this.toggle.setValue(this.options.settings.enabled).onChange(v => {
-            this.options.settings.enable = v;
+        this.toggle.setValue(this.options.config.enabled).onChange(v => {
+            this.config.enabled = v;
             this.dispatchChanges();
         });
         if (!this.context.getSettings().explorer.enabled) {

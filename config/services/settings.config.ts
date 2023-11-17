@@ -16,9 +16,7 @@ import ProcessorBuilder from "../../src/Settings/SettingBuilders/Processor/Proce
 import NoteLinkBuilder from "@src/Settings/FeatureBuilder/NoteLinkBuilder";
 
 export default (c: Container) => {
-    c.bind(SI["settings:feature:builder"])
-        .toDynamicValue(() => new DefaultBuilder())
-        .whenTargetNamed("default");
+    c.bind(SI["settings:feature:builder"]).to(DefaultBuilder).whenTargetNamed("default");
     c.bind(SI["settings:feature:builder"])
         .toDynamicValue(() => new AliasBuilder())
         .whenTargetNamed(Feature.Alias);
