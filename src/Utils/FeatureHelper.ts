@@ -8,7 +8,6 @@ export default class FeatureHelper {
         return [
             Feature.Alias,
             Feature.Explorer,
-            Feature.ExplorerSort,
             Feature.Graph,
             Feature.Header,
             Feature.Starred,
@@ -28,8 +27,6 @@ export default class FeatureHelper {
                 return t("feature.alias.name");
             case Feature.Explorer:
                 return t("feature.explorer.name");
-            case Feature.ExplorerSort:
-                return t("feature.explorer:sort.name");
             case Feature.Graph:
                 return t("feature.graph.name");
             case Feature.Header:
@@ -59,8 +56,6 @@ export default class FeatureHelper {
                 return t("feature.alias.desc");
             case Feature.Explorer:
                 return t("feature.explorer.desc");
-            case Feature.ExplorerSort:
-                return t("feature.explorer:sort.desc");
             case Feature.Graph:
                 return t("feature.graph.desc");
             case Feature.Header:

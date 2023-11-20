@@ -29,7 +29,7 @@ describe("ExplorerManager", () => {
         explorerManager.setResolver(resolver);
     });
 
-    it("should enable the explorer feature", () => {
+    it("should start the explorer feature", () => {
         // Assume that the method getLeavesOfType returns a non-empty array
         mockedFacade.getViewsOfType.mockReturnValue([mock<TFileExplorerView>()]);
 
@@ -46,7 +46,7 @@ describe("ExplorerManager", () => {
         }).toThrow("There are some explorers' leaves");
     });
 
-    it("should disable the explorer feature", () => {
+    it("should stop the explorer feature", () => {
         mockedFacade.getViewsOfType.mockReturnValue([mockDeep<TFileExplorerView>()]);
         explorerManager.enable();
         explorerManager.disable();

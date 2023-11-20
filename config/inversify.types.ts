@@ -34,6 +34,7 @@ const SI = {
     "feature:notelink:approve": "",
     "feature:config": "",
     "feature:explorer:file_mutator:factory": "",
+    "feature:explorer:sort": "",
     filter: "",
     "getter:delimiter": "",
     listener: "",

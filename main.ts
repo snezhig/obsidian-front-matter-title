@@ -41,14 +41,15 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private async loadSettings(): Promise<void> {
         const loaded = await this.loadData();
         let data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
-        data = new Migrator(data).migrate(PLUGIN_VERSION);
+        data = new Migrator(data, this.dispatcher).migrate(PLUGIN_VERSION);
+        console.log(data);
         this.storage = new Storage<SettingsType>(data);
         this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
         this.addSettingTab(this.container.resolve(SettingsTab).getTab());
     }
 
     private async onSettingsChange(settings: SettingsType): Promise<void> {
-        await this.saveData(settings);
+        // await this.saveData(settings);
         this.reloadFeatures();
         await this.mc.refresh();
     }
@@ -153,8 +154,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private registerCommands(): void {
         this.addCommand({
-            id: "ofmt-features-disable",
-            name: t("command.features.disable"),
+            id: "ofmt-features-stop",
+            name: t("command.features.stop"),
             callback: () => this.fc.disableAll(),
         });
         this.addCommand({

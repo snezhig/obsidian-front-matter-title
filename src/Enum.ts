@@ -11,7 +11,6 @@ export enum Leaves {
 
 export enum Feature {
     Explorer = "explorer",
-    ExplorerSort = "explorer:sort",
     Graph = "graph",
     Header = "header",
     Starred = "starred",

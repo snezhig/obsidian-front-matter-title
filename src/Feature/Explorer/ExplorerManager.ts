@@ -7,20 +7,25 @@ import AbstractManager from "@src/Feature/AbstractManager";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import { ExplorerFileItemMutator } from "./ExplorerFileItemMutator";
 import { ResolverInterface } from "../../Resolver/Interfaces";
+import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 
 @injectable()
 export default class ExplorerManager extends AbstractManager {
     private explorerView: TFileExplorerView = null;
     private modified = new WeakMap<TFileExplorerItem, ExplorerFileItemMutator>();
     private enabled = false;
+    private sort: ExplorerSort = null;
 
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
         @inject(SI["feature:explorer:file_mutator:factory"])
-        private factory: (item: TFileExplorerItem, resolver: ResolverInterface) => ExplorerFileItemMutator
+        private factory: (item: TFileExplorerItem, resolver: ResolverInterface) => ExplorerFileItemMutator,
+        @inject(SI['feature:explorer:sort'])
+        sort: ExplorerSort
     ) {
         super();
+        this.sort = sort.isEnabled() ? sort : null;
     }
 
     getId(): Feature {

@@ -57,7 +57,6 @@ export default (container: Container) => {
         });
     container.bind<FeatureInterface<any>>(SI.feature).to(AliasFeature).whenTargetNamed(AliasFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerManager).whenTargetNamed(ExplorerManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerSort).whenTargetNamed(ExplorerSort.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SearchFeature).whenTargetNamed(SearchFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
@@ -103,4 +102,6 @@ export default (container: Container) => {
         }).when(() => true)
 
     container.bind(SI["feature:explorer:file_mutator:factory"]).toFunction((item: TFileExplorerItem, resolver: ResolverInterface) => new ExplorerFileItemMutator(item, resolver))
+    container.bind(SI["feature:explorer:sort"]).to(ExplorerSort);
+
 };

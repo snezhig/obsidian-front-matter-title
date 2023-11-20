@@ -7,7 +7,6 @@ import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
 import { t } from "../../i18n/Locale";
 
 export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
-    private id: Feature;
     private setting: Setting;
     private toggle: ToggleComponent;
     private approval: DropdownComponent;
@@ -24,15 +23,15 @@ export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
                 [NoteLinkStrategy.All]: t("feature.noteLink.strategy.all"),
                 [NoteLinkStrategy.OnlyEmpty]: t("feature.noteLink.strategy.onlyEmpty"),
             })
-            .setValue(settings.strategy ?? NoteLinkStrategy.OnlyEmpty)
+            .setValue(config.strategy ?? NoteLinkStrategy.OnlyEmpty)
             .onChange(this.onChange.bind(this));
         this.setting.addDropdown(e => (this.approval = e));
         this.approval
             .addOptions({ Y: t("feature.noteLink.approval.showModal"), N: t("feature.noteLink.approval.auto") })
-            .setValue(settings.approval ? "Y" : "N")
+            .setValue(config.approval ? "Y" : "N")
             .onChange(this.onChange.bind(this));
         this.setting.addToggle(e => (this.toggle = e));
-        this.toggle.setValue(settings.enabled).onChange(this.onChange.bind(this));
+        this.toggle.setValue(config.enabled).onChange(this.onChange.bind(this));
     }
 
     private onChange(): void {

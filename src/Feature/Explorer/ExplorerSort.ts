@@ -6,17 +6,19 @@ import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
 import { Leaves, Feature } from "@src/Enum";
-import AbstractFeature from "../AbstractFeature";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import { ResolverInterface } from "../../Resolver/Interfaces";
 import FeatureService from "../FeatureService";
+import Storage from "@src/Storage/Storage";
+import { SettingsType } from "@src/Settings/SettingsType";
 
 @injectable()
-export default class ExplorerSort extends AbstractFeature<Feature> {
+export default class ExplorerSort {
     private view: TFileExplorerView;
     private enabled = false;
+    private started = false;
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
     private readonly cb: (e: { id: string; result?: boolean }) => void;
     private refs: [ListenerRef<"manager:refresh">?, ListenerRef<"manager:update">?] = [];
@@ -31,9 +33,11 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["feature:service"])
-        service: FeatureService
+        service: FeatureService,
+        @inject(SI["settings:storage"])
+        storage: Storage<SettingsType>
     ) {
-        super();
+        this.enabled = storage.get("features").get(Feature.Explorer).get("sort").value() ?? false;
         this.resolver = service.createResolver(Feature.Explorer);
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
         this.cb = e => {
@@ -45,15 +49,11 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
 
     private onManagerUpdate(): void {
         this.logger.log("Try to request sort by event");
-        if (!this.isEnabled()) {
+        if (!this.isStarted()) {
             this.logger.log("Skipped because feature is not enabled");
             return;
         }
         this.view.requestSort();
-    }
-
-    static getId(): Feature {
-        return Feature.ExplorerSort;
     }
 
     private initView(): void {
@@ -61,7 +61,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
     }
 
     private tryToReplaceOriginalSort(): void {
-        if (!this.isEnabled()) {
+        if (!this.isStarted()) {
             return;
         }
         if (this.replacer) {
@@ -149,8 +149,8 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         }
     }
 
-    public async enable(): Promise<void> {
-        if (this.isEnabled()) {
+    public async start(): Promise<void> {
+        if (this.isStarted()) {
             return;
         }
         if (!this.view && (this.initView(), !this.view)) {
@@ -169,7 +169,7 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         this.logger.log("enabled");
     }
 
-    public async disable(): Promise<void> {
+    public async stop(): Promise<void> {
         this.enabled = false;
         this.refs.forEach(e => this.dispatcher.removeListener(e));
         this.refs = [];
@@ -177,12 +177,11 @@ export default class ExplorerSort extends AbstractFeature<Feature> {
         this.view?.requestSort();
         this.logger.log("disabled");
     }
-
     public isEnabled(): boolean {
         return this.enabled;
     }
 
-    getId(): Feature {
-        return Feature.ExplorerSort;
+    public isStarted(): boolean {
+        return this.started;
     }
 }
