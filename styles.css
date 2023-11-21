@@ -1,8 +1,0 @@
-.setting-feature-name .setting-item-name {
-    font-weight: bold;
-    font-size: 16px;
-}
-.test > .setting-item{
-    border-top: 3px solid var(--background-modifier-border);
-    padding: 0.75em 0
-}

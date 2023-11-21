@@ -1,5 +1,5 @@
 import { Feature } from "@src/Enum";
-import { DropdownComponent, Setting } from "obsidian";
+import { DropdownComponent, Modal, Setting } from "obsidian";
 import AbstractBuilder from "./AbstractBuilder";
 import { StrategyType, ValidatorType } from "@src/Feature/Alias/Types";
 import { t } from "@src/i18n/Locale";
@@ -12,16 +12,17 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
     doBuild(): void {
         this.buildEnable();
         this.extraSettingContainerEl = this.context.getContainer().createDiv();
-        this.buildValidatorDropdown(this.config.validator);
-        this.buildStrategyDropdown(this.config.strategy);
     }
 
-    protected getExtraSettingContainer(): HTMLElement | null {
-        return this.extraSettingContainerEl;
+    protected onModalShow(modal: Modal) {
+        this.buildValidatorDropdown(modal.contentEl);
+        this.buildStrategyDropdown(modal.contentEl);
+        this.buildTemplates(modal.contentEl);
     }
 
-    private buildValidatorDropdown(value: string): void {
-        const s = new Setting(this.extraSettingContainerEl).setName(t("strategy"));
+    private buildValidatorDropdown(el: HTMLElement): void {
+        const value = this.config.validator;
+        const s = new Setting(el).setName(t("strategy"));
         this.validatorDropdown = new DropdownComponent(s.controlEl)
             .addOptions({
                 [ValidatorType.FrontmatterAuto]: t("feature.alias.validator.auto.name"),
@@ -51,8 +52,9 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
         setting.setDesc(text);
     }
 
-    private buildStrategyDropdown(value: string): void {
-        const s = new Setting(this.extraSettingContainerEl).setName(t("strategy"));
+    private buildStrategyDropdown(el: HTMLElement): void {
+        const value = this.config.strategy;
+        const s = new Setting(el).setName(t("strategy"));
         this.strategyDropdown = new DropdownComponent(s.controlEl)
             .addOptions({
                 [StrategyType.Ensure]: t("feature.alias.strategy.ensure.name"),
@@ -67,6 +69,7 @@ export default class AliasBuilder extends AbstractBuilder<Feature.Alias> {
             });
         this.actualizeStrategyDesc(s, this.strategyDropdown.getValue());
     }
+
     private actualizeStrategyDesc(setting: Setting, value: string): void {
         let desc = "";
         switch (value) {

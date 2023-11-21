@@ -79,12 +79,12 @@ export default class FeatureHelper {
         }
     }
 
-    getDocSection(feature: Feature): string {
+    getDocSection(feature: Feature): string | null {
         switch (feature) {
             case Feature.NoteLink:
                 return "Features/NoteLink.md";
             default:
-                return feature;
+                return null;
         }
     }
 }

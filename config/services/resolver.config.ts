@@ -15,7 +15,7 @@ export default new ContainerModule(bind => {
             TemplateNames,
             keyof TemplateValue
         ];
-        const targetTemplates = storage.get("templates").get(name);
+        const targetTemplates = storage.get("features").get(name)?.get("templates");
         return targetTemplates?.get(type)?.value() ?? storage.get("templates").get("common").get(type).value();
     });
 

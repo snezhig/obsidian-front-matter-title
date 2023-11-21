@@ -1,16 +1,14 @@
 import AbstractBuilder from "./AbstractBuilder";
 import { injectable } from "inversify";
+import { Modal } from "obsidian";
 
 @injectable()
 export default class DefaultBuilder extends AbstractBuilder {
-    private extraContainerEl: HTMLElement;
     doBuild() {
         this.buildEnable();
-        this.extraContainerEl = this.context.getContainer().createDiv();
-        this.addTemplateManageButton();
     }
 
-    protected getExtraSettingContainer(): HTMLElement {
-        return this.extraContainerEl;
+    protected onModalShow(modal: Modal) {
+        this.buildTemplates(modal.contentEl);
     }
 }
