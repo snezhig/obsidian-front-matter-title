@@ -5,19 +5,17 @@ import SI from "../../../config/inversify.types";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
 import { debounce, TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
-import { Leaves, Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 import { ResolverInterface } from "../../Resolver/Interfaces";
 import FeatureService from "../FeatureService";
-import Storage from "@src/Storage/Storage";
-import { SettingsType } from "@src/Settings/SettingsType";
+import { DelayerInterface } from "@src/Components/Delayer/Delayer";
 
 @injectable()
 export default class ExplorerSort {
     private view: TFileExplorerView;
-    private enabled = false;
     private started = false;
     private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
     private readonly cb: (e: { id: string; result?: boolean }) => void;
@@ -34,10 +32,8 @@ export default class ExplorerSort {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["feature:service"])
         service: FeatureService,
-        @inject(SI["settings:storage"])
-        storage: Storage<SettingsType>
+        private readonly delayer: DelayerInterface
     ) {
-        this.enabled = storage.get("features").get(Feature.Explorer).get("sort").value() ?? false;
         this.resolver = service.createResolver(Feature.Explorer);
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
         this.cb = e => {
@@ -45,6 +41,39 @@ export default class ExplorerSort {
                 trigger();
             }
         };
+    }
+
+    public start(): void {
+        if (this.isStarted()) {
+            return;
+        }
+        if (!this.view && (this.initView(), !this.view)) {
+            throw new ExplorerViewUndefined();
+        }
+
+        this.refs.push(this.dispatcher.addListener({ name: "manager:refresh", cb: e => this.cb({ id: e.get().id }) }));
+        this.refs.push(
+            this.dispatcher.addListener({
+                name: "manager:update",
+                cb: e => this.cb(e.get()),
+            })
+        );
+        this.started = true;
+        this.tryToReplaceOriginalSort();
+        this.logger.log("enabled");
+    }
+
+    public stop(): void {
+        this.started = false;
+        this.refs.forEach(e => this.dispatcher.removeListener(e));
+        this.refs = [];
+        this.replacer?.disable();
+        this.view?.requestSort();
+        this.logger.log("disabled");
+    }
+
+    public isStarted(): boolean {
+        return this.started;
     }
 
     private onManagerUpdate(): void {
@@ -57,7 +86,7 @@ export default class ExplorerSort {
     }
 
     private initView(): void {
-        this.view = (this.facade.getLeavesOfType(Leaves.FE)?.[0]?.view as TFileExplorerView) ?? null;
+        this.view = this.facade.getViewsOfType<TFileExplorerView>(Leaves.FE)?.[0] ?? null;
     }
 
     private tryToReplaceOriginalSort(): void {
@@ -75,7 +104,7 @@ export default class ExplorerSort {
         const item = this.getFolderItem();
         if (!item) {
             this.logger.log("Folder item not found. Try again in 1000 ms");
-            setTimeout(() => this.tryToReplaceOriginalSort(), 1000);
+            this.delayer.delay(this.tryToReplaceOriginalSort.bind(this), 1000);
             return;
         }
         this.logger.log("Init replacer");
@@ -147,41 +176,5 @@ export default class ExplorerSort {
                 return item;
             }
         }
-    }
-
-    public async start(): Promise<void> {
-        if (this.isStarted()) {
-            return;
-        }
-        if (!this.view && (this.initView(), !this.view)) {
-            throw new ExplorerViewUndefined();
-        }
-
-        this.refs.push(this.dispatcher.addListener({ name: "manager:refresh", cb: e => this.cb({ id: e.get().id }) }));
-        this.refs.push(
-            this.dispatcher.addListener({
-                name: "manager:update",
-                cb: e => this.cb(e.get()),
-            })
-        );
-        this.enabled = true;
-        this.tryToReplaceOriginalSort();
-        this.logger.log("enabled");
-    }
-
-    public async stop(): Promise<void> {
-        this.enabled = false;
-        this.refs.forEach(e => this.dispatcher.removeListener(e));
-        this.refs = [];
-        this.replacer?.disable();
-        this.view?.requestSort();
-        this.logger.log("disabled");
-    }
-    public isEnabled(): boolean {
-        return this.enabled;
-    }
-
-    public isStarted(): boolean {
-        return this.started;
     }
 }

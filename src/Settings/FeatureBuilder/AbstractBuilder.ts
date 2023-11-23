@@ -80,6 +80,7 @@ export default abstract class AbstractBuilder<K extends Feature = null> implemen
     protected abstract onModalShow(modal: Modal): void;
 
     protected buildTemplates(el: HTMLElement): void {
+        el.createEl("h6", { text: "Templates" });
         const templateStorage = this.storage.get("templates");
         for (const type of ["main", "fallback"] as (keyof TemplateValue)[]) {
             const tStorage = this.storage.get("features").get(this.id).get("templates").get(type);

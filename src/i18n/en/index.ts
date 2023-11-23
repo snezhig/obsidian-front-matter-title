@@ -38,10 +38,10 @@ const en = {
         [Feature.Explorer]: {
             name: "Explorer",
             desc: "Replace shown titles in the file explorer",
-        },
-        [Feature.ExplorerSort]: {
-            name: "Explorer sort",
-            desc: "Sort files in explorer by titles from Explorer feature",
+            sort: {
+                name: "Sort",
+                desc: "Sort files in explorer by titles from Explorer feature",
+            },
         },
         [Feature.Graph]: {
             name: "Graph",
@@ -83,12 +83,20 @@ const en = {
             name: "Note Link",
             desc: "Replace internal links in files",
             strategy: {
-                all: "Repalce all links",
-                onlyEmpty: "Replace only links without alias",
+                name: "Strategy",
+                desc: "Define the strategy what the feature will do with links",
+                options: {
+                    all: "Replace all links",
+                    onlyEmpty: "Replace only links without alias",
+                },
             },
             approval: {
-                showModal: "Show approve modal",
-                auto: "Use auto approve",
+                name: "Approval",
+                desc: "Should plugin ask you to approve changes or not",
+                options: {
+                    showModal: "Show approve modal",
+                    auto: "Use auto approve",
+                },
             },
         },
     },

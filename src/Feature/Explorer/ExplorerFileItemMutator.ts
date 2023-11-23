@@ -1,5 +1,5 @@
 import { TFileExplorerItem } from "obsidian";
-import { ResolverInterface } from "../../Resolver/Interfaces";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 import { injectable } from "inversify";
 
 @injectable()
@@ -9,9 +9,15 @@ export class ExplorerFileItemMutator {
         item.startRename = this.startRename.bind(this);
     }
 
+    public destroy() {
+        this.item.updateTitle = this.getProto().updateTitle;
+        this.item.startRename = this.getProto().startRename;
+    }
+
     private getProto(): TFileExplorerItem {
         return Object.getPrototypeOf(this.item);
     }
+
     private updateTitle() {
         this.getProto().updateTitle.call(this.item);
         const title = this.resolver.resolve(this.item.file.path);
@@ -21,9 +27,5 @@ export class ExplorerFileItemMutator {
     private startRename() {
         this.item.innerEl.setText(this.item.getTitle());
         return this.getProto().startRename.call(this.item);
-    }
-    public destroy() {
-        this.item.updateTitle = this.getProto().updateTitle;
-        this.item.startRename = this.getProto().startRename;
     }
 }

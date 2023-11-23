@@ -1,10 +1,11 @@
 import { mock, mockDeep, mockReset } from "jest-mock-extended";
 import { TFile, TFileExplorerItem, TFileExplorerView } from "obsidian";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { ExplorerFileItemMutator } from "../../../../src/Feature/Explorer/ExplorerFileItemMutator";
+import { ExplorerFileItemMutator } from "@src/Feature/Explorer/ExplorerFileItemMutator";
 import ExplorerManager from "../../../../src/Feature/Explorer/ExplorerManager";
-import { ResolverInterface } from "../../../../src/Resolver/Interfaces";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 import ExplorerViewUndefined from "../../../../src/Feature/Explorer/ExplorerViewUndefined";
+import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 
 // Mock dependencies
 const mockedFacade = mock<ObsidianFacade>();
@@ -17,6 +18,7 @@ factory.mockImplementation(item => mock<ExplorerFileItemMutator>());
 
 describe("ExplorerManager", () => {
     let explorerManager: ExplorerManager;
+    let explorerSort: ExplorerSort;
 
     beforeEach(() => {
         // Reset all mocks before each test
@@ -25,7 +27,8 @@ describe("ExplorerManager", () => {
         factory.mockClear();
 
         // Create an instance of the class to be tested
-        explorerManager = new ExplorerManager(mockedFacade, factory);
+        explorerSort = mock<ExplorerSort>();
+        explorerManager = new ExplorerManager(mockedFacade, factory, explorerSort);
         explorerManager.setResolver(resolver);
     });
 

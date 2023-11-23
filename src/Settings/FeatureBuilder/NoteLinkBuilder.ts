@@ -19,27 +19,36 @@ export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
     }
 
     private buildStrategy(el: HTMLElement): void {
-        new Setting(el).addDropdown(e => {
-            e.addOptions({
-                [NoteLinkStrategy.All]: t("feature.noteLink.strategy.all"),
-                [NoteLinkStrategy.OnlyEmpty]: t("feature.noteLink.strategy.onlyEmpty"),
-            })
-                .setValue(this.config.strategy ?? NoteLinkStrategy.OnlyEmpty)
-                .onChange(v => {
-                    this.config.strategy = v as NoteLinkStrategy;
-                    this.dispatchChanges();
-                });
-        });
+        new Setting(el)
+            .setName(t("feature.noteLink.strategy.name"))
+            .setDesc(t("feature.noteLink.strategy.desc"))
+            .addDropdown(e => {
+                e.addOptions({
+                    [NoteLinkStrategy.All]: t("feature.noteLink.strategy.options.all"),
+                    [NoteLinkStrategy.OnlyEmpty]: t("feature.noteLink.strategy.options.onlyEmpty"),
+                })
+                    .setValue(this.config.strategy ?? NoteLinkStrategy.OnlyEmpty)
+                    .onChange(v => {
+                        this.config.strategy = v as NoteLinkStrategy;
+                        this.dispatchChanges();
+                    });
+            });
     }
 
     private buildApproval(el: HTMLElement): void {
-        new Setting(el).addDropdown(e => {
-            e.addOptions({ Y: t("feature.noteLink.approval.showModal"), N: t("feature.noteLink.approval.auto") })
-                .setValue(this.config.approval ? "Y" : "N")
-                .onChange(v => {
-                    this.config.approval = v === "Y";
-                    this.dispatchChanges();
-                });
-        });
+        new Setting(el)
+            .setName(t("feature.noteLink.approval.name"))
+            .setDesc(t("feature.noteLink.approval.desc"))
+            .addDropdown(e => {
+                e.addOptions({
+                    Y: t("feature.noteLink.approval.options.showModal"),
+                    N: t("feature.noteLink.approval.options.auto"),
+                })
+                    .setValue(this.config.approval ? "Y" : "N")
+                    .onChange(v => {
+                        this.config.approval = v === "Y";
+                        this.dispatchChanges();
+                    });
+            });
     }
 }
