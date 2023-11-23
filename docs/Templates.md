@@ -14,7 +14,7 @@ Both of templates may be simple and complex:
 
 - Simple means that template contains just a key `title` or path `title.value`; [Examples](TemplateExamples.md)
 - Complex means that template contains one or more keys\paths and\or static
-  symbols `{{title}} static text {{title.valie}}`; [Examples](TemplateExamples.md)
+  symbols `{{title}} static text {{title.value}}`; [Examples](TemplateExamples.md)
 
 
 ## Features' Templates
