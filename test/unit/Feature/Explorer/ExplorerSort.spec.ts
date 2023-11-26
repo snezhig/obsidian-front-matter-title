@@ -1,5 +1,5 @@
 import { mock, MockProxy } from "jest-mock-extended";
-import { TFileExplorerView } from "obsidian";
+import { TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
 import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
 import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
@@ -11,6 +11,8 @@ import FeatureService from "@src/Feature/FeatureService";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
 import { DelayerInterface } from "@src/Components/Delayer/Delayer";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import { FunctionReplacerFactory } from "../../../../config/inversify.factory.types";
+import FunctionReplacer from "../../../../src/Utils/FunctionReplacer";
 
 let facade: MockProxy<ObsidianFacade>;
 let callback: Callback<AppEvents[keyof AppEvents]>;
@@ -20,6 +22,7 @@ let featureService: MockProxy<FeatureService>;
 let delayer: MockProxy<DelayerInterface>;
 let sort: ExplorerSort;
 let view: MockProxy<TFileExplorerView>;
+let replacerFactory: jest.Mock<ReturnType<FunctionReplacerFactory<TFileExplorerItem, "sort", ExplorerSort>>>
 
 beforeEach(() => {
     refs = [];
@@ -35,9 +38,10 @@ beforeEach(() => {
     featureService.createResolver.mockReturnValue(mock<ResolverInterface>());
     delayer = mock<DelayerInterface>();
     view = mock<TFileExplorerView>();
+    replacerFactory = jest.fn()
     // @ts-ignore
     view.requestSort = jest.fn();
-    sort = new ExplorerSort(mock<LoggerInterface>(), facade, dispatcher, featureService, delayer);
+    sort = new ExplorerSort(mock<LoggerInterface>(), facade, dispatcher, featureService, delayer, replacerFactory);
 });
 
 describe("ExplorerSort", () => {
@@ -48,7 +52,9 @@ describe("ExplorerSort", () => {
     });
 
     describe("with view", () => {
-        beforeEach(() => facade.getViewsOfType.mockReturnValue([view]));
+        beforeEach(() => {
+            facade.getViewsOfType.mockReturnValue([view])
+        });
 
         test("should add listener after enabled", () => {
             sort.start();
@@ -71,7 +77,26 @@ describe("ExplorerSort", () => {
             //Call delayed function
             fn();
             expect(delayer.delay).toHaveBeenCalledTimes(2);
+            expect(replacerFactory).not.toBeCalled()
         });
+
+        describe("with explorer item", () => {
+            let replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>
+            let item: TFileExplorerItem;
+            beforeEach(() => {
+                item = mock<TFileExplorerItem>();
+                item.file = new TFolder();;
+                replacer = mock<FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>>()
+                replacerFactory.mockImplementationOnce(() => replacer)
+            });
+            test("Should create function replacer without delay, because there is folder item", () => {
+                view.fileItems["mock"] = item;
+                sort.start();
+                expect(delayer.delay).not.toHaveBeenCalled();
+                expect(replacerFactory).toBeCalled();
+                expect(replacer.enable).toBeCalled()
+            })
+        })
         //
         // test("Should call requestSort", () => {
         //     callback(new Event({ id: Feature.Explorer, result: true }));

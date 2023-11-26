@@ -12,6 +12,7 @@ import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef"
 import { ResolverInterface } from "../../Resolver/Interfaces";
 import FeatureService from "../FeatureService";
 import { DelayerInterface } from "@src/Components/Delayer/Delayer";
+import { FunctionReplacerFactory } from "../../../config/inversify.factory.types";
 
 @injectable()
 export default class ExplorerSort {
@@ -32,7 +33,9 @@ export default class ExplorerSort {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["feature:service"])
         service: FeatureService,
-        private readonly delayer: DelayerInterface
+        private readonly delayer: DelayerInterface,
+        @inject(SI["factory:replacer"])
+        private readonly replacerFactory: FunctionReplacerFactory<TFileExplorerItem, "sort", ExplorerSort>
     ) {
         this.resolver = service.createResolver(Feature.Explorer);
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
@@ -109,15 +112,9 @@ export default class ExplorerSort {
         }
         this.logger.log("Init replacer");
 
-        this.replacer = new FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>(
-            //@ts-ignore
-            item.__proto__,
-            "sort",
-            this,
-            function (args, defaultArgs, vanilla) {
-                args.sort(this, vanilla);
-            }
-        );
+        this.replacer = this.replacerFactory(Object.getPrototypeOf(item), "sort", this, function (args, defaultArgs, vanilla) {
+            args.sort(this, vanilla);
+        })
         this.replacer.enable();
     }
 
