@@ -77,10 +77,10 @@ i18next.init({
 const resolved = i18next.resolvedLanguage;
 if (resolved !== locale) {
     if (i18next.languages.includes(locale)) {
-        /* eslint-stop-next-line no-console  */
+        // eslint-disable-next-line no-console
         console.warn(`Locale ${locale} empty. Resolved ${resolved}`);
     } else {
-        /* eslint-stop-next-line no-console  */
+        // eslint-disable-next-line no-console
         console.warn(`Locale ${locale} does not exist. Resolved ${resolved}`);
     }
 }

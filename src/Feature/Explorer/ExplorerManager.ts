@@ -26,7 +26,6 @@ export default class ExplorerManager extends AbstractManager {
     ) {
         super();
         this.sort = sortFactory();
-        console.warn(this.sort);
     }
 
     static getId(): Feature {
