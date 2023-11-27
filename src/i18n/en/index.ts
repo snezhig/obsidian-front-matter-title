@@ -1,4 +1,4 @@
-import { Feature } from "../../Enum";
+import {Feature} from "../../Enum";
 
 //First version
 const en = {

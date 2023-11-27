@@ -2,7 +2,7 @@ import { Feature } from "@src/Enum";
 import { NoteLink } from "./Utils/FileNoteLinkService";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import { SettingsEvent } from "@src/Settings/SettingsType";
-import { TAbstractFile, TFile, CachedMetadata } from "obsidian";
+import { CachedMetadata, TAbstractFile, TFile } from "obsidian";
 import { NoteLinkChange } from "./Feature/NoteLink/NoteLinkTypes";
 import { Events } from "../modules/api-provider/src";
 

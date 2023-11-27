@@ -40,6 +40,10 @@ export default class SettingsTab {
         return this.getTab().containerEl;
     }
 
+    private get orderedKeys(): (keyof SettingsType)[] {
+        return ["templates", "processor", "rules", "features", "debug", "boot"];
+    }
+
     public getTab(): PluginSettingTab {
         return this.tab;
     }
@@ -66,8 +70,8 @@ export default class SettingsTab {
         this.buildDonation();
     }
 
-    private get orderedKeys(): (keyof SettingsType)[] {
-        return ["templates", "processor", "rules", "features", "debug", "boot"];
+    hide(): any {
+        this.dispatch();
     }
 
     private buildDonation(): void {
@@ -88,10 +92,6 @@ export default class SettingsTab {
 
     private updatePrevious(): void {
         this.previous = JSON.parse(JSON.stringify(this.storage.collect()));
-    }
-
-    hide(): any {
-        this.dispatch();
     }
 
     private dispatch(): void {

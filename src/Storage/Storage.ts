@@ -1,9 +1,9 @@
 import ObjectHelper from "@src/Utils/ObjectHelper";
 import {
-    ObjectItem,
-    ObjectItemInterface,
     DynamicItem,
     KeyStorageInterface,
+    ObjectItem,
+    ObjectItemInterface,
     PrimitiveItemInterface,
 } from "./Interfaces";
 
@@ -69,9 +69,11 @@ class StorageObjectItem<T extends ObjectItem> implements ObjectItemInterface<T> 
 
 class StoragePrimitiveItem<T> implements PrimitiveItemInterface<T> {
     constructor(private data: T) {}
+
     value(): T {
         return this.data;
     }
+
     set(value: T): void {
         this.data = value;
     }

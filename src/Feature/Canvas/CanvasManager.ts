@@ -15,6 +15,14 @@ export class CanvasManager extends AbstractManager {
     private ref: ListenerRef<"layout:change"> = null;
     private enabled = false;
     private queue: Set<string> = new Set();
+    private updateByRequestFrame = debounce(
+        () => {
+            this.logger.log(`updateByRequestFrame`, this.queue);
+            Array.from(this.queue.values()).forEach(e => this.innerUpdate(e) && this.queue.delete(e));
+        },
+        1000,
+        true
+    );
 
     constructor(
         @inject(SI["event:dispatcher"])
@@ -32,6 +40,14 @@ export class CanvasManager extends AbstractManager {
 
     static getId(): Feature {
         return Feature.Canvas;
+    }
+
+    getId(): Feature {
+        return CanvasManager.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
     }
 
     protected doDisable(): void {
@@ -56,15 +72,6 @@ export class CanvasManager extends AbstractManager {
     protected async doUpdate(path: string): Promise<boolean> {
         return this.innerUpdate(path);
     }
-
-    private updateByRequestFrame = debounce(
-        () => {
-            this.logger.log(`updateByRequestFrame`, this.queue);
-            Array.from(this.queue.values()).forEach(e => this.innerUpdate(e) && this.queue.delete(e));
-        },
-        1000,
-        true
-    );
 
     private async resolve(path: string): Promise<string | null> {
         return this.resolver.resolve(path);
@@ -165,13 +172,5 @@ export class CanvasManager extends AbstractManager {
             label: `${prefix}-label`,
             inline: `${prefix}-inline`,
         };
-    }
-
-    getId(): Feature {
-        return CanvasManager.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
     }
 }

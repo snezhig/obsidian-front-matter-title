@@ -22,12 +22,38 @@ export default class StarredManager extends AbstractManager {
         super();
     }
 
+    static getId(): Feature {
+        return Feature.Starred;
+    }
+
     async doUpdate(path?: string): Promise<boolean> {
         return this.onChanged(path)[path] === true;
     }
 
     async doRefresh(): Promise<{ [k: string]: boolean }> {
         return this.onChanged();
+    }
+
+    doEnable(): void {
+        if (!this.isEnabled() && this.initView() && this.subscribe()) {
+            this.enabled = true;
+        }
+    }
+
+    doDisable(): void {
+        if (this.isEnabled()) {
+            this.unsubscribe();
+            this.view = null;
+            this.enabled = false;
+        }
+    }
+
+    getId(): Feature {
+        return StarredManager.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
     }
 
     private initView(): boolean {
@@ -79,31 +105,5 @@ export default class StarredManager extends AbstractManager {
         if (div.getText() !== title) {
             div.setText(title);
         }
-    }
-
-    doEnable(): void {
-        if (!this.isEnabled() && this.initView() && this.subscribe()) {
-            this.enabled = true;
-        }
-    }
-
-    doDisable(): void {
-        if (this.isEnabled()) {
-            this.unsubscribe();
-            this.view = null;
-            this.enabled = false;
-        }
-    }
-
-    static getId(): Feature {
-        return Feature.Starred;
-    }
-
-    getId(): Feature {
-        return StarredManager.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
     }
 }

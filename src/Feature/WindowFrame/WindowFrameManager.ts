@@ -5,6 +5,10 @@ export default class WindowFrameManager extends AbstractManager {
         return undefined;
     }
 
+    isEnabled(): boolean {
+        return false;
+    }
+
     protected doDisable(): void {}
 
     protected doEnable(): void {}
@@ -15,9 +19,5 @@ export default class WindowFrameManager extends AbstractManager {
 
     protected doUpdate(path: string): Promise<boolean> {
         return Promise.resolve(false);
-    }
-
-    isEnabled(): boolean {
-        return false;
     }
 }

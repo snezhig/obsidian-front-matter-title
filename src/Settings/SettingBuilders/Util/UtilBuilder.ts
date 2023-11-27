@@ -26,6 +26,10 @@ export default class UtilBuilder implements SettingBuilderInterface<SettingsType
         }
     }
 
+    support(k: keyof SettingsType): boolean {
+        return ["boot", "debug"].includes(k);
+    }
+
     private buildTitle(container: HTMLElement): void {
         if (!this.isTitleBuild) {
             container.createEl("h4", { text: t("util") });
@@ -51,9 +55,5 @@ export default class UtilBuilder implements SettingBuilderInterface<SettingsType
                     item.get("delay").set(v);
                 })
             );
-    }
-
-    support(k: keyof SettingsType): boolean {
-        return ["boot", "debug"].includes(k);
     }
 }

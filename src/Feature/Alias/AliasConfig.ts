@@ -1,4 +1,4 @@
-import { SettingsType, SettingsFeature } from "@src/Settings/SettingsType";
+import { SettingsFeature, SettingsType } from "@src/Settings/SettingsType";
 import Storage from "@src/Storage/Storage";
 import { ObjectItemInterface } from "@src/Storage/Interfaces";
 import { Feature } from "@src/Enum";

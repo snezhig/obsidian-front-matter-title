@@ -1,10 +1,10 @@
-import { SettingsType, TemplateValue } from "@src/Settings/SettingsType";
+import { SettingsType } from "@src/Settings/SettingsType";
 import AbstractBuilder from "../AbstractBuilder";
 import { Setting } from "obsidian";
 import { inject, injectable } from "inversify";
 import { ObsidianModalFactory } from "@config/inversify.factory.types";
 import SI from "../../../../config/inversify.types";
-import { Feature, GITHUB_DOCS } from "@src/Enum";
+import { GITHUB_DOCS } from "@src/Enum";
 import FeatureHelper from "../../../Utils/FeatureHelper";
 import { t } from "../../../i18n/Locale";
 

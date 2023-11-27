@@ -38,6 +38,10 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
         this.resolver = featureService.createResolver(this.getId());
     }
 
+    static getId(): Feature {
+        return Feature.NoteLink;
+    }
+
     disable(): void {
         this.refs.forEach(e => this.dispatcher.removeListener(e));
         this.refs = [];
@@ -52,6 +56,14 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
             })
         );
         this.enabled = true;
+    }
+
+    getId(): Feature {
+        return NoteLinkFeature.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
     }
 
     private shouldChangeLink(link: NoteLink, destTitle: string): boolean {
@@ -95,17 +107,5 @@ export default class NoteLinkFeature extends AbstractFeature<Feature> {
             content = content.replace(original, replace);
         }
         await this.facade.modifyFile(file, content).catch(console.error);
-    }
-
-    getId(): Feature {
-        return NoteLinkFeature.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
-    }
-
-    static getId(): Feature {
-        return Feature.NoteLink;
     }
 }

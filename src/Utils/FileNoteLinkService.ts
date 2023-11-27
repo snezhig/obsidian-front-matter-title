@@ -7,6 +7,7 @@ export type NoteLink = { link: string; original: string; dest: string; alias: st
 @injectable()
 export default class FileNoteLinkService {
     private readonly REGEXP = /^\[\[.+\]\]$/;
+
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade

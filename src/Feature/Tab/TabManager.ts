@@ -32,6 +32,18 @@ export default class TabManager extends AbstractManager {
         };
     }
 
+    static getId(): Feature {
+        return Feature.Tab;
+    }
+
+    getId(): Feature {
+        return TabManager.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
+    }
+
     protected async doDisable(): Promise<void> {
         this.dispatcher.removeListener(this.ref);
         this.replacer?.disable();
@@ -45,6 +57,15 @@ export default class TabManager extends AbstractManager {
         this.initReplacer();
         this.ref = this.dispatcher.addListener({ name: "layout:change", cb: this.callback });
         return;
+    }
+
+    protected async doRefresh(): Promise<{ [k: string]: boolean }> {
+        return this.innerUpdate();
+    }
+
+    protected async doUpdate(path: string): Promise<boolean> {
+        const result = await this.innerUpdate(path);
+        return result[path] === true;
     }
 
     private initReplacer(): void {
@@ -90,25 +111,5 @@ export default class TabManager extends AbstractManager {
             }
         }
         return result;
-    }
-
-    protected async doRefresh(): Promise<{ [k: string]: boolean }> {
-        return this.innerUpdate();
-    }
-
-    protected async doUpdate(path: string): Promise<boolean> {
-        const result = await this.innerUpdate(path);
-        return result[path] === true;
-    }
-
-    static getId(): Feature {
-        return Feature.Tab;
-    }
-    getId(): Feature {
-        return TabManager.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
     }
 }

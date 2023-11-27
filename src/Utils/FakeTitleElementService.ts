@@ -19,21 +19,6 @@ export default class FakeTitleElementService {
         out: (e: Event) => this.setVisible(this.extractId(e.target), true),
     };
 
-    private extractId(e: any): string | null {
-        if (e instanceof HTMLElement) {
-            return e.getAttribute(this.attr.fake) ?? e.getAttribute(this.attr.original);
-        }
-        return null;
-    }
-
-    private getOriginal(id: string): HTMLElement | null {
-        return this.elements.get(id)?.original ?? null;
-    }
-
-    private has(id: string): boolean {
-        return this.elements.has(id);
-    }
-
     removeExcept(id: string | string[]) {
         const ids = Array.isArray(id) ? id : [id];
         for (const [key, { fake }] of this.elements.entries()) {
@@ -114,6 +99,21 @@ export default class FakeTitleElementService {
             fake.hidden = !visible;
         }
         return this;
+    }
+
+    private extractId(e: any): string | null {
+        if (e instanceof HTMLElement) {
+            return e.getAttribute(this.attr.fake) ?? e.getAttribute(this.attr.original);
+        }
+        return null;
+    }
+
+    private getOriginal(id: string): HTMLElement | null {
+        return this.elements.get(id)?.original ?? null;
+    }
+
+    private has(id: string): boolean {
+        return this.elements.has(id);
     }
 
     private bindClick(id: string): void {
