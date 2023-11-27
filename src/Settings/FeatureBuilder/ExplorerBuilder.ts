@@ -20,7 +20,7 @@ export default class ExplorerBuilder extends AbstractBuilder<Feature.Explorer> {
             .setDesc(t("feature.explorer.sort.desc"))
             .addToggle(e => {
                 e.setValue(this.config.sort).onChange(v => {
-                    this.config.enabled = v;
+                    this.config.sort = v;
                     this.dispatchChanges();
                 });
             });

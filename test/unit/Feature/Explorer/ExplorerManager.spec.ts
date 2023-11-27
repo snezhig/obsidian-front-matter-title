@@ -19,6 +19,7 @@ factory.mockImplementation(item => mock<ExplorerFileItemMutator>());
 describe("ExplorerManager", () => {
     let explorerManager: ExplorerManager;
     let explorerSort: ExplorerSort;
+    let sortFactory: jest.Mock<ReturnType<() => ExplorerSort | null>>;
 
     beforeEach(() => {
         // Reset all mocks before each test
@@ -28,7 +29,8 @@ describe("ExplorerManager", () => {
 
         // Create an instance of the class to be tested
         explorerSort = mock<ExplorerSort>();
-        explorerManager = new ExplorerManager(mockedFacade, factory, explorerSort);
+        sortFactory = jest.fn().mockReturnValue(explorerSort);
+        explorerManager = new ExplorerManager(mockedFacade, factory, sortFactory);
         explorerManager.setResolver(resolver);
     });
 

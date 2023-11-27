@@ -21,11 +21,12 @@ export default class ExplorerManager extends AbstractManager {
         private facade: ObsidianFacade,
         @inject(SI["feature:explorer:file_mutator:factory"])
         private factory: (item: TFileExplorerItem, resolver: ResolverInterface) => ExplorerFileItemMutator,
-        @inject(SI["feature:explorer:sort"])
-        sort: ExplorerSort
+        @inject(SI["factory:feature:explorer:sort"])
+        sortFactory: () => ExplorerSort | null
     ) {
         super();
-        this.sort = sort.isEnabled() ? sort : null;
+        this.sort = sortFactory();
+        console.warn(this.sort);
     }
 
     static getId(): Feature {

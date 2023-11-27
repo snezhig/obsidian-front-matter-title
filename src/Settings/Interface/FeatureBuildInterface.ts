@@ -1,4 +1,4 @@
-import { SettingsFeature, SettingsFeatureCommon, SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
+import { SettingsEvent, SettingsFeature } from "@src/Settings/SettingsType";
 import { Feature } from "@src/Enum";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
@@ -15,7 +15,8 @@ export type Context = {
     getDispatcher: () => EventDispatcherInterface<SettingsEvent>;
     getSettings: () => SettingsFeature;
 };
-export default interface FeatureBuildInterface<K extends Feature = null> {
+export default interface FeatureBuildInterface<K extends Feature> {
     build(options: BuildParams<K>): void;
+
     setContext(context: Context): void;
 }

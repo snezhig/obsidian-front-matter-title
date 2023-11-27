@@ -32,6 +32,7 @@ import ProcessorListener from "../src/Components/Processor/ProccessorListener";
 import FakeTitleElementService from "@src/Utils/FakeTitleElementService";
 import BooleanStrategy from "@src/Components/Extractor/BooleanStrategy";
 import SearchDomWrapperService from "../src/Utils/SearchDomWrapperService";
+import { Delayer, DelayerInterface } from "@src/Components/Delayer/Delayer";
 
 const Container = new _Container();
 Container.bind<EventDispatcherInterface<any>>(SI["event:dispatcher"]).to(EventDispatcher).inSingletonScope();
@@ -47,6 +48,7 @@ Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(ArraySt
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(NullStrategy);
 Container.bind<StrategyInterface>(SI["component:extractor:strategy"]).to(BooleanStrategy);
 Container.bind(SI["logger:composer"]).to(LoggerComposer).inSingletonScope();
+Container.bind<DelayerInterface>(SI.delayer).to(Delayer);
 Container.bind<LoggerInterface>(SI.logger)
     .toDynamicValue(context => {
         return context.container

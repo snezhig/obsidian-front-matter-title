@@ -2,6 +2,10 @@
 
 ![img.png](../img/NoteLinkSettings.png)
 
+Settings opened by manage button
+
+![img.png](../img/NoteLinkSettingsManage.png)
+
 This feature work with
 internal [links to files](https://help.obsidian.md/Linking+notes+and+files/Internal+links#Link+to+a+file)
 

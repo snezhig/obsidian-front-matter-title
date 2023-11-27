@@ -7,6 +7,7 @@ import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import PluginHelper from "../../src/Utils/PluginHelper";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
+(global as any).PLUGIN_VERSION = "test-version";
 const spy = {
     addListener: jest.spyOn<EventDispatcherInterface<any>, "addListener">(
         Container.get(SI["event:dispatcher"]),

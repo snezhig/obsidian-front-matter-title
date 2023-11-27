@@ -33,6 +33,7 @@ export default class ExplorerSort {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["feature:service"])
         service: FeatureService,
+        @inject(SI.delayer)
         private readonly delayer: DelayerInterface,
         @inject(SI["factory:replacer"])
         private readonly replacerFactory: FunctionReplacerFactory<TFileExplorerItem, "sort", ExplorerSort>
@@ -112,9 +113,14 @@ export default class ExplorerSort {
         }
         this.logger.log("Init replacer");
 
-        this.replacer = this.replacerFactory(Object.getPrototypeOf(item), "sort", this, function (args, defaultArgs, vanilla) {
-            args.sort(this, vanilla);
-        })
+        this.replacer = this.replacerFactory(
+            Object.getPrototypeOf(item),
+            "sort",
+            this,
+            function (args, defaultArgs, vanilla) {
+                args.sort(this, vanilla);
+            }
+        );
         this.replacer.enable();
     }
 
