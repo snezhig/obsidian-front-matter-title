@@ -42,8 +42,11 @@ export class Migrator {
         //@ts-ignore
         delete this.config.features["explorer:sort"];
         for (const [k, v] of Object.entries(this.config.templates)) {
+            // @ts-ignore
             if (features.contains(k)) {
+                // @ts-ignore
                 this.config.features[k].templates = v;
+                // @ts-ignore
                 delete this.config.templates[k];
             }
         }
