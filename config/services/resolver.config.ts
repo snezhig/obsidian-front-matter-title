@@ -14,7 +14,8 @@ export default new ContainerModule(bind => {
 
         const [name, type]: [Feature, keyof TemplateValue] = value.split(":") as [Feature, keyof TemplateValue];
         const targetTemplates = storage.get("features").get(name)?.get("templates");
-        return targetTemplates?.get(type)?.value() ?? storage.get("templates").get("common").get(type).value();
+        const template = targetTemplates?.get(type)?.value();
+        return template ? template : storage.get("templates").get("common").get(type).value();
     });
 
     bind<ResolverDynamicInterface>(SI.resolver).to(ResolverCachedProxy).whenTargetIsDefault();
