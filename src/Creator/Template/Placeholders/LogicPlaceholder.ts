@@ -8,10 +8,12 @@ export default class LogicPlaceholder implements TemplatePlaceholderInterface {
     private readonly DELIMITER = "|";
     private placeholder: string;
     private children: TemplatePlaceholderInterface[] = [];
+
     constructor(
         @inject<Factory>(SI["factory:placeholder"])
         private factory: TemplatePlaceholderFactoryInterface
     ) {}
+
     makeValue(path: string): string | null {
         for (const child of this.children) {
             const value = child.makeValue(path);
@@ -28,6 +30,7 @@ export default class LogicPlaceholder implements TemplatePlaceholderInterface {
         }
         return this;
     }
+
     getPlaceholder(): string {
         return this.placeholder;
     }

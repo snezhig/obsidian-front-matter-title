@@ -7,6 +7,7 @@ import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import PluginHelper from "../../src/Utils/PluginHelper";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 
+(global as any).PLUGIN_VERSION = "test-version";
 const spy = {
     addListener: jest.spyOn<EventDispatcherInterface<any>, "addListener">(
         Container.get(SI["event:dispatcher"]),
@@ -29,7 +30,7 @@ describe("Test App", () => {
         expect(spy.addListener).toHaveBeenCalledWith({ name: "settings.loaded", cb: expect.anything(), once: true });
     });
 
-    describe('Test "settings.loaded" event', () => {
+    describe('Test "config.loaded" event', () => {
         beforeAll(() => spy.dispatch.mockClear());
         afterAll(() => {
             spy.dispatch.mockClear();
@@ -47,7 +48,7 @@ describe("Test App", () => {
         });
     });
 
-    describe('Test "settings.changed event"', () => {
+    describe('Test "config.changed event"', () => {
         afterEach(() => spy.dispatch.mockClear());
         beforeAll(() => spy.dispatch.mockClear());
 

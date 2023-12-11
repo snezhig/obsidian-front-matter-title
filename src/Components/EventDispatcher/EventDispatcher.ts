@@ -10,15 +10,16 @@ import SI from "@config/inversify.types";
 
 @injectable()
 export class EventDispatcher<E> implements EventDispatcherInterface<E> {
+    private readonly events: Map<
+        keyof E,
+        { cb: Callback<E[keyof E]>; sort: number; once: boolean; ref: ListenerRef<keyof E> }[]
+    > = new Map();
+
     constructor(
         @inject(SI.logger)
         @named("event:dispatcher")
         private logger: LoggerInterface
     ) {}
-    private readonly events: Map<
-        keyof E,
-        { cb: Callback<E[keyof E]>; sort: number; once: boolean; ref: ListenerRef<keyof E> }[]
-    > = new Map();
 
     addListener<T extends keyof E>({ name, cb, sort = null, once = false }: Listener<E, T>): ListenerRef<T> {
         const ref: ListenerRef<T> = { getName: () => name };

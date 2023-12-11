@@ -9,18 +9,21 @@ import { ProcessorFactory, ProcessorTypes } from "./ProcessorUtils";
 import ProcessorInterface from "./Interfaces";
 import { inject, injectable } from "inversify";
 import SI from "../../../config/inversify.types";
+
 @injectable()
 export default class ProcessorListener implements ListenerInterface {
     private changedRef: ListenerRef<"settings:changed"> = null;
     private resolvedRef: ListenerRef<"resolver:resolved"> = null;
 
     private processor: ProcessorInterface = null;
+
     constructor(
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents>,
         @inject(SI["factory:processor"])
         private factory: ProcessorFactory
     ) {}
+
     bind(): void {
         this.changedRef = this.dispatcher.addListener({ name: "settings:changed", cb: e => this.make(e.get().actual) });
         this.dispatcher.addListener({ name: "settings.loaded", cb: e => this.make(e.get().settings), once: true });

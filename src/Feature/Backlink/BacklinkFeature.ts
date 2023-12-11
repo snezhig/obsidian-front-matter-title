@@ -44,6 +44,10 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
         };
     }
 
+    static getId() {
+        return Feature.Backlink;
+    }
+
     isEnabled(): boolean {
         return this.enabled;
     }
@@ -76,6 +80,10 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
         }
     }
 
+    getId(): Feature {
+        return BacklinkFeature.getId();
+    }
+
     private process(): void {
         this.logger.log("process");
         this.processBacklinkLayout();
@@ -87,6 +95,7 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
             }
         }
     }
+
     private processBacklinkLayout(): void {
         if (this.isBacklinkWrapped) {
             return;
@@ -96,13 +105,5 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
             this.mutateService.wrapDom(view.backlink.backlinkDom, this.resolver, this.getId());
         }
         this.isBacklinkWrapped = true;
-    }
-
-    getId(): Feature {
-        return BacklinkFeature.getId();
-    }
-
-    static getId() {
-        return Feature.Backlink;
     }
 }

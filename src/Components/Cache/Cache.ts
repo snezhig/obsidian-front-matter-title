@@ -25,13 +25,6 @@ export default class Cache implements CacheInterface {
         return new CacheItem<T>(isHit, value, key);
     }
 
-    private resolve<T>(key: string): T {
-        if (this.pool.has(key)) {
-            return this.pool.get(key);
-        }
-        return JSON.parse(this.serialized.get(key));
-    }
-
     save<T>(item: CacheItemInterface<T>): void {
         const key = item.getKey();
         const value = item.get();
@@ -47,6 +40,13 @@ export default class Cache implements CacheInterface {
         } else {
             this.pool.set(key, value);
         }
+    }
+
+    private resolve<T>(key: string): T {
+        if (this.pool.has(key)) {
+            return this.pool.get(key);
+        }
+        return JSON.parse(this.serialized.get(key));
     }
 
     private isObject(value: unknown): boolean {

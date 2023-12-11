@@ -109,7 +109,7 @@ describe("Flow is case the graph is not opened yet", () => {
         expect(getText.original).toBeCalledTimes(1);
     });
 
-    test("Should disable resolve and be disabled", () => {
+    test("Should stop resolve and be disabled", () => {
         expect(mockReplacer.disable).not.toHaveBeenCalled();
         manager.disable();
         expect(manager.isEnabled()).toBeFalsy();

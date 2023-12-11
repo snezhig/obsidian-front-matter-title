@@ -7,6 +7,7 @@ import { ResolverInterface } from "../Resolver/Interfaces";
 @injectable()
 export default abstract class AbstractManager extends AbstractFeature<Feature> implements ManagerFeatureInterface {
     protected resolver: ResolverInterface;
+
     disable(): void {
         this.isEnabled() && this.doDisable();
     }

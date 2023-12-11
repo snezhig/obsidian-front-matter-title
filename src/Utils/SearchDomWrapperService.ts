@@ -28,6 +28,7 @@ export default class SearchDomWrapperService {
             this.runTimer();
         }
     }
+
     public destroyByTag(tag: string): void {
         if (!this.entities.has(tag)) {
             return;
@@ -37,12 +38,14 @@ export default class SearchDomWrapperService {
             this.entities.get(tag).delete(dom);
         }
     }
+
     private runTimer(): void {
         if (this.timer) {
             clearTimeout(this.timer);
         }
         this.timer = setTimeout(this.selfClean.bind(this), 10000);
     }
+
     private selfClean(): void {
         this.timer = null;
         for (const [tag, entities] of this.entities) {

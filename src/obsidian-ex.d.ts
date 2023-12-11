@@ -7,6 +7,7 @@ declare module "obsidian" {
             getEnabledPluginById: (id: string) => Plugin | null;
         };
     }
+
     export interface TFileExplorerItem {
         file: TFile | TFolder;
         /**
@@ -23,8 +24,11 @@ declare module "obsidian" {
         vChildren?: {
             setChildren(items: any[]): void;
         };
+
         updateTitle(): void;
+
         startRename(): void;
+
         getTitle(): string;
     }
 
@@ -42,12 +46,11 @@ declare module "obsidian" {
             [K: string]: TFileExplorerItem;
         };
         sortOrder: string;
+        requestSort: () => void;
 
         getDisplayText(): string;
 
         getViewType(): string;
-
-        requestSort: () => void;
     }
 
     export class GraphNode {
@@ -82,6 +85,7 @@ declare module "obsidian" {
         leaf: WorkspaceLeafExt;
         backlinks: Backlink;
     }
+
     export abstract class CanvasViewExt extends FileView {
         canvas: Canvas;
     }
@@ -122,10 +126,10 @@ declare module "obsidian" {
     }
 
     export interface SearchDOM {
-        addResult(f: TFile, ...other: unknown[]): unknown;
         el: HTMLDivElement;
-
         resultDomLookup: Map<TFile, HTMLDivElement>;
+
+        addResult(f: TFile, ...other: unknown[]): unknown;
     }
 
     export abstract class SearchPluginView extends View {

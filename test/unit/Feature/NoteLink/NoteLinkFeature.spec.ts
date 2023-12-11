@@ -2,21 +2,15 @@ import { mock } from "jest-mock-extended";
 import NoteLinkFeature from "../../../../src/Feature/NoteLink/NoteLinkFeature";
 import FeatureService from "../../../../src/Feature/FeatureService";
 import FileNoteLinkService, { NoteLink } from "../../../../src/Utils/FileNoteLinkService";
-import EventDispatcherInterface, {
-    Callback,
-    Listener,
-} from "../../../../src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { AppEvents } from "../../../../src/Types";
-import ListenerInterface from "../../../../src/Interfaces/ListenerInterface";
 import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
 import { FeatureConfig } from "../../../../src/Feature/Types";
 import { Feature } from "../../../../src/Enum";
 import { NoteLinkStrategy } from "../../../../src/Feature/NoteLink/NoteLinkTypes";
-import ListenerRef from "../../../../src/Components/EventDispatcher/Interfaces/ListenerRef";
 import { createEventDispatcherMock } from "../../../mocks/MockFactory";
 import NoteLinkApprove from "../../../../src/Feature/NoteLink/NoteLinkApprove";
 import { ResolverInterface } from "../../../../src/Resolver/Interfaces";
-import { CachedMetadata, MetadataCache, TFile } from "obsidian";
+import { CachedMetadata, TFile } from "obsidian";
 import Event from "../../../../src/Components/EventDispatcher/Event";
 
 const mockResolver = mock<ResolverInterface>();
@@ -26,7 +20,12 @@ const { mockEventDispatcher, callbacks } = createEventDispatcherMock<AppEvents>(
 const mockService = mock<FileNoteLinkService>();
 const mockApprove = mock<NoteLinkApprove>();
 const mockFacade = mock<ObsidianFacade>();
-const config: FeatureConfig<Feature.NoteLink> = { approval: true, strategy: NoteLinkStrategy.OnlyEmpty, enabled: true };
+const config: FeatureConfig<Feature.NoteLink> = {
+    approval: true,
+    strategy: NoteLinkStrategy.OnlyEmpty,
+    enabled: true,
+    templates: { main: "", fallback: "" },
+};
 
 const feature = new NoteLinkFeature(
     mockFeatureService,

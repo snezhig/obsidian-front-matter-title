@@ -38,7 +38,7 @@ test("Should subscribe events on bind", () => {
     expect(mockDispatcher.addListener).toHaveBeenCalledTimes(2);
 });
 
-test("Should not do anything on settings loaded, because processor is null", () => {
+test("Should not do anything on config loaded, because processor is null", () => {
     mockDispatcher.dispatch("settings.loaded", new Event({ settings: { processor: { type: null } } }));
     expect(mockFactory).not.toHaveBeenCalled();
     expect(mockDispatcher.addListener).not.toHaveBeenCalled();

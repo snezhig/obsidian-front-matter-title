@@ -4,9 +4,9 @@ import { Chooser, SuggestModalChooserFileItem } from "obsidian";
 import AbstractFeature from "../AbstractFeature";
 import { inject, injectable, interfaces } from "inversify";
 import SI from "@config/inversify.types";
-import Newable = interfaces.Newable;
 import FeatureService from "@src/Feature/FeatureService";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
+import Newable = interfaces.Newable;
 
 @injectable()
 export default class SuggestFeature extends AbstractFeature<Feature> {
@@ -23,6 +23,10 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
         super();
         this.resolver = service.createResolver(this.getId());
         this.createChooserReplacer(chooser);
+    }
+
+    static getId(): Feature {
+        return Feature.Suggest;
     }
 
     isEnabled(): boolean {
@@ -44,10 +48,6 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
 
     getId(): Feature {
         return SuggestFeature.getId();
-    }
-
-    static getId(): Feature {
-        return Feature.Suggest;
     }
 
     private createChooserReplacer(chooser: Newable<Chooser>): void {

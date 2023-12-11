@@ -13,6 +13,11 @@ export default class RulesBuiler extends AbstractBuilder<SettingsType, "rules"> 
     ) {
         super();
     }
+
+    private get orderedKeys(): (keyof SettingsType["rules"])[] {
+        return ["paths", "delimiter"];
+    }
+
     public doBuild(): void {
         this.container.createEl("h4", { text: t("rule.name") });
         const builders = this.factory<SettingsType["rules"]>("rules");
@@ -26,10 +31,6 @@ export default class RulesBuiler extends AbstractBuilder<SettingsType, "rules"> 
                     });
             }
         }
-    }
-
-    private get orderedKeys(): (keyof SettingsType["rules"])[] {
-        return ["paths", "delimiter"];
     }
 
     support(k: keyof SettingsType): boolean {

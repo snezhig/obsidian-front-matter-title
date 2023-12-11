@@ -8,6 +8,7 @@ import { t } from "../../../i18n/Locale";
 export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "processor"> {
     private setting: Setting;
     private lastArgs: { [K in ProcessorTypes]?: string[] } = {};
+
     support(k: keyof SettingsType): boolean {
         return k === "processor";
     }

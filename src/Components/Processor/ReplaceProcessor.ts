@@ -6,6 +6,7 @@ import SI from "../../../config/inversify.types";
 export default class ReplaceProcessor implements ProcessorInterface {
     private pattern: RegExp;
     private replacement: string;
+
     constructor(
         @inject(SI["processor:args"])
         args: string[]
@@ -17,6 +18,7 @@ export default class ReplaceProcessor implements ProcessorInterface {
             console.error(e);
         }
     }
+
     process(value: string): string {
         return value.replace(this.pattern, this.replacement);
     }

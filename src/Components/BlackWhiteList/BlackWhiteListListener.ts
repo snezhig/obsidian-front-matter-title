@@ -29,6 +29,11 @@ export default class BlackWhiteListListener implements ListenerInterface {
         });
     }
 
+    unbind(): void {
+        this.dispatcher.removeListener(this.ref);
+        this.ref = null;
+    }
+
     private handle({ changed, actual }: SettingsEvent["settings:changed"]): void {
         if (changed?.rules?.paths?.values) {
             this.component.setList(actual.rules.paths.values);
@@ -36,10 +41,5 @@ export default class BlackWhiteListListener implements ListenerInterface {
         if (changed?.rules?.paths?.mode) {
             this.component.setMode(actual.rules.paths.mode);
         }
-    }
-
-    unbind(): void {
-        this.dispatcher.removeListener(this.ref);
-        this.ref = null;
     }
 }

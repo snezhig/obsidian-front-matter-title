@@ -7,8 +7,8 @@ export function debounce(cb: () => any) {
 }
 
 export const moment = {
-    locale: () => 'en'
-}
+    locale: () => "en",
+};
 
 export abstract class TAbstractFile {
     path: string;
@@ -16,19 +16,16 @@ export abstract class TAbstractFile {
     basename: string;
 }
 
-
-export class TFolder extends TAbstractFile {
-
-}
+export class TFolder extends TAbstractFile {}
 
 export class TFile extends TAbstractFile {
-    extension: string
-    name: string
+    extension: string;
+    name: string;
 }
 
 export class Vault extends EventEmitter {
     async read(file: TFile): Promise<string> {
-        return fs.readFileSync(file.path, 'utf8');
+        return fs.readFileSync(file.path, "utf8");
     }
 
     trigger(name: string, ...data: any[]): void {
@@ -38,9 +35,9 @@ export class Vault extends EventEmitter {
     getAbstractFileByPath(path: string): TAbstractFile | null {
         if (/.*\.md$/.test(path)) {
             const file = new TFile();
-            file.basename = path.replace(/.*\/(.*)\.md/, '$1');
-            file.extension = 'md'
-            file.name = `${file.basename}.md`
+            file.basename = path.replace(/.*\/(.*)\.md/, "$1");
+            file.extension = "md";
+            file.name = `${file.basename}.md`;
             file.path = path;
             file.vault = new Vault();
             return file;
@@ -51,10 +48,9 @@ export class Vault extends EventEmitter {
 
 export class TFileExplorer {
     fileItems: {
-        [K: string]: TFileExplorerItem
+        [K: string]: TFileExplorerItem;
     };
 }
-
 
 export class Workspace extends EventEmitter {
     getLeavesOfType(viewType: string): WorkspaceLeaf[] {
@@ -64,18 +60,12 @@ export class Workspace extends EventEmitter {
     trigger(name: string, ...data: any[]): void {
         this.emit(name, ...data);
     }
-
-
 }
 
-export class GraphLeaf {
-
-}
+export class GraphLeaf {}
 
 export class GraphNode {
-    getDisplayText() {
-
-    }
+    getDisplayText() {}
 }
 
 export class MetadataCache {

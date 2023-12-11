@@ -14,15 +14,15 @@ export default class LoggerComposer {
         return this.loggers.get(name);
     }
 
-    private isEnabled() {
-        return this.enabled;
-    }
-
     public enable(): void {
         this.enabled = true;
     }
 
     public disable(): void {
         this.enabled = false;
+    }
+
+    private isEnabled() {
+        return this.enabled;
     }
 }

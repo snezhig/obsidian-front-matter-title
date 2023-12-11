@@ -9,6 +9,7 @@ import { Feature } from "@src/Enum";
 @injectable()
 export default abstract class AbstractStrategy implements StrategyInterface {
     private resolver: ResolverInterface;
+
     constructor(
         @inject(SI["feature:service"])
         private service: FeatureService

@@ -39,10 +39,6 @@ const zh_tw: Translation = {
             name: "檔資源管理器",
             desc: "替換檔資源管理器中顯示的標題",
         },
-        [Feature.ExplorerSort]: {
-            name: "標題排序",
-            desc: "通過資源管理器功能，按標題對資源管理器中的檔進行排序",
-        },
         [Feature.Graph]: {
             name: "圖譜",
             desc: "替換圖譜/本地圖譜中顯示的標題",
@@ -83,12 +79,16 @@ const zh_tw: Translation = {
             name: "筆記鏈接",
             desc: "替換筆記中的內部鏈接",
             strategy: {
-                all: "替換全部鏈接",
-                onlyEmpty: "只替換沒有別名的鏈接",
+                options: {
+                    all: "替換全部鏈接",
+                    onlyEmpty: "只替換沒有別名的鏈接",
+                },
             },
             approval: {
-                showModal: "顯示確認窗口",
-                auto: "使用自動確認",
+                options: {
+                    showModal: "顯示確認窗口",
+                    auto: "使用自動確認",
+                },
             },
         },
     },
@@ -101,7 +101,7 @@ const zh_tw: Translation = {
         main: "主範本",
         fallback: "備用",
         placeholder: "輸入範本",
-        commmon: {
+        common: {
             main: {
                 name: "通用主範本",
                 desc: `設置 yaml 路徑，該值將用於檔標題。值必須是字串或數值。還可以使用類似範本路徑 "{{ }}"。

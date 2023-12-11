@@ -1,10 +1,11 @@
 import { mock, mockDeep, mockReset } from "jest-mock-extended";
 import { TFile, TFileExplorerItem, TFileExplorerView } from "obsidian";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
-import { ExplorerFileItemMutator } from "../../../../src/Feature/Explorer/ExplorerFileItemMutator";
+import { ExplorerFileItemMutator } from "@src/Feature/Explorer/ExplorerFileItemMutator";
 import ExplorerManager from "../../../../src/Feature/Explorer/ExplorerManager";
-import { ResolverInterface } from "../../../../src/Resolver/Interfaces";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 import ExplorerViewUndefined from "../../../../src/Feature/Explorer/ExplorerViewUndefined";
+import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 
 // Mock dependencies
 const mockedFacade = mock<ObsidianFacade>();
@@ -17,6 +18,8 @@ factory.mockImplementation(item => mock<ExplorerFileItemMutator>());
 
 describe("ExplorerManager", () => {
     let explorerManager: ExplorerManager;
+    let explorerSort: ExplorerSort;
+    let sortFactory: jest.Mock<ReturnType<() => ExplorerSort | null>>;
 
     beforeEach(() => {
         // Reset all mocks before each test
@@ -25,11 +28,13 @@ describe("ExplorerManager", () => {
         factory.mockClear();
 
         // Create an instance of the class to be tested
-        explorerManager = new ExplorerManager(mockedFacade, factory);
+        explorerSort = mock<ExplorerSort>();
+        sortFactory = jest.fn().mockReturnValue(explorerSort);
+        explorerManager = new ExplorerManager(mockedFacade, factory, sortFactory);
         explorerManager.setResolver(resolver);
     });
 
-    it("should enable the explorer feature", () => {
+    it("should start the explorer feature", () => {
         // Assume that the method getLeavesOfType returns a non-empty array
         mockedFacade.getViewsOfType.mockReturnValue([mock<TFileExplorerView>()]);
 
@@ -46,7 +51,7 @@ describe("ExplorerManager", () => {
         }).toThrow("There are some explorers' leaves");
     });
 
-    it("should disable the explorer feature", () => {
+    it("should stop the explorer feature", () => {
         mockedFacade.getViewsOfType.mockReturnValue([mockDeep<TFileExplorerView>()]);
         explorerManager.enable();
         explorerManager.disable();

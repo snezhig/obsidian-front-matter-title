@@ -32,7 +32,7 @@ describe("Test toggle one feature", () => {
         mockFeatureFoo.enable.mockClear();
         mockFeatureFoo.disable.mockClear();
     });
-    test("Should enable feature", () => {
+    test("Should start feature", () => {
         mockFactory.mockReturnValueOnce(mockFeatureFoo);
         composer.toggle("foo", true);
         expect(composer.get("foo")).toEqual(mockFeatureFoo);
@@ -43,7 +43,7 @@ describe("Test toggle one feature", () => {
         expect(mockDispatcher.dispatch).toHaveBeenCalledWith("feature:enable", new Event({ feature: mockFeatureFoo }));
     });
 
-    test("Should disable feature", () => {
+    test("Should stop feature", () => {
         composer.toggle("foo", false);
         expect(mockFactory).not.toHaveBeenCalled();
         expect(mockFeatureFoo.disable).toHaveBeenCalledTimes(1);
@@ -51,7 +51,7 @@ describe("Test toggle one feature", () => {
     });
 });
 
-test("Should disable all features", () => {
+test("Should stop all features", () => {
     mockFactory.mockReturnValueOnce(mockFeatureFoo);
     mockFactory.mockReturnValueOnce(mockFeatureBar);
     composer.toggle("foo", true);

@@ -8,9 +8,11 @@ import { t } from "../../../i18n/Locale";
 export default class RulesDelimiterBuilder extends AbstractBuilder<SettingsType["rules"], "delimiter"> {
     private setting: Setting = null;
     private text: TextComponent = null;
+
     support(k: "delimiter" | "paths"): boolean {
         return k === "delimiter";
     }
+
     doBuild(): void {
         this.setting = new Setting(this.container).setName(t("rule.delimiter.name")).setDesc(t("rule.delimiter.desc"));
         this.buildDropdown();

@@ -7,10 +7,6 @@ export default class Alias {
 
     constructor(private cache: { [k: string]: any }) {}
 
-    private getPossibleKeys(): string[] {
-        return ["alias", "aliases"];
-    }
-
     public getKey(): string | null {
         for (const key of Object.keys(this.cache)) {
             if (this.getPossibleKeys().includes(key)) {
@@ -48,6 +44,10 @@ export default class Alias {
             this.modify(this.original.value);
         }
         this.changed = false;
+    }
+
+    private getPossibleKeys(): string[] {
+        return ["alias", "aliases"];
     }
 
     private modify(alias: string | string[]): void {

@@ -39,10 +39,6 @@ const zh: Translation = {
             name: "文件资源管理器",
             desc: "替换文件资源管理器中显示的标题",
         },
-        [Feature.ExplorerSort]: {
-            name: "标题排序",
-            desc: "通过资源管理器功能，按标题对资源管理器中的文件进行排序",
-        },
         [Feature.Graph]: {
             name: "图谱",
             desc: "替换图谱/本地图谱中显示的标题",
@@ -83,12 +79,16 @@ const zh: Translation = {
             name: "笔记链接",
             desc: "替换笔记中的内部链接",
             strategy: {
-                all: "替换全部链接",
-                onlyEmpty: "只替换没有别名的链接",
+                options: {
+                    all: "替换全部链接",
+                    onlyEmpty: "只替换没有别名的链接",
+                },
             },
             approval: {
-                showModal: "显示确认窗口",
-                auto: "使用自动确认",
+                options: {
+                    showModal: "显示确认窗口",
+                    auto: "使用自动确认",
+                },
             },
         },
     },
@@ -101,7 +101,7 @@ const zh: Translation = {
         main: "主模板",
         fallback: "备用",
         placeholder: "输入模板",
-        commmon: {
+        common: {
             main: {
                 name: "通用主模板",
                 desc: `设置 yaml 路径，该值将用于文件标题。值必须是字符串或数值。还可以使用类似模板路径 "{{ }}"。

@@ -30,6 +30,14 @@ export class MarkdownHeaderManager extends AbstractManager {
         return Feature.Header;
     }
 
+    getId(): Feature {
+        return MarkdownHeaderManager.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
+    }
+
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
         this.facade.getViewsOfType<MarkdownViewExt>(Leaves.MD).forEach(this.revert.bind(this));
@@ -123,13 +131,5 @@ export class MarkdownHeaderManager extends AbstractManager {
         };
         (view.titleContainerEl as HTMLDivElement).appendChild(el);
         return el;
-    }
-
-    getId(): Feature {
-        return MarkdownHeaderManager.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
     }
 }
