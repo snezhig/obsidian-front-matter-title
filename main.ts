@@ -65,8 +65,12 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async loadSettings(): Promise<void> {
         const loaded = await this.loadData();
+        if (loaded && !loaded.version) {
+            loaded.version = "0.0.0";
+        }
         let data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
         data = new Migrator(data, this.dispatcher).migrate(PLUGIN_VERSION);
+        data.version = PLUGIN_VERSION;
         this.storage = new Storage<SettingsType>(data);
         this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
         this.addSettingTab(this.container.resolve(SettingsTab).getTab());
