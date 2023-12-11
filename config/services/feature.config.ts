@@ -1,5 +1,4 @@
 import { interfaces } from "inversify";
-import Container = interfaces.Container;
 import SI from "@config/inversify.types";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import ExplorerManager from "@src/Feature/Explorer/ExplorerManager";
@@ -31,12 +30,14 @@ import BacklinkManager from "../../src/Feature/Backlink/BacklinkFeature";
 import NoteLinkFeature from "../../src/Feature/NoteLink/NoteLinkFeature";
 import NoteLinkApprove from "../../src/Feature/NoteLink/NoteLinkApprove";
 import AliasConfig from "@src/Feature/Alias/AliasConfig";
-import { KeyStorageInterface } from "../../src/Storage/Interfaces";
-import { SettingsType } from "../../src/Settings/SettingsType";
-import { Feature } from "../../src/Enum";
+import { KeyStorageInterface } from "@src/Storage/Interfaces";
+import { SettingsType } from "@src/Settings/SettingsType";
+import { Feature } from "@src/Enum";
 import { TFileExplorerItem } from "obsidian";
-import { ResolverInterface } from "../../src/Resolver/Interfaces";
-import { ExplorerFileItemMutator } from "../../src/Feature/Explorer/ExplorerFileItemMutator";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
+import { ExplorerFileItemMutator } from "@src/Feature/Explorer/ExplorerFileItemMutator";
+import Storage from "@src/Storage/Storage";
+import Container = interfaces.Container;
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();
@@ -57,7 +58,6 @@ export default (container: Container) => {
         });
     container.bind<FeatureInterface<any>>(SI.feature).to(AliasFeature).whenTargetNamed(AliasFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerManager).whenTargetNamed(ExplorerManager.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerSort).whenTargetNamed(ExplorerSort.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SearchFeature).whenTargetNamed(SearchFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
@@ -96,11 +96,31 @@ export default (container: Container) => {
         .whenTargetNamed(AliasValidatorType.FrontmatterRequired);
 
     container.bind(SI["feature:notelink:approve"]).to(NoteLinkApprove);
-    container.bind(SI["feature:config"])
-        .toDynamicValue((c) => {
-            const feature = c.currentRequest.target.getNamedTag().value as Feature
-            return c.container.get<KeyStorageInterface<SettingsType>>(SI["settings:storage"]).get('features').get(feature).value()
-        }).when(() => true)
+    container
+        .bind(SI["feature:config"])
+        .toDynamicValue(c => {
+            const feature = c.currentRequest.target.getNamedTag().value as Feature;
+            return c.container
+                .get<KeyStorageInterface<SettingsType>>(SI["settings:storage"])
+                .get("features")
+                .get(feature)
+                .value();
+        })
+        .when(() => true);
 
-    container.bind(SI["feature:explorer:file_mutator:factory"]).toFunction((item: TFileExplorerItem, resolver: ResolverInterface) => new ExplorerFileItemMutator(item, resolver))
+    container
+        .bind(SI["feature:explorer:file_mutator:factory"])
+        .toFunction(
+            (item: TFileExplorerItem, resolver: ResolverInterface) => new ExplorerFileItemMutator(item, resolver)
+        );
+    container.bind(SI["feature:explorer:sort"]).to(ExplorerSort);
+    container.bind(SI["factory:feature:explorer:sort"]).toFunction(() => {
+        const enabled = container
+            .get<Storage<SettingsType>>(SI["settings:storage"])
+            .get("features")
+            .get(Feature.Explorer)
+            .get("sort")
+            .value();
+        return enabled ? container.get(SI["feature:explorer:sort"]) : null;
+    });
 };

@@ -9,12 +9,15 @@ export interface PrimitiveItemInterface<T> {
 
 export interface ObjectItemInterface<T extends ObjectItem> extends PrimitiveItemInterface<T> {
     get<K extends keyof T>(key: K): DynamicItem<T[K]>;
+
     add<K extends keyof T>(key: K, value: T[K]): DynamicItem<T[K]>;
 }
 
 export interface KeyStorageInterface<T extends ObjectItem> {
     collect(): T;
+
     get<K extends keyof T>(key: K): DynamicItem<T[K]>;
+
     set(value: T): void;
 }
 

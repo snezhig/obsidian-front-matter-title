@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { AppExt, CachedMetadata, Modal, Plugin, moment } from "obsidian";
+import { AppExt, CachedMetadata, Modal, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
@@ -20,11 +20,13 @@ import FeatureComposer from "@src/Feature/FeatureComposer";
 import ManagerComposer from "@src/Feature/ManagerComposer";
 import { ObsidianMetaFactory } from "@config/inversify.factory.types";
 import ListenerInterface from "@src/Interfaces/ListenerInterface";
-import { DeferInterface, PluginInterface } from "front-matter-plugin-api-provider";
+import { PluginInterface } from "front-matter-plugin-api-provider";
 import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Components/ApiAdapter/Defer";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
-import { t } from "./src/i18n/Locale";
+import { t } from "@src/i18n/Locale";
+import { Migrator } from "@src/Migrator/Migrator";
 
+declare const PLUGIN_VERSION: string;
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private container: interfaces.Container = Container;
@@ -35,32 +37,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     public getDefer(): Defer {
         return this.container.get(SI.defer);
-    }
-
-    private async loadSettings(): Promise<void> {
-        const loaded = await this.loadData();
-        if (Array.isArray(loaded?.templates)) {
-            loaded.templates = {
-                ...PluginHelper.createDefaultSettings().templates,
-                common: { main: loaded.templates?.[0] ?? "title", fallback: loaded.templates?.[1] ?? "" },
-            };
-        }
-        const data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
-        this.storage = new Storage<SettingsType>(data);
-        this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
-        this.addSettingTab(this.container.resolve(SettingsTab).getTab());
-    }
-
-    private async onSettingsChange(settings: SettingsType): Promise<void> {
-        await this.saveData(settings);
-        this.reloadFeatures();
-        await this.mc.refresh();
-    }
-
-    private async delay(): Promise<void> {
-        const delay = this.storage.get("boot").get("delay").value();
-        this.logger.log(`Plugin manual delay ${delay}`);
-        await new Promise(r => setTimeout(r, delay));
     }
 
     public async onload() {
@@ -81,6 +57,35 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         this.mc = Container.get(SI["manager:composer"]);
         this.bind();
         this.registerCommands();
+    }
+
+    public onunload() {
+        this.fc.disableAll();
+    }
+
+    private async loadSettings(): Promise<void> {
+        const loaded = await this.loadData();
+        if (loaded && !loaded.version) {
+            loaded.version = "0.0.0";
+        }
+        let data = ObjectHelper.fillFrom(PluginHelper.createDefaultSettings(), loaded ?? {});
+        data = new Migrator(data, this.dispatcher).migrate(PLUGIN_VERSION);
+        data.version = PLUGIN_VERSION;
+        this.storage = new Storage<SettingsType>(data);
+        this.container.bind<Storage<SettingsType>>(SI["settings:storage"]).toConstantValue(this.storage);
+        this.addSettingTab(this.container.resolve(SettingsTab).getTab());
+    }
+
+    private async onSettingsChange(settings: SettingsType): Promise<void> {
+        await this.saveData(settings);
+        this.reloadFeatures();
+        await this.mc.refresh();
+    }
+
+    private async delay(): Promise<void> {
+        const delay = this.storage.get("boot").get("delay").value();
+        this.logger.log(`Plugin manual delay ${delay}`);
+        await new Promise(r => setTimeout(r, delay));
     }
 
     private bindServices(): void {
@@ -111,10 +116,6 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         );
         Container.bind(SI["factory:obsidian:active:file"]).toFunction(() => this.app.workspace.getActiveFile());
         Container.bind(SI["factory:obsidian:modal"]).toFunction(() => new Modal(this.app));
-    }
-
-    public onunload() {
-        this.fc.disableAll();
     }
 
     private bind() {
@@ -157,7 +158,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private registerCommands(): void {
         this.addCommand({
-            id: "ofmt-features-disable",
+            id: "ofmt-features-stop",
             name: t("command.features.disable"),
             callback: () => this.fc.disableAll(),
         });

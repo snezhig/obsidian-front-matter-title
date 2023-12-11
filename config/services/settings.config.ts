@@ -5,7 +5,6 @@ import DefaultBuilder from "@src/Settings/FeatureBuilder/DefaultBuilder";
 import AliasBuilder from "@src/Settings/FeatureBuilder/AliasBuilder";
 import { Feature } from "@src/Enum";
 import { SettingsBuilderFactory, SettingsFeatureBuildFactory } from "@config/inversify.factory.types";
-import ExplorerSortBuilder from "@src/Settings/FeatureBuilder/ExplorerSortBuilder";
 import TemplatesBuilder from "@src/Settings/SettingBuilders/Templates/TemplatesBuilder";
 import RulesBuiler from "@src/Settings/SettingBuilders/Rules/RulesBuilder";
 import FeaturesBuilder from "@src/Settings/SettingBuilders/Features/FeaturesBuilder";
@@ -14,19 +13,18 @@ import RulesDelimiterBuilder from "@src/Settings/SettingBuilders/Rules/RulesDeli
 import RulesPathsBuilder from "@src/Settings/SettingBuilders/Rules/RulesPathsBuilder";
 import ProcessorBuilder from "../../src/Settings/SettingBuilders/Processor/ProcessorBuilder";
 import NoteLinkBuilder from "@src/Settings/FeatureBuilder/NoteLinkBuilder";
+import ExplorerBuilder from "@src/Settings/FeatureBuilder/ExplorerBuilder";
 
 export default (c: Container) => {
+    c.bind(SI["settings:feature:builder"]).to(DefaultBuilder).whenTargetNamed("default");
     c.bind(SI["settings:feature:builder"])
-        .toDynamicValue(() => new DefaultBuilder())
-        .whenTargetNamed("default");
+        .to(AliasBuilder)
+    .whenTargetNamed(Feature.Alias);
     c.bind(SI["settings:feature:builder"])
-        .toDynamicValue(() => new AliasBuilder())
-        .whenTargetNamed(Feature.Alias);
+        .to(ExplorerBuilder)
+        .whenTargetNamed(Feature.Explorer);
     c.bind(SI["settings:feature:builder"])
-        .toDynamicValue(() => new ExplorerSortBuilder())
-        .whenTargetNamed(Feature.ExplorerSort);
-    c.bind(SI["settings:feature:builder"])
-        .toDynamicValue(() => new NoteLinkBuilder())
+        .to(NoteLinkBuilder)
         .whenTargetNamed(Feature.NoteLink);
     c.bind<SettingsFeatureBuildFactory>(SI["factory:settings:feature:builder"]).toFunction((name: string) =>
         c.isBoundNamed(SI["settings:feature:builder"], name) ? c.getNamed(SI["settings:feature:builder"], name) : null

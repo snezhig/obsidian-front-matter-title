@@ -1,50 +1,54 @@
 import AbstractBuilder from "./AbstractBuilder";
 import { Feature } from "@src/Enum";
-import { BuildParams } from "@src/Settings/Interface/FeatureBuildInterface";
-import { DropdownComponent, Setting, ToggleComponent } from "obsidian";
-import Event from "@src/Components/EventDispatcher/Event";
+import { DropdownComponent, Modal, Setting } from "obsidian";
 import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
-import { t } from "../../i18n/Locale";
+import { t } from "@src/i18n/Locale";
 
 export default class NoteLinkBuilder extends AbstractBuilder<Feature.NoteLink> {
-    private id: Feature;
-    private setting: Setting;
-    private toggle: ToggleComponent;
     private approval: DropdownComponent;
     private strategy: DropdownComponent;
 
-    build({ id, name, desc, settings, doc }: BuildParams<Feature.NoteLink>): void {
-        this.id = id;
-        const fragment = createFragment(e => e.createEl("a", { text: name, href: doc.link }));
-        this.setting = new Setting(this.context.getContainer()).setName(fragment).setDesc(desc);
-        this.setting.addDropdown(e => (this.strategy = e));
-        this.strategy
-            .addOptions({
-                [NoteLinkStrategy.All]: t("feature.noteLink.strategy.all"),
-                [NoteLinkStrategy.OnlyEmpty]: t("feature.noteLink.strategy.onlyEmpty"),
-            })
-            .setValue(settings.strategy ?? NoteLinkStrategy.OnlyEmpty)
-            .onChange(this.onChange.bind(this));
-        this.setting.addDropdown(e => (this.approval = e));
-        this.approval
-            .addOptions({ Y: t("feature.noteLink.approval.showModal"), N: t("feature.noteLink.approval.auto") })
-            .setValue(settings.approval ? "Y" : "N")
-            .onChange(this.onChange.bind(this));
-        this.setting.addToggle(e => (this.toggle = e));
-        this.toggle.setValue(settings.enabled).onChange(this.onChange.bind(this));
+    doBuild(): void {
+        this.buildEnable();
     }
 
-    private onChange(): void {
-        this.context.getDispatcher().dispatch(
-            "settings:tab:feature:changed",
-            new Event({
-                id: this.id,
-                value: {
-                    enabled: this.toggle.getValue(),
-                    approval: this.approval.getValue() === "Y",
-                    strategy: this.strategy.getValue(),
-                },
-            })
-        );
+    protected onModalShow(modal: Modal) {
+        this.buildStrategy(modal.contentEl);
+        this.buildApproval(modal.contentEl);
+        this.buildTemplates(modal.contentEl);
+    }
+
+    private buildStrategy(el: HTMLElement): void {
+        new Setting(el)
+            .setName(t("feature.noteLink.strategy.name"))
+            .setDesc(t("feature.noteLink.strategy.desc"))
+            .addDropdown(e => {
+                e.addOptions({
+                    [NoteLinkStrategy.All]: t("feature.noteLink.strategy.options.all"),
+                    [NoteLinkStrategy.OnlyEmpty]: t("feature.noteLink.strategy.options.onlyEmpty"),
+                })
+                    .setValue(this.config.strategy ?? NoteLinkStrategy.OnlyEmpty)
+                    .onChange(v => {
+                        this.config.strategy = v as NoteLinkStrategy;
+                        this.dispatchChanges();
+                    });
+            });
+    }
+
+    private buildApproval(el: HTMLElement): void {
+        new Setting(el)
+            .setName(t("feature.noteLink.approval.name"))
+            .setDesc(t("feature.noteLink.approval.desc"))
+            .addDropdown(e => {
+                e.addOptions({
+                    Y: t("feature.noteLink.approval.options.showModal"),
+                    N: t("feature.noteLink.approval.options.auto"),
+                })
+                    .setValue(this.config.approval ? "Y" : "N")
+                    .onChange(v => {
+                        this.config.approval = v === "Y";
+                        this.dispatchChanges();
+                    });
+            });
     }
 }

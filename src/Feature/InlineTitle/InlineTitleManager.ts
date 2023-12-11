@@ -33,6 +33,14 @@ export class InlineTitleManager extends AbstractManager {
         return Feature.InlineTitle;
     }
 
+    getId(): Feature {
+        return InlineTitleManager.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
+    }
+
     protected doDisable(): void {
         this.dispatcher.removeListener(this.ref);
         this.fakeTitleElementService.removeAll();
@@ -95,15 +103,8 @@ export class InlineTitleManager extends AbstractManager {
         }
         return id;
     }
+
     private getTitleElId(view: MarkdownViewExt): string {
         return `${view.getState().mode}-${this.getId()}-${view.leaf.id}`;
-    }
-
-    getId(): Feature {
-        return InlineTitleManager.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
     }
 }

@@ -34,15 +34,6 @@ export default class Defer implements DeferInterface {
         }
     }
 
-    private processState(): void {
-        if (this.isPluginReady()) {
-            this.resolves.plugin();
-            if (this.isFeaturesReady()) {
-                this.resolves.managers();
-            }
-        }
-    }
-
     async awaitPlugin(): Promise<void> {
         return await this.promises.plugin;
     }
@@ -61,5 +52,14 @@ export default class Defer implements DeferInterface {
 
     getApi(): ApiInterface | null {
         return this.isPluginReady() ? this.factory() : null;
+    }
+
+    private processState(): void {
+        if (this.isPluginReady()) {
+            this.resolves.plugin();
+            if (this.isFeaturesReady()) {
+                this.resolves.managers();
+            }
+        }
     }
 }

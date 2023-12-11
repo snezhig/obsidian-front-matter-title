@@ -25,7 +25,7 @@ test("Should not work because disabled", async () => {
     expect(mockResolver.resolve).not.toHaveBeenCalled();
 });
 
-describe("Test enable when the dependencies are not exist", () => {
+describe("Test start when the dependencies are not exist", () => {
     afterEach(() => mockFacade.getViewsOfType.mockClear());
     test("Should not be enabled because there is no the leaf", () => {
         manager.enable();

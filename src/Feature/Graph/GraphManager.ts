@@ -35,6 +35,48 @@ export default class GraphManager extends AbstractManager {
         return Feature.Graph;
     }
 
+    getId(): Feature {
+        return GraphManager.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
+    }
+
+    protected doDisable(): void {
+        this.unbind();
+        this.replacement?.disable();
+        this.enabled = false;
+    }
+
+    protected doEnable(): void {
+        if (!this.initReplacement()) {
+            this.bind();
+        }
+        this.enabled = true;
+    }
+
+    protected doRefresh(): Promise<void> {
+        for (const view of this.getViews()) {
+            view.renderer?.onIframeLoad();
+        }
+        return Promise.resolve();
+    }
+
+    protected async doUpdate(path: string): Promise<boolean> {
+        let result = false;
+        for (const view of this.getViews()) {
+            for (const node of view.renderer?.nodes ?? []) {
+                if (node.id === path) {
+                    result = true;
+                    view.renderer.onIframeLoad();
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     private unbind(): void {
         if (this.ref) {
             this.logger.log("unbind");
@@ -94,47 +136,5 @@ export default class GraphManager extends AbstractManager {
 
     private getViews(): GraphView[] {
         return [...this.facade.getViewsOfType(Leaves.G), ...this.facade.getViewsOfType(Leaves.LG)];
-    }
-
-    protected doDisable(): void {
-        this.unbind();
-        this.replacement?.disable();
-        this.enabled = false;
-    }
-
-    protected doEnable(): void {
-        if (!this.initReplacement()) {
-            this.bind();
-        }
-        this.enabled = true;
-    }
-
-    protected doRefresh(): Promise<void> {
-        for (const view of this.getViews()) {
-            view.renderer?.onIframeLoad();
-        }
-        return Promise.resolve();
-    }
-
-    protected async doUpdate(path: string): Promise<boolean> {
-        let result = false;
-        for (const view of this.getViews()) {
-            for (const node of view.renderer?.nodes ?? []) {
-                if (node.id === path) {
-                    result = true;
-                    view.renderer.onIframeLoad();
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    getId(): Feature {
-        return GraphManager.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
     }
 }

@@ -16,17 +16,16 @@ Both of templates may be simple and complex:
 - Complex means that template contains one or more keys\paths and\or static
   symbols `{{title}} static text {{title.value}}`; [Examples](TemplateExamples.md)
 
+## Feature's Templates
 
-## Features' Templates
+Also, plugin has `Feature's templates` and you can set templates for each feature individually
 
-Also, plugin has `Features' templates` and you can set templates for each feature individually
+Each feature, when it's enabled, has "Manage" button. Click on it and you will see the following modal window:
 
-![img_1.png](FeaturesTemplate.png)
+![Example Explorer](img/FeatureTemplateExampleExplorer.png)
 
-In screenshot below we can see some defined templates:
+Let's look at the **Templates** section in the example:
 
-- `Explorer` has its own templates and this feature will be use them
-- `Graph` has only common template. If its template is not resolved, it will use global fallback template
-- `Header` does not has any specific templates, so it will use global templates
+- `Main` - Explorer feature has its main template and it will be used for this feature
+- `Fallback` - Explorer feature does not has its fallback template and default template (fallback_title) will be used
 
-![img.png](FeatureTemplateOpen.png)

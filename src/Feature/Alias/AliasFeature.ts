@@ -39,14 +39,8 @@ export class AliasFeature extends AbstractFeature<Feature> {
         super();
     }
 
-    private setValidator(type: ValidatorType): void {
-        this.validator = this.validatorFactory(type);
-        this.logger.log(`Set validator [${type}]. Status: ${this.validator !== null}`);
-    }
-
-    private setStrategy(type: StrategyType): void {
-        this.strategy = this.strategyFactory(type);
-        this.logger.log(`Set strategy [${type}]. Status: ${this.strategy !== null}`);
+    static getId(): Feature {
+        return Feature.Alias;
     }
 
     disable(): void {
@@ -65,6 +59,24 @@ export class AliasFeature extends AbstractFeature<Feature> {
         this.setStrategy(this.config.getStrategy());
         this.enabled = true;
         this.refresh().catch(console.error);
+    }
+
+    getId(): Feature {
+        return AliasFeature.getId();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
+    }
+
+    private setValidator(type: ValidatorType): void {
+        this.validator = this.validatorFactory(type);
+        this.logger.log(`Set validator [${type}]. Status: ${this.validator !== null}`);
+    }
+
+    private setStrategy(type: StrategyType): void {
+        this.strategy = this.strategyFactory(type);
+        this.logger.log(`Set strategy [${type}]. Status: ${this.strategy !== null}`);
     }
 
     private process(frontmatter: { [k: string]: any }, path: string): boolean {
@@ -97,17 +109,5 @@ export class AliasFeature extends AbstractFeature<Feature> {
             promises.push(this.update(path, cache.getCache(path)));
         }
         await Promise.all(promises);
-    }
-
-    static getId(): Feature {
-        return Feature.Alias;
-    }
-
-    getId(): Feature {
-        return AliasFeature.getId();
-    }
-
-    isEnabled(): boolean {
-        return this.enabled;
     }
 }

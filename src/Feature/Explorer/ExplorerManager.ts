@@ -1,26 +1,35 @@
 import { TFile, TFileExplorerItem, TFileExplorerView } from "obsidian";
-import { Leaves, Feature } from "@src/Enum";
+import { Feature, Leaves } from "@src/Enum";
 import { inject, injectable } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
 import AbstractManager from "@src/Feature/AbstractManager";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import { ExplorerFileItemMutator } from "./ExplorerFileItemMutator";
-import { ResolverInterface } from "../../Resolver/Interfaces";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
+import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 
 @injectable()
 export default class ExplorerManager extends AbstractManager {
     private explorerView: TFileExplorerView = null;
     private modified = new WeakMap<TFileExplorerItem, ExplorerFileItemMutator>();
     private enabled = false;
+    private sort: ExplorerSort = null;
 
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
         @inject(SI["feature:explorer:file_mutator:factory"])
-        private factory: (item: TFileExplorerItem, resolver: ResolverInterface) => ExplorerFileItemMutator
+        private factory: (item: TFileExplorerItem, resolver: ResolverInterface) => ExplorerFileItemMutator,
+        @inject(SI["factory:feature:explorer:sort"])
+        sortFactory: () => ExplorerSort | null
     ) {
         super();
+        this.sort = sortFactory();
+    }
+
+    static getId(): Feature {
+        return Feature.Explorer;
     }
 
     getId(): Feature {
@@ -36,12 +45,24 @@ export default class ExplorerManager extends AbstractManager {
             this.restoreTitles();
             this.explorerView = null;
         }
+        this.sort?.stop();
         this.enabled = false;
     }
 
     protected doEnable() {
         this.explorerView = this.getExplorerView();
+        this.sort?.start();
         this.enabled = true;
+    }
+
+    protected doRefresh(): Promise<{ [p: string]: boolean }> {
+        return this.updateInternal(Object.values(this.explorerView.fileItems));
+    }
+
+    protected async doUpdate(path: string): Promise<boolean> {
+        const item = this.explorerView.fileItems[path];
+        await this.updateInternal(item ? [item] : []);
+        return !!item;
     }
 
     private getExplorerView(): TFileExplorerView | null {
@@ -86,19 +107,5 @@ export default class ExplorerManager extends AbstractManager {
             return true;
         }
         return false;
-    }
-
-    protected doRefresh(): Promise<{ [p: string]: boolean }> {
-        return this.updateInternal(Object.values(this.explorerView.fileItems));
-    }
-
-    protected async doUpdate(path: string): Promise<boolean> {
-        const item = this.explorerView.fileItems[path];
-        await this.updateInternal(item ? [item] : []);
-        return !!item;
-    }
-
-    static getId(): Feature {
-        return Feature.Explorer;
     }
 }

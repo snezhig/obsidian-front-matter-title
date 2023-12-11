@@ -1,21 +1,19 @@
 import { ContainerModule, interfaces } from "inversify";
 import SI from "@config/inversify.types";
 import Storage from "@src/Storage/Storage";
-import { SettingsType, TemplateNames, TemplateValue } from "@src/Settings/SettingsType";
+import { SettingsType, TemplateValue } from "@src/Settings/SettingsType";
 import { ResolverDynamicInterface, ResolverServiceInterface } from "@src/Resolver/Interfaces";
 import ResolverService from "@src/Resolver/ResolverService";
 import ResolverCachedProxy from "@src/Resolver/ResolverCachedProxy";
 import { Resolver } from "@src/Resolver/Resolver";
+import { Feature } from "@src/Enum";
 
 export default new ContainerModule(bind => {
     bind<interfaces.Factory<string>>(SI["factory:resolver:template"]).toFactory<string, [string]>(c => value => {
         const storage = c.container.get<Storage<SettingsType>>(SI["settings:storage"]);
 
-        const [name, type]: [TemplateNames, keyof TemplateValue] = value.split(":") as [
-            TemplateNames,
-            keyof TemplateValue
-        ];
-        const targetTemplates = storage.get("templates").get(name);
+        const [name, type]: [Feature, keyof TemplateValue] = value.split(":") as [Feature, keyof TemplateValue];
+        const targetTemplates = storage.get("features").get(name)?.get("templates");
         return targetTemplates?.get(type)?.value() ?? storage.get("templates").get("common").get(type).value();
     });
 

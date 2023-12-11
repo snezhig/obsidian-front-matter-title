@@ -23,6 +23,7 @@ export default class FeatureComposer {
     public get<K extends FeatureInterface<any>>(id: any): K | null {
         return (this.features[id] as K) ?? null;
     }
+
     public getIds(): string[] {
         return Object.keys(this.features);
     }

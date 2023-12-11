@@ -1,9 +1,6 @@
-import { mock } from "jest-mock-extended";
-import { TFileExplorerView, WorkspaceLeaf } from "obsidian";
-import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import { mock, MockProxy } from "jest-mock-extended";
+import { TFileExplorerItem, TFileExplorerView, TFolder } from "obsidian";
 import ObsidianFacade from "../../../../src/Obsidian/ObsidianFacade";
-import Event from "@src/Components/EventDispatcher/Event";
-import { Feature } from "@src/Enum";
 import ExplorerSort from "@src/Feature/Explorer/ExplorerSort";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface, {
@@ -12,72 +9,119 @@ import EventDispatcherInterface, {
 import { AppEvents } from "@src/Types";
 import FeatureService from "@src/Feature/FeatureService";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
+import { DelayerInterface } from "@src/Components/Delayer/Delayer";
+import LoggerInterface from "@src/Components/Debug/LoggerInterface";
+import { FunctionReplacerFactory } from "@config/inversify.factory.types";
+import FunctionReplacer from "../../../../src/Utils/FunctionReplacer";
+import Event from "@src/Components/EventDispatcher/Event";
+import { Feature } from "@src/Enum";
 
-jest.useFakeTimers();
-jest.spyOn(global, "setTimeout");
-
-const facade = mock<ObsidianFacade>();
+let facade: MockProxy<ObsidianFacade>;
 let callback: Callback<AppEvents[keyof AppEvents]>;
-const mockDispatcher = mock<EventDispatcherInterface<any>>();
-const refs: [any?, any?] = [];
-mockDispatcher.addListener.mockImplementation(({ name, cb }) => {
-    callback = cb;
-    const ref = { getName: () => name };
-    refs.push(ref);
-    return ref;
-});
-const mockFeatureService = mock<FeatureService>();
-mockFeatureService.createResolver.mockReturnValue(mock<ResolverInterface>());
-const sort = new ExplorerSort(mock<LoggerInterface>(), facade, mockDispatcher, mockFeatureService);
+let dispatcher: MockProxy<EventDispatcherInterface<any>>;
+let refs: [any?, any?];
+let featureService: MockProxy<FeatureService>;
+let delayer: MockProxy<DelayerInterface>;
+let sort: ExplorerSort;
+let view: MockProxy<TFileExplorerView>;
+let replacerFactory: jest.Mock<ReturnType<FunctionReplacerFactory<TFileExplorerItem, "sort", ExplorerSort>>>;
 
-const view = mock<TFileExplorerView>();
-// @ts-ignore
-view.requestSort = jest.fn();
-
-test("Should be disabled", () => expect(sort.isEnabled()).toBeFalsy());
-
-test("Should throw exception because there is no explorer", () =>
-    expect(() => sort.enable()).rejects.toThrow(ExplorerViewUndefined));
-
-test("Should add listener after enabled", async () => {
-    const leaf = mock<WorkspaceLeaf>();
-    leaf.view = view;
-    facade.getLeavesOfType.mockReturnValueOnce([leaf]);
-    await sort.enable();
-    expect(sort.isEnabled()).toBeTruthy();
-    expect(mockDispatcher.addListener).toHaveBeenCalledWith({ name: "manager:update", cb: expect.anything() });
-    expect(mockDispatcher.addListener).toHaveBeenCalledWith({ name: "manager:refresh", cb: expect.anything() });
-    expect(mockDispatcher.addListener).toHaveBeenCalledTimes(2);
+beforeEach(() => {
+    refs = [];
+    facade = mock<ObsidianFacade>();
+    dispatcher = mock<EventDispatcherInterface<any>>();
+    dispatcher.addListener.mockImplementation(({ name, cb }) => {
+        callback = cb;
+        const ref = { getName: () => name };
+        refs.push(ref);
+        return ref;
+    });
+    featureService = mock<FeatureService>();
+    featureService.createResolver.mockReturnValue(mock<ResolverInterface>());
+    delayer = mock<DelayerInterface>();
+    view = mock<TFileExplorerView>();
+    replacerFactory = jest.fn();
+    // @ts-ignore
+    view.requestSort = jest.fn();
+    sort = new ExplorerSort(mock<LoggerInterface>(), facade, dispatcher, featureService, delayer, replacerFactory);
 });
 
-test("Should init timer to find item", () => {
-    expect(setTimeout).toHaveBeenCalledTimes(1);
-    jest.runOnlyPendingTimers();
-    expect(setTimeout).toHaveBeenCalledTimes(2);
-});
+describe("ExplorerSort", () => {
+    test("should be stopped by default", () => expect(sort.isStarted()).toBeFalsy());
 
-test("Should call requestSort", () => {
-    callback(new Event({ id: Feature.Explorer, result: true }));
-    expect(view.requestSort).toHaveBeenCalledTimes(1);
-    view.requestSort.mockClear();
-});
+    test("should throw exception because there is no explorer", () => {
+        expect(() => sort.start()).toThrow(ExplorerViewUndefined);
+    });
 
-test("Should switch off, requestSort and do not call requestSort by event", async () => {
-    await sort.disable();
-    expect(sort.isEnabled()).toBeFalsy();
-    expect(view.requestSort).toHaveBeenCalledTimes(1);
-    expect(mockDispatcher.removeListener).toHaveBeenCalledTimes(2);
-    expect(mockDispatcher.removeListener).toHaveBeenCalledWith(refs[0]);
-    expect(mockDispatcher.removeListener).toHaveBeenCalledWith(refs[1]);
-    callback(new Event({ id: Feature.Explorer }));
-    expect(view.requestSort).toHaveBeenCalledTimes(1);
-});
+    describe("with view", () => {
+        beforeEach(() => {
+            facade.getViewsOfType.mockReturnValue([view]);
+        });
 
-test("Should not init times after disabling", () => {
-    jest.runOnlyPendingTimers();
-    expect(setTimeout).toHaveBeenCalledTimes(2);
-});
+        test("should add listener after enabled", () => {
+            sort.start();
+            expect(sort.isStarted()).toBeTruthy();
+            expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:update", cb: expect.anything() });
+            expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:refresh", cb: expect.anything() });
+            expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
+        });
+        //
+        test("should delay replace because these is not item", () => {
+            let fn: Function;
+            //copy delayed function to call it manually
+            delayer.delay.mockImplementation(f => {
+                fn = f;
+                return 0;
+            });
+            //enable sort to trigger internal "tryToReplaceOriginalSort"
+            sort.start();
+            expect(delayer.delay).toHaveBeenCalledTimes(1);
+            //Call delayed function
+            fn();
+            expect(delayer.delay).toHaveBeenCalledTimes(2);
+            expect(replacerFactory).not.toBeCalled();
+        });
 
-test("Should not dispatch anything", () => {
-    expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
+        describe("with explorer item", () => {
+            let replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
+            let item: TFileExplorerItem;
+            beforeEach(() => {
+                item = mock<TFileExplorerItem>();
+                item.file = new TFolder();
+                replacer = mock<FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>>();
+                replacerFactory.mockImplementationOnce(() => replacer);
+            });
+            test("Should create function replacer without delay, because there is folder item", () => {
+                view.fileItems["mock"] = item;
+                sort.start();
+                expect(delayer.delay).not.toHaveBeenCalled();
+                expect(replacerFactory).toBeCalled();
+                expect(replacer.enable).toBeCalled();
+            });
+
+            test("should not trigger vanilla sort because event is not suitable", () => {
+                view.fileItems["mock"] = item;
+                sort.start();
+                callback(new Event({ id: Feature.Explorer, result: false }));
+                callback(new Event({ id: Feature.Tab, result: false }));
+                expect(view.requestSort).not.toHaveBeenCalled();
+            });
+
+            test("should trigger requestSort because event is suitable", () => {
+                view.fileItems["mock"] = item;
+                sort.start();
+                callback(new Event({ id: Feature.Explorer, result: true }));
+                expect(view.requestSort).toHaveBeenCalledTimes(1);
+            });
+
+            test("should disable replacer and remove listener after stop", () => {
+                view.fileItems["mock"] = item;
+                sort.start();
+                sort.stop();
+                expect(replacer.disable).toBeCalled();
+                expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[0]);
+                expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[1]);
+            });
+        });
+    });
 });

@@ -8,6 +8,7 @@ import { ResolverEvents } from "./ResolverType";
 import { ResolverDynamicInterface } from "@src/Resolver/Interfaces";
 
 import { AppEvents } from "@src/Types";
+
 @injectable()
 export default class ResolverCachedProxy implements ResolverDynamicInterface {
     constructor(
@@ -31,6 +32,14 @@ export default class ResolverCachedProxy implements ResolverDynamicInterface {
         });
     }
 
+    resolve(path: string): string {
+        return this.get(path);
+    }
+
+    setTemplate(template: string): void {
+        this.resolver.setTemplate(template);
+    }
+
     private handleDelete(path: string): void {
         const item = this.cache.getItem<string | null>(path);
 
@@ -45,10 +54,6 @@ export default class ResolverCachedProxy implements ResolverDynamicInterface {
         }
     }
 
-    resolve(path: string): string {
-        return this.get(path);
-    }
-
     private actualize(item: CacheItemInterface<string | null>): void {
         const title = this.resolver.resolve(item.getKey());
         this.cache.save(item.set(title));
@@ -60,9 +65,5 @@ export default class ResolverCachedProxy implements ResolverDynamicInterface {
             this.actualize(item);
         }
         return item.get() ?? null;
-    }
-
-    setTemplate(template: string): void {
-        this.resolver.setTemplate(template);
     }
 }

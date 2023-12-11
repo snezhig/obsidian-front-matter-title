@@ -7,8 +7,9 @@ import { NoteLinkStrategy } from "@src/Feature/NoteLink/NoteLinkTypes";
 type SettingsFeatureSpecific = {
     [Feature.Alias]: { strategy: AliasStrategyType; validator: AliasValidatorType };
     [Feature.NoteLink]: { approval: boolean; strategy: NoteLinkStrategy };
+    [Feature.Explorer]: { sort: boolean };
 };
-export type SettingsFeatureCommon = { enabled: boolean };
+export type SettingsFeatureCommon = { enabled: boolean; templates: TemplateValue };
 export type SettingsFeature = {
     [K in Feature]: K extends keyof SettingsFeatureSpecific
         ? SettingsFeatureSpecific[K] & SettingsFeatureCommon
@@ -16,9 +17,10 @@ export type SettingsFeature = {
 };
 
 export type TemplateValue = { main: string | null; fallback: string | null };
-export type TemplateNames = "common" & Feature;
+export type TemplateNames = "common";
 export type SettingsType = {
-    templates: { [K in Feature]?: TemplateValue } & { common: TemplateValue };
+    version: string;
+    templates: { common: TemplateValue };
 
     processor: {
         type: ProcessorTypes | null;
@@ -39,6 +41,30 @@ export type SettingsEvent = {
     "settings:changed": { old: SettingsType; actual: SettingsType; changed: Changed<SettingsType> };
     "settings:tab:close": null;
     "settings.loaded": { settings: SettingsType };
-    "settings:tab:manager:changed": { id: Feature; value: boolean };
     "settings:tab:feature:changed": { id: Feature; value: SettingsFeature[keyof SettingsFeature] };
 };
+
+// enum Feature {
+//     Foo,
+//     Bar,
+//     Quo,
+// }
+// type SettingSpecific = {
+//     [Feature.Foo]: { strategy: string };
+//     [Feature.Quo]: { vaidator: string };
+//     //Feature.Bar does not have specific config
+// };
+// type SettingsFeatureCommon = { enabled: boolean; templates: TemplateValue };
+//
+// type Setting = {
+//     [K in Feature]: K extends keyof SettingSpecific ? SettingSpecific & SettingsFeatureCommon : SettingsFeatureCommon;
+// };
+//
+// export type BuildSettingConfig<K> = K extends keyof SettingSpecific ? SettingSpecific[K] : SettingsFeatureCommon;
+// export type BuildParams<K extends keyof Feature> = {
+//     id: K;
+//     name: string;
+//     desc: string;
+//     config: BuildSettingConfig<K>;
+//     doc: { link: string };
+// };

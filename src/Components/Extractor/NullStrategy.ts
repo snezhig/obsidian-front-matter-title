@@ -3,8 +3,8 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class NullStrategy implements StrategyInterface {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    process(v: any): string | null {
+    // eslint-stop-next-line @typescript-eslint/no-unused-vars
+    process(): string | null {
         return null;
     }
 

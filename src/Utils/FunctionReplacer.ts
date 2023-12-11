@@ -16,14 +16,18 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
     ) {
         this.valid();
     }
-    public getTarget(): Target {
-        return this.target;
+
+    public static create<Target, Method extends FunctionPropertyNames<Required<Target>>, O>(
+        target: Target,
+        method: Method,
+        args: O,
+        implementation: Implementation<Target, Method, O>
+    ) {
+        return new FunctionReplacer(target, method, args, implementation);
     }
 
-    private valid(): void {
-        if (typeof this.target[this.method] !== "function") {
-            throw new Error(`Method ${this.method} is not a function`);
-        }
+    public getTarget(): Target {
+        return this.target;
     }
 
     public enable(): boolean {
@@ -51,12 +55,9 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
         return this.vanilla !== null;
     }
 
-    public static create<Target, Method extends FunctionPropertyNames<Required<Target>>, O>(
-        target: Target,
-        method: Method,
-        args: O,
-        implementation: Implementation<Target, Method, O>
-    ) {
-        return new FunctionReplacer(target, method, args, implementation);
+    private valid(): void {
+        if (typeof this.target[this.method] !== "function") {
+            throw new Error(`Method ${this.method} is not a function`);
+        }
     }
 }

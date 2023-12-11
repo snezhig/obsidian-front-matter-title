@@ -54,6 +54,7 @@ export default class ObjectHelper {
     public static entries<T extends object>(object: T): [keyof T, T[keyof T]][] {
         return Object.entries(object) as [keyof T, T[keyof T]][];
     }
+
     public static values<T extends object>(object: T): T[keyof T][] {
         return Object.values(object) as T[keyof T][];
     }

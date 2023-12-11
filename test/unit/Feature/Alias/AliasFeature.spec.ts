@@ -69,8 +69,8 @@ test("Should add listener, set validator, strategy and refresh", () => {
 //         mockValidator.validate.mockClear();
 //     });
 //     test("Should be enabled", () => {
-//         feature.enable();
-//         expect(feature.isEnabled()).toBeTruthy();
+//         feature.start();
+//         expect(feature.isStarted()).toBeTruthy();
 //     });
 //
 //     test("Should set `bar` as alias by update", async () => {
@@ -129,7 +129,7 @@ test("Should add listener, set validator, strategy and refresh", () => {
 //     });
 // });
 //
-// test("Should restore after disable", async () => {
+// test("Should restore after stop", async () => {
 //     const value = "bar";
 //     mockStrategy.process.mockImplementationOnce(alias => alias.setValue(value));
 //     const cache = {frontmatter: {position: mock<Pos>()} as FrontMatterCache};
@@ -137,7 +137,7 @@ test("Should add listener, set validator, strategy and refresh", () => {
 //     expect(cache.frontmatter.alias).not.toEqual("bar");
 //     expect(await feature.update(fooPath)).toBeTruthy();
 //     expect(cache.frontmatter.alias).toEqual("bar");
-//     feature.disable();
-//     expect(feature.isEnabled()).toBeFalsy();
+//     feature.stop();
+//     expect(feature.isStarted()).toBeFalsy();
 //     expect(cache.frontmatter).not.toHaveProperty("alias");
 // });

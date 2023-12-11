@@ -16,6 +16,7 @@ export default abstract class AbstractBuilder<T extends object, K extends keyof 
         this.container = container;
         this.doBuild();
     }
+
     abstract support(k: keyof T): boolean;
 
     abstract doBuild(): void;
