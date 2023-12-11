@@ -37,7 +37,6 @@ export default class PluginHelper {
             version: PLUGIN_VERSION,
             templates: {
                 common: { main: "title", fallback: "fallback_title" },
-                ...Object.fromEntries(Object.values(Feature).map(e => [e, { main: null, fallback: null }])),
             },
             rules: {
                 paths: {
