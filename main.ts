@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { AppExt, CachedMetadata, Modal, Plugin } from "obsidian";
+import { AppExt, CachedMetadata, Modal, Notice, Plugin } from "obsidian";
 import { SettingsEvent, SettingsType } from "@src/Settings/SettingsType";
 import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
@@ -152,7 +152,13 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         }
 
         for (const [id, state] of states) {
-            this.fc.toggle(id, state as boolean);
+            try {
+                this.fc.toggle(id, state as boolean);
+            } catch (e) {
+                //TODO: refactor
+                this.fc.toggle(id, false);
+                new Notice(e);
+            }
         }
     }
 

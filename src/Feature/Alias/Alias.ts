@@ -47,7 +47,7 @@ export default class Alias {
     }
 
     private getPossibleKeys(): string[] {
-        return ["alias", "aliases"];
+        return ["aliases", "alias"];
     }
 
     private modify(alias: string | string[]): void {

@@ -66,15 +66,15 @@ describe("Test mutation", () => {
     });
 });
 describe("Test mutation of empty object", () => {
-    const data: { alias?: any } = {};
+    const data: { aliases?: any } = {};
     const alias = new Alias(data);
     test("Should set `foo` as a value and createNamed new key", () => {
         expect(alias.getKey()).toBeNull();
         expect(alias.getValue()).toBeNull();
         alias.setValue("foo");
-        expect(alias.getKey()).toEqual("alias");
+        expect(alias.getKey()).toEqual("aliases");
         expect(alias.getValue()).toEqual("foo");
-        expect(data.alias).toEqual("foo");
+        expect(data.aliases).toEqual("foo");
     });
     test("Should restore data", () => {
         alias.restore();
