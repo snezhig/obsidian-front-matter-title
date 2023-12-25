@@ -88,6 +88,7 @@ export default class FakeTitleElementService {
         }
 
         container.insertBefore(element, original);
+        element.hidden = true;
 
         return { created: true, element };
     }

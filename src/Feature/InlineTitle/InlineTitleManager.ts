@@ -98,7 +98,7 @@ export class InlineTitleManager extends AbstractManager {
         const id = this.getTitleElId(view);
         const original = view.inlineTitleEl;
         const { created } = this.fakeTitleElementService.getOrCreate({ original, title, id, events: ["click"] });
-        if (created) {
+        if (created && !original.isActiveElement()) {
             this.fakeTitleElementService.setVisible(id, true);
         }
         return id;
