@@ -32,7 +32,6 @@ export class Migrator {
             //@ts-ignore
             this[method]();
         }
-        //TODO: dispatcher does not log event because logger will be enabled after settings load
         this.dispatcher.dispatch("migrator:migrated", new Event({ from: currentVersion, to: version }));
         return this.config;
     }
@@ -51,5 +50,16 @@ export class Migrator {
             }
         }
         return;
+    }
+
+    private v3_8_3(): void {
+        if (Array.isArray(this.config?.templates)) {
+            this.config.templates = {
+                common: {
+                    main: this.config?.templates?.[0] ?? PluginHelper.createDefaultSettings().templates.common.main,
+                    fallback: this.config?.templates?.[1] ?? "",
+                },
+            };
+        }
     }
 }

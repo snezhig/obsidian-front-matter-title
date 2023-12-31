@@ -7,29 +7,18 @@ declare const PLUGIN_VERSION: string;
 
 export type CompareOperation = ">" | ">=" | "=" | "!=" | "<" | "<=";
 export default class PluginHelper {
-    public static compareVersion(left: string, operation: CompareOperation, right: string): boolean {
-        const leftV = left.split(".").map(e => parseInt(e));
-        const rightV = right.split(".").map(e => parseInt(e));
-        let result = true;
-        for (const [k, i] of leftV.entries()) {
-            if (operation.includes(">")) {
-                if (i !== rightV[k]) {
-                    result = i > rightV[k];
-                    break;
-                }
-            } else if (operation.includes("<")) {
-                if (i !== rightV[k]) {
-                    result = i < rightV[k];
-                    break;
-                }
-            } else if (operation.includes("=")) {
-                if (i !== rightV[k]) {
-                    result = false;
-                    break;
-                }
+    public static compareVersion(version1: string, comparator: CompareOperation, version2: string): boolean {
+        const left = version1.split(".").map(Number);
+        const right = version2.split(".").map(Number);
+
+        for (let i = 0; i < 3; ++i) {
+            if (left[i] > right[i]) {
+                return comparator === ">" || comparator === ">=" || comparator === "!=";
+            } else if (left[i] < right[i]) {
+                return comparator === "<" || comparator === "<=" || comparator === "!=";
             }
         }
-        return operation.includes("!") ? !result : result;
+        return comparator === "=" || comparator === ">=" || comparator === "<=";
     }
 
     public static createDefaultSettings(): SettingsType {

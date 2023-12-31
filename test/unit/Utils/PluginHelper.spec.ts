@@ -56,6 +56,12 @@ describe("PluginHelper Test", () => {
             operation: "<",
             result: false,
         },
+        {
+            left: "1.4.40",
+            right: "1.4.40",
+            operation: ">",
+            result: false,
+        },
     ];
     for (const item of data) {
         it(`${item.left} ${item.operation} ${item.right} should be ${item.result}`, () => {
