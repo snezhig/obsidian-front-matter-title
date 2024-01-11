@@ -77,6 +77,7 @@ export default class FakeTitleElementService {
         element.className = original.className;
         element.setText(title);
         element.setAttribute(this.attr.fake, id);
+        element.tabIndex = -1;
         original.setAttribute(this.attr.original, id);
         this.elements.set(id, { original, fake: element, events: [...events] });
 
@@ -121,6 +122,7 @@ export default class FakeTitleElementService {
         if (this.has(id)) {
             const { fake, original } = this.elements.get(id);
             fake.addEventListener("click", this.events.click);
+            fake.addEventListener("focus", this.events.click);
             original.addEventListener("blur", this.events.blur);
         }
     }
