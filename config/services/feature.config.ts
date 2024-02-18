@@ -12,7 +12,7 @@ import EnsureStrategy from "@src/Feature/Alias/Strategy/EnsureStrategy";
 import AdjustStrategy from "@src/Feature/Alias/Strategy/AdjustStrategy";
 import ReplaceStrategy from "@src/Feature/Alias/Strategy/ReplaceStrategy";
 import SuggestFeature from "@src/Feature/Suggest/SuggestFeature";
-import StarredManager from "@src/Feature/Starred/StarredManager";
+import BookmarksManager from "@src/Feature/Bookmarks/BookmarksManager";
 import GraphManager from "@src/Feature/Graph/GraphManager";
 import { MarkdownHeaderManager } from "@src/Feature/MarkdownHeader/MarkdownHeaderManager";
 import {
@@ -37,6 +37,7 @@ import { TFileExplorerItem } from "obsidian";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
 import { ExplorerFileItemMutator } from "@src/Feature/Explorer/ExplorerFileItemMutator";
 import Storage from "@src/Storage/Storage";
+import WindowFrameFeature from "@src/Feature/WindowFrame/WindowFrameFeature";
 import Container = interfaces.Container;
 
 export default (container: Container) => {
@@ -57,9 +58,13 @@ export default (container: Container) => {
             return feature;
         });
     container.bind<FeatureInterface<any>>(SI.feature).to(AliasFeature).whenTargetNamed(AliasFeature.getId());
+    container
+        .bind<FeatureInterface<any>>(SI.feature)
+        .to(WindowFrameFeature)
+        .whenTargetNamed(WindowFrameFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(ExplorerManager).whenTargetNamed(ExplorerManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SearchFeature).whenTargetNamed(SearchFeature.getId());
-    container.bind<FeatureInterface<any>>(SI.feature).to(StarredManager).whenTargetNamed(StarredManager.getId());
+    container.bind<FeatureInterface<any>>(SI.feature).to(BookmarksManager).whenTargetNamed(BookmarksManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(TabManager).whenTargetNamed(TabManager.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(SuggestFeature).whenTargetNamed(SuggestFeature.getId());
     container.bind<FeatureInterface<any>>(SI.feature).to(GraphManager).whenTargetNamed(GraphManager.getId());

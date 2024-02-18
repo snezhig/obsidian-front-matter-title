@@ -10,7 +10,7 @@ export default class FeatureHelper {
             Feature.Explorer,
             Feature.Graph,
             Feature.Header,
-            Feature.Starred,
+            Feature.Bookmarks,
             Feature.Search,
             Feature.Suggest,
             Feature.Tab,
@@ -18,6 +18,7 @@ export default class FeatureHelper {
             Feature.Canvas,
             Feature.Backlink,
             Feature.NoteLink,
+            Feature.WindowFrame,
         ];
     }
 
@@ -31,8 +32,8 @@ export default class FeatureHelper {
                 return t("feature.graph.name");
             case Feature.Header:
                 return t("feature.header.name");
-            case Feature.Starred:
-                return t("feature.starred.name");
+            case Feature.Bookmarks:
+                return t("feature.bookmarks.name");
             case Feature.Search:
                 return t("feature.search.name");
             case Feature.Suggest:
@@ -47,6 +48,8 @@ export default class FeatureHelper {
                 return t("feature.backlink.name");
             case Feature.NoteLink:
                 return t("feature.noteLink.name");
+            case Feature.WindowFrame:
+                return t("feature.windowFrame.name");
         }
     }
 
@@ -60,8 +63,8 @@ export default class FeatureHelper {
                 return t("feature.graph.desc");
             case Feature.Header:
                 return t("feature.header.desc");
-            case Feature.Starred:
-                return t("feature.starred.desc");
+            case Feature.Bookmarks:
+                return t("feature.bookmarks.desc");
             case Feature.Search:
                 return t("feature.search.desc");
             case Feature.Suggest:
@@ -76,6 +79,8 @@ export default class FeatureHelper {
                 return t("feature.backlink.desc");
             case Feature.NoteLink:
                 return t("feature.noteLink.desc");
+            case Feature.WindowFrame:
+                return t("feature.windowFrame.desc");
         }
     }
 

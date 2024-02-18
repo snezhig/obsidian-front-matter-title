@@ -47,7 +47,7 @@ const zh_tw: Translation = {
             name: "頁頂標題",
             desc: "替換Tab標籤頁頂部的標題並更新它們",
         },
-        [Feature.Starred]: {
+        [Feature.Bookmarks]: {
             name: "書簽",
             desc: "替換內置書簽插件中顯示的標題",
         },
