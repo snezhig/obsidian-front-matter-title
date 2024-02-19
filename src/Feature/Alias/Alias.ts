@@ -17,7 +17,8 @@ export default class Alias {
     }
 
     public getValue(): string | string[] | null {
-        return this.cache[this.getKey()] ?? null;
+        const val = this.cache[this.getKey()] ?? null;
+        return Array.isArray(val) ? [...val] : val;
     }
 
     public setValue(alias: string | string[]): void {

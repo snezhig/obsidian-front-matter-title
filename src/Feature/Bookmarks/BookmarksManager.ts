@@ -103,14 +103,12 @@ export default class BookmarksManager extends AbstractFeature<Feature> {
         for (const item of items) {
             const titleEl = itemDoms.get(item)?.titleEl;
             result[item.path] = false;
-            console.log(item, titleEl, path, item.title === "" || item?.title === undefined);
             if (
                 titleEl &&
                 item.type === "file" &&
                 (item.title === "" || item?.title === undefined) &&
                 (!path || item.path === path)
             ) {
-                console.log("====");
                 this.process(titleEl, item.path).catch(console.error);
                 result[item.path] = true;
             }
@@ -120,7 +118,6 @@ export default class BookmarksManager extends AbstractFeature<Feature> {
 
     private async process(div: Element, path: string): Promise<void> {
         const title = this.resolver.resolve(path) ?? div.getText();
-        console.log(title, div.getText());
         if (div.getText() !== title) {
             div.setText(title);
         }
