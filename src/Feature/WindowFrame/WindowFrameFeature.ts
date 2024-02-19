@@ -6,6 +6,10 @@ import SI from "@config/inversify.types";
 import { EditableFileView } from "obsidian";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
 import FeatureService from "@src/Feature/FeatureService";
+import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
+import { AppEvents } from "@src/Types";
+import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
+import EventInterface from "@src/Components/EventDispatcher/Interfaces/EventInterface";
 
 @injectable()
 export default class WindowFrameFeature implements AbstractFeature<Feature> {
@@ -15,22 +19,33 @@ export default class WindowFrameFeature implements AbstractFeature<Feature> {
 
     private enabled = false;
 
+    private ref: ListenerRef<"metadata:cache:changed"> = null;
+
     constructor(
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
         @inject(SI["feature:service"])
-        featureService: FeatureService
+        featureService: FeatureService,
+        @inject(SI["event:dispatcher"])
+        private dispatcher: EventDispatcherInterface<AppEvents>
     ) {
         this.resolver = featureService.createResolver(this.getId());
+        this.ref = dispatcher.addListener({ name: "metadata:cache:changed", cb: this.onCacheChanged.bind(this) });
     }
 
     static getId(): Feature {
         return Feature.WindowFrame;
     }
 
+    onCacheChanged(e: EventInterface<AppEvents["metadata:cache:changed"]>) {
+        if (this.facade.getActiveFile()?.path === e.get().path) {
+            this.updateTitle();
+        }
+    }
+
     updateTitle() {
         const e = this.facade.getMostRecentLeaf(this.facade.getActiveLeaf().getContainer());
-        let text = "";
+        let text: string;
         if (e.view instanceof EditableFileView) {
             text = this.resolver.resolve(e.view.file.path);
         } else {
@@ -41,6 +56,7 @@ export default class WindowFrameFeature implements AbstractFeature<Feature> {
     }
 
     disable(): void {
+        this.dispatcher.removeListener(this.ref);
         this.facade.getWorkspace().updateTitle = this.vanillaUpdateTitle;
         this.facade.getWorkspace().updateTitle();
         this.enabled = false;

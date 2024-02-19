@@ -55,6 +55,10 @@ export default class ObsidianFacade {
         return this.app.workspace?.activeLeaf ?? null;
     }
 
+    public getActiveFile(): TFile | null {
+        return this.app.workspace?.getActiveFile() ?? null;
+    }
+
     public getWorkspace(): WorkspaceInterface {
         return this.app.workspace as WorkspaceExt;
     }
