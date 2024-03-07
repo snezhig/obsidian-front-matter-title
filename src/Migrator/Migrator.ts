@@ -62,4 +62,12 @@ export class Migrator {
             };
         }
     }
+
+    private v3_9_0(): void {
+        // @ts-ignore
+        if (this.config.features.starred) {
+            // @ts-ignore
+            delete this.config.features.starred;
+        }
+    }
 }

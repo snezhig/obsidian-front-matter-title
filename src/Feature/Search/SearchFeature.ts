@@ -18,7 +18,7 @@ export default class SearchManager extends AbstractFeature<Feature> {
         @inject(SI["facade:obsidian"])
         private facade: ObsidianFacade,
         @inject(SI.logger)
-        @named("manager:starred")
+        @named("manager:search")
         private logger: LoggerInterface,
         @inject(SI["service:search:dom:wrapper"])
         private service: SearchDomWrapperService,

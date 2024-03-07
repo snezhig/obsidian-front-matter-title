@@ -1,11 +1,17 @@
 import "obsidian";
-import { Events, MarkdownView, MetadataCache, Plugin, TFile, TFolder, View, WorkspaceLeaf } from "obsidian";
+import { Events, MarkdownView, MetadataCache, Plugin, TFile, TFolder, View, Workspace, WorkspaceLeaf } from "obsidian";
 
 declare module "obsidian" {
     export class AppExt extends App {
         internalPlugins: {
             getEnabledPluginById: (id: string) => Plugin | null;
         };
+
+        getAppTitle(text: string | null): string;
+    }
+
+    export interface WorkspaceInterface {
+        updateTitle(): void;
     }
 
     export interface TFileExplorerItem {
@@ -32,9 +38,9 @@ declare module "obsidian" {
         getTitle(): string;
     }
 
-    export abstract class StarredPluginView extends ViewPluginEventable {
-        itemLookup: WeakMap<Element, { type: string | "file"; title: string; path: string }>;
-        listEl: Element;
+    export abstract class BookmarksPluginView extends ViewPluginEventable {
+        plugin: Plugin & Events & { items: { type: string | "file"; title: string; path: string }[] };
+        itemDoms: WeakMap<{ type: string | "file"; title: string; path: string }, { titleEl: Element }>;
     }
 
     export abstract class ViewPluginEventable extends View {
@@ -144,5 +150,9 @@ declare module "obsidian" {
 
     export abstract class MetadataCacheExt extends MetadataCache {
         getCachedFiles(): string[];
+    }
+
+    export class WorkspaceExt extends Workspace {
+        updateTitle(): void;
     }
 }

@@ -47,7 +47,7 @@ const zh: Translation = {
             name: "页顶标题",
             desc: "替换Tab标签页顶部的标题并更新它们",
         },
-        [Feature.Starred]: {
+        [Feature.Bookmarks]: {
             name: "书签",
             desc: "替换内置书签插件中显示的标题",
         },

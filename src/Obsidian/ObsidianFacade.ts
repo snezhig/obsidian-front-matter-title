@@ -1,4 +1,14 @@
-import { AppExt, CachedMetadata, LinkCache, TFile, View, WorkspaceLeaf } from "obsidian";
+import {
+    AppExt,
+    CachedMetadata,
+    LinkCache,
+    TFile,
+    View,
+    WorkspaceExt,
+    WorkspaceInterface,
+    WorkspaceLeaf,
+    WorkspaceParent,
+} from "obsidian";
 import { Leaves } from "../Enum";
 
 export default class ObsidianFacade {
@@ -43,5 +53,21 @@ export default class ObsidianFacade {
 
     public getActiveLeaf(): WorkspaceLeaf | null {
         return this.app.workspace?.activeLeaf ?? null;
+    }
+
+    public getActiveFile(): TFile | null {
+        return this.app.workspace?.getActiveFile() ?? null;
+    }
+
+    public getWorkspace(): WorkspaceInterface {
+        return this.app.workspace as WorkspaceExt;
+    }
+
+    public getMostRecentLeaf(root?: WorkspaceParent): WorkspaceLeaf | null {
+        return this.app.workspace.getMostRecentLeaf(root);
+    }
+
+    public getAppTitle(text: string = null): string {
+        return this.app.getAppTitle(text);
     }
 }

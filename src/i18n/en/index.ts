@@ -51,9 +51,9 @@ const en = {
             name: "Header",
             desc: "Replace titles in header of leaves and update them",
         },
-        [Feature.Starred]: {
-            name: "Starred",
-            desc: "Replace shown titles in built-in starred plugin",
+        [Feature.Bookmarks]: {
+            name: "Bookmarks",
+            desc: "Replace shown titles in built-in bookmarks plugin",
         },
         [Feature.Search]: {
             name: "Search",
@@ -98,6 +98,10 @@ const en = {
                     auto: "Use auto approve",
                 },
             },
+        },
+        [Feature.WindowFrame]: {
+            name: "Window Frame Title",
+            desc: "Replace shown title in window frame",
         },
     },
     manage: "Manage",

@@ -5,7 +5,7 @@ export enum Leaves {
     MD = "markdown",
     BL = "backlink",
     S = "search",
-    ST = "starred",
+    Bookmarks = "bookmarks",
     CV = "canvas",
 }
 
@@ -13,7 +13,7 @@ export enum Feature {
     Explorer = "explorer",
     Graph = "graph",
     Header = "header",
-    Starred = "starred",
+    Bookmarks = "bookmarks",
     Search = Leaves.S,
     Tab = "tab",
     Alias = "alias",
@@ -22,13 +22,13 @@ export enum Feature {
     Canvas = "canvas",
     Backlink = Leaves.BL,
     NoteLink = "noteLink",
+    WindowFrame = "windowFrame",
 }
 
 export const Managers = [
     Feature.Explorer,
     Feature.Graph,
     Feature.Header,
-    Feature.Starred,
     Feature.Tab,
     Feature.InlineTitle,
     Feature.Canvas,
