@@ -63,7 +63,7 @@ export class Migrator {
         }
     }
 
-    private v3_10_0(): void {
+    private v3_9_0(): void {
         // @ts-ignore
         if (this.config.features.starred) {
             // @ts-ignore
