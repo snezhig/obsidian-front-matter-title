@@ -26,7 +26,22 @@ jobs:
           cache: "npm"
       - run: npm i
 
-      - name: Eslint
+      - name: Fix issues with Eslint
+        run: npm run eslint-fix
+
+      - name: Commit changes
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git commit -am "fixed eslint issues" || true
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+      
+      - name: Eslint check again
         run: npm run eslint
 
       - name: Run test
