@@ -18,7 +18,7 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
     private refs: ListenerRef<keyof AppEvents>[] | never[] = [];
     private resolver: ResolverInterface;
     private dProcess: () => void = null;
-    private timer: NodeJS.Timer = null;
+    private timer: number = null;
     private isBacklinkWrapped = false;
 
     constructor(
@@ -40,7 +40,7 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
             if (this.timer) {
                 clearTimeout(this.timer);
             }
-            this.timer = setTimeout(this.process.bind(this), 50);
+            this.timer = window.setTimeout(this.process.bind(this), 50);
         };
     }
 
