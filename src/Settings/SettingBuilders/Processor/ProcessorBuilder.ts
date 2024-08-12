@@ -52,6 +52,13 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
                     `const value = new Function('title', #${t("processor.function.valueDesc")}#)`,
                 ];
                 break;
+            case ProcessorTypes.FunctionV2:
+                additional = [
+                    "",
+                    t("processor.functionV2.desc"),
+                    `const value = new Function('obj', #${t("processor.functionV2.valueDesc")}#)`,
+                ];
+                break;
         }
         additional.forEach(e => {
             fragment.appendChild(createEl("br"));
@@ -68,6 +75,7 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
                     "": t("disabled"),
                     [ProcessorTypes.Replace]: t("processor.replace.name"),
                     [ProcessorTypes.Function]: t("processor.function.name"),
+                    [ProcessorTypes.FunctionV2]: t("processor.functionV2.name"),
                 })
                 .setValue(this.item.get("type").value() ?? "")
                 .onChange((v: ProcessorTypes | "") => {
@@ -84,6 +92,9 @@ export default class ProcessorBuilder extends AbstractBuilder<SettingsType, "pro
 
         switch (this.item.get("type").value()) {
             case ProcessorTypes.Function:
+                this.setAlignItemsMode("start");
+                return this.buildFunction();
+            case ProcessorTypes.FunctionV2:
                 this.setAlignItemsMode("start");
                 return this.buildFunction();
             case ProcessorTypes.Replace:

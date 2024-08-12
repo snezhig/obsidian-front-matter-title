@@ -9,6 +9,7 @@ import { ProcessorFactory, ProcessorTypes } from "./ProcessorUtils";
 import ProcessorInterface from "./Interfaces";
 import { inject, injectable } from "inversify";
 import SI from "../../../config/inversify.types";
+import ProcessorArgumentTransformer from "@src/Components/Processor/ProcessorArgumentTransformer";
 
 @injectable()
 export default class ProcessorListener implements ListenerInterface {
@@ -67,7 +68,11 @@ export default class ProcessorListener implements ListenerInterface {
         if (typeof obj.value !== "string") {
             return;
         }
-        const value = this.processor?.process(obj.value) ?? null;
+        if (this.processor === null) {
+            return;
+        }
+        const arg = ProcessorArgumentTransformer.transform(event, this.processor.getType());
+        const value = this.processor.process(arg) ?? null;
         if (value) {
             obj.modify(value);
         }
