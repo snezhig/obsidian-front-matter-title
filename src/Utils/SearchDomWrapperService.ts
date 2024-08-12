@@ -8,7 +8,7 @@ import ResultDomWrapper from "./ResultDomWrapper";
 @injectable()
 export default class SearchDomWrapperService {
     private entities: Map<string, Map<SearchDOM, ResultDomWrapper>> = new Map();
-    private timer: NodeJS.Timer = null;
+    private timer: number = null;
 
     constructor(
         @inject(SI.logger)
@@ -43,7 +43,7 @@ export default class SearchDomWrapperService {
         if (this.timer) {
             clearTimeout(this.timer);
         }
-        this.timer = setTimeout(this.selfClean.bind(this), 10000);
+        this.timer = window.setTimeout(this.selfClean.bind(this), 10000);
     }
 
     private selfClean(): void {

@@ -45,3 +45,25 @@ You can read more about this
 logic [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function)
 Inside your function you will be able to use `title` variable which contains resolved title.
 A value returned by your function will be used as shown title
+
+## FunctionV2
+
+Works same as [Function](#function), but the argument is the object instead of string;
+Object your function will give an argument:
+```typescript
+// Object that will be given into FunctionV2 processor as an "obj" argument
+export type FunctionV2ObjArg = {
+    // New file title
+    title: string;
+    // Path to file
+    path: string;
+};
+```
+
+Example of text area:
+```typescript
+//just for debugging
+console.debug(obj)
+
+return obj.title + '-title-in-' + obj.path
+```

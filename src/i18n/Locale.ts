@@ -87,5 +87,5 @@ if (resolved !== locale) {
 export type Translation = DeepPartial<typeof en>;
 
 export const t = (path: DotNot<typeof en>, params?: object): string => {
-    return i18next.t(path, params);
+    return i18next.t(path as string, params as any) as string;
 };

@@ -30,7 +30,7 @@ export class Resolver implements ResolverDynamicInterface {
 
     private get(path: string): string | null {
         try {
-            return this.dispatch(this.creator.create(path, this.template)) ?? null;
+            return this.dispatch(this.creator.create(path, this.template), path) ?? null;
         } catch (e) {
             console.error(`Error by path ${path}`, e);
         }
@@ -38,12 +38,13 @@ export class Resolver implements ResolverDynamicInterface {
         return null;
     }
 
-    private dispatch(title: string | null): string | null {
+    private dispatch(title: string | null, path: string): string | null {
         const event = new Event<ResolverEvents["resolver:resolved"]>({
             value: title,
             modify(v: string) {
                 this.value = v;
             },
+            path: path,
         });
         this.dispatcher.dispatch("resolver:resolved", event);
         return event.get().value ?? null;

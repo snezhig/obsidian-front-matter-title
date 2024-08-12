@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import ProcessorInterface from "./Interfaces";
 import SI from "../../../config/inversify.types";
+import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
 
 @injectable()
 export default class ReplaceProcessor implements ProcessorInterface {
@@ -21,5 +22,9 @@ export default class ReplaceProcessor implements ProcessorInterface {
 
     process(value: string): string {
         return value.replace(this.pattern, this.replacement);
+    }
+
+    getType(): ProcessorTypes {
+        return ProcessorTypes.Replace;
     }
 }

@@ -189,6 +189,11 @@ const en = {
             desc: "How it will work:",
             valueDesc: "Your value of text area",
         },
+        functionV2: {
+            name: "Function V2",
+            desc: "How it will work:",
+            valueDesc: "Your value of text area",
+        },
     },
     command: {
         features: {
