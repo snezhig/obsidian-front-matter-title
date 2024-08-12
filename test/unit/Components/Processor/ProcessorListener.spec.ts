@@ -76,6 +76,8 @@ test("Should unbinb 'resolver:resolved' ref, because processor is null", () => {
 
 describe("Test 'resolver:resolved' listener", () => {
     const mockProcessor = mock<ProcessorInterface>();
+    mockProcessor.getType.mockReturnValue(ProcessorTypes.Replace);
+
     beforeEach(() => mockProcessor.process.mockClear());
     beforeAll(() => {
         mockProcessor.process.mockReturnValue(null);
@@ -86,12 +88,12 @@ describe("Test 'resolver:resolved' listener", () => {
         );
     });
     const modify = jest.fn();
-    const dispatch = (value: any) => {
-        mockDispatcher.dispatch("resolver:resolved", new Event({ modify, value }));
+    const dispatch = (value: any, path: string) => {
+        mockDispatcher.dispatch("resolver:resolved", new Event({ modify, value, path }));
     };
 
     test("Should call processor, but withour modify value", () => {
-        dispatch("foo");
+        dispatch("foo", "/path/foo");
         expect(mockProcessor.process).toHaveBeenCalledWith("foo");
         expect(mockProcessor.process).toHaveBeenCalledTimes(1);
         expect(modify).not.toHaveBeenCalled();
@@ -100,18 +102,18 @@ describe("Test 'resolver:resolved' listener", () => {
     test("Should call processor and modify the value", () => {
         const changed = "bar";
         mockProcessor.process.mockReturnValueOnce(changed);
-        dispatch("foo");
+        dispatch("foo", "/path/");
         expect(mockProcessor.process).toHaveBeenCalledWith("foo");
         expect(mockProcessor.process).toHaveBeenCalledTimes(1);
         expect(modify).toHaveBeenCalledTimes(1);
         expect(modify).toHaveBeenCalledWith(changed);
     });
 
-    test("Should not call processir, becuase value is not a string", () => {
-        dispatch({});
-        dispatch(null);
-        dispatch(false);
-        dispatch(10);
+    test("Should not call processor, because value is not a string", () => {
+        dispatch({}, "");
+        dispatch(null, "");
+        dispatch(false, "");
+        dispatch(10, "");
         expect(mockProcessor.process).not.toHaveBeenCalled();
     });
 });
