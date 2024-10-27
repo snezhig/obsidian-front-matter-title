@@ -59,6 +59,8 @@ declare module "obsidian" {
         sortOrder: string;
         requestSort: () => void;
 
+        getSortedFolderItems: (TFolder) => TFileExplorerItem[];
+
         getDisplayText(): string;
 
         getViewType(): string;

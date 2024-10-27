@@ -50,13 +50,18 @@ A value returned by your function will be used as shown title
 
 Works same as [Function](#function), but the argument is the object instead of string;
 Object your function will give an argument:
+
 ```typescript
 // Object that will be given into FunctionV2 processor as an "obj" argument
+import {TFile} from "obsidian";
+
 export type FunctionV2ObjArg = {
     // New file title
     title: string;
     // Path to file
     path: string;
+    // Obisian's TFile
+    file: TFile | null;
 };
 ```
 

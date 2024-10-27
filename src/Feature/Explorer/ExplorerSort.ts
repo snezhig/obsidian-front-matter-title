@@ -9,16 +9,15 @@ import { Feature, Leaves } from "@src/Enum";
 import ExplorerViewUndefined from "@src/Feature/Explorer/ExplorerViewUndefined";
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
-import { ResolverInterface } from "../../Resolver/Interfaces";
+import { ResolverInterface } from "@src/Resolver/Interfaces";
 import FeatureService from "../FeatureService";
-import { DelayerInterface } from "@src/Components/Delayer/Delayer";
-import { FunctionReplacerFactory } from "../../../config/inversify.factory.types";
+import { FunctionReplacerFactory } from "@config/inversify.factory.types";
 
 @injectable()
 export default class ExplorerSort {
     private view: TFileExplorerView;
     private started = false;
-    private replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
+    private replacer: FunctionReplacer<TFileExplorerView, "getSortedFolderItems", ExplorerSort>;
     private readonly cb: (e: { id: string; result?: boolean }) => void;
     private refs: [ListenerRef<"manager:refresh">?, ListenerRef<"manager:update">?] = [];
     private resolver: ResolverInterface;
@@ -33,10 +32,12 @@ export default class ExplorerSort {
         private dispatcher: EventDispatcherInterface<AppEvents>,
         @inject(SI["feature:service"])
         service: FeatureService,
-        @inject(SI.delayer)
-        private readonly delayer: DelayerInterface,
         @inject(SI["factory:replacer"])
-        private readonly replacerFactory: FunctionReplacerFactory<TFileExplorerItem, "sort", ExplorerSort>
+        private readonly replacerFactory: FunctionReplacerFactory<
+            TFileExplorerView,
+            "getSortedFolderItems",
+            ExplorerSort
+        >
     ) {
         this.resolver = service.createResolver(Feature.Explorer);
         const trigger = debounce(this.onManagerUpdate.bind(this), 1000);
@@ -105,20 +106,15 @@ export default class ExplorerSort {
             }
             return;
         }
-        const item = this.getFolderItem();
-        if (!item) {
-            this.logger.log("Folder item not found. Try again in 1000 ms");
-            this.delayer.delay(this.tryToReplaceOriginalSort.bind(this), 1000);
-            return;
-        }
+
         this.logger.log("Init replacer");
 
         this.replacer = this.replacerFactory(
-            Object.getPrototypeOf(item),
-            "sort",
+            Object.getPrototypeOf(this.view),
+            "getSortedFolderItems",
             this,
-            function (args, defaultArgs, vanilla) {
-                args.sort(this, vanilla);
+            (feature, defaultArgs, vanilla) => {
+                return feature.getSortedFolderItems(defaultArgs?.[0]) ?? vanilla.call(this);
             }
         );
         this.replacer.enable();
@@ -132,21 +128,19 @@ export default class ExplorerSort {
         return order === "alphabetical";
     }
 
-    private sort(item: TFileExplorerItem, vanilla: () => void) {
+    private getSortedFolderItems(folder: TFolder): TFileExplorerItem[] | null {
         const sortOrder = this.view.sortOrder;
 
         if (!this.isSortSupported(sortOrder)) {
             this.logger.log(`Sort is ${sortOrder}. Skipped.`);
-            vanilla.call(item);
             return;
         }
-        if (!(item.file instanceof TFolder)) {
+        if (!(folder instanceof TFolder)) {
             this.logger.log("File is not TFolder. Why? Skipped.");
-            vanilla.call(item);
             return;
         }
-        this.logger.log("Sort by feature");
-        const children = item.file.children.slice();
+
+        const children = folder.children.slice();
         const result = [];
         children.sort((a, b) => {
             const i = a instanceof TFolder;
@@ -169,15 +163,6 @@ export default class ExplorerSort {
             const f = this.view.fileItems[child.path];
             f && result.push(f);
         }
-
-        item.vChildren.setChildren(result);
-    }
-
-    private getFolderItem(): TFileExplorerItem {
-        for (const item of Object.values(this.view.fileItems)) {
-            if (item.file instanceof TFolder) {
-                return item;
-            }
-        }
+        return result;
     }
 }
