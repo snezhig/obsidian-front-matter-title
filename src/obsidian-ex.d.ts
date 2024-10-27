@@ -38,6 +38,7 @@ declare module "obsidian" {
         getTitle(): string;
     }
 
+    export abstract class BookmarksPluginLeaf extends WorkspaceLeafExt<BookmarksPluginView> {}
     export abstract class BookmarksPluginView extends ViewPluginEventable {
         plugin: Plugin & Events & { items: { type: string | "file"; title: string; path: string }[] };
         itemDoms: WeakMap<{ type: string | "file"; title: string; path: string }, { titleEl: Element }>;
@@ -45,6 +46,10 @@ declare module "obsidian" {
 
     export abstract class ViewPluginEventable extends View {
         plugin: Plugin & Events;
+    }
+
+    export class TFileExplorerLeaf extends WorkspaceLeafExt {
+        view: TFileExplorerView;
     }
 
     export class TFileExplorerView extends View {
@@ -69,8 +74,10 @@ declare module "obsidian" {
         view: GraphView;
     }
 
-    export class WorkspaceLeafExt extends WorkspaceLeaf {
+    export class WorkspaceLeafExt<T extends View = View> extends WorkspaceLeaf {
         id: string;
+        view: T;
+        isVisible(): boolean;
     }
 
     export class GraphView extends View {

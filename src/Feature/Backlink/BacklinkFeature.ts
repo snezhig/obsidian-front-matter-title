@@ -1,6 +1,6 @@
 import { inject, injectable, named } from "inversify";
 import ObsidianFacade from "../../Obsidian/ObsidianFacade";
-import { Feature, Leaves } from "@src/Enum";
+import { Feature, Leaves, Plugins } from "@src/Enum";
 import SI from "../../../config/inversify.types";
 import LoggerInterface from "../../Components/Debug/LoggerInterface";
 import { BacklinkViewExt, MarkdownViewExt } from "obsidian";
@@ -53,7 +53,7 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
     }
 
     public enable(): void {
-        this.enabled = this.facade.isInternalPluginEnabled(this.getId());
+        this.enabled = this.facade.isInternalPluginEnabled(Plugins.Backlink);
         this.logger.log(`Manager state is ${this.enabled}`);
         if (!this.enabled) {
             return;

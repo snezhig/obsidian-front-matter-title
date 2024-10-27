@@ -8,14 +8,16 @@ import Event from "../../../../src/Components/EventDispatcher/Event";
 import { mock } from "jest-mock-extended";
 import ProcessorInterface from "../../../../src/Components/Processor/Interfaces";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
+import ProcessorArgumentTransformer from "@src/Components/Processor/ProcessorArgumentTransformer";
 
 type Events = AppEvents & ResolverEvents;
 const events: Map<ListenerRef<keyof Events>, Callback<Events[keyof Events]>> = new Map();
 
 const mockDispatcher = new EventDispatcherMock<Events>(events);
 const mockFactory = jest.fn();
+const argumentTransformer = new ProcessorArgumentTransformer();
 
-const listener = new ProcessorListener(mockDispatcher, mockFactory);
+const listener = new ProcessorListener(mockDispatcher, mockFactory, argumentTransformer);
 
 beforeEach(() => {
     mockDispatcher.addListener.mockClear();

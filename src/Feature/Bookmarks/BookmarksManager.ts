@@ -1,4 +1,4 @@
-import { BookmarksPluginView, EventRef } from "obsidian";
+import { BookmarksPluginLeaf, BookmarksPluginView, EventRef } from "obsidian";
 import { inject, injectable, named } from "inversify";
 import SI from "@config/inversify.types";
 import ObsidianFacade from "@src/Obsidian/ObsidianFacade";
@@ -11,12 +11,19 @@ import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces
 import { AppEvents } from "@src/Types";
 import ListenerRef from "@src/Components/EventDispatcher/Interfaces/ListenerRef";
 
+enum State {
+    Disabled = "disabled",
+    Enabled = "enabled",
+    Awaiting = "awaiting",
+}
+
 @injectable()
 export default class BookmarksManager extends AbstractFeature<Feature> {
-    private enabled = false;
+    private state: State = State.Disabled;
     private view: BookmarksPluginView = null;
     private ref: EventRef = null;
     private metaRef: ListenerRef<"metadata:cache:changed"> = null;
+    private activeLeafChangeRef: ListenerRef<"active:leaf:change"> = null;
     private resolver: ResolverInterface;
     private requestUpdate: () => void;
 
@@ -33,29 +40,27 @@ export default class BookmarksManager extends AbstractFeature<Feature> {
     ) {
         super();
         this.requestUpdate = () => setTimeout(this.onChanged.bind(this), 100);
-        this.metaRef = this.dispatcher.addListener({
-            name: "metadata:cache:changed",
-            cb: this.requestUpdate.bind(this),
-        });
         this.resolver = service.createResolver(this.getId());
     }
 
+    private setState(state: State): void {
+        this.logger.log(`State changed from ${this.state} to ${state}`);
+        this.state = state;
+    }
     static getId(): Feature {
         return Feature.Bookmarks;
     }
 
     enable(): void {
-        if (!this.isEnabled() && this.initView() && this.subscribe()) {
-            this.enabled = true;
-            this.requestUpdate();
-        }
+        this.tryEnable(true);
     }
 
     disable(): void {
+        this.logger.log("disable");
         if (this.isEnabled()) {
             this.unsubscribe();
             this.view = null;
-            this.enabled = false;
+            this.setState(State.Disabled);
         }
     }
 
@@ -64,7 +69,28 @@ export default class BookmarksManager extends AbstractFeature<Feature> {
     }
 
     isEnabled(): boolean {
-        return this.enabled;
+        return this.state !== State.Disabled;
+    }
+
+    private tryEnable(subscribeOnActive = false): void {
+        const leaf = this.facade.getLeavesOfType<BookmarksPluginLeaf>(Leaves.Bookmarks)?.[0];
+
+        if (leaf.isVisible()) {
+            if (this.state !== State.Enabled && this.initView() && this.subscribe()) {
+                this.setState(State.Enabled);
+                this.requestUpdate();
+            }
+            if (this.activeLeafChangeRef) {
+                this.dispatcher.removeListener(this.activeLeafChangeRef);
+                this.activeLeafChangeRef = null;
+            }
+        } else if (subscribeOnActive) {
+            this.setState(State.Awaiting);
+            this.activeLeafChangeRef = this.dispatcher.addListener({
+                name: "active:leaf:change",
+                cb: () => this.tryEnable(),
+            });
+        }
     }
 
     private initView(): boolean {
@@ -87,16 +113,34 @@ export default class BookmarksManager extends AbstractFeature<Feature> {
             this.logger.log("Triggered by plugin event");
             this.requestUpdate();
         });
+        this.metaRef = this.dispatcher.addListener({
+            name: "metadata:cache:changed",
+            cb: this.requestUpdate.bind(this),
+        });
         return true;
     }
 
     private unsubscribe(): void {
-        this.dispatcher.removeListener(this.metaRef);
-        this.view.plugin.offref(this.ref);
-        this.view.plugin.trigger("changed");
+        if (this.metaRef) {
+            this.dispatcher.removeListener(this.metaRef);
+        }
+        if (this.activeLeafChangeRef) {
+            this.dispatcher.removeListener(this.activeLeafChangeRef);
+        }
+        if (this.state === State.Enabled) {
+            this.view.plugin.offref(this.ref);
+            this.view.plugin.trigger("changed");
+        }
     }
 
     private onChanged(path: string = null): { [k: string]: boolean } {
+        if (this.state !== State.Enabled) {
+            this.logger.log(`Called onChanged when is ${this.state} state`);
+            return;
+        }
+        if (!this.view.plugin) {
+            return;
+        }
         const items = this.view.plugin.items;
         const itemDoms = this.view.itemDoms;
         const result: { [k: string]: boolean } = {};

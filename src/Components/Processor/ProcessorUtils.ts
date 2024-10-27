@@ -1,4 +1,5 @@
 import ProcessorInterface from "./Interfaces";
+import { TFile } from "obsidian";
 
 export enum ProcessorTypes {
     Function = "function",
@@ -14,4 +15,6 @@ export type FunctionV2ObjArg = {
     title: string;
     // Path to file
     path: string;
+    // TFile
+    file: TFile | null;
 };

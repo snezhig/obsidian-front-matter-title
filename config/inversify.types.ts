@@ -63,9 +63,10 @@ const SI = {
     api: "",
     defer: "",
     "factory:api": "",
-    "factory:processor": "",
+    "processor:factory": "",
     processor: "",
     "processor:args": "",
+    "processor:argument.transformer": "",
 };
 
 for (const key of Object.keys(SI)) {

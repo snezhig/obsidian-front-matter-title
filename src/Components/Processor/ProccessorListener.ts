@@ -21,8 +21,10 @@ export default class ProcessorListener implements ListenerInterface {
     constructor(
         @inject(SI["event:dispatcher"])
         private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents>,
-        @inject(SI["factory:processor"])
-        private factory: ProcessorFactory
+        @inject(SI["processor:factory"])
+        private factory: ProcessorFactory,
+        @inject(SI["processor:argument.transformer"])
+        private transformer: ProcessorArgumentTransformer
     ) {}
 
     bind(): void {
@@ -71,7 +73,7 @@ export default class ProcessorListener implements ListenerInterface {
         if (this.processor === null) {
             return;
         }
-        const arg = ProcessorArgumentTransformer.transform(event, this.processor.getType());
+        const arg = this.transformer.transform(event, this.processor.getType());
         const value = this.processor.process(arg) ?? null;
         if (value) {
             obj.modify(value);

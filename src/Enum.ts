@@ -1,3 +1,9 @@
+export enum Plugins {
+    Search = "global-search",
+    FileExplorer = "file-explorer",
+    Backlink = "backlink",
+}
+
 export enum Leaves {
     FE = "file-explorer",
     G = "graph",
