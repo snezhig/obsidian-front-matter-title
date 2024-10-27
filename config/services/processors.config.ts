@@ -6,6 +6,7 @@ import ReplaceProcessor from "@src/Components/Processor/ReplaceProcessor";
 import FunctionProcessor from "@src/Components/Processor/FunctionProcessor";
 import { ProcessorTypes } from "@src/Components/Processor/ProcessorUtils";
 import FunctionV2Processor from "@src/Components/Processor/FunctionV2Processor";
+import ProcessorArgumentTransformer from "@src/Components/Processor/ProcessorArgumentTransformer";
 
 export default new ContainerModule(bind => {
     bind(SI.processor).to(ReplaceProcessor).whenTargetNamed(ProcessorTypes.Replace);
@@ -14,5 +15,6 @@ export default new ContainerModule(bind => {
     bind(SI["processor:args"]).toDynamicValue(c =>
         c.container.get<KeyStorageInterface<SettingsType>>(SI["settings:storage"]).get("processor").get("args").value()
     );
-    bind(SI["factory:processor"]).toAutoNamedFactory(SI.processor);
+    bind(SI["processor:factory"]).toAutoNamedFactory(SI.processor);
+    bind(SI["processor:argument.transformer"]).to(ProcessorArgumentTransformer);
 });

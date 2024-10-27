@@ -73,7 +73,7 @@ export class InlineTitleManager extends AbstractManager {
         const promises = [];
         const ids: string[] = [];
         for (const view of views) {
-            if (!path || view.file.path === path) {
+            if (view.file && (!path || view.file.path === path)) {
                 promises.push(
                     this.resolve(view.file.path)
                         .then(title =>

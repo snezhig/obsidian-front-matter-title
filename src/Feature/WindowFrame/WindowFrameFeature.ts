@@ -46,8 +46,8 @@ export default class WindowFrameFeature implements AbstractFeature<Feature> {
     updateTitle() {
         const e = this.facade.getMostRecentLeaf(this.facade.getActiveLeaf().getContainer());
         let text: string;
-        if (e.view instanceof EditableFileView) {
-            text = this.resolver.resolve(e.view.file.path);
+        if (e.view instanceof EditableFileView && e.getViewState().state.file) {
+            text = this.resolver.resolve(e.getViewState().state.file as string);
         } else {
             text = e?.getDisplayText().trim() ?? "";
         }

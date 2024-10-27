@@ -99,15 +99,15 @@ export default class TabManager extends AbstractManager {
         const leaves = this.facade.getLeavesOfType<MarkdownLeaf>("markdown");
         const result: { [k: string]: boolean } = {};
         for (const leaf of leaves) {
-            const file = leaf.view?.file;
-            if (path && path !== file.path) {
+            const filePath = leaf.view?.getState()?.file as string;
+            if (!filePath || (path && path !== filePath)) {
                 continue;
             }
-            result[file.path] = false;
-            const title = file ? this.resolver.resolve(file.path) : null;
+            result[filePath] = false;
+            const title = filePath ? this.resolver.resolve(filePath) : null;
             if (title && title !== leaf.tabHeaderInnerTitleEl.getText()) {
                 leaf.tabHeaderInnerTitleEl.setText(title);
-                result[file.path] = true;
+                result[filePath] = true;
             }
         }
         return result;

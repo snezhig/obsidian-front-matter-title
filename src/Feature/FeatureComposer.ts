@@ -29,6 +29,7 @@ export default class FeatureComposer {
     }
 
     toggle(id: any, state: boolean): void {
+        this.logger.log(`Feature - ${id} toggle to ${state}`);
         const feature = this.features[id];
         if ((!state && !feature) || (state && feature?.isEnabled())) {
             return;

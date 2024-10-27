@@ -65,7 +65,7 @@ export class MarkdownHeaderManager extends AbstractManager {
         const views = this.facade.getViewsOfType<MarkdownViewExt>(Leaves.MD);
         let updated = false;
         for (const view of views) {
-            if (!path || view.file.path === path) {
+            if (view.file && (!path || view.file.path === path)) {
                 const title = this.resolver.resolve(view.file.path);
                 this.setTitle(view, title);
                 updated = true;
@@ -96,6 +96,9 @@ export class MarkdownHeaderManager extends AbstractManager {
     }
 
     private revert(view: MarkdownViewExt): void {
+        if (!view.file) {
+            return;
+        }
         const container = view.titleContainerEl as HTMLDivElement;
         const el = this.findExistingFakeEl(container);
         if (el) {

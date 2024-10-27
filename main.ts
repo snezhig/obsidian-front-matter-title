@@ -157,6 +157,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
             } catch (e) {
                 //TODO: refactor
                 this.fc.toggle(id, false);
+                this.logger.log(e);
                 new Notice(e);
             }
         }
