@@ -64,13 +64,19 @@ export default class ExplorerManager extends AbstractManager {
         this.setState(State.Disabled);
     }
 
+    private tryEnable(): void {
+        this.sort?.start();
+        this.setState(State.Enabled);
+        this.logger.log("Manager enabled");
+    }
+
     private subscribe(): void {
         const ref = this.dispatcher.addListener({
             name: "active:leaf:change",
             cb: () => {
                 if (this.isEnabled() && this.getExplorerView()) {
                     this.logger.log("Catch explorer view");
-                    this.setState(State.Enabled);
+                    this.tryEnable();
                     this.doRefresh().catch(this.logger.log);
                     this.dispatcher.removeListener(ref);
                 } else if (!this.isEnabled()) {
@@ -79,6 +85,7 @@ export default class ExplorerManager extends AbstractManager {
                 }
             },
         });
+        this.setState(State.WaitForActiveLeaf);
     }
 
     protected doEnable() {
@@ -86,14 +93,11 @@ export default class ExplorerManager extends AbstractManager {
             this.logger.info(`internal plugin ${Plugins.FileExplorer} is not enabled`);
             return;
         }
-        this.sort?.start();
         if (!this.getExplorerView()) {
             this.logger.log("Could not get view. Subscribe and wait for active leaf");
             this.subscribe();
-            this.setState(State.WaitForActiveLeaf);
         } else {
-            this.logger.log("Manager enabled");
-            this.setState(State.Enabled);
+            this.tryEnable();
         }
     }
 

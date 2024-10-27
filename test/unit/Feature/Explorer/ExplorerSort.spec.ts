@@ -9,7 +9,6 @@ import EventDispatcherInterface, {
 import { AppEvents } from "@src/Types";
 import FeatureService from "@src/Feature/FeatureService";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
-import { DelayerInterface } from "@src/Components/Delayer/Delayer";
 import LoggerInterface from "@src/Components/Debug/LoggerInterface";
 import { FunctionReplacerFactory } from "@config/inversify.factory.types";
 import FunctionReplacer from "../../../../src/Utils/FunctionReplacer";
@@ -21,10 +20,11 @@ let callback: Callback<AppEvents[keyof AppEvents]>;
 let dispatcher: MockProxy<EventDispatcherInterface<any>>;
 let refs: [any?, any?];
 let featureService: MockProxy<FeatureService>;
-let delayer: MockProxy<DelayerInterface>;
 let sort: ExplorerSort;
 let view: MockProxy<TFileExplorerView>;
-let replacerFactory: jest.Mock<ReturnType<FunctionReplacerFactory<TFileExplorerItem, "sort", ExplorerSort>>>;
+let replacerFactory: jest.Mock<
+    ReturnType<FunctionReplacerFactory<TFileExplorerView, "getSortedFolderItems", ExplorerSort>>
+>;
 
 beforeEach(() => {
     refs = [];
@@ -38,12 +38,11 @@ beforeEach(() => {
     });
     featureService = mock<FeatureService>();
     featureService.createResolver.mockReturnValue(mock<ResolverInterface>());
-    delayer = mock<DelayerInterface>();
     view = mock<TFileExplorerView>();
     replacerFactory = jest.fn();
     // @ts-ignore
     view.requestSort = jest.fn();
-    sort = new ExplorerSort(mock<LoggerInterface>(), facade, dispatcher, featureService, delayer, replacerFactory);
+    sort = new ExplorerSort(mock<LoggerInterface>(), facade, dispatcher, featureService, replacerFactory);
 });
 
 describe("ExplorerSort", () => {
@@ -58,43 +57,25 @@ describe("ExplorerSort", () => {
             facade.getViewsOfType.mockReturnValue([view]);
         });
 
-        test("should add listener after enabled", () => {
-            sort.start();
-            expect(sort.isStarted()).toBeTruthy();
-            expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:update", cb: expect.anything() });
-            expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:refresh", cb: expect.anything() });
-            expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
-        });
-        //
-        test("should delay replace because these is not item", () => {
-            let fn: Function;
-            //copy delayed function to call it manually
-            delayer.delay.mockImplementation(f => {
-                fn = f;
-                return 0;
-            });
-            //enable sort to trigger internal "tryToReplaceOriginalSort"
-            sort.start();
-            expect(delayer.delay).toHaveBeenCalledTimes(1);
-            //Call delayed function
-            fn();
-            expect(delayer.delay).toHaveBeenCalledTimes(2);
-            expect(replacerFactory).not.toBeCalled();
-        });
-
         describe("with explorer item", () => {
-            let replacer: FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>;
+            let replacer: FunctionReplacer<TFileExplorerView, "getSortedFolderItems", ExplorerSort>;
             let item: TFileExplorerItem;
             beforeEach(() => {
                 item = mock<TFileExplorerItem>();
                 item.file = new TFolder();
-                replacer = mock<FunctionReplacer<TFileExplorerItem, "sort", ExplorerSort>>();
+                replacer = mock<FunctionReplacer<TFileExplorerView, "getSortedFolderItems", ExplorerSort>>();
                 replacerFactory.mockImplementationOnce(() => replacer);
             });
+
+            afterEach(() => {
+                expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:update", cb: expect.anything() });
+                expect(dispatcher.addListener).toHaveBeenCalledWith({ name: "manager:refresh", cb: expect.anything() });
+                expect(dispatcher.addListener).toHaveBeenCalledTimes(2);
+            });
+
             test("Should create function replacer without delay, because there is folder item", () => {
                 view.fileItems["mock"] = item;
                 sort.start();
-                expect(delayer.delay).not.toHaveBeenCalled();
                 expect(replacerFactory).toBeCalled();
                 expect(replacer.enable).toBeCalled();
             });
