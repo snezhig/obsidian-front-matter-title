@@ -33,6 +33,7 @@ export type SettingsType = {
     debug: boolean;
     boot: {
         delay: number;
+        background: boolean;
     };
     features: SettingsFeature;
 };

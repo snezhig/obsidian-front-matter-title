@@ -164,6 +164,10 @@ const en = {
         title: "Boot delay",
         desc: "Plugin will be loaded with specified delay in ms",
     },
+    boot_background: {
+        title: "Boot in background",
+        desc: "Plugin will be loaded in background to not blocking application",
+    },
     disabled: "Disabled",
     processor: {
         name: "Processor",

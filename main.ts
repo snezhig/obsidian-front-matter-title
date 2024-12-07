@@ -51,12 +51,8 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         this.container.getAllNamed<ListenerInterface>(SI.listener, "unnamed").map(e => e.bind());
         await this.loadSettings();
         this.app.workspace.onLayoutReady(() => this.getDefer().setFlag(DeferPluginReady));
-        await this.delay();
 
-        this.fc = Container.get(SI["feature:composer"]);
-        this.mc = Container.get(SI["manager:composer"]);
-        this.bind();
-        this.registerCommands();
+        await this.delay();
     }
 
     public onunload() {
@@ -84,8 +80,18 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async delay(): Promise<void> {
         const delay = this.storage.get("boot").get("delay").value();
+        const background = this.storage.get("boot").get("background").value();
         this.logger.log(`Plugin manual delay ${delay}`);
-        await new Promise(r => setTimeout(r, delay));
+        const promise = new Promise(r =>
+            setTimeout(() => {
+                this.fc = Container.get(SI["feature:composer"]);
+                this.mc = Container.get(SI["manager:composer"]);
+                this.bind();
+                this.registerCommands();
+                r();
+            }, delay)
+        );
+        return background ? null : promise;
     }
 
     private bindServices(): void {
@@ -130,6 +136,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                     this.dispatcher.dispatch("file:rename", new Event({ old, actual }))
                 )
             );
+            await new Promise(r => setTimeout(r, 3000));
             this.reloadFeatures();
             await this.mc.refresh();
             this.getDefer().setFlag(DeferFeaturesReady);
