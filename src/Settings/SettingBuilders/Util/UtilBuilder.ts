@@ -3,7 +3,7 @@ import { SettingsType } from "@src/Settings/SettingsType";
 import { ObjectItemInterface, PrimitiveItemInterface } from "@src/Storage/Interfaces";
 import { injectable } from "inversify";
 import { Setting } from "obsidian";
-import { t } from "../../../i18n/Locale";
+import { t } from "@src/i18n/Locale";
 
 type BootItem = ObjectItemInterface<SettingsType["boot"]>;
 type DebugItem = PrimitiveItemInterface<SettingsType["debug"]>;
@@ -53,6 +53,14 @@ export default class UtilBuilder implements SettingBuilderInterface<SettingsType
                     const v = !isNaN(parseInt(s)) ? parseInt(s) : 0;
                     e.setValue(v.toString());
                     item.get("delay").set(v);
+                })
+            );
+        new Setting(container)
+            .setName(t("boot_background.title"))
+            .setDesc(t("boot_background.desc"))
+            .addToggle(e =>
+                e.setValue(item.get("background").value()).onChange(e => {
+                    item.get("background").set(e);
                 })
             );
     }
