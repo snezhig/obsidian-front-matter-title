@@ -82,7 +82,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         const delay = this.storage.get("boot").get("delay").value();
         const background = this.storage.get("boot").get("background").value();
         this.logger.log(`Plugin manual delay ${delay}`);
-        const promise = new Promise(r =>
+        let promise = new Promise(r =>
             setTimeout(() => {
                 this.fc = Container.get(SI["feature:composer"]);
                 this.mc = Container.get(SI["manager:composer"]);
@@ -91,6 +91,10 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 r();
             }, delay)
         );
+        if (delay > 0) {
+            new Notice(`[${this.manifest.name}]\nWill be loaded in ${delay}ms. Background: ${background}`);
+            promise = promise.then(() => new Notice(`[${this.manifest.name}]\nLoaded. Background: ${background}`));
+        }
         return background ? null : promise;
     }
 
