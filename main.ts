@@ -140,6 +140,11 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                     this.dispatcher.dispatch("file:rename", new Event({ old, actual }))
                 )
             );
+            this.registerEvent(
+                // after workspace.onLayoutReady, "create" is only called for new files.
+                // (it's called for *all* files on startup, before layout is ready.)
+                this.app.vault.on("create", ({ path }) => this.mc.update(path).catch(console.error))
+            );
             await new Promise(r => setTimeout(r, 3000));
             this.reloadFeatures();
             await this.mc.refresh();
