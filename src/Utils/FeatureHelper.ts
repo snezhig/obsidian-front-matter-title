@@ -19,13 +19,24 @@ export default class FeatureHelper {
             Feature.Backlink,
             Feature.NoteLink,
             Feature.WindowFrame,
+            // Abbreviations will be injected conditionally by getVisibleFeatures
         ];
+    }
+
+    getVisibleFeatures(settings: any): Feature[] {
+        const features = this.getOrderedFeatures();
+        if (settings?.alias?.enabled) {
+            features.splice(1, 0, Feature.Abbreviations);
+        }
+        return features;
     }
 
     getName(feature: Feature): string {
         switch (feature) {
             case Feature.Alias:
                 return t("feature.alias.name");
+            case Feature.Abbreviations:
+                return t("feature.abbreviations.name");
             case Feature.Explorer:
                 return t("feature.explorer.name");
             case Feature.Graph:
@@ -57,6 +68,8 @@ export default class FeatureHelper {
         switch (feature) {
             case Feature.Alias:
                 return t("feature.alias.desc");
+            case Feature.Abbreviations:
+                return t("feature.abbreviations.desc");
             case Feature.Explorer:
                 return t("feature.explorer.desc");
             case Feature.Graph:

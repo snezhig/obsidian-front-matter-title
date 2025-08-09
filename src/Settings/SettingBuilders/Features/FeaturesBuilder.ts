@@ -12,6 +12,7 @@ import { t } from "@src/i18n/Locale";
 @injectable()
 export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "features"> {
     private ref: ListenerRef<"settings:tab:feature:changed"> = null;
+    private sectionEl: HTMLElement;
 
     constructor(
         @inject(SI["factory:settings:feature:builder"])
@@ -30,9 +31,16 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
 
     doBuild(): void {
         this.bind();
-        this.container.createEl("h4", { text: t("features") });
+        // Create an isolated section container so we don't wipe the whole settings tab
+        this.sectionEl = this.container.createDiv();
+        this.render();
+    }
+
+    private render(): void {
+        this.sectionEl.empty();
+        this.sectionEl.createEl("h4", { text: t("features") });
         const data: { feature: Feature; name: string; desc: string; doc: { link: string } }[] = this.helper
-            .getOrderedFeatures()
+            .getVisibleFeatures(this.item.value())
             .map(feature => ({
                 desc: this.helper.getDescription(feature),
                 feature,
@@ -47,7 +55,7 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
             const builder = this.builderFactory(item.feature) ?? this.builderFactory("default");
             const settings = this.item.get(item.feature).value();
             builder.setContext({
-                getContainer: () => this.container,
+                getContainer: () => this.sectionEl,
                 getSettings: () => this.item.value(),
                 getDispatcher: () => this.dispatcher,
             });
@@ -58,7 +66,11 @@ export default class FeaturesBuilder extends AbstractBuilder<SettingsType, "feat
     private bind(): void {
         this.ref = this.dispatcher.addListener({
             name: "settings:tab:feature:changed",
-            cb: e => this.item.get(e.get().id).set(e.get().value),
+            cb: e => {
+                this.item.get(e.get().id).set(e.get().value);
+                // Immediately re-render features list so visibility changes (e.g., Abbreviations) apply
+                this.render();
+            },
         });
         this.dispatcher.addListener({
             name: "settings:tab:close",

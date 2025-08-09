@@ -8,6 +8,7 @@ import ManagerComposer from "@src/Feature/ManagerComposer";
 import SearchFeature from "@src/Feature/Search/SearchFeature";
 import TabManager from "@src/Feature/Tab/TabManager";
 import { AliasFeature } from "@src/Feature/Alias/AliasFeature";
+import AbbreviationsFeature from "@src/Feature/Abbreviations/AbbreviationsFeature";
 import EnsureStrategy from "@src/Feature/Alias/Strategy/EnsureStrategy";
 import AdjustStrategy from "@src/Feature/Alias/Strategy/AdjustStrategy";
 import ReplaceStrategy from "@src/Feature/Alias/Strategy/ReplaceStrategy";
@@ -58,6 +59,10 @@ export default (container: Container) => {
             return feature;
         });
     container.bind<FeatureInterface<any>>(SI.feature).to(AliasFeature).whenTargetNamed(AliasFeature.getId());
+    container
+        .bind<FeatureInterface<any>>(SI.feature)
+        .to(AbbreviationsFeature)
+        .whenTargetNamed(AbbreviationsFeature.getId());
     container
         .bind<FeatureInterface<any>>(SI.feature)
         .to(WindowFrameFeature)

@@ -35,6 +35,10 @@ const en = {
                 },
             },
         },
+        [Feature.Abbreviations]: {
+            name: "Abbreviations",
+            desc: "Add an additional abbreviation value to the aliases metadata cache.",
+        },
         [Feature.Explorer]: {
             name: "Explorer",
             desc: "Replace shown titles in the file explorer",
