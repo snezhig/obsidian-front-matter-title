@@ -49,6 +49,7 @@ export default class PluginHelper {
                     validator: ValidatorType.FrontmatterRequired,
                     templates: { main: "", fallback: "" },
                 },
+                [Feature.Abbreviations]: { enabled: false, templates: { main: "", fallback: "" } },
                 [Feature.Explorer]: { enabled: false, sort: false, templates: { main: "", fallback: "" } },
                 [Feature.Tab]: { enabled: false, templates: { main: "", fallback: "" } },
                 [Feature.Header]: { enabled: false, templates: { main: "", fallback: "" } },

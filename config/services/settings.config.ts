@@ -14,9 +14,11 @@ import RulesPathsBuilder from "@src/Settings/SettingBuilders/Rules/RulesPathsBui
 import ProcessorBuilder from "../../src/Settings/SettingBuilders/Processor/ProcessorBuilder";
 import NoteLinkBuilder from "@src/Settings/FeatureBuilder/NoteLinkBuilder";
 import ExplorerBuilder from "@src/Settings/FeatureBuilder/ExplorerBuilder";
+import { Feature as F } from "@src/Enum";
 
 export default (c: Container) => {
     c.bind(SI["settings:feature:builder"]).to(DefaultBuilder).whenTargetNamed("default");
+    c.bind(SI["settings:feature:builder"]).to(DefaultBuilder).whenTargetNamed(F.Abbreviations);
     c.bind(SI["settings:feature:builder"])
         .to(AliasBuilder)
     .whenTargetNamed(Feature.Alias);

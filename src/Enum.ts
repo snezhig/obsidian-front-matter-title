@@ -23,6 +23,7 @@ export enum Feature {
     Search = Leaves.S,
     Tab = "tab",
     Alias = "alias",
+    Abbreviations = "abbreviations",
     Suggest = "suggest",
     InlineTitle = "inlineTitle",
     Canvas = "canvas",
