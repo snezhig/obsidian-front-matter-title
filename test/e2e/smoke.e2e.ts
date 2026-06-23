@@ -24,9 +24,7 @@ describe("Front Matter Title — smoke on real Obsidian", function () {
         await browser.waitUntil(
             async () => {
                 const texts: string[] = await browser.execute(() =>
-                    Array.from(document.querySelectorAll(".nav-file-title-content")).map(
-                        e => e.textContent ?? ""
-                    )
+                    Array.from(document.querySelectorAll(".nav-file-title-content")).map(e => e.textContent ?? "")
                 );
                 return texts.some(t => t.includes("Hello From Frontmatter"));
             },

@@ -12,10 +12,10 @@ describe("Front Matter Title — Tab title (#277)", function () {
 
     it("shows the frontmatter title in a tab opened normally", async function () {
         await browser.executeObsidian(({ app }) => app.workspace.openLinkText("202208251731", "", true));
-        await browser.waitUntil(
-            async () => (await activeTabTitles()).some(t => t.includes("Hello From Frontmatter")),
-            { timeout: 20000, timeoutMsg: "tab header did not show the frontmatter title (general case)" }
-        );
+        await browser.waitUntil(async () => (await activeTabTitles()).some(t => t.includes("Hello From Frontmatter")), {
+            timeout: 20000,
+            timeoutMsg: "tab header did not show the frontmatter title (general case)",
+        });
     });
 
     it("shows the frontmatter title when opened from global search in a new tab", async function () {
@@ -32,7 +32,10 @@ describe("Front Matter Title — Tab title (#277)", function () {
                 const opened = await browser.executeObsidian(({ app }) => {
                     const f = (app.vault as any).getAbstractFileByPath("202208251731.md");
                     if (!f) return false;
-                    return app.workspace.getLeaf("tab").openFile(f).then(() => true);
+                    return app.workspace
+                        .getLeaf("tab")
+                        .openFile(f)
+                        .then(() => true);
                 });
                 if (!opened) return false;
                 return (await activeTabTitles()).some(t => t.includes("Hello From Frontmatter"));

@@ -11,7 +11,7 @@ describe("Front Matter Title — update notice modal", function () {
             async () => {
                 const t: string = await browser.execute(() => {
                     const m = document.querySelector(".modal-container .modal");
-                    return m ? (m.textContent ?? "") : "";
+                    return m ? m.textContent ?? "" : "";
                 });
                 return t.includes("back in action") ? t : false;
             },

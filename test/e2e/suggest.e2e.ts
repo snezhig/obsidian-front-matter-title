@@ -10,9 +10,7 @@ describe("Front Matter Title — Quick Switcher / Suggest (#268)", function () {
             async () => {
                 // (Re)open the switcher and type a path-like query each poll, until
                 // the Suggest feature has activated and substitutes the title.
-                await browser.executeObsidian(({ app }) =>
-                    (app as any).commands.executeCommandById("switcher:open")
-                );
+                await browser.executeObsidian(({ app }) => (app as any).commands.executeCommandById("switcher:open"));
                 const input = await browser.$(".prompt-input");
                 if (!(await input.isExisting())) return false;
                 await input.click();

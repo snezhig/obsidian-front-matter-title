@@ -77,7 +77,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         const loaded = await this.loadData();
         // Remember the previously installed version (null on a fresh install) to
         // decide whether to show the "what's new" notice after an update.
-        this.previousVersion = loaded ? (loaded.version ?? "0.0.0") : null;
+        this.previousVersion = loaded ? loaded.version ?? "0.0.0" : null;
         if (loaded && !loaded.version) {
             loaded.version = "0.0.0";
         }

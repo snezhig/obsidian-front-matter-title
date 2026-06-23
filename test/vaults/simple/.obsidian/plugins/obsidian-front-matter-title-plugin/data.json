@@ -1,38 +1,38 @@
 {
-    "version": "4.0.0",
-    "templates": {
-        "common": { "main": "title", "fallback": "fallback_title" }
+  "version": "4.0.0",
+  "templates": {
+    "common": { "main": "title", "fallback": "fallback_title" }
+  },
+  "rules": {
+    "paths": { "mode": "black", "values": [] },
+    "delimiter": { "enabled": false, "value": "" }
+  },
+  "debug": false,
+  "boot": { "delay": 0, "background": false },
+  "features": {
+    "alias": {
+      "enabled": false,
+      "strategy": "ensure",
+      "validator": "frontmatterRequired",
+      "templates": { "main": "", "fallback": "" }
     },
-    "rules": {
-        "paths": { "mode": "black", "values": [] },
-        "delimiter": { "enabled": false, "value": "" }
-    },
-    "debug": false,
-    "boot": { "delay": 0, "background": false },
-    "features": {
-        "alias": {
-            "enabled": false,
-            "strategy": "ensure",
-            "validator": "frontmatterRequired",
-            "templates": { "main": "", "fallback": "" }
-        },
-        "explorer": { "enabled": true, "sort": true, "templates": { "main": "", "fallback": "" } },
-        "tab": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "header": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "graph": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "bookmarks": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "search": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "suggest": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "inlineTitle": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "canvas": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "backlink": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "windowFrame": { "enabled": true, "templates": { "main": "", "fallback": "" } },
-        "noteLink": {
-            "enabled": true,
-            "strategy": "onlyEmpty",
-            "approval": false,
-            "templates": { "main": "", "fallback": "" }
-        }
-    },
-    "processor": { "args": [], "type": null }
+    "explorer": { "enabled": true, "sort": true, "templates": { "main": "", "fallback": "" } },
+    "tab": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "header": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "graph": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "bookmarks": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "search": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "suggest": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "inlineTitle": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "canvas": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "backlink": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "windowFrame": { "enabled": true, "templates": { "main": "", "fallback": "" } },
+    "noteLink": {
+      "enabled": true,
+      "strategy": "onlyEmpty",
+      "approval": false,
+      "templates": { "main": "", "fallback": "" }
+    }
+  },
+  "processor": { "args": [], "type": null }
 }
