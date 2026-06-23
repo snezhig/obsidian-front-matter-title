@@ -113,8 +113,14 @@ export default class ExplorerSort {
             Object.getPrototypeOf(this.view),
             "getSortedFolderItems",
             this,
-            (feature, defaultArgs, vanilla) => {
-                return feature.getSortedFolderItems(defaultArgs?.[0]) ?? vanilla.call(this);
+            // Regular function (not an arrow) so `this` is the file-explorer view
+            // at call time. For unsupported sort orders (e.g. by created/modified
+            // time) the feature returns null and we defer to Obsidian's native
+            // sort, forwarding the original args (the folder) AND the view `this`
+            // — otherwise native getSortedFolderItems reads this.fileItems on the
+            // wrong object and time-sort breaks (#262).
+            function (feature, defaultArgs, vanilla) {
+                return feature.getSortedFolderItems(defaultArgs?.[0]) ?? vanilla.apply(this, defaultArgs);
             }
         );
         if (!this.replacer) {

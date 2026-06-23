@@ -7,7 +7,7 @@ import { browser, $, expect } from "@wdio/globals";
 //
 // Note: the title-sort settles ~1s after load (the re-sort is debounced), so we
 // poll the order until it reflects titles rather than checking it immediately.
-describe("Front Matter Title — Explorer sort by title (#262)", function () {
+describe("Front Matter Title — Explorer sort by title (#262, #242)", function () {
     it("orders files by their frontmatter title, not their filename", async function () {
         await browser.executeObsidianCommand("file-explorer:open");
         const explorer = await $(".nav-files-container");
