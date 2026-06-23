@@ -16,6 +16,21 @@ const PLUGIN_VERSION="${manifest.version}";
 
 const prod = (process.argv[2] === "production");
 
+// prod keeps main.js in the repo root (pack-release.mjs expects it there);
+// dev/watch writes to dist/ together with a copy of manifest.json, so the
+// folder holds exactly the two files Obsidian needs and can be synced to a vault.
+const outfile = prod ? "main.js" : "dist/main.js";
+
+const copyManifestPlugin = {
+	name: "copy-manifest",
+	setup(build) {
+		build.onEnd(() => {
+			fs.mkdirSync("dist", { recursive: true });
+			fs.copyFileSync("manifest.json", "dist/manifest.json");
+		});
+	},
+};
+
 const context = await esbuild.context({
 	banner: {
 		js: banner,
@@ -42,7 +57,8 @@ const context = await esbuild.context({
 	logLevel: "info",
 	sourcemap: prod ? false : "inline",
 	treeShaking: true,
-	outfile: "main.js",
+	outfile: outfile,
+	plugins: prod ? [] : [copyManifestPlugin],
 });
 
 if (prod) {
