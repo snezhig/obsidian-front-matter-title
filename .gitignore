@@ -23,6 +23,8 @@ main.js
 
 # obsidian
 data.json
+# but the e2e fixture vault's seeded plugin settings must be tracked
+!test/vaults/**/data.json
 
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store
