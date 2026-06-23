@@ -17,7 +17,7 @@ import { FunctionReplacerFactory } from "@config/inversify.factory.types";
 export default class ExplorerSort {
     private view: TFileExplorerView;
     private started = false;
-    private replacer: FunctionReplacer<TFileExplorerView, "getSortedFolderItems", ExplorerSort>;
+    private replacer: FunctionReplacer<TFileExplorerView, "getSortedFolderItems", ExplorerSort> | null;
     private readonly cb: (e: { id: string; result?: boolean }) => void;
     private refs: [ListenerRef<"manager:refresh">?, ListenerRef<"manager:update">?] = [];
     private resolver: ResolverInterface;
@@ -117,6 +117,10 @@ export default class ExplorerSort {
                 return feature.getSortedFolderItems(defaultArgs?.[0]) ?? vanilla.call(this);
             }
         );
+        if (!this.replacer) {
+            this.logger.log("Could not patch getSortedFolderItems (Obsidian API changed). Sort feature degraded.");
+            return;
+        }
         this.replacer.enable();
     }
 
@@ -129,6 +133,10 @@ export default class ExplorerSort {
     }
 
     private getSortedFolderItems(folder: TFolder): TFileExplorerItem[] | null {
+        if (!this.view?.fileItems) {
+            this.logger.log("Explorer view has no fileItems (Obsidian API changed). Skipped.");
+            return null;
+        }
         const sortOrder = this.view.sortOrder;
 
         if (!this.isSortSupported(sortOrder)) {

@@ -26,6 +26,25 @@ export default class FunctionReplacer<Target, Method extends FunctionPropertyNam
         return new FunctionReplacer(target, method, args, implementation);
     }
 
+    /**
+     * Fail-soft variant of {@link create}: returns null instead of throwing when
+     * the target or method is missing (e.g. an Obsidian internal API changed),
+     * so a single drifted API degrades one feature instead of crashing boot.
+     */
+    public static tryCreate<Target, Method extends FunctionPropertyNames<Required<Target>>, O>(
+        target: Target,
+        method: Method,
+        args: O,
+        implementation: Implementation<Target, Method, O>
+    ): FunctionReplacer<Target, Method, O> | null {
+        try {
+            return new FunctionReplacer(target, method, args, implementation);
+        } catch (e) {
+            console.error(`[front-matter-title] cannot patch "${String(method)}", feature degraded:`, e);
+            return null;
+        }
+    }
+
     public getTarget(): Target {
         return this.target;
     }

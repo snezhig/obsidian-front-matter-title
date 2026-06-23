@@ -70,7 +70,7 @@ Container.load(resolverModule);
 Container.load(apiAdapterModule);
 
 Container.bind(SI["factory:replacer"]).toFunction((t: any, m: any, a: unknown, i: any) =>
-    FunctionReplacer.create(t, m, a, i)
+    FunctionReplacer.tryCreate(t, m, a, i)
 );
 Container.bind(SI["service:search:dom:wrapper"]).to(SearchDomWrapperService).inSingletonScope();
 

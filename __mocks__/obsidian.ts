@@ -6,6 +6,10 @@ export function debounce(cb: () => any) {
     return (...args: []) => cb(...args);
 }
 
+export class Notice {
+    constructor(public message: string) {}
+}
+
 export const moment = {
     locale: () => "en",
 };
