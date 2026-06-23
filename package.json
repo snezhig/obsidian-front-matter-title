@@ -1,6 +1,6 @@
 {
   "name": "obsidian-front-matter-title",
-  "version": "3.13.1",
+  "version": "4.0.0",
   "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
   "main": "main.js",
   "scripts": {
