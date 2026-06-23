@@ -6,18 +6,21 @@ export default class ResultDomWrapper {
     private replacer: FunctionReplacer<SearchDOM, "addResult", ResultDomWrapper> = null;
 
     constructor(private resolver: ResolverInterface = null, dom: SearchDOM) {
-        this.replacer = FunctionReplacer.create(dom, "addResult", this, (self, defaultArgs, vanilla) => {
+        this.replacer = FunctionReplacer.tryCreate(dom, "addResult", this, (self, defaultArgs, vanilla) => {
             const c = vanilla.call(dom, ...defaultArgs);
             const file = defaultArgs[0];
             self.processLookupItem(file, c);
             return c;
         });
+        if (!this.replacer) {
+            return;
+        }
         this.replacer.enable();
         this.process();
     }
 
     public disable(): void {
-        this.replacer.disable();
+        this.replacer?.disable();
         this.replacer = null;
     }
 
@@ -33,7 +36,10 @@ export default class ResultDomWrapper {
         if (file.extension !== "md") {
             return;
         }
-        const node = item.containerEl.firstElementChild.find(".tree-item-inner");
+        const node = item?.containerEl?.firstElementChild?.find(".tree-item-inner");
+        if (!node) {
+            return;
+        }
         const text = (restore ? null : this.resolver.resolve(file.path)) ?? file.basename;
         if (node.getText() !== text) {
             node.setText(text);

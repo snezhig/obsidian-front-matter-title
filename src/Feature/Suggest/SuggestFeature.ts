@@ -37,12 +37,12 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
         if (this.isEnabled()) {
             return;
         }
-        this.replacer.enable();
+        this.replacer?.enable();
         this.state = true;
     }
 
     public disable(): void {
-        this.replacer.disable();
+        this.replacer?.disable();
         this.state = false;
     }
 
@@ -51,20 +51,22 @@ export default class SuggestFeature extends AbstractFeature<Feature> {
     }
 
     private createChooserReplacer(chooser: Newable<Chooser>): void {
-        if (typeof chooser.prototype.setSuggestions !== "function") {
+        if (typeof chooser?.prototype?.setSuggestions !== "function") {
+            console.error("[front-matter-title] Chooser.setSuggestions not found, Suggest feature degraded.");
             return;
         }
-        this.replacer = new FunctionReplacer(chooser.prototype, "setSuggestions", this, function (
-            self: SuggestFeature,
-            args: unknown[],
-            vanilla: (e: any) => any
-        ) {
-            if (Array.isArray(args?.[0])) {
-                args[0] = self.modifySuggestions(args[0]);
+        this.replacer = FunctionReplacer.tryCreate(
+            chooser.prototype,
+            "setSuggestions",
+            this,
+            function (self: SuggestFeature, args: unknown[], vanilla: (e: any) => any) {
+                if (Array.isArray(args?.[0])) {
+                    args[0] = self.modifySuggestions(args[0]);
+                }
+                return vanilla.call(this, ...args);
             }
-            return vanilla.call(this, ...args);
-        });
-        this.replacer.enable();
+        );
+        this.replacer?.enable();
     }
 
     private modifySuggestions(items: SuggestModalChooserFileItem[]): SuggestModalChooserFileItem[] {

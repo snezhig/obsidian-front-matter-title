@@ -21,6 +21,14 @@ export default class PluginHelper {
         return comparator === "=" || comparator === ">=" || comparator === "<=";
     }
 
+    /**
+     * Whether to show the "what's new" notice: only on an actual update (a known
+     * previous version that differs from the current one), never on first install.
+     */
+    public static shouldShowReleaseNotice(previous: string | null, current: string): boolean {
+        return previous !== null && previous !== current;
+    }
+
     public static createDefaultSettings(): SettingsType {
         return {
             version: PLUGIN_VERSION,

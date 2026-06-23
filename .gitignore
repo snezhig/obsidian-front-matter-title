@@ -8,6 +8,12 @@ coverage
 # npm
 node_modules
 
+# dev build output synced to the local vault (main.js + manifest.json)
+dist
+
+# downloaded Obsidian binaries for headless e2e
+.obsidian-cache
+
 # Don't include the compiled main.js file in the repo.
 # They should be uploaded to GitHub releases instead.
 main.js
@@ -17,6 +23,8 @@ main.js
 
 # obsidian
 data.json
+# but the e2e fixture vault's seeded plugin settings must be tracked
+!test/vaults/**/data.json
 
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store

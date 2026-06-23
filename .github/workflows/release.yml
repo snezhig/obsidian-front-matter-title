@@ -1,0 +1,70 @@
+name: Release Obsidian plugin
+
+# Publishes a GitHub Release when a version tag (e.g. 3.14.0) is pushed.
+# Builds on the GitHub runner (ephemeral sandbox — never the maintainer's host),
+# then attaches the loose assets Obsidian needs: main.js + manifest.json.
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.repository == 'snezhig/obsidian-front-matter-title'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with api-provider submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify tag matches manifest.json version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          MANIFEST_VERSION="$(node -p "require('./manifest.json').version")"
+          if [ "$TAG" != "$MANIFEST_VERSION" ]; then
+            echo "::error::Tag '$TAG' does not match manifest.json version '$MANIFEST_VERSION'"
+            exit 1
+          fi
+
+      - name: Build release notes from CHANGELOG.md (+ compare link)
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          # Extract the "## <TAG>" section from CHANGELOG.md.
+          awk -v ver="$TAG" '/^## /{p=($2==ver)} p' CHANGELOG.md > notes.md || true
+          if [ ! -s notes.md ]; then
+            echo "::warning::No '## $TAG' section in CHANGELOG.md — using a minimal note."
+            printf '## %s\n' "$TAG" > notes.md
+          fi
+          # Append a "Full Changelog" compare link against the previous tag, if any.
+          PREV="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          if [ -n "$PREV" ]; then
+            printf '\n**Full Changelog**: https://github.com/%s/compare/%s...%s\n' \
+              "$GITHUB_REPOSITORY" "$PREV" "$TAG" >> notes.md
+          fi
+          echo "----- release notes -----"; cat notes.md
+
+      - name: Create GitHub Release with assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file notes.md \
+            --verify-tag \
+            main.js manifest.json

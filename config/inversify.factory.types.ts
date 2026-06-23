@@ -15,5 +15,5 @@ export type FunctionReplacerFactory<Target, Method extends FunctionPropertyNames
     method: Method,
     args: O,
     implementation: Implementation<Target, Method, O>
-) => FunctionReplacer<Target, Method, O>;
+) => FunctionReplacer<Target, Method, O> | null;
 export type ObsidianModalFactory = () => Modal;

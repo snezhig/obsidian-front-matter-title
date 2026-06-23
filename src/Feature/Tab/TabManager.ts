@@ -70,7 +70,10 @@ export default class TabManager extends AbstractManager {
 
     private initReplacer(): void {
         const leaf = this.facade.getActiveLeaf();
-        this.replacer = FunctionReplacer.create(
+        if (!leaf) {
+            return;
+        }
+        this.replacer = FunctionReplacer.tryCreate(
             Object.getPrototypeOf(leaf),
             "setPinned",
             this,
@@ -82,14 +85,14 @@ export default class TabManager extends AbstractManager {
                 return result;
             }
         );
-        this.replacer.enable();
+        this.replacer?.enable();
     }
 
     private reset() {
         const leaves = this.facade.getLeavesOfType<MarkdownLeaf>("markdown");
         for (const leaf of leaves) {
             const file = leaf.view?.file;
-            if (file) {
+            if (file && leaf.tabHeaderInnerTitleEl) {
                 leaf.tabHeaderInnerTitleEl.setText(file.basename);
             }
         }
@@ -104,6 +107,9 @@ export default class TabManager extends AbstractManager {
                 continue;
             }
             result[filePath] = false;
+            if (!leaf.tabHeaderInnerTitleEl) {
+                continue;
+            }
             const title = filePath ? this.resolver.resolve(filePath) : null;
             if (title && title !== leaf.tabHeaderInnerTitleEl.getText()) {
                 leaf.tabHeaderInnerTitleEl.setText(title);

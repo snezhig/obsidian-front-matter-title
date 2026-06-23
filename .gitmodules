@@ -1,3 +1,3 @@
 [submodule "modules/api-provider"]
 	path = modules/api-provider
-	url = git@github.com:snezhig/front-matter-plugin-api-provider.git
+	url = https://github.com/snezhig/front-matter-plugin-api-provider.git

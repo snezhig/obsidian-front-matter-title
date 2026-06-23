@@ -62,3 +62,44 @@ test("Should stop all features", () => {
     expect(mockFeatureBar.enable).toHaveBeenCalledTimes(1);
     expect(mockFeatureBar.disable).toHaveBeenCalledTimes(1);
 });
+
+describe("Boot isolation: a failing feature must not crash the plugin", () => {
+    let errorSpy: jest.SpyInstance;
+    const isolated = new FeatureComposer(mockFactory, mockDispatcher, mock<LoggerInterface>());
+
+    beforeEach(() => {
+        mockFactory.mockReset();
+        mockDispatcher.dispatch.mockClear();
+        errorSpy = jest.spyOn(console, "error").mockImplementation(() => undefined);
+    });
+    afterEach(() => errorSpy.mockRestore());
+
+    test("enable() throwing is swallowed, feature is rolled back, no dispatch", () => {
+        const broken = mock<FeatureInterface<any>>();
+        broken.enable.mockImplementation(() => {
+            throw new Error("internal API changed");
+        });
+        mockFactory.mockReturnValueOnce(broken);
+
+        expect(() => isolated.toggle("broken", true)).not.toThrow();
+        expect(broken.disable).toHaveBeenCalledTimes(1); // best-effort rollback
+        expect(isolated.get("broken")).toBeNull(); // removed
+        expect(mockDispatcher.dispatch).not.toHaveBeenCalled();
+    });
+
+    test("disableAll() keeps going when one feature's disable() throws", () => {
+        const bad = mock<FeatureInterface<any>>();
+        const good = mock<FeatureInterface<any>>();
+        bad.disable.mockImplementation(() => {
+            throw new Error("boom");
+        });
+        mockFactory.mockReturnValueOnce(bad);
+        mockFactory.mockReturnValueOnce(good);
+        isolated.toggle("bad", true);
+        isolated.toggle("good", true);
+
+        expect(() => isolated.disableAll()).not.toThrow();
+        expect(bad.disable).toHaveBeenCalledTimes(1);
+        expect(good.disable).toHaveBeenCalledTimes(1);
+    });
+});
