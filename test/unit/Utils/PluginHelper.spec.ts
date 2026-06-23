@@ -68,4 +68,19 @@ describe("PluginHelper Test", () => {
             expect(PluginHelper.compareVersion(item.left, item.operation, item.right)).toBe(item.result);
         });
     }
+
+    describe("shouldShowReleaseNotice", () => {
+        it("does not show on a fresh install (no previous version)", () => {
+            expect(PluginHelper.shouldShowReleaseNotice(null, "4.0.0")).toBe(false);
+        });
+        it("does not show when the version is unchanged", () => {
+            expect(PluginHelper.shouldShowReleaseNotice("4.0.0", "4.0.0")).toBe(false);
+        });
+        it("shows after an update to a different version", () => {
+            expect(PluginHelper.shouldShowReleaseNotice("3.13.1", "4.0.0")).toBe(true);
+        });
+        it("shows when upgrading from a versionless ('0.0.0') install", () => {
+            expect(PluginHelper.shouldShowReleaseNotice("0.0.0", "4.0.0")).toBe(true);
+        });
+    });
 });

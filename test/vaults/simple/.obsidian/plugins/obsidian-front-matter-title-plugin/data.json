@@ -1,5 +1,5 @@
 {
-    "version": "3.13.1",
+    "version": "4.0.0",
     "templates": {
         "common": { "main": "title", "fallback": "fallback_title" }
     },

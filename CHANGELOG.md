@@ -8,6 +8,10 @@ At release time, rename `## Unreleased` to the version being released.
 
 ## 4.0.0
 
+### Added
+- After the plugin updates, a short note pops up explaining what changed and where the
+  project stands.
+
 ### Fixed
 - Sorting the file explorer by created or modified date works again. Before, turning the
   plugin on left you stuck with name sorting only (#262).

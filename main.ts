@@ -25,6 +25,7 @@ import Defer, { DeferFeaturesReady, DeferPluginReady } from "@src/Components/Api
 import EventDispatcherInterface from "@src/Components/EventDispatcher/Interfaces/EventDispatcherInterface";
 import { t } from "@src/i18n/Locale";
 import { Migrator } from "@src/Migrator/Migrator";
+import ReleaseNoticeModal from "@src/Modal/ReleaseNoticeModal";
 
 declare const PLUGIN_VERSION: string;
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
@@ -34,6 +35,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private logger: LoggerInterface;
     private fc: FeatureComposer;
     private mc: ManagerComposer;
+    private previousVersion: string | null = null;
 
     public getDefer(): Defer {
         return this.container.get(SI.defer);
@@ -50,9 +52,21 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         new App(); //replace with static
         this.container.getAllNamed<ListenerInterface>(SI.listener, "unnamed").map(e => e.bind());
         await this.loadSettings();
-        this.app.workspace.onLayoutReady(() => this.getDefer().setFlag(DeferPluginReady));
+        this.app.workspace.onLayoutReady(() => {
+            this.getDefer().setFlag(DeferPluginReady);
+            this.maybeShowReleaseNotice();
+        });
 
         await this.delay();
+    }
+
+    private maybeShowReleaseNotice(): void {
+        if (!PluginHelper.shouldShowReleaseNotice(this.previousVersion, PLUGIN_VERSION)) {
+            return;
+        }
+        new ReleaseNoticeModal(this.app, PLUGIN_VERSION).open();
+        // Persist the current version so the notice is shown only once per update.
+        this.saveData(this.storage.collect()).catch(e => this.logger?.log(e));
     }
 
     public onunload() {
@@ -61,6 +75,9 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
 
     private async loadSettings(): Promise<void> {
         const loaded = await this.loadData();
+        // Remember the previously installed version (null on a fresh install) to
+        // decide whether to show the "what's new" notice after an update.
+        this.previousVersion = loaded ? (loaded.version ?? "0.0.0") : null;
         if (loaded && !loaded.version) {
             loaded.version = "0.0.0";
         }
