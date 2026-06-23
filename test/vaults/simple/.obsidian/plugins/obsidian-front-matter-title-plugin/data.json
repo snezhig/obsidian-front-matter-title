@@ -22,7 +22,7 @@
         "graph": { "enabled": false, "templates": { "main": "", "fallback": "" } },
         "bookmarks": { "enabled": false, "templates": { "main": "", "fallback": "" } },
         "search": { "enabled": false, "templates": { "main": "", "fallback": "" } },
-        "suggest": { "enabled": false, "templates": { "main": "", "fallback": "" } },
+        "suggest": { "enabled": true, "templates": { "main": "", "fallback": "" } },
         "inlineTitle": { "enabled": false, "templates": { "main": "", "fallback": "" } },
         "canvas": { "enabled": false, "templates": { "main": "", "fallback": "" } },
         "backlink": { "enabled": false, "templates": { "main": "", "fallback": "" } },
