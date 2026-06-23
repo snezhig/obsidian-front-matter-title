@@ -11,6 +11,9 @@ node_modules
 # dev build output synced to the local vault (main.js + manifest.json)
 dist
 
+# downloaded Obsidian binaries for headless e2e
+.obsidian-cache
+
 # Don't include the compiled main.js file in the repo.
 # They should be uploaded to GitHub releases instead.
 main.js
