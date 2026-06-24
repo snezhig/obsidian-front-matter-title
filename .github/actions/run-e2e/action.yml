@@ -1,0 +1,28 @@
+name: Run e2e
+description: Install the Electron/Xvfb system deps and run the Obsidian e2e suite.
+# Expects the repo checked out (with the api-provider submodule), Node set up,
+# `npm ci` and `npm run build` already done by the caller.
+runs:
+  using: composite
+  steps:
+    - name: Install Electron/Xvfb system dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          xvfb dbus dbus-x11 libfuse2 \
+          libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+          libdrm2 libgbm1 libasound2 libxkbcommon0 libxcomposite1 \
+          libxdamage1 libxfixes3 libxrandr2 libxshmfence1 libx11-xcb1 \
+          libxext6 libxi6 libglib2.0-0 libpango-1.0-0 libcairo2 \
+          libgtk-3-0 libgdk-pixbuf-2.0-0 libsecret-1-0
+
+    - name: Cache downloaded Obsidian
+      uses: actions/cache@v4
+      with:
+        path: .obsidian-cache
+        key: obsidian-cache-${{ runner.os }}
+
+    - name: Run e2e under Xvfb
+      shell: bash
+      run: xvfb-run -a npm run test:e2e
