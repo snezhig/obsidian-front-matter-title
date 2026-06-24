@@ -104,6 +104,9 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
         if (view?.backlink?.backlinkDom) {
             this.mutateService.wrapDom(view.backlink.backlinkDom, this.resolver, this.getId());
         }
+        if (view?.backlink?.unlinkedDom) {
+            this.mutateService.wrapDom(view.backlink.unlinkedDom, this.resolver, this.getId());
+        }
         this.isBacklinkWrapped = true;
     }
 }

@@ -21,13 +21,10 @@ describe("Front Matter Title — Explorer updates (#250, #245)", function () {
         });
     });
 
-    // T2 — #250: CONFIRMED BUG. A newly created file's title is NOT applied in the
-    // explorer automatically; it only appears after a feature reload. This test
-    // documents the current (buggy) behaviour: basename right after create, title
-    // after reload. When #250 is fixed (auto-update on create), the first
-    // assertion will start failing — update it to expect the title immediately.
-    const RELOAD = "obsidian-front-matter-title-plugin:ofmt-features-reload";
-    it("KNOWN #250: new-file title appears only after a reload, not on create", async function () {
+    // T2 — #250: a file created via the API (stand-in for an externally added file)
+    // now gets its title rendered in the explorer automatically, without a manual
+    // reload (fixed by the vault "create" listener, PR #254).
+    it("renders the title for a newly created file automatically (#250)", async function () {
         await browser.executeObsidian(({ app }) => (app as any).commands.executeCommandById("file-explorer:open"));
         await $(".nav-files-container").then(el => el.waitForExist({ timeout: 20000 }));
         await browser.pause(4500);
@@ -37,18 +34,10 @@ describe("Front Matter Title — Explorer updates (#250, #245)", function () {
             if (existing) await app.vault.delete(existing);
             await app.vault.create("ext-new.md", "---\ntitle: External New Title\n---\n\nbody\n");
         });
-        await browser.pause(4000);
 
-        // Current behaviour: not auto-applied (the bug).
-        const beforeReload = await explorerTitles();
-        expect(beforeReload).toContain("ext-new");
-        expect(beforeReload).not.toContain("External New Title");
-
-        // After a reload the plugin does resolve & render it (capability works).
-        await browser.executeObsidian((_u, id) => (window as any).app.commands.executeCommandById(id), RELOAD);
         await browser.waitUntil(async () => (await explorerTitles()).some(t => t.includes("External New Title")), {
             timeout: 20000,
-            timeoutMsg: "title not applied even after reload",
+            timeoutMsg: "newly created file did not get its title in the explorer (#250)",
         });
     });
 });

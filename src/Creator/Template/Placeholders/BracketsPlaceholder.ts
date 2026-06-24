@@ -27,7 +27,7 @@ export default class BracketsPlaceholder implements TemplatePlaceholderInterface
         this.placeholder = placeholder;
         const {
             groups: { left, key, right },
-        } = this.placeholder.match(new RegExp(`^{{((?<left>\\s*)(?<key>.*\\b)(?<right>\\s*))}}`));
+        } = this.placeholder.match(new RegExp(`^{{(?<left>\\s*)(?<key>.*?)(?<right>\\s*)}}$`));
         this.leftSpace = left ?? "";
         this.rightSpace = right ?? "";
         this.child = this.factory.create(key);

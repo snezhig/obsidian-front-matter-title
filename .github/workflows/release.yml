@@ -33,6 +33,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Run e2e (gate — a release is not published if e2e fails)
+        uses: ./.github/actions/run-e2e
+
       - name: Verify tag matches manifest.json version
         run: |
           TAG="${GITHUB_REF_NAME}"

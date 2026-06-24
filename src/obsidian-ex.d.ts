@@ -127,6 +127,7 @@ declare module "obsidian" {
 
     export abstract class Backlink {
         backlinkDom: SearchDOM;
+        unlinkedDom: SearchDOM;
     }
 
     export abstract class Chooser {

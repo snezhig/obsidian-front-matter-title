@@ -13,12 +13,14 @@ describe("Front Matter Title — update notice modal", function () {
                     const m = document.querySelector(".modal-container .modal");
                     return m ? m.textContent ?? "" : "";
                 });
-                return t.includes("back in action") ? t : false;
+                return t.includes("What's new in Front Matter Title") ? t : false;
             },
             { timeout: 20000, timeoutMsg: "the update notice modal did not appear" }
         );
 
-        expect(text).toContain("4.0.0");
+        expect(text).toContain("4.1.0");
+        // version-specific content comes from the 4.1.0 CHANGELOG section
+        expect(text).toContain("Unlinked mentions");
         expect(text.toLowerCase()).toContain("community");
     });
 });

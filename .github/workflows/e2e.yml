@@ -1,0 +1,42 @@
+name: E2E
+
+# Authoritative run on every merge to master; on PRs it is OPTIONAL — it runs
+# only when the PR carries the "e2e" label (or via manual dispatch). So normal
+# PRs are not slowed down, while master is always exercised against real Obsidian.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    # Skip forks; on PRs require the "e2e" label.
+    if: >
+      github.repository == 'snezhig/obsidian-front-matter-title' &&
+      (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with api-provider submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run e2e
+        uses: ./.github/actions/run-e2e
