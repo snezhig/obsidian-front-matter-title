@@ -98,6 +98,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private async delay(): Promise<void> {
         const delay = this.storage.get("boot").get("delay").value();
         const background = this.storage.get("boot").get("background").value();
+        const debug = this.storage.get("debug").value();
         this.logger.log(`Plugin manual delay ${delay}`);
         let promise: Promise<void> = new Promise(r =>
             setTimeout(() => {
@@ -108,7 +109,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 r();
             }, delay)
         );
-        if (delay > 0) {
+        if (delay > 0 && debug) {
             new Notice(`[${this.manifest.name}]\nWill be loaded in ${delay}ms. Background: ${background}`);
             promise = promise.then(() => {
                 new Notice(`[${this.manifest.name}]\nLoaded. Background: ${background}`);
