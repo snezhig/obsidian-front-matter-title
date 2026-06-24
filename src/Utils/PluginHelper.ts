@@ -23,10 +23,12 @@ export default class PluginHelper {
 
     /**
      * Whether to show the "what's new" notice: only on an actual update (a known
-     * previous version that differs from the current one), never on first install.
+     * previous version that differs from the current one), never on first install,
+     * and only when there are release notes to show (`hasNotes`) — technical
+     * patches without a CHANGELOG section show nothing.
      */
-    public static shouldShowReleaseNotice(previous: string | null, current: string): boolean {
-        return previous !== null && previous !== current;
+    public static shouldShowReleaseNotice(previous: string | null, current: string, hasNotes: boolean): boolean {
+        return hasNotes && previous !== null && previous !== current;
     }
 
     public static createDefaultSettings(): SettingsType {
