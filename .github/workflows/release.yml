@@ -14,7 +14,9 @@ permissions:
 jobs:
   release:
     if: github.repository == 'snezhig/obsidian-front-matter-title'
-    runs-on: ubuntu-latest
+    # Pinned to 22.04 to match the e2e system-deps list (run-e2e action); 24.04's
+    # t64 package renames break apt-get for the Electron/Obsidian dependencies.
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout (with api-provider submodule)
         uses: actions/checkout@v4
