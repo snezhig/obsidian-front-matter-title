@@ -10,6 +10,9 @@ describe("Brackets Placeholder Test", () => {
         { placeholder: "{{key }}", inside: "key", childValue: "baz", expectedValue: "baz " },
         { placeholder: "{{ composite key }}", inside: "composite key", childValue: "quo", expectedValue: " quo " },
         { placeholder: "{{ composite key }}", inside: "composite key", childValue: "", expectedValue: null },
+        // non-ASCII (CJK) keys — used to break because of the ASCII-only \b (#256)
+        { placeholder: "{{完稿}}", inside: "完稿", childValue: "稿件", expectedValue: "稿件" },
+        { placeholder: "{{ 完稿 }}", inside: "完稿", childValue: "x", expectedValue: " x " },
     ];
 
     for (const item of data) {
