@@ -6,6 +6,23 @@ compare link. Headings must be `## X.Y.Z` (the version, no `v`) so CI can find t
 
 At release time, rename `## Unreleased` to the version being released.
 
+## 4.1.0
+
+### Added
+- Note titles now also show under "Unlinked mentions" in the backlinks panel (#190).
+
+### Fixed
+- Files added from outside Obsidian (e.g. via sync) now get their title in the file
+  explorer right away, without needing a reload (#250).
+- Bookmarked files placed inside a group now show their title (#257).
+- Composite templates now work with non-Latin frontmatter keys, such as Chinese (#256).
+- Tab titles are no longer lost when switching between tabs (#248, #277).
+- Fixed a crash that could leave the interface blank after switching a workspace that has
+  pinned tabs (#251).
+
+### Changed
+- The "loading" notifications on startup now only appear in Debug mode (#270).
+
 ## 4.0.0
 
 ### Added
