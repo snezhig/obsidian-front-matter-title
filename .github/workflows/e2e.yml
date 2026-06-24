@@ -19,7 +19,10 @@ jobs:
     if: >
       github.repository == 'snezhig/obsidian-front-matter-title' &&
       (github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e'))
-    runs-on: ubuntu-latest
+    # Pinned to 22.04: the Electron/Obsidian system-deps list (see run-e2e action)
+    # is written for jammy package names. Ubuntu 24.04 renamed many of them under
+    # the t64 transition (libasound2 -> libasound2t64, etc.), breaking apt-get.
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout (with api-provider submodule)
         uses: actions/checkout@v4
