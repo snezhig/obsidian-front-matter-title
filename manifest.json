@@ -1,7 +1,7 @@
 {
   "id": "obsidian-front-matter-title-plugin",
   "name": "Front Matter Title",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "minAppVersion": "1.12.0",
   "description": "Lets you define a title in frontmatter to be displayed as the filename for explorer, graph, search and etc.",
   "author": "Snezhig",

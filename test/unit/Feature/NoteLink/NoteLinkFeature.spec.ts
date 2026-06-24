@@ -72,11 +72,11 @@ test("Should request changes and execute them", async () => {
     mockFacade.modifyFile.mockResolvedValueOnce();
 
     await callbacks["metadata:cache:changed"].cb(new Event({ path, cache: mock<CachedMetadata>() }));
-    expect(mockService.getNoteLinks).toBeCalledWith(path);
-    expect(mockApprove.request).toBeCalledWith(path, [
+    expect(mockService.getNoteLinks).toHaveBeenCalledWith(path);
+    expect(mockApprove.request).toHaveBeenCalledWith(path, [
         { original: links.bar.original, replace: `[[${links.bar.link}|bar-resolved]]` },
     ]);
-    expect(mockFacade.getTFile).toBeCalledWith(path);
-    expect(mockFacade.getFileContent).toBeCalledWith(mockFile);
+    expect(mockFacade.getTFile).toHaveBeenCalledWith(path);
+    expect(mockFacade.getFileContent).toHaveBeenCalledWith(mockFile);
     expect(mockFacade.modifyFile).toHaveBeenCalledWith(mockFile, expectedContent);
 });

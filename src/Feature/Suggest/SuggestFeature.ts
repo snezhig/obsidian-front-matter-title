@@ -2,11 +2,11 @@ import { Feature } from "@src/Enum";
 import FunctionReplacer from "@src/Utils/FunctionReplacer";
 import { Chooser, SuggestModalChooserFileItem } from "obsidian";
 import AbstractFeature from "../AbstractFeature";
-import { inject, injectable, interfaces } from "inversify";
+import { inject, injectable, type interfaces } from "inversify";
 import SI from "@config/inversify.types";
 import FeatureService from "@src/Feature/FeatureService";
 import { ResolverInterface } from "@src/Resolver/Interfaces";
-import Newable = interfaces.Newable;
+type Newable<T = unknown> = interfaces.Newable<T>;
 
 @injectable()
 export default class SuggestFeature extends AbstractFeature<Feature> {

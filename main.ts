@@ -6,7 +6,7 @@ import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
-import { interfaces } from "inversify";
+import { type interfaces } from "inversify";
 import App from "@src/App";
 import { AppEvents } from "@src/Types";
 import { ResolverEvents } from "@src/Resolver/ResolverType";

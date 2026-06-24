@@ -1,4 +1,4 @@
-import { interfaces } from "inversify";
+import { type interfaces } from "inversify";
 import SI from "@config/inversify.types";
 import FeatureInterface from "@src/Interfaces/FeatureInterface";
 import ExplorerManager from "@src/Feature/Explorer/ExplorerManager";
@@ -38,7 +38,7 @@ import { ResolverInterface } from "@src/Resolver/Interfaces";
 import { ExplorerFileItemMutator } from "@src/Feature/Explorer/ExplorerFileItemMutator";
 import Storage from "@src/Storage/Storage";
 import WindowFrameFeature from "@src/Feature/WindowFrame/WindowFrameFeature";
-import Container = interfaces.Container;
+type Container = interfaces.Container;
 
 export default (container: Container) => {
     container.bind(SI["feature:service"]).to(FeatureService).inSingletonScope();

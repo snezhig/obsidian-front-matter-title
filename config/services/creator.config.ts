@@ -1,4 +1,4 @@
-import { ContainerModule, interfaces } from "inversify";
+import { ContainerModule, type interfaces } from "inversify";
 import SI from "../inversify.types";
 import TemplateFactory from "../../src/Creator/Template/Factory";
 import Simple from "../../src/Creator/Template/Simple";

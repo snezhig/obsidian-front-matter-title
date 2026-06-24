@@ -20,7 +20,7 @@ Array.prototype.first = function () {
 
 const mockFactory = jest.fn();
 const mockDispatcher = mock<EventDispatcherInterface<AppEvents>>();
-const mockFacade = mock<ObsidianFacade>({ getViewsOfType: jest.fn(() => []) });
+const mockFacade = mock<ObsidianFacade>({ getViewsOfType: jest.fn((): any[] => []) });
 const mockResolver = mock<ResolverInterface>();
 
 test(`Should return ${Feature.Graph} as Id`, () => {
@@ -66,8 +66,8 @@ describe("Flow is case the graph is not opened yet", () => {
         expect(callback).not.toBeNull();
         expect(ref).not.toBeNull();
         expect(mockDispatcher.addListener).toHaveBeenCalledTimes(1);
-        expect(mockDispatcher.addListener).toBeCalledWith({ name: "layout:change", cb: callback });
-        expect(mockFacade.getViewsOfType).toBeCalledTimes(4);
+        expect(mockDispatcher.addListener).toHaveBeenCalledWith({ name: "layout:change", cb: callback });
+        expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(4);
     });
 
     test("Should unbind and try init through timeout, because there are leaves, but without nodes", () => {
@@ -99,14 +99,14 @@ describe("Flow is case the graph is not opened yet", () => {
         mockResolver.resolve.mockReturnValueOnce("resolved");
         const result = getText.stub(manager, [], getText.original);
         expect(result).toEqual("resolved");
-        expect(getText.original).not.toBeCalled();
-        expect(mockResolver.resolve).toBeCalledTimes(1);
+        expect(getText.original).not.toHaveBeenCalled();
+        expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
     });
 
     test("Should call vanilla getText", () => {
         expect(getText.stub(manager, [], getText.original)).toEqual("original");
         expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
-        expect(getText.original).toBeCalledTimes(1);
+        expect(getText.original).toHaveBeenCalledTimes(1);
     });
 
     test("Should stop resolve and be disabled", () => {
@@ -132,15 +132,15 @@ describe("Flow in case graph is opened already", () => {
 
     test("Should not bind listener, but be enabled and createNamed replacer", () => {
         expect(manager.isEnabled()).toBeFalsy();
-        expect(renderer.onIframeLoad).not.toBeCalled();
+        expect(renderer.onIframeLoad).not.toHaveBeenCalled();
 
         manager.enable();
         expect(manager.isEnabled()).toBeTruthy();
 
-        expect(mockFacade.getViewsOfType).toBeCalledTimes(2);
-        expect(mockFactory).toBeCalledTimes(1);
-        expect(mockReplacer.enable).toBeCalledTimes(1);
-        expect(mockDispatcher.addListener).not.toBeCalled();
+        expect(mockFacade.getViewsOfType).toHaveBeenCalledTimes(2);
+        expect(mockFactory).toHaveBeenCalledTimes(1);
+        expect(mockReplacer.enable).toHaveBeenCalledTimes(1);
+        expect(mockDispatcher.addListener).not.toHaveBeenCalled();
     });
 
     test("Should reload only one view", async () => {
@@ -158,8 +158,8 @@ describe("Flow in case graph is opened already", () => {
         ]);
 
         expect(await manager.update("foo")).toBeTruthy();
-        expect(fooIFrameLoad).toBeCalled();
-        expect(barIFrameLoad).not.toBeCalled();
+        expect(fooIFrameLoad).toHaveBeenCalled();
+        expect(barIFrameLoad).not.toHaveBeenCalled();
     });
     test("Should not reload view", async () => {
         const onIframeLoad = jest.fn();
@@ -167,6 +167,6 @@ describe("Flow in case graph is opened already", () => {
             mock<GraphView>({ renderer: { onIframeLoad: onIframeLoad, nodes: undefined } }),
         ]);
         expect(await manager.update("foo")).toBeFalsy();
-        expect(onIframeLoad).not.toBeCalled();
+        expect(onIframeLoad).not.toHaveBeenCalled();
     });
 });

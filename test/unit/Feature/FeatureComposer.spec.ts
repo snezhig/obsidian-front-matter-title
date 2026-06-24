@@ -9,7 +9,7 @@ import LoggerInterface from "../../../src/Components/Debug/LoggerInterface";
 const mockDispatcher = mock<EventDispatcherInterface<AppEvents>>();
 const mockFeatureFoo = mock<FeatureInterface<any>>();
 const mockFeatureBar = mock<FeatureInterface<any>>();
-const mockFactory = jest.fn(() => null);
+const mockFactory = jest.fn<FeatureInterface<any> | null, [string]>(() => null);
 
 const composer = new FeatureComposer(mockFactory, mockDispatcher, mock<LoggerInterface>());
 
