@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "type": "group",
+      "ctime": 1,
+      "title": "My Group",
+      "items": [{ "type": "file", "ctime": 1, "path": "202208251731.md", "title": "" }]
+    }
+  ]
+}
