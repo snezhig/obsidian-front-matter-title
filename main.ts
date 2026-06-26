@@ -6,7 +6,7 @@ import SettingsTab from "@src/Settings/SettingsTab";
 import Storage from "@src/Storage/Storage";
 import Container from "@config/inversify.config";
 import SI from "@config/inversify.types";
-import { interfaces } from "inversify";
+import { type interfaces } from "inversify";
 import App from "@src/App";
 import { AppEvents } from "@src/Types";
 import { ResolverEvents } from "@src/Resolver/ResolverType";
@@ -28,6 +28,7 @@ import { Migrator } from "@src/Migrator/Migrator";
 import ReleaseNoticeModal from "@src/Modal/ReleaseNoticeModal";
 
 declare const PLUGIN_VERSION: string;
+declare const PLUGIN_WHATS_NEW: string;
 export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     private dispatcher: EventDispatcherInterface<AppEvents & ResolverEvents & SettingsEvent>;
     private container: interfaces.Container = Container;
@@ -61,7 +62,10 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
     }
 
     private maybeShowReleaseNotice(): void {
-        if (!PluginHelper.shouldShowReleaseNotice(this.previousVersion, PLUGIN_VERSION)) {
+        // Skip the notice for releases without changelog notes (e.g. purely
+        // technical/maintenance patches) — there is nothing to announce.
+        const hasNotes = typeof PLUGIN_WHATS_NEW === "string" && PLUGIN_WHATS_NEW.trim().length > 0;
+        if (!PluginHelper.shouldShowReleaseNotice(this.previousVersion, PLUGIN_VERSION, hasNotes)) {
             return;
         }
         new ReleaseNoticeModal(this.app, PLUGIN_VERSION).open();

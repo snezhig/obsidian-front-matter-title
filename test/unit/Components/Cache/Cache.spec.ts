@@ -103,7 +103,7 @@ describe("Cache Test", () => {
             };
             const key = "object-with-function";
 
-            expect(() => cache.save(cache.getItem(key).set(value))).toThrowError(
+            expect(() => cache.save(cache.getItem(key).set(value))).toThrow(
                 "Object with functions can not be serialized"
             );
         });
@@ -116,7 +116,7 @@ describe("Cache Test", () => {
             };
             const key = "object-with-nested-function";
 
-            expect(() => cache.save(cache.getItem(key).set(value))).toThrowError(
+            expect(() => cache.save(cache.getItem(key).set(value))).toThrow(
                 "Object with functions can not be serialized"
             );
         });

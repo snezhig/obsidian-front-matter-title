@@ -43,7 +43,7 @@ describe("Extractor Test", () => {
         for (const item of data) {
             test(`Path ${item.path} will be not found in ${JSON.stringify(item.obj)}`, () => {
                 const cb = () => extractor.extract(item.path, item.obj);
-                expect(cb).toThrowError(PathNotFoundException);
+                expect(cb).toThrow(PathNotFoundException);
             });
         }
     });
@@ -61,7 +61,7 @@ describe("Extractor Test", () => {
         for (const item of data) {
             test(`Data type by path ${item.path} in ${JSON.stringify(item.obj)} will not be supported`, () => {
                 const cb = () => extractor.extract(item.path, item.obj);
-                expect(cb).toThrowError(TypeNotSupportedException);
+                expect(cb).toThrow(TypeNotSupportedException);
                 expect(strategies.string.support).toHaveBeenCalledTimes(1);
                 expect(strategies.number.support).toHaveBeenCalledTimes(1);
             });

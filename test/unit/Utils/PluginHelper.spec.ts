@@ -71,16 +71,19 @@ describe("PluginHelper Test", () => {
 
     describe("shouldShowReleaseNotice", () => {
         it("does not show on a fresh install (no previous version)", () => {
-            expect(PluginHelper.shouldShowReleaseNotice(null, "4.0.0")).toBe(false);
+            expect(PluginHelper.shouldShowReleaseNotice(null, "4.0.0", true)).toBe(false);
         });
         it("does not show when the version is unchanged", () => {
-            expect(PluginHelper.shouldShowReleaseNotice("4.0.0", "4.0.0")).toBe(false);
+            expect(PluginHelper.shouldShowReleaseNotice("4.0.0", "4.0.0", true)).toBe(false);
         });
         it("shows after an update to a different version", () => {
-            expect(PluginHelper.shouldShowReleaseNotice("3.13.1", "4.0.0")).toBe(true);
+            expect(PluginHelper.shouldShowReleaseNotice("3.13.1", "4.0.0", true)).toBe(true);
         });
         it("shows when upgrading from a versionless ('0.0.0') install", () => {
-            expect(PluginHelper.shouldShowReleaseNotice("0.0.0", "4.0.0")).toBe(true);
+            expect(PluginHelper.shouldShowReleaseNotice("0.0.0", "4.0.0", true)).toBe(true);
+        });
+        it("does not show when there are no release notes (technical patch)", () => {
+            expect(PluginHelper.shouldShowReleaseNotice("4.1.0", "4.1.1", false)).toBe(false);
         });
     });
 });

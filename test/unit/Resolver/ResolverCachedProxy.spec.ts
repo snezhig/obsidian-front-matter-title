@@ -54,14 +54,18 @@ describe("Test cached proxy", () => {
     });
 
     test("Should add 2 new listeners", () => {
-        expect(mockDispatcher.addListener).toBeCalledTimes(3);
-        expect(mockDispatcher.addListener).toBeCalledWith({
+        expect(mockDispatcher.addListener).toHaveBeenCalledTimes(3);
+        expect(mockDispatcher.addListener).toHaveBeenCalledWith({
             name: "metadata:cache:changed",
             cb: expect.anything(),
             sort: 0,
         });
-        expect(mockDispatcher.addListener).toBeCalledWith({ name: "file:rename", cb: expect.anything() });
-        expect(mockDispatcher.addListener).toBeCalledWith({ name: "resolver:clear", cb: expect.anything(), sort: 0 });
+        expect(mockDispatcher.addListener).toHaveBeenCalledWith({ name: "file:rename", cb: expect.anything() });
+        expect(mockDispatcher.addListener).toHaveBeenCalledWith({
+            name: "resolver:clear",
+            cb: expect.anything(),
+            sort: 0,
+        });
     });
 
     test("Should call original resolver and save value", () => {
@@ -70,9 +74,9 @@ describe("Test cached proxy", () => {
         mockResolver.resolve.mockReturnValueOnce(expected);
         const actual = cached.resolve(path);
         expect(actual).toEqual(expected);
-        expect(mockResolver.resolve).toBeCalledTimes(1);
-        expect(mockResolver.resolve).toBeCalledWith(path);
-        expect(mockCache.save).toBeCalledTimes(1);
+        expect(mockResolver.resolve).toHaveBeenCalledTimes(1);
+        expect(mockResolver.resolve).toHaveBeenCalledWith(path);
+        expect(mockCache.save).toHaveBeenCalledTimes(1);
         expect(mockCache.save).toHaveBeenCalledWith(mockCacheItem);
         expect(mockCacheItem.set).toHaveBeenCalledWith(expected);
     });

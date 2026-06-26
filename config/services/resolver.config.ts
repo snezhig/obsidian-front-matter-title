@@ -1,4 +1,4 @@
-import { ContainerModule, interfaces } from "inversify";
+import { ContainerModule, type interfaces } from "inversify";
 import SI from "@config/inversify.types";
 import Storage from "@src/Storage/Storage";
 import { SettingsType, TemplateValue } from "@src/Settings/SettingsType";

@@ -76,8 +76,8 @@ describe("ExplorerSort", () => {
             test("Should create function replacer without delay, because there is folder item", () => {
                 view.fileItems["mock"] = item;
                 sort.start();
-                expect(replacerFactory).toBeCalled();
-                expect(replacer.enable).toBeCalled();
+                expect(replacerFactory).toHaveBeenCalled();
+                expect(replacer.enable).toHaveBeenCalled();
             });
 
             test("should not trigger vanilla sort because event is not suitable", () => {
@@ -99,7 +99,7 @@ describe("ExplorerSort", () => {
                 view.fileItems["mock"] = item;
                 sort.start();
                 sort.stop();
-                expect(replacer.disable).toBeCalled();
+                expect(replacer.disable).toHaveBeenCalled();
                 expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[0]);
                 expect(dispatcher.removeListener).toHaveBeenCalledWith(refs[1]);
             });

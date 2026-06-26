@@ -1,0 +1,9 @@
+{
+	"nodes": [
+		{"id":"node-zettel","type":"file","file":"202208251731.md","x":-260,"y":-160,"width":420,"height":300},
+		{"id":"node-linker","type":"file","file":"linker.md","x":240,"y":-160,"width":420,"height":300}
+	],
+	"edges": [
+		{"id":"e1","fromNode":"node-linker","fromSide":"left","toNode":"node-zettel","toSide":"right"}
+	]
+}

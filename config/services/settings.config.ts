@@ -1,5 +1,5 @@
-import { Container as K, interfaces } from "inversify";
-import Container = interfaces.Container;
+import { Container as K, type interfaces } from "inversify";
+type Container = interfaces.Container;
 import SI from "@config/inversify.types";
 import DefaultBuilder from "@src/Settings/FeatureBuilder/DefaultBuilder";
 import AliasBuilder from "@src/Settings/FeatureBuilder/AliasBuilder";

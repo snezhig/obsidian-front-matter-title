@@ -12,7 +12,7 @@ import { AppEvents } from "@src/Types";
 
 const addResult = jest.fn();
 const mockDom = mock<SearchDOM>({ addResult }, { deep: true });
-const mockView = mock<SearchPluginView>({ dom: mockDom });
+const mockView = mock<SearchPluginView>({ dom: mockDom as any });
 const mockFacade = mock<ObsidianFacade>();
 const mockResolver = mock<ResolverInterface>();
 const mockFactory = mock<FeatureService>();
@@ -35,21 +35,21 @@ describe("Search feature test", () => {
     test("Should throw exception because there is no leave", () => {
         mockFacade.getLeavesOfType.mockReturnValueOnce([leafMock]);
         expect(() => feature.enable()).toThrow(`View of ${Leaves.S} not found`);
-        expect(leafMock.isVisible).toBeCalled();
+        expect(leafMock.isVisible).toHaveBeenCalled();
     });
     test("Should call service and be enabled", () => {
         mockFacade.getLeavesOfType.mockReturnValueOnce([leafMock]);
         mockFacade.getViewsOfType.mockReturnValueOnce([mockView]);
         feature.enable();
-        expect(mockService.wrapDom).toBeCalledTimes(1);
-        expect(mockService.wrapDom).toBeCalledWith(mockDom, mockResolver, feature.getId());
+        expect(mockService.wrapDom).toHaveBeenCalledTimes(1);
+        expect(mockService.wrapDom).toHaveBeenCalledWith(mockDom, mockResolver, feature.getId());
         expect(feature.isEnabled()).toBeTruthy();
     });
     test("Should destroy wrap and be disabled", () => {
         feature.disable();
         expect(feature.isEnabled()).toBeFalsy();
-        expect(mockFacade.getViewsOfType).not.toBeCalled();
-        expect(mockService.destroyByTag).toBeCalledTimes(1);
-        expect(mockService.destroyByTag).toBeCalledWith(feature.getId());
+        expect(mockFacade.getViewsOfType).not.toHaveBeenCalled();
+        expect(mockService.destroyByTag).toHaveBeenCalledTimes(1);
+        expect(mockService.destroyByTag).toHaveBeenCalledWith(feature.getId());
     });
 });

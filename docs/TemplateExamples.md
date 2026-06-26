@@ -1,5 +1,9 @@
 # Examples
 
+New to templates? Read **[Templates](./Templates.md)** first — it explains the concepts. This page is the full reference.
+
+**How to read the table below:** each row is one template you could enter in settings. *Original filename* is the name on disk; *Displayed filename* is what Obsidian shows for the example note. When a template can't be resolved (missing key, unsupported type), the displayed name stays the original filename. The numbered notes under the table explain each row.
+
 Let's imagine that we have a file `MyFolder/MyNote.md` with the following content:
 
 ```yaml

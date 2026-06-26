@@ -53,7 +53,7 @@ Container.bind<LoggerInterface>(SI.logger)
     .toDynamicValue(context => {
         return context.container
             .get<LoggerComposer>(SI["logger:composer"])
-            .create(context.currentRequest.target.getNamedTag().value);
+            .create(String(context.currentRequest.target.getNamedTag().value));
     })
     .when(() => true);
 
