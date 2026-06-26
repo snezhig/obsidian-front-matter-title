@@ -1,7 +1,10 @@
 # Processor
 
-Processor allows you to modify new title in a way you want to.
-By default, processor is disabled.
+The **Processor** is an advanced, optional step that runs **after** a title is resolved from your [template](./Templates.md) and transforms it further. Reach for it only when templates alone can't get the result you want — for example stripping a prefix, reformatting a date, or building a title with custom logic.
+
+It offers three modes: **Replace** (a regular expression), **Function** (custom JavaScript), and **Function V2** (custom JavaScript with file context). The latter two require some JavaScript knowledge.
+
+By default, the processor is disabled.
 
 ![](img/Processor_disabled.png)
 

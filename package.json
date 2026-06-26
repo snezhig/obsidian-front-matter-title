@@ -11,6 +11,9 @@
     "version": "node utils/version-bump.mjs && git add manifest.json versions.json",
     "test": "jest",
     "test:e2e": "wdio run ./wdio.conf.mts",
+    "shots": "wdio run ./wdio.shots.mts",
+    "frame": "node tools/screenshots/frame.mjs",
+    "shots:pretty": "npm run shots && npm run frame",
     "eslint": "eslint src",
     "pretty": "prettier --write *.ts *.json src test --ignore-path package-lock.json"
   },
@@ -47,6 +50,7 @@
     "obsidian": "^1.13.1",
     "obsidian-launcher": "^3.1.1",
     "prettier": "^3.8.4",
+    "sharp": "^0.35.2",
     "ts-debounce": "^5.0.1",
     "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
