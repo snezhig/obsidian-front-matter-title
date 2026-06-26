@@ -6,6 +6,13 @@ compare link. Headings must be `## X.Y.Z` (the version, no `v`) so CI can find t
 
 At release time, rename `## Unreleased` to the version being released.
 
+## 4.1.1
+
+### Fixed
+- The note title and the file name no longer appear together at the top of a note. This
+  happened with themes that style the inline title, such as anuPpuccin. Now only the note
+  title is shown (#280, #234, #123).
+
 ## 4.1.0
 
 ### Added

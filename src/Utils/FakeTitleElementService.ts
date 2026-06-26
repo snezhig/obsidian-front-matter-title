@@ -89,7 +89,7 @@ export default class FakeTitleElementService {
         }
 
         container.insertBefore(element, original);
-        element.hidden = true;
+        this.hide(element);
 
         return { created: true, element };
     }
@@ -97,10 +97,24 @@ export default class FakeTitleElementService {
     public setVisible(id: string, visible: boolean): this {
         if (this.elements.has(id)) {
             const { fake, original } = this.elements.get(id);
-            original.hidden = visible;
-            fake.hidden = !visible;
+            visible ? this.hide(original) : this.show(original);
+            visible ? this.show(fake) : this.hide(fake);
         }
         return this;
+    }
+
+    // Hide via an inline `display:none !important` instead of the `hidden`
+    // attribute. The UA rule `[hidden]{display:none}` has the lowest priority,
+    // so any theme/snippet with a `.inline-title{display:…}` rule un-hides the
+    // original title and the filename shows alongside our title (#280, #234,
+    // #123). An important inline declaration wins the cascade against any
+    // author selector, keeping exactly one title visible.
+    private hide(el: HTMLElement): void {
+        el.style.setProperty("display", "none", "important");
+    }
+
+    private show(el: HTMLElement): void {
+        el.style.removeProperty("display");
     }
 
     private extractId(e: any): string | null {
