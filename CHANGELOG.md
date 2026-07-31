@@ -6,6 +6,13 @@ compare link. Headings must be `## X.Y.Z` (the version, no `v`) so CI can find t
 
 At release time, rename `## Unreleased` to the version being released.
 
+## Unreleased
+
+### Added
+- `#h1`..`#h6` template placeholders: use the first heading of a specific level as
+  the title (e.g. `#h1` uses the H1 only). `#heading` still matches the first heading
+  of any level. Compose a fallback like `#h1|_basename`.
+
 ## 4.1.1
 
 ### Fixed

@@ -13,6 +13,15 @@ export default class HeadingPlaceholder extends AbstractPlaceholder {
     }
 
     makeValue(path: string): string {
-        return this.factory(path, "headings")?.[0]?.heading ?? "";
+        const headings = this.factory(path, "headings") ?? [];
+        const match = this.placeholder.match(/^#h([1-6])$/);
+        if (match) {
+            const level = Number(match[1]);
+            const found = headings.find(
+                (h: { level: number; heading: string }) => h.level === level
+            );
+            return found?.heading ?? "";
+        }
+        return headings[0]?.heading ?? "";
     }
 }
