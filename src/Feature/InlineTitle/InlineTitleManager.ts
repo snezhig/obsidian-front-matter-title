@@ -85,7 +85,14 @@ export class InlineTitleManager extends AbstractManager {
         }
 
         await Promise.all(promises);
-        this.fakeTitleElementService.removeExcept(ids);
+        // Only a full refresh knows the complete set of live elements. A targeted
+        // update sees a single path, so garbage-collecting "everything else" there
+        // wipes the titles of all other open notes — and of every note when the
+        // path belongs to no markdown view at all, e.g. the attachment created by
+        // dropping an image into a note (#285).
+        if (path === null) {
+            this.fakeTitleElementService.removeExcept(ids);
+        }
         return promises.length > 0;
     }
 

@@ -21,10 +21,12 @@ export default class FakeTitleElementService {
 
     removeExcept(id: string | string[]) {
         const ids = Array.isArray(id) ? id : [id];
-        for (const [key, { fake }] of this.elements.entries()) {
+        for (const key of Array.from(this.elements.keys())) {
             if (!ids.includes(key)) {
-                fake.remove();
-                this.elements.delete(key);
+                // Go through remove() so the original title is made visible again.
+                // Dropping the fake on its own leaves the original hidden and the
+                // note ends up with no title at all (#285).
+                this.remove(key);
             }
         }
     }
@@ -37,7 +39,10 @@ export default class FakeTitleElementService {
         const { fake, events = [], original } = this.elements.get(id);
         events.forEach(e => {
             if (e === "click") {
-                original.removeEventListener("click", this.events.blur);
+                // bindClick() listens for "blur", not "click", on the original.
+                // Passing the wrong name here left the handler attached, so every
+                // create/remove cycle stacked another listener on the same element.
+                original.removeEventListener("blur", this.events.blur);
             }
             if (e === "hover") {
                 original.removeEventListener("mouseout", this.events.out);

@@ -6,6 +6,13 @@ compare link. Headings must be `## X.Y.Z` (the version, no `v`) so CI can find t
 
 At release time, rename `## Unreleased` to the version being released.
 
+## Unreleased
+
+### Fixed
+- The note title no longer disappears when an image (or any other file) is added to the
+  vault while a note is open. Adding a file made the plugin drop the title of every open
+  note and leave nothing in its place until a reload (#285).
+
 ## 4.1.1
 
 ### Fixed
