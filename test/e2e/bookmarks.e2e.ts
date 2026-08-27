@@ -16,19 +16,27 @@ describe("Front Matter Title — Bookmarks inside a group (#257)", function () {
             timeoutMsg: "bookmarks pane / group never rendered",
         });
 
-        // Expand the group: this renders the nested file item and triggers the
-        // plugin to process it (the recursive traversal handles nested files).
-        await browser.execute(() => {
-            const self = Array.from(
-                document.querySelectorAll(".workspace-leaf-content[data-type='bookmarks'] .tree-item-self")
-            ).find(e => (e.textContent ?? "").includes("My Group"));
-            (self as HTMLElement | undefined)?.click();
-        });
-
-        await browser.waitUntil(async () => (await paneText()).includes("Hello From Frontmatter"), {
-            timeout: 20000,
-            timeoutMsg: "bookmarked file inside a group did not show its title (#257)",
-        });
+        // Expand the group so the nested file item renders. The group can already
+        // be expanded when the pane restores its state, and a blind click would
+        // then collapse it and hide the file — that race is what made this test
+        // flaky. Click only while it is actually collapsed, and stop as soon as
+        // the title shows up.
+        await browser.waitUntil(
+            async () =>
+                browser.execute(() => {
+                    const pane = document.querySelector(".workspace-leaf-content[data-type='bookmarks']");
+                    if (!pane) return false;
+                    if ((pane.textContent ?? "").includes("Hello From Frontmatter")) return true;
+                    const group = Array.from(pane.querySelectorAll(".tree-item")).find(e =>
+                        (e.querySelector(".tree-item-self")?.textContent ?? "").includes("My Group")
+                    );
+                    if (group?.classList.contains("is-collapsed")) {
+                        (group.querySelector(".tree-item-self") as HTMLElement | null)?.click();
+                    }
+                    return false;
+                }),
+            { timeout: 20000, timeoutMsg: "bookmarked file inside a group did not show its title (#257)" }
+        );
         expect(true).toBe(true);
     });
 });
