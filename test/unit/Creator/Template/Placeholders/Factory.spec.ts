@@ -12,7 +12,15 @@ describe("Factory Test", () => {
         { placeholder: "{{foo bar}}", type: AbstractPlaceholder.BRACKETS },
         { placeholder: "_foo bar", type: AbstractPlaceholder.FILE },
         { placeholder: "#heading", type: AbstractPlaceholder.HEADING },
+        { placeholder: "#h1", type: AbstractPlaceholder.HEADING },
+        { placeholder: "#h6", type: AbstractPlaceholder.HEADING },
         { placeholder: "foo|bar", type: AbstractPlaceholder.LOGIC },
+        // Only #h1..#h6 are level tokens; anything else keeps its usual type.
+        { placeholder: "#h7", type: AbstractPlaceholder.META },
+        { placeholder: "#h0", type: AbstractPlaceholder.META },
+        { placeholder: "#H1", type: AbstractPlaceholder.META },
+        // A composite still goes to the logic placeholder, which splits it itself.
+        { placeholder: "#h1|_basename", type: AbstractPlaceholder.LOGIC },
     ];
 
     for (const item of data) {
