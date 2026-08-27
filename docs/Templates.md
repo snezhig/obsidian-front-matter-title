@@ -42,7 +42,8 @@ book:
 
 Beyond frontmatter keys, a template can pull from:
 
-- **`#heading`** — the first heading in the note.
+- **`#heading`** — the first heading in the note (any level).
+- **`#h1`, `#h2`, … `#h6`** — the first heading of that exact level. `#h1` uses the H1 only.
 - **`_basename`** — a field from Obsidian's file info (the `_` prefix). `_basename` is the filename without extension; other [TFile](https://github.com/obsidianmd/obsidian-api/blob/master/obsidian.d.ts) fields work too.
 
 **"Or" logic with `|`** — try several keys, use the first non‑empty one:
@@ -93,3 +94,4 @@ In the **Templates** section:
 | Title, or the note's first heading if there's no title | `title\|#heading` |
 | Title, or status if there's no title | `title\|status` |
 | Use the first heading as the title | `#heading` |
+| Use only the H1 as the title (or fallback if no H1 exists) | `#h1` |

@@ -8,6 +8,11 @@ At release time, rename `## Unreleased` to the version being released.
 
 ## Unreleased
 
+### Added
+- New `#h1` to `#h6` template placeholders take the first heading of that exact level.
+  For example, `#h1` uses only the H1 and falls back when the note has none. `#heading`
+  still takes the first heading of any level (#286).
+
 ### Fixed
 - The note title no longer disappears when an image (or any other file) is added to the
   vault while a note is open. Adding a file made the plugin drop the title of every open
