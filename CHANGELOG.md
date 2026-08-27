@@ -6,7 +6,7 @@ compare link. Headings must be `## X.Y.Z` (the version, no `v`) so CI can find t
 
 At release time, rename `## Unreleased` to the version being released.
 
-## Unreleased
+## 4.2.0
 
 ### Added
 - New `#h1` to `#h6` template placeholders take the first heading of that exact level.
