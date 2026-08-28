@@ -51,8 +51,12 @@ export default class ObsidianFacade {
         return this.app.metadataCache.getFirstLinkpathDest(linkpath, from);
     }
 
+    // workspace.activeLeaf is deprecated; getActiveViewOfType is the supported way
+    // to reach the same leaf. Fall back to the most recent one when no view is
+    // active, so callers still get a leaf instead of null.
     public getActiveLeaf(): WorkspaceLeaf | null {
-        return this.app.workspace?.activeLeaf ?? null;
+        const workspace = this.app.workspace;
+        return workspace?.getActiveViewOfType(View)?.leaf ?? workspace?.getMostRecentLeaf() ?? null;
     }
 
     public getActiveFile(): TFile | null {

@@ -68,8 +68,7 @@ const shotEl = async (selector: string, name: string) => {
     await el.waitForExist({ timeout: 20000 });
     const size = await el.getSize();
     if (!size.width || !size.height) {
-        // eslint-disable-next-line no-console
-        console.warn(`[shots] skip ${name}: ${selector} has 0 size`);
+        process.stdout.write(`[shots] skip ${name}: ${selector} has 0 size\n`);
         return;
     }
     await el.saveScreenshot(path.join(OUT, name));
@@ -356,8 +355,7 @@ describe("Front Matter Title — documentation screenshots", function () {
     it("Window Frame (not capturable — logged only)", async function () {
         await reloadFeatures();
         const title = await browser.execute(() => document.title);
-        // eslint-disable-next-line no-console
-        console.log("[shots] window/document title with features on =>", title);
+        process.stdout.write(`[shots] window/document title with features on => ${title}\n`);
         // The OS title bar is outside the renderer; no PNG is produced here.
         // Keep the existing WindowFrameOff/On.png in docs/img.
     });

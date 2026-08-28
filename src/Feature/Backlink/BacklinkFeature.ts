@@ -38,7 +38,7 @@ export default class BacklinkFeature extends AbstractFeature<Feature> {
         this.resolver = service.createResolver(this.getId());
         this.dProcess = () => {
             if (this.timer) {
-                clearTimeout(this.timer);
+                window.clearTimeout(this.timer);
             }
             this.timer = window.setTimeout(this.process.bind(this), 50);
         };

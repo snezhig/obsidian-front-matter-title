@@ -78,7 +78,7 @@ export default class FakeTitleElementService {
             return { created: false, element };
         }
 
-        element = document.createElement(original.tagName) as T;
+        element = createEl(original.tagName.toLowerCase() as keyof HTMLElementTagNameMap) as T;
         element.className = original.className;
         element.setText(title);
         element.setAttribute(this.attr.fake, id);
@@ -157,7 +157,7 @@ export default class FakeTitleElementService {
     private find(container: HTMLElement, id: string): HTMLElement | null {
         for (const node of Array.from(container.children)) {
             const cId = node.getAttribute(this.attr.fake);
-            if (id === cId && node instanceof HTMLElement) {
+            if (id === cId && node.instanceOf(HTMLElement)) {
                 return node;
             }
         }

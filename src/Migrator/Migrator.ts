@@ -27,8 +27,6 @@ export class Migrator {
             });
         for (const version of versions) {
             const method = "v" + version.replaceAll(".", "_");
-            // eslint-disable-next-line no-console
-            console.log(`Migrate from ${currentVersion} to ${version} by ${method}`);
             //@ts-ignore
             this[method]();
         }

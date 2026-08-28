@@ -75,19 +75,15 @@ export default class SettingsTab {
     }
 
     private buildDonation(): void {
-        const div = this.containerEl.createEl("div");
+        const div = this.containerEl.createDiv();
         div.style.width = "75%";
         div.style.textAlign = "center";
         div.style.margin = "0 auto";
 
-        const text = document.createElement("p");
-        text.textContent = t("coffee");
-        div.appendChild(text);
+        div.createEl("p", { text: t("coffee") });
 
-        const anchor = document.createElement("a");
-        anchor.setAttribute("href", "https://www.buymeacoffee.com/snezhig");
+        const anchor = div.createEl("a", { href: "https://www.buymeacoffee.com/snezhig" });
         anchor.appendChild(new DOMParser().parseFromString(coffee, "text/xml").documentElement);
-        div.appendChild(anchor);
     }
 
     private updatePrevious(): void {

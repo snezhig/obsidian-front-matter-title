@@ -39,7 +39,7 @@ export default class BookmarksManager extends AbstractFeature<Feature> {
         private logger: LoggerInterface
     ) {
         super();
-        this.requestUpdate = () => setTimeout(this.onChanged.bind(this), 100);
+        this.requestUpdate = () => window.setTimeout(this.onChanged.bind(this), 100);
         this.resolver = service.createResolver(this.getId());
     }
 

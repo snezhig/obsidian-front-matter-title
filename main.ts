@@ -105,7 +105,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
         const debug = this.storage.get("debug").value();
         this.logger.log(`Plugin manual delay ${delay}`);
         let promise: Promise<void> = new Promise(r =>
-            setTimeout(() => {
+            window.setTimeout(() => {
                 this.fc = Container.get(SI["feature:composer"]);
                 this.mc = Container.get(SI["manager:composer"]);
                 this.bind();
@@ -169,7 +169,7 @@ export default class MetaTitlePlugin extends Plugin implements PluginInterface {
                 // (it's called for *all* files on startup, before layout is ready.)
                 this.app.vault.on("create", ({ path }) => this.mc.update(path).catch(console.error))
             );
-            await new Promise(r => setTimeout(r, 3000));
+            await new Promise(r => window.setTimeout(r, 3000));
             this.reloadFeatures();
             await this.mc.refresh();
             this.getDefer().setFlag(DeferFeaturesReady);
