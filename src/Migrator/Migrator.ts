@@ -6,10 +6,7 @@ import { Feature } from "@src/Enum";
 import Event from "@src/Components/EventDispatcher/Event";
 
 export class Migrator {
-    constructor(
-        private config: SettingsType,
-        private dispatcher: EventDispatcherInterface<AppEvents>
-    ) {}
+    constructor(private config: SettingsType, private dispatcher: EventDispatcherInterface<AppEvents>) {}
 
     public migrate(version: string): SettingsType {
         if (this.config.version === version) {
