@@ -9,10 +9,10 @@ export interface DelayerInterface {
 @injectable()
 export class Delayer implements DelayerInterface {
     delay(fn: Function, time: number): number {
-        return setTimeout(fn, time);
+        return window.setTimeout(fn, time);
     }
 
     clear(id: number): void {
-        clearTimeout(id);
+        window.clearTimeout(id);
     }
 }

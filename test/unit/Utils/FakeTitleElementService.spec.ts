@@ -55,6 +55,9 @@ class StubElement {
         }
         this.parentElement = null;
     }
+    instanceOf(): boolean {
+        return true;
+    }
     isHidden(): boolean {
         return this.properties.get("display") === "none !important";
     }
@@ -67,9 +70,9 @@ describe("FakeTitleElementService", () => {
     let container: StubElement;
     let original: StubElement;
 
-    // Obsidian polyfills these on the prototypes at runtime.
+    // Obsidian polyfills these on the globals/prototypes at runtime.
     beforeAll(() => {
-        (global as any).document = { createElement: () => new StubElement() };
+        (global as any).createEl = () => new StubElement();
         (Array.prototype as any).contains ??= function (this: unknown[], value: unknown) {
             return this.includes(value);
         };

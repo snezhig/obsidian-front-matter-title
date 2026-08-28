@@ -131,7 +131,7 @@ export class CanvasManager extends AbstractManager {
 
     private async setNodeTitle(node: CanvasNode, title: string | null): Promise<void> {
         do {
-            await new Promise(resolve => setTimeout(resolve, 200));
+            await new Promise(resolve => window.setTimeout(resolve, 200));
         } while (!node.initialized);
 
         const view = node.canvas.view;
