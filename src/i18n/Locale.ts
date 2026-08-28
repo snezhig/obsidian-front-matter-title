@@ -74,16 +74,6 @@ i18next.init({
     },
     nsSeparator: "|",
 });
-const resolved = i18next.resolvedLanguage;
-if (resolved !== locale) {
-    if (i18next.languages.includes(locale)) {
-        // eslint-disable-next-line no-console
-        console.warn(`Locale ${locale} empty. Resolved ${resolved}`);
-    } else {
-        // eslint-disable-next-line no-console
-        console.warn(`Locale ${locale} does not exist. Resolved ${resolved}`);
-    }
-}
 export type Translation = DeepPartial<typeof en>;
 
 export const t = (path: DotNot<typeof en>, params?: object): string => {

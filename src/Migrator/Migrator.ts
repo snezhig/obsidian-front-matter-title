@@ -6,7 +6,10 @@ import { Feature } from "@src/Enum";
 import Event from "@src/Components/EventDispatcher/Event";
 
 export class Migrator {
-    constructor(private config: SettingsType, private dispatcher: EventDispatcherInterface<AppEvents>) {}
+    constructor(
+        private config: SettingsType,
+        private dispatcher: EventDispatcherInterface<AppEvents>
+    ) {}
 
     public migrate(version: string): SettingsType {
         if (this.config.version === version) {
@@ -27,8 +30,6 @@ export class Migrator {
             });
         for (const version of versions) {
             const method = "v" + version.replaceAll(".", "_");
-            // eslint-disable-next-line no-console
-            console.log(`Migrate from ${currentVersion} to ${version} by ${method}`);
             //@ts-ignore
             this[method]();
         }
